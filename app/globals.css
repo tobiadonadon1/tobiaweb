@@ -47,6 +47,15 @@ canvas {
   outline: none;
 }
 
+/* The ink cursor replaces the native one on fine pointers (class added by
+   the component on mount — no JS, no change). */
+@media (pointer: fine) {
+  html.has-ink-cursor,
+  html.has-ink-cursor * {
+    cursor: none !important;
+  }
+}
+
 /* Warm paper sheet: the site's background tone plus a faint fibrous grain. */
 .paper-bg {
   background-color: var(--background);

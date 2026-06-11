@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectPageShell } from "@/components/ui/project-page";
 
 export const metadata: Metadata = {
-  title: "Sole — Tobia Donadon",
+  title: "Sole",
   description:
     "Hands-on help for people shipping their first things — positioning, product, and the push to press publish.",
 };

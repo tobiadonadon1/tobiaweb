@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectPageShell } from "@/components/ui/project-page";
 
 export const metadata: Metadata = {
-  title: "The Book — Tobia Donadon",
+  title: "The Book",
   description:
     "A long-form attempt to make sense of AI, consciousness, and what we become next — written slowly, and in public.",
 };

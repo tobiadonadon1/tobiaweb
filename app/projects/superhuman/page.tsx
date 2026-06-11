@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ProjectPageShell } from "@/components/ui/project-page";
 
 export const metadata: Metadata = {
-  title: "Superhuman — Tobia Donadon",
+  title: "Superhuman",
   description:
     "A guided journey of small, deliberate practices that compound into superhuman abilities. Not a course — a journey you take.",
 };

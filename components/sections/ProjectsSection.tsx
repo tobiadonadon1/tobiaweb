@@ -118,10 +118,16 @@ export function ProjectsSection() {
         gsap.set(tide, { yPercent: tideY(p) });
         const a = crestAlpha(p);
         gsap.set(crest, { opacity: a, y: (1 - a) * 18 });
+        // Tell the ink cursor when the screen is mostly navy (it flips to
+        // paper-white). Only while the stage is actually pinned in view.
+        document.body.dataset.ink = self.isActive && p >= 0.5 ? "1" : "";
       },
     });
 
-    return () => st.kill();
+    return () => {
+      st.kill();
+      delete document.body.dataset.ink;
+    };
   }, []);
 
   return (
