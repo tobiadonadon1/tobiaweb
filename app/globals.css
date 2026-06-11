@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  /* Light / white site theme */
-  --background: #ffffff;
+  /* Light theme on warm paper-white (not clinical #fff) */
+  --background: #faf8f2;
   --foreground: #0a0a0a;
-  --muted: #f4f4f5;
+  --muted: #f1ede4;
   --muted-foreground: #6b6b70;
-  --border: #e6e6e9;
+  --border: #e7e3d8;
   --primary: #0a0a0a;
   --primary-foreground: #fafafa;
 }
@@ -30,6 +30,10 @@ body {
   color: var(--foreground);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   /* `clip` prevents horizontal scroll WITHOUT creating a scroll container
      (which would break position: sticky used by the hero stage). */
@@ -41,4 +45,270 @@ body {
 /* Keep the WebGL canvases from showing a focus ring / selection flicker */
 canvas {
   outline: none;
+}
+
+/* Warm paper sheet: the site's background tone plus a faint fibrous grain. */
+.paper-bg {
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0 0.30 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Images spawned by the pointer trail on the intro loader */
+@keyframes trail-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.55) rotate(var(--r, 0deg));
+  }
+  10% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--r, 0deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96) rotate(var(--r, 0deg));
+  }
+}
+
+.trail-img {
+  position: absolute;
+  width: 118px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  animation: trail-pop 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   DRIFTING AURORA — blended plasma metaballs.
+   One unified electric blue -> cyan family, reused across the
+   phrase cards (clipped inside the glass) and the hero CTA glow
+   over the mountains, so it reads as a single energy.
+
+   Each aurora is an isolated group: 3-4 soft radial "blobs" that
+   SCREEN-blend ONLY against each other (isolation: isolate), so
+   overlaps fuse into hot cyan cores while edges stay deep blue —
+   a lava-lamp plasma — WITHOUT ever asking the card's
+   backdrop-filter glass or preserve-3d tilt to take part in a
+   blend (Safari-safe).
+
+   Motion is GPU-only: translate3d()/scale() exclusively. Blur is
+   baked once as a static filter (NEVER animated). Each blob runs
+   its own keyframe + duration + negative delay so the field is
+   permanently out of phase (organic, never pulses in sync).
+   ============================================================ */
+
+/* The isolated blending group. `isolation: isolate` seals the
+   screen blends to the blobs themselves. Opacity is set inline
+   per context (cards: 0.55 rest -> 1 hover; CTA: 0 -> 1 hover) so
+   the React handlers / ctaHover keep full control. `--ah` lets a
+   handler gently swell the whole field on hover (scale only). */
+.aurora {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: none;
+  transform: scale(var(--ah, 1));
+  transition: opacity 450ms ease, transform 600ms ease;
+  will-change: opacity, transform;
+  contain: paint;
+}
+
+.aurora__blob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen; /* metaball colour-fusion vs siblings */
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* Blob A — deep steel-navy, large, lower-left orbit.
+   (Whole palette runs DEEP ocean blues, muted — the earlier electric
+   cyan family read too vivid against the navy chapter below.) */
+.aurora__blob--a {
+  width: 78%;
+  height: 82%;
+  left: -18%;
+  top: 6%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(20, 44, 76, 0.9) 0%,
+    rgba(20, 47, 86, 0.5) 38%,
+    rgba(11, 31, 58, 0) 70%
+  );
+  filter: blur(46px);
+  animation: aurora-drift-a 8s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+/* Blob B — the core: ocean blue, no longer hot cyan. */
+.aurora__blob--b {
+  width: 64%;
+  height: 68%;
+  right: -12%;
+  top: -8%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(25, 55, 96, 0.85) 0%,
+    rgba(17, 41, 75, 0.5) 42%,
+    rgba(11, 31, 58, 0) 72%
+  );
+  filter: blur(40px);
+  animation: aurora-drift-b 6.5s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+/* Blob C — slate-blue sheet, wide and slow. */
+.aurora__blob--c {
+  width: 86%;
+  height: 72%;
+  left: 6%;
+  bottom: -22%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(16, 43, 77, 0.75) 0%,
+    rgba(23, 55, 96, 0.45) 45%,
+    rgba(11, 31, 58, 0) 74%
+  );
+  filter: blur(52px);
+  animation: aurora-drift-c 10s ease-in-out infinite;
+  animation-delay: -7s;
+}
+
+/* Blob D — small deep-blue accent, fast wander. */
+.aurora__blob--d {
+  width: 48%;
+  height: 52%;
+  right: 4%;
+  bottom: 2%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(29, 63, 104, 0.8) 0%,
+    rgba(12, 34, 64, 0.4) 48%,
+    rgba(11, 31, 58, 0) 70%
+  );
+  filter: blur(44px);
+  animation: aurora-drift-d 8.5s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+/* Four desynced drift paths — translate3d + scale ONLY. Travel is bold
+   on purpose: the plasma must visibly ROAM the card within a couple of
+   seconds, not shimmer in place. */
+@keyframes aurora-drift-a {
+  0% {
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(44%, 29%, 0) scale(1.28);
+  }
+  66% {
+    transform: translate3d(16%, -23%, 0) scale(0.86);
+  }
+  100% {
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+}
+
+@keyframes aurora-drift-b {
+  0% {
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+  30% {
+    transform: translate3d(-39%, 34%, 0) scale(1.32);
+  }
+  60% {
+    transform: translate3d(-55%, 5%, 0) scale(0.84);
+  }
+  100% {
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+}
+
+@keyframes aurora-drift-c {
+  0% {
+    transform: translate3d(0%, 0%, 0) scale(1.04);
+  }
+  40% {
+    transform: translate3d(31%, -34%, 0) scale(0.84);
+  }
+  70% {
+    transform: translate3d(-23%, -16%, 0) scale(1.26);
+  }
+  100% {
+    transform: translate3d(0%, 0%, 0) scale(1.04);
+  }
+}
+
+@keyframes aurora-drift-d {
+  0% {
+    transform: translate3d(0%, 0%, 0) scale(0.9);
+  }
+  35% {
+    transform: translate3d(-42%, -29%, 0) scale(1.24);
+  }
+  65% {
+    transform: translate3d(26%, 36%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(0%, 0%, 0) scale(0.9);
+  }
+}
+
+/* (The hero CTA no longer uses an aurora overlay — hovering the button
+   tints the mountain LINES via a shader uniform in glsl-hills.tsx.) */
+
+/* One-shot entrance for the project subpages (the landing spot the
+   bento cards zoom into). */
+@keyframes page-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-rise {
+  animation: page-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-rise {
+    animation: none;
+  }
+}
+
+/* ---- Reduced motion: freeze the drift to a gentle STATIC glow ----
+   No animation; each blob rests at a pleasing offset so the result
+   is a balanced static plasma glow, not a frozen 0% smear. */
+@media (prefers-reduced-motion: reduce) {
+  .aurora__blob {
+    animation: none !important;
+  }
+  .aurora__blob--a {
+    transform: translate3d(8%, 4%, 0) scale(1.05);
+  }
+  .aurora__blob--b {
+    transform: translate3d(-8%, 4%, 0) scale(1.05);
+  }
+  .aurora__blob--c {
+    transform: translate3d(2%, -6%, 0) scale(1.02);
+  }
+  .aurora__blob--d {
+    transform: translate3d(-4%, 2%, 0) scale(1);
+  }
+  .aurora,
+  .aurora__blob {
+    will-change: auto;
+  }
+  .aurora {
+    transition: opacity 200ms ease;
+  }
 }

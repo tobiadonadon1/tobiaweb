@@ -1,171 +1,162 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import InfiniteGallery from "@/components/ui/3d-gallery-photography";
+import TypingEffect from "@/components/ui/typing-effect";
+import { ImageTrail } from "@/components/ui/image-trail";
 import { GLSLHills } from "@/components/ui/glsl-hills";
+import { ButtonColorful } from "@/components/ui/button-colorful";
 
 /**
- * Placeholder imagery for the loader gallery.
- * Swap these for Tobia's own photography later.
+ * Tobia's own photos, trailing the pointer on the intro loader.
+ * Originals live in assets/trail-originals/; these are web-optimized copies.
  */
-const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1741332966416-414d8a5b8887?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1754769440490-2eb64d715775?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1758640920659-0bb864175983?w=1200&auto=format&fit=crop&q=70",
-  "https://plus.unsplash.com/premium_photo-1758367454070-731d3cc11774?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1746023841657-e5cd7cc90d2c?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1741715661559-6149723ea89a?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1725878746053-407492aa4034?w=1200&auto=format&fit=crop&q=70",
-  "https://images.unsplash.com/photo-1752588975168-d2d7965a6d64?w=1200&auto=format&fit=crop&q=70",
+const TRAIL_IMAGES = [
+  "/trail/trail-01.jpg",
+  "/trail/trail-02.jpg",
+  "/trail/trail-03.jpg",
+  "/trail/trail-04.jpg",
+  "/trail/trail-05.jpg",
+  "/trail/trail-06.jpg",
+  "/trail/trail-07.jpg",
+  "/trail/trail-08.jpg",
 ];
 
-// Duration of the loader before the hero is revealed.
-const INTRO_MS = 3000;
-// Mountain colouring, timed from when the hero lands.
-const COLOR_HOLD_MS = 1000; // stay monochrome this long after landing
-const COLOR_RAMP_MS = 2000; // then colour in (fully coloured ~3s after landing)
+const NAME = "Tobia Donadon";
+const TYPING_SPEED = 95; // base ms per character (humanized: varies per key)
+const HOLD_MS = 1000; // breath on the finished name before the cancel
+const EXIT_MS = 380; // the fast cancel into the hero
 
-const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
-const seg = (x: number, a: number, b: number) => clamp01((x - a) / (b - a));
-const smooth = (t: number) => t * t * (3 - 2 * t);
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+type Phase = "typing" | "typed" | "exiting" | "done";
 
 export default function HeroSequence() {
-  const hillsRef = useRef<HTMLDivElement>(null);
-  const galleryRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  // Live 0→1 blend the hills shader reads each frame (monochrome → pastel).
-  const colorMixRef = useRef(0);
-  // Once the loader finishes we unmount the gallery to free its WebGL context.
-  const [introDone, setIntroDone] = useState(false);
+  const [phase, setPhase] = useState<Phase>("typing");
+  // Hover state lifted from the CTA so the mountains beneath it light up.
+  const [ctaHover, setCtaHover] = useState(false);
+  // 0→1 tint level the hills shader reads every frame: on CTA hover the
+  // ridge LINES slightly lean blue (no overlay wash — the mountains
+  // themselves tint). Eased here so it breathes in/out over ~0.6s.
+  const hillsTintRef = useRef(0);
+
+  useEffect(() => {
+    const target = ctaHover ? 1 : 0;
+    let raf = 0;
+    const step = () => {
+      const cur = hillsTintRef.current;
+      const next = cur + (target - cur) * 0.09;
+      hillsTintRef.current = Math.abs(target - next) < 0.005 ? target : next;
+      if (hillsTintRef.current !== target) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [ctaHover]);
 
   useEffect(() => {
     // The loader owns the screen: pin to top and lock scroll while it plays.
     window.scrollTo(0, 0);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    let raf = 0;
-    let startTs: number | null = null;
-    let finished = false;
-
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      document.body.style.overflow = prevOverflow;
-      setIntroDone(true);
-      window.dispatchEvent(new CustomEvent("intro:done"));
-    };
-
-    const apply = (now: number) => {
-      if (startTs === null) startTs = now;
-      const p = clamp01((now - startTs) / INTRO_MS);
-
-      // Gallery (the loader): holds, then dissolves near the end.
-      if (galleryRef.current) {
-        galleryRef.current.style.opacity = `${1 - seg(p, 0.6, 0.86)}`;
-      }
-      // Hills hero: blooms in behind the gallery as it dissolves.
-      if (hillsRef.current) {
-        hillsRef.current.style.opacity = `${smooth(seg(p, 0.58, 0.92))}`;
-      }
-      // Headline: rises in once the hero has arrived.
-      if (textRef.current) {
-        const t = smooth(seg(p, 0.78, 1));
-        textRef.current.style.opacity = `${t}`;
-        textRef.current.style.transform = `translateY(${lerp(26, 0, t)}px)`;
-      }
-
-      if (p < 1) {
-        raf = requestAnimationFrame(apply);
-      } else {
-        finish();
-      }
-    };
-
-    raf = requestAnimationFrame(apply);
-
     return () => {
-      cancelAnimationFrame(raf);
       document.body.style.overflow = prevOverflow;
     };
   }, []);
 
-  // After the hero lands, hold briefly, then colour the mountains in.
+  // Phase chain driven by the typing actually finishing (not a stopwatch,
+  // since humanized typing has a variable duration).
   useEffect(() => {
-    if (!introDone) return;
-    let raf = 0;
-    let startTs: number | null = null;
-    const tick = (now: number) => {
-      if (startTs === null) startTs = now;
-      const t = now - startTs;
-      colorMixRef.current = smooth(clamp01((t - COLOR_HOLD_MS) / COLOR_RAMP_MS));
-      if (t < COLOR_HOLD_MS + COLOR_RAMP_MS) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [introDone]);
+    if (phase === "typed") {
+      const t = setTimeout(() => setPhase("exiting"), HOLD_MS);
+      return () => clearTimeout(t);
+    }
+    if (phase === "exiting") {
+      const t = setTimeout(() => {
+        setPhase("done");
+        document.body.style.overflow = "";
+        window.dispatchEvent(new CustomEvent("intro:done"));
+      }, EXIT_MS);
+      return () => clearTimeout(t);
+    }
+  }, [phase]);
+
+  const heroRevealed = phase === "exiting" || phase === "done";
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-white">
-      {/* Hero hills — initial opacity via class so the unmount re-render
-          doesn't fight the opacity we drive imperatively. */}
-      <div ref={hillsRef} className="absolute inset-0 z-0 opacity-0">
+    <section className="paper-bg relative h-screen w-full overflow-hidden">
+      {/* The flowing monochrome mountains — pre-warmed behind the loader.
+          On CTA hover the shader slightly tints the central ridge lines blue
+          (hillsTintRef) — the mountains themselves colour, no overlay wash. */}
+      <div className="absolute inset-0 z-0">
         <GLSLHills
           lineColor="#8b9199"
           opacity={2.0}
           speed={0.32}
           segments={150}
-          colorMixRef={colorMixRef}
+          tintRef={hillsTintRef}
+          tintColor="#38bdf8"
         />
+
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 120% at 50% 42%, rgba(255,255,255,0) 38%, rgba(255,255,255,0.92) 100%)",
+              "radial-gradient(120% 120% at 50% 42%, rgba(250,248,242,0) 38%, rgba(250,248,242,0.92) 100%)",
           }}
         />
       </div>
 
-      {/* Headline */}
+      {/* Headline — rises in as the loader cancels. */}
       <div
-        ref={textRef}
-        className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center opacity-0"
+        className={`pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center transition-all duration-700 ease-out ${
+          heroRevealed ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+        }`}
       >
-        <span className="mb-7 font-mono text-[11px] uppercase tracking-[0.45em] text-black/45">
-          Tobia Donadon
-        </span>
-        <h1 className="font-serif text-6xl leading-[0.95] tracking-tight text-[#0a0a0a] md:text-8xl">
-          <span className="font-light italic">Selling,</span>
+        <h1 className="font-serif text-5xl leading-[1.02] tracking-tight text-[#0a0a0a] md:text-7xl">
+          I&rsquo;m figuring this out.
           <br />
-          by design.
+          <span className="font-light italic">
+            Maybe we can figure it out together.
+          </span>
         </h1>
-        <span className="mt-8 font-mono text-[11px] uppercase tracking-[0.35em] text-black/40">
-          Info products · A book · An agency
-        </span>
+        <p className="mt-7 max-w-md text-sm leading-relaxed text-black/55 md:text-base">
+          I build tools, write about consciousness, and help people launch
+          things. I&rsquo;m 20, and I think about the future a lot — this is
+          where I share what I&rsquo;m working on.
+        </p>
+        <div className="pointer-events-auto relative mt-8">
+          {/* Hovering the CTA slightly tints the mountain lines below it blue
+              (the shader's tintRef, driven by ctaHover). */}
+          <ButtonColorful
+            label="See what I'm building"
+            onHoverChange={setCtaHover}
+            onClick={() =>
+              document
+                .getElementById("projects")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          />
+        </div>
       </div>
 
-      {/* The loader gallery — scattered images rushing toward the viewer.
-          Unmounts once the intro completes. */}
-      {!introDone && (
-        <div ref={galleryRef} className="absolute inset-0 z-10 opacity-100">
-          <InfiniteGallery
-            images={HERO_IMAGES}
-            interactive={false}
-            visibleCount={16}
-            spread={1.25}
-            autoSpeed={16}
-            fadeSettings={{
-              fadeIn: { start: 0.0, end: 0.08 },
-              fadeOut: { start: 0.86, end: 0.99 },
-            }}
-            blurSettings={{
-              blurIn: { start: 0.0, end: 0.05 },
-              blurOut: { start: 0.94, end: 1.0 },
-              maxBlur: 2.0,
-            }}
-            className="h-screen w-full"
-          />
+      {/* The loader — white sheet, the name typing itself out, and images
+          trailing the pointer. Cancels fast, then unmounts. */}
+      {phase !== "done" && (
+        <div
+          className={`paper-bg absolute inset-0 z-40 transition-opacity ease-out ${
+            phase === "exiting" ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ transitionDuration: `${EXIT_MS}ms` }}
+        >
+          <ImageTrail images={TRAIL_IMAGES} spawnDistance={150} />
+          <div className="relative z-10 flex h-full items-center justify-center px-6">
+            {/* Solid black editorial serif — trail images pass behind it. */}
+            <TypingEffect
+              texts={[NAME]}
+              typingSpeed={TYPING_SPEED}
+              humanize
+              onComplete={() => setPhase((p) => (p === "typing" ? "typed" : p))}
+              rotationInterval={99999}
+              className="font-serif text-5xl font-normal tracking-tight text-[#0a0a0a] md:text-7xl"
+            />
+          </div>
         </div>
       )}
     </section>

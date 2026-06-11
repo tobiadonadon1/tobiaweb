@@ -34,7 +34,11 @@ export function NavBar({ items, className }: NavBarProps) {
   return (
     <div
       className={cn(
-        "fixed bottom-0 sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 sm:pt-6",
+        // `sm:bottom-auto` is load-bearing: with bottom-0 AND sm:top-0 both
+        // set, this fixed wrapper stretched the FULL viewport height — an
+        // invisible z-50 column down the screen's center that swallowed all
+        // mouse events over the hero CTA (hover never fired).
+        "fixed bottom-0 sm:bottom-auto sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 sm:pt-6",
         className,
       )}
     >

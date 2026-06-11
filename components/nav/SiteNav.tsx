@@ -1,25 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, GraduationCap, BookOpen, Briefcase, User, PenLine } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Home, Layers, User, PenLine } from "lucide-react";
 import { NavBar } from "@/components/ui/tubelight-navbar";
 import { cn } from "@/lib/utils";
 
-// Placeholder copy — maps to the site's sections/offers. Rename freely.
+// Root-relative hashes so the nav also works from subpages (/projects/…).
 const navItems = [
-  { name: "Home", url: "#home", icon: Home },
-  { name: "Products", url: "#products", icon: GraduationCap },
-  { name: "Book", url: "#book", icon: BookOpen },
-  { name: "Agency", url: "#agency", icon: Briefcase },
-  { name: "About", url: "#about", icon: User },
-  { name: "Journal", url: "#journal", icon: PenLine },
+  { name: "Home", url: "/#home", icon: Home },
+  { name: "Projects", url: "/#projects", icon: Layers },
+  { name: "About", url: "/#about", icon: User },
+  { name: "Thoughts", url: "/#thoughts", icon: PenLine },
 ];
 
 export function SiteNav() {
-  // The nav stays hidden until the loader finishes, then fades in.
+  const pathname = usePathname();
+  // The nav stays hidden until the loader finishes, then fades in. The
+  // intro only runs on the homepage — everywhere else (direct loads of
+  // /projects/*, the 404 page) "intro:done" never fires, so reveal on
+  // mount instead of waiting out the fallback.
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (pathname !== "/") {
+      setVisible(true);
+      return;
+    }
     const reveal = () => setVisible(true);
     window.addEventListener("intro:done", reveal);
     // Fallback in case the intro event is missed (e.g. reduced-motion skip).
@@ -29,7 +36,7 @@ export function SiteNav() {
       window.removeEventListener("intro:done", reveal);
       clearTimeout(fallback);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <NavBar

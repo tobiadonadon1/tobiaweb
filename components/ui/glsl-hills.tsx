@@ -16,10 +16,18 @@ interface GLSLHillsProps {
   /** Mesh subdivision. Lower = calmer (less moiré flicker) at some cost in detail. */
   segments?: number;
   /**
-   * Live 0→1 value (read every frame) blending from monochrome to the pastel
-   * elevation palette. Pass a ref the parent animates over time.
+   * Live multiplier on the animation speed (read every frame). Animate it
+   * 1 → 0 to decelerate the terrain to a complete standstill.
    */
-  colorMixRef?: { current: number };
+  timeScaleRef?: { current: number };
+  /**
+   * Live 0→1 hover tint (read every frame): the ridge LINES slightly take
+   * on `tintColor`, strongest in the central band (under the hero CTA),
+   * fading to plain monochrome at the edges. 0 = untinted rest state.
+   */
+  tintRef?: { current: number };
+  /** Colour the lines lean toward while tinted (slightly — capped in-shader). */
+  tintColor?: string;
   className?: string;
 }
 
@@ -32,7 +40,9 @@ const GLSLHills = ({
   lineColor = "#ffffff",
   opacity = 1,
   segments = 150,
-  colorMixRef,
+  timeScaleRef,
+  tintRef,
+  tintColor = "#38bdf8",
   className,
 }: GLSLHillsProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -48,7 +58,8 @@ const GLSLHills = ({
         time: { value: number };
         uColor: { value: THREE.Color };
         uOpacity: { value: number };
-        uColorMix: { value: number };
+        uTint: { value: number };
+        uTintColor: { value: THREE.Color };
       };
       mesh: THREE.Mesh;
       time: number;
@@ -58,7 +69,8 @@ const GLSLHills = ({
           time: { value: 0 },
           uColor: { value: new THREE.Color(lineColor) },
           uOpacity: { value: opacity },
-          uColorMix: { value: 0 },
+          uTint: { value: 0 },
+          uTintColor: { value: new THREE.Color(tintColor) },
         };
         this.mesh = this.createMesh();
         this.time = speed;
@@ -183,25 +195,18 @@ const GLSLHills = ({
               varying vec3 vPosition;
               uniform vec3 uColor;
               uniform float uOpacity;
-              uniform float uColorMix;
+              uniform float uTint;
+              uniform vec3 uTintColor;
 
               void main(void) {
-                float baseOpacity = (96.0 - length(vPosition)) / 256.0 * 0.6;
-
-                // Pastel palette by elevation: lake -> meadow -> rock -> snow.
-                float hn = clamp((vPosition.y + 8.0) / 46.0, 0.0, 1.0);
-                vec3 lake = vec3(0.70, 0.84, 0.90);
-                vec3 meadow = vec3(0.71, 0.85, 0.66);
-                vec3 rock = vec3(0.82, 0.73, 0.62);
-                vec3 snow = vec3(0.97, 0.96, 0.94);
-                vec3 pastel = mix(lake, meadow, smoothstep(0.12, 0.40, hn));
-                pastel = mix(pastel, rock, smoothstep(0.42, 0.70, hn));
-                pastel = mix(pastel, snow, smoothstep(0.78, 0.96, hn));
-
-                vec3 finalColor = mix(uColor, pastel, uColorMix);
-                // Colour reads better a touch more opaque than the bare lines.
-                float opacity = baseOpacity * uOpacity * (1.0 + uColorMix * 0.6);
-                gl_FragColor = vec4(finalColor, opacity);
+                float opacity = (96.0 - length(vPosition)) / 256.0 * 0.6;
+                // Hover tint: the line colour itself leans toward uTintColor,
+                // strongest in the central band (under the CTA), gone at the
+                // edges. Capped at 0.55 so even full hover stays a SLIGHT
+                // tint of the mountains — never a wash of colour.
+                float band = 1.0 - smoothstep(18.0, 95.0, abs(vPosition.x));
+                vec3 col = mix(uColor, uTintColor, uTint * band * 0.55);
+                gl_FragColor = vec4(col, opacity * uOpacity);
               }
             `,
             transparent: true,
@@ -243,9 +248,11 @@ const GLSLHills = ({
     };
 
     const render = () => {
-      plane.render(clock.getDelta());
-      // Live-read the externally animated colour blend (0 → 1).
-      plane.uniforms.uColorMix.value = colorMixRef ? colorMixRef.current : 0;
+      // Live time-scale lets the parent decelerate the terrain to a stop.
+      const scale = timeScaleRef ? timeScaleRef.current : 1;
+      // Live hover tint (0→1), eased by the parent.
+      plane.uniforms.uTint.value = tintRef ? tintRef.current : 0;
+      plane.render(clock.getDelta() * scale);
       renderer.render(scene, camera);
     };
 
@@ -274,7 +281,7 @@ const GLSLHills = ({
       (plane.mesh.material as THREE.Material).dispose();
       renderer.dispose();
     };
-  }, [cameraZ, planeSize, speed, lineColor, opacity, segments]);
+  }, [cameraZ, planeSize, speed, lineColor, opacity, segments, tintColor]);
 
   return (
     <div
