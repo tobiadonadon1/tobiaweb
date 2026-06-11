@@ -17,9 +17,37 @@ function GithubIcon({ className }: { className?: string }) {
   );
 }
 
-// TODO(Tobia): add Instagram/LinkedIn URLs when ready (inline icons like GitHub's).
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+      <circle cx="12" cy="12" r="4.2" />
+      <circle cx="17.4" cy="6.6" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.4 8.1h4.2V23H.4V8.1Zm7.1 0h4.02v2.03h.06c.56-1.06 1.93-2.18 3.97-2.18 4.25 0 5.03 2.8 5.03 6.44V23h-4.19v-7.4c0-1.77-.03-4.05-2.47-4.05-2.47 0-2.85 1.93-2.85 3.92V23H7.5V8.1Z" />
+    </svg>
+  );
+}
+
 const SOCIAL_LINKS = [
   { href: "mailto:tobia@donadon.com", label: "Email", Icon: Mail },
+  { href: "https://www.instagram.com/tobia.donadon/", label: "Instagram", Icon: InstagramIcon },
+  { href: "https://www.linkedin.com/in/tobia-donadon", label: "LinkedIn", Icon: LinkedinIcon },
   { href: "https://github.com/tobiadonadon1", label: "GitHub", Icon: GithubIcon },
 ];
 
