@@ -41,7 +41,7 @@ const MAX_TILT_DEG = 10;
 
 // Aurora intensity dials (group opacity over the blobs' own gradients).
 const AURORA_REST = "0.35"; // ambient — present but clearly translucent
-const AURORA_HOVER = "0.6"; // hover — brightens, without shouting
+const AURORA_HOVER = "0.45"; // hover — a breath deeper than rest, never heavy
 
 // Real shade: clearly visible at rest, deepens when the card lifts on hover.
 const REST_SHADOW =

@@ -8,15 +8,6 @@ const MAIN_LINKS = [
   { href: "/#thoughts", label: "Thoughts" },
 ];
 
-// lucide dropped brand icons — tiny inline mark instead.
-function GithubIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-      <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.36 1.12 2.94.86.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.06 10.06 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" />
-    </svg>
-  );
-}
-
 function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -48,7 +39,6 @@ const SOCIAL_LINKS = [
   { href: "mailto:tobia@donadon.com", label: "Email", Icon: Mail },
   { href: "https://www.instagram.com/tobia.donadon/", label: "Instagram", Icon: InstagramIcon },
   { href: "https://www.linkedin.com/in/tobia-donadon", label: "LinkedIn", Icon: LinkedinIcon },
-  { href: "https://github.com/tobiadonadon1", label: "GitHub", Icon: GithubIcon },
 ];
 
 /**
@@ -62,19 +52,9 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6 pb-10 pt-16 lg:pt-20">
         <div className="md:flex md:items-start md:justify-between">
           <Link href="/#home" className="flex items-center gap-x-3" aria-label="Tobia Donadon">
-            {/* The comet — same mark as the browser tab */}
-            <svg viewBox="0 0 64 64" className="h-6 w-6" aria-hidden>
-              <path
-                d="M55 10 C 44 17, 32 26, 21 39"
-                stroke="#0b1f3a"
-                strokeWidth="5.5"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.5"
-              />
-              <circle cx="18" cy="45" r="10" fill="#0b1f3a" />
-              <circle cx="14.5" cy="41.5" r="3.2" fill="#67e8f9" opacity="0.95" />
-            </svg>
+            {/* The mark — Tobia's logo, same as the browser tab */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- small static brand mark */}
+            <img src="/logo.png" alt="" className="h-7 w-7" />
             <span className="font-serif text-2xl tracking-tight text-[#0a0a0a]">
               Tobia Donadon
             </span>
@@ -117,9 +97,13 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-black/30">
-            © 2026 Tobia Donadon
+        <div className="mt-12 flex flex-col items-center gap-4">
+          {/* The sign-off: the name, not a copyright formality. */}
+          <span className="font-serif text-2xl italic text-black/50">
+            Tobia Donadon
+          </span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-black/25">
+            © 2026
           </span>
           {/* The Line ends here. */}
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#0b1f3a]/60" />
