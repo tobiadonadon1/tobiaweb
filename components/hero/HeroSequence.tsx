@@ -117,10 +117,9 @@ export default function HeroSequence() {
           </span>
         </h1>
         <p className="mt-7 max-w-md text-sm leading-relaxed text-black/55 md:text-base">
-          I build with technology, and I write about the inner world —
-          consciousness, presence, the power we have within. I&rsquo;m 20, and
-          the place I actually live is where those two meet. This is the
-          notebook I keep in public.
+          I build tools, write about consciousness, and help people launch
+          things. I&rsquo;m 20, and I think about the future a lot — this is
+          where I share what I&rsquo;m working on.
         </p>
         <div className="pointer-events-auto relative mt-8">
           {/* Hovering the CTA slightly tints the mountain lines below it blue

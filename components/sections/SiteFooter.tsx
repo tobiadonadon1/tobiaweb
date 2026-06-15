@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Mail } from "lucide-react";
 
 const MAIN_LINKS = [
   { href: "/#home", label: "Home" },
@@ -7,13 +8,37 @@ const MAIN_LINKS = [
   { href: "/#thoughts", label: "Thoughts" },
 ];
 
-// Labeled channels — the echo, not the ask. Handle-as-text beats anonymous
-// icons: no one has to hover to know where a link goes. rel="me" on the real
-// profiles consolidates his identity around the name.
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+      <circle cx="12" cy="12" r="4.2" />
+      <circle cx="17.4" cy="6.6" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function LinkedinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.4 8.1h4.2V23H.4V8.1Zm7.1 0h4.02v2.03h.06c.56-1.06 1.93-2.18 3.97-2.18 4.25 0 5.03 2.8 5.03 6.44V23h-4.19v-7.4c0-1.77-.03-4.05-2.47-4.05-2.47 0-2.85 1.93-2.85 3.92V23H7.5V8.1Z" />
+    </svg>
+  );
+}
+
 const SOCIAL_LINKS = [
-  { href: "https://www.instagram.com/tobia.donadon/", text: "Instagram @tobia.donadon" },
-  { href: "https://www.linkedin.com/in/tobia-donadon", text: "LinkedIn" },
-  { href: "mailto:tobia@donadon.com?subject=Hi%20Tobia", text: "Email" },
+  { href: "mailto:tobia@donadon.com", label: "Email", Icon: Mail },
+  { href: "https://www.instagram.com/tobia.donadon/", label: "Instagram", Icon: InstagramIcon },
+  { href: "https://www.linkedin.com/in/tobia-donadon", label: "LinkedIn", Icon: LinkedinIcon },
 ];
 
 /**
@@ -35,30 +60,28 @@ export function SiteFooter() {
             </span>
           </Link>
 
-          <div className="mt-8 flex flex-col gap-3 md:mt-0 md:items-end">
-            {/* The beloved tagline now captions the channels (Option B). */}
-            <p className="font-serif text-base italic text-black/40">
-              Figuring it out in public.
-            </p>
-            <ul className="flex list-none flex-wrap gap-x-5 gap-y-2 md:justify-end">
-              {SOCIAL_LINKS.map(({ href, text }) => (
-                <li key={text}>
-                  <a
-                    href={href}
-                    target={href.startsWith("http") ? "_blank" : undefined}
-                    rel={href.startsWith("http") ? "me noreferrer" : undefined}
-                    className="font-mono text-[11px] uppercase tracking-[0.3em] text-black/45 transition-colors hover:text-black/80"
-                  >
-                    {text}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="mt-8 flex list-none gap-3 md:mt-0">
+            {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target={href.startsWith("http") ? "_blank" : undefined}
+                  rel={href.startsWith("http") ? "noreferrer" : undefined}
+                  aria-label={label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-black/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:text-cyan-900"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="mt-10 border-t border-black/10 pt-8 md:flex md:items-baseline md:justify-end">
-          <nav>
+        <div className="mt-10 border-t border-black/10 pt-8 md:flex md:items-baseline md:justify-between">
+          <p className="font-serif text-base italic text-black/40">
+            Figuring it out in public.
+          </p>
+          <nav className="mt-6 md:mt-0">
             <ul className="flex list-none flex-wrap gap-x-7 gap-y-2">
               {MAIN_LINKS.map((link) => (
                 <li key={link.href}>

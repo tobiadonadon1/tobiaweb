@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -13,15 +12,7 @@ if (typeof window !== "undefined") {
  * Tobia's road, distilled to pins — a couple of words each, never
  * paragraphs ("quick things are better"). Facts in mono, phrase in serif.
  */
-type Milestone = {
-  when: string;
-  phrase: string;
-  sub: string;
-  /** Optional whisper-route into the product this beat seeded. */
-  route?: { label: string; href: string };
-};
-
-const MILESTONES: Milestone[] = [
+const MILESTONES = [
   {
     when: "early",
     phrase: "Curious first.",
@@ -36,18 +27,16 @@ const MILESTONES: Milestone[] = [
     when: "15",
     phrase: "First paying clients.",
     sub: "photography → a social media agency",
-    route: { label: "→ where Sole began", href: "/projects/sole" },
   },
   {
     when: "18",
     phrase: "Left for Miami.",
-    sub: "an ocean from home — startups instead of sleep",
+    sub: "college in the US — startups instead of sleep",
   },
   {
     when: "19",
     phrase: "Started the book.",
-    sub: "spirituality, creativity, mindset — a year in already",
-    route: { label: "→ the book", href: "/projects/book" },
+    sub: "spirituality, mindset — a year in already",
   },
   {
     when: "20",
@@ -273,14 +262,6 @@ export function RoadSoFar() {
                   <p className="mt-1 font-mono text-[11px] leading-relaxed tracking-wide text-black/45">
                     {m.sub}
                   </p>
-                  {m.route && (
-                    <Link
-                      href={m.route.href}
-                      className="mt-1.5 block font-mono text-[10px] uppercase tracking-[0.35em] text-[#0b1f3a]/55 transition-colors hover:text-cyan-900"
-                    >
-                      {m.route.label}
-                    </Link>
-                  )}
                 </div>
               </div>
             );

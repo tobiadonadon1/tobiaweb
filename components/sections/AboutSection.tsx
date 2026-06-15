@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { track } from "@vercel/analytics";
 
 // At-a-glance facts — the quiet mono proof voice.
 const FACTS: [string, string][] = [
@@ -130,33 +129,13 @@ export function AboutSection() {
             </p>
             <p data-settle className="font-serif text-xl italic text-black/45 md:text-2xl">
               This site is me figuring things out in public. If something here
-              resonates, I&rsquo;d genuinely like to hear from you. Or just walk
-              alongside for a while — you can find me on{" "}
-              <a
-                href="/ig/about"
-                onClick={() => track("follow_click", { network: "instagram", placement: "about" })}
-                className="underline decoration-black/20 underline-offset-4 transition-colors hover:text-cyan-900"
-              >
-                Instagram
-              </a>
-              , and on{" "}
-              <a
-                href="https://www.linkedin.com/in/tobia-donadon"
-                target="_blank"
-                rel="me noreferrer"
-                onClick={() => track("follow_click", { network: "linkedin", placement: "about" })}
-                className="underline decoration-black/20 underline-offset-4 transition-colors hover:text-cyan-900"
-              >
-                LinkedIn
-              </a>
-              .
+              resonates, I&rsquo;d genuinely like to hear from you.
             </p>
           </div>
 
           <div data-settle className="mt-9 flex items-end justify-between">
             <a
-              href="mailto:tobia@donadon.com?subject=Hi%20Tobia"
-              onClick={() => track("write_me", { origin: "about" })}
+              href="mailto:tobia@donadon.com"
               className="font-mono text-[11px] uppercase tracking-[0.3em] text-black/45 underline decoration-black/20 underline-offset-4 transition-colors hover:text-cyan-900 hover:decoration-cyan-900/40"
             >
               Write me

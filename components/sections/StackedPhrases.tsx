@@ -15,21 +15,21 @@ const phrases = [
     eyebrow: "01",
     title: "Who Am I",
     description:
-      "It started with 3D printers and drones, and it never stopped — the things just kept getting bigger: companies now, a book, the quiet hours after work.",
+      "I aim to build technologies and write ideas that connect AI and consciousness, where design meets depth and innovation serves growth. Through my work, I explore how intelligence can guide us to create with purpose and awareness.",
   },
   {
     id: 2,
     eyebrow: "02",
     title: "Where am I going",
     description:
-      "Somewhere I can't fully see yet. But the method is small: a morning practice, a few pages, a few quiet hours of building — days that compound. I'd rather become it slowly than announce it early.",
+      "I'll keep building, writing, and learning. I'm driven to shape a world where innovation feels human and awareness leads progress. My path is about creating with purpose, growing through experience, and letting what I learn compound into everything I build.",
   },
   {
     id: 3,
     eyebrow: "03",
     title: "Why I create",
     description:
-      "I create to understand. At fifteen, an experience I still can't explain left me with a question that won't close: what is awareness, and what are we building when we build machines that imitate it? Everything here — the tools, the book, these pages — is an attempt.",
+      "I create to understand. To turn complexity into clarity. To build systems, stories, and experiences that remind us what we're capable of when intelligence meets intention.",
   },
 ];
 

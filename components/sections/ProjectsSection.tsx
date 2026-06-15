@@ -5,7 +5,6 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BentoGrid, type BentoItem } from "@/components/ui/bento-grid";
 import { EmberField } from "@/components/ui/ember-field";
-import { ScrollMark } from "@/components/ui/scroll-mark";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -16,26 +15,23 @@ const PROJECTS: BentoItem[] = [
   {
     title: "The Book",
     description:
-      "A long book about the inner life — spirituality, creativity, mindset, and how a life actually gets built. Written slowly, in public.",
-    status: "in review",
-    consequence: "arriving late 2026",
+      "A long-form attempt to make sense of AI, consciousness, and what we become next — written slowly, and in public.",
+    status: "in motion",
     href: "/projects/book",
     flagship: true,
   },
   {
     title: "Sole",
     description:
-      "Hands-on help when the thing is built but won't quite ship — positioning, decisions, and the final push to press publish.",
+      "Hands-on help for people shipping their first things — positioning, product, and the push to press publish.",
     status: "open",
-    consequence: "for first launches",
     href: "/projects/sole",
   },
   {
     title: "Superhuman",
     description:
-      "Consulting that makes your business superhuman with AI — the systems, the infrastructure, built with you and left running.",
-    status: "open",
-    consequence: "taking on a few",
+      "A guided journey where small daily practices compound into abilities that feel superhuman.",
+    status: "becoming",
     href: "/projects/superhuman",
   },
 ];
@@ -208,7 +204,6 @@ export function ProjectsSection() {
           entrance fires at "top bottom"). No header row: the crest line
           already announced the chapter. */}
       <div className="relative mx-auto max-w-6xl px-6 pb-32 pt-16">
-        <ScrollMark event="reached_projects" />
         <BentoGrid items={PROJECTS} />
       </div>
     </section>
