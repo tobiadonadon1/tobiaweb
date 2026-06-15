@@ -4,6 +4,7 @@ import { RoadSoFar } from "@/components/sections/RoadSoFar";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { ThoughtsSection } from "@/components/sections/ThoughtsSection";
 import { AboutSection } from "@/components/sections/AboutSection";
+import NowSection from "@/components/sections/NowSection";
 
 export default function Home() {
   return (
@@ -20,6 +21,8 @@ export default function Home() {
 
       <AboutSection />
       <ThoughtsSection />
+
+      <NowSection />
     </main>
   );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { InkCursor } from "@/components/ui/ink-cursor";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,7 +24,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 const DESCRIPTION =
-  "I'm Tobia — 20, building tools, writing a book about AI and consciousness, and helping people launch things. This is where I share what I'm working on, and figure it out in public.";
+  "I'm Tobia — 20. I build with technology, and I write about the inner world: consciousness, presence, and the power we have within. The notebook I keep in public.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tobiadonadon.com"),
@@ -64,6 +65,7 @@ export default function RootLayout({
         {children}
         <SiteFooter />
         <InkCursor />
+        <Analytics />
       </body>
     </html>
   );

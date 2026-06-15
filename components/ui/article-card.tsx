@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export interface ArticleCardProps {
@@ -8,6 +9,8 @@ export interface ArticleCardProps {
   /** Cover photo (Tobia's own — rendered with the sea-tone grade). */
   cover?: string;
   tag?: string;
+  /** When set, the tag becomes a quiet link to its product/section. */
+  tagHref?: string;
   readTime?: string; // e.g. "4 min read"
   date?: string; // e.g. "Jun 4, 2026"
   writer?: string;
@@ -33,6 +36,7 @@ export function ArticleCard({
   excerpt,
   cover,
   tag,
+  tagHref,
   readTime,
   date,
   writer,
@@ -84,14 +88,23 @@ export function ArticleCard({
       <div className="flex flex-grow flex-col p-4 pb-2">
         {hasMeta && (
           <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">
-            {tag && (
-              <span
-                className="rounded-full border px-2.5 py-1"
-                style={{ borderColor: "rgba(30,26,14,0.1)" }}
-              >
-                {tag}
-              </span>
-            )}
+            {tag &&
+              (tagHref ? (
+                <Link
+                  href={tagHref}
+                  className="rounded-full border px-2.5 py-1 transition-colors hover:text-cyan-900"
+                  style={{ borderColor: "rgba(30,26,14,0.1)" }}
+                >
+                  {tag}
+                </Link>
+              ) : (
+                <span
+                  className="rounded-full border px-2.5 py-1"
+                  style={{ borderColor: "rgba(30,26,14,0.1)" }}
+                >
+                  {tag}
+                </span>
+              ))}
             {tag && readTime && <span className="text-black/25">·</span>}
             {readTime && <span>{readTime}</span>}
           </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
+import { track } from "@vercel/analytics";
 import { cn } from "@/lib/utils";
 
 if (typeof window !== "undefined") {
@@ -15,8 +16,10 @@ if (typeof window !== "undefined") {
 export interface BentoItem {
   title: string;
   description: string;
-  /** Quiet mono status — e.g. "in motion", "open", "becoming". */
+  /** Quiet mono status — e.g. "in review", "open". */
   status: string;
+  /** One mono consequence line under the status — e.g. "arriving late 2026". */
+  consequence?: string;
   href: string;
   flagship?: boolean;
 }
@@ -102,6 +105,10 @@ export function BentoGrid({ items, className }: BentoGridProps) {
   }, []);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, item: BentoItem) => {
+    track("project_open", {
+      project: item.href.split("/").pop() || item.href,
+      source: "bento",
+    });
     // Let the browser handle new-tab/window intents natively.
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
@@ -221,6 +228,11 @@ export function BentoGrid({ items, className }: BentoGridProps) {
             <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.35em] text-black/35">
               {item.status}
             </span>
+            {item.consequence && (
+              <span className="relative z-10 mt-1 block font-mono text-[9px] uppercase tracking-[0.3em] text-black/25">
+                {item.consequence}
+              </span>
+            )}
             <h3
               className={cn(
                 "relative z-10 font-serif tracking-tight text-[#0a0a0a]",
