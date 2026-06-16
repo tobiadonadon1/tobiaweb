@@ -9,65 +9,67 @@ if (typeof window !== "undefined") {
 }
 
 /**
- * Tobia's road, distilled to pins — a couple of words each, never
- * paragraphs ("quick things are better"). Facts in mono, phrase in serif.
+ * The Road So Far — the centred winding Line (the design Tobia preferred),
+ * carrying the tighter funnel COPY. A single thin ink line draws itself down
+ * the MIDDLE of the section as you scroll (SVG stroke-dashoffset, scrubbed),
+ * winding wide left↔right through one dot per beat. Pins ALTERNATE sides on
+ * desktop; on mobile they hang right of a left-edge spine. Entrances settle
+ * once (rise + unblur); the line is the only scroll-tied motion.
+ *
+ * COPY = the compounding through-line (funnel spec §2): a kid building real
+ * things → an agency at 15 → Miami → real AI work now → a major company pays
+ * him for exactly this. The SEQUENCE is the proof; no single beat carries it.
+ * `accent` marks the LIVE beat (the payoff) — its dot earns the sky accent.
  */
-const MILESTONES = [
+type Beat = {
+  when: string;
+  phrase: string;
+  sub: string;
+  accent?: boolean;
+};
+
+const BEATS: Beat[] = [
   {
-    when: "early",
-    phrase: "Curious first.",
-    sub: "3D printers, drones, anything buildable",
+    when: "a kid",
+    phrase: "Built real things.",
+    sub: "drones, 3D printers, anything I could make work",
   },
   {
-    when: "15",
-    phrase: "Inner journeys.",
-    sub: "meditation, dreams, an out-of-body experience",
+    when: "at 15",
+    phrase: "Started an agency.",
+    sub: "a social-media agency, with paying clients",
   },
   {
-    when: "15",
-    phrase: "First paying clients.",
-    sub: "photography → a social media agency",
-  },
-  {
-    when: "18",
+    when: "at 18",
     phrase: "Left for Miami.",
-    sub: "college in the US — startups instead of sleep",
-  },
-  {
-    when: "19",
-    phrase: "Started the book.",
-    sub: "spirituality, mindset — a year in already",
-  },
-  {
-    when: "20",
-    phrase: "Graduated in three years.",
-    sub: "straight into a very big company",
+    sub: "college in the US — graduated in three years",
   },
   {
     when: "now",
-    phrase: "Building quietly.",
-    sub: "an agency, an AI-infrastructure company, the book",
+    phrase: "AI for businesses.",
+    sub: "systems companies actually run on",
+  },
+  {
+    when: "now",
+    phrase: "A major company pays me.",
+    sub: "to do exactly this",
+    accent: true,
   },
 ];
 
-// The track's vertical rhythm: milestone i sits at these fractions of the
-// track height (first/last keep margin for the line's entry/exit).
-const yFrac = (i: number) => 0.05 + (0.9 * i) / (MILESTONES.length - 1);
+// The track's vertical rhythm: beat i sits at these fractions of the track
+// height (first/last keep margin for the line's entry/exit).
+const yFrac = (i: number) => 0.05 + (0.9 * i) / (BEATS.length - 1);
 
 // Deterministic horizontal sweep for the line's waypoints (no Math.random —
 // SSR/hydration must match; the path itself is built client-side anyway).
-// Wide on purpose: the road develops horizontally, not just down.
-// Pins are anchored to these same offsets via --wob, so text rides the
-// curve with its dot. Mobile uses 0.18× around a left-edge spine.
-const WOBBLE = [120, -160, 135, -175, 150, -125, 95];
+// Wide on purpose: the road develops horizontally, not just down. Pins are
+// anchored to these same offsets via --wob, so text rides the curve with its
+// dot. Signs alternate with i%2 so the dot swings to the side OPPOSITE its
+// text, keeping the words in the readable central band. Mobile uses 0.18×
+// around a left-edge spine.
+const WOBBLE = [120, -150, 135, -150, 115];
 
-/**
- * The Road So Far — the Line's debut. A single thin ink line draws itself
- * down the section as you scroll (SVG stroke-dashoffset, scrubbed),
- * winding through one dot per milestone. Pins alternate sides on desktop,
- * hang right of a left-edge line on mobile. Entrances settle once
- * (rise + unblur); the line is the only scroll-tied motion.
- */
 export function RoadSoFar() {
   const trackRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -82,9 +84,9 @@ export function RoadSoFar() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let st: ScrollTrigger | null = null;
 
-    // Build the path through the milestone waypoints with smooth curves —
-    // dots and text are positioned from the SAME fractions, so everything
-    // stays aligned by construction at any size.
+    // Build the path through the beat waypoints with smooth curves — dots and
+    // text are positioned from the SAME fractions, so everything stays aligned
+    // by construction at any size.
     const build = () => {
       const w = track.clientWidth;
       const h = track.clientHeight;
@@ -95,7 +97,7 @@ export function RoadSoFar() {
       // MUST mirror the pins' CSS: calc(50% + var(--wob)) desktop,
       // calc(36px + var(--wob)*0.18) mobile — dots sit on the line by
       // construction only if both sides share this math.
-      const pts = MILESTONES.map((_, i) => ({
+      const pts = BEATS.map((_, i) => ({
         x: baseX + (mobile ? WOBBLE[i] * 0.18 : WOBBLE[i]),
         y: yFrac(i) * h,
       }));
@@ -143,11 +145,11 @@ export function RoadSoFar() {
 
     // Pins settle in once as they enter (rise + unblur). IntersectionObserver,
     // NOT a per-pin ScrollTrigger: the intro loader's teardown forces a
-    // ScrollTrigger refresh, and an instant jump into the section right
-    // after it (fast scroll, nav anchor click) left `once` triggers stale —
-    // pins stuck invisible. IO fires on actual visibility, however you
-    // arrived. (The line scrub above keeps ScrollTrigger; it's progress-
-    // mapped, so refresh timing can't strand it.)
+    // ScrollTrigger refresh, and an instant jump into the section right after
+    // it (fast scroll, nav anchor click) left `once` triggers stale — pins
+    // stuck invisible. IO fires on actual visibility, however you arrived.
+    // (The line scrub above keeps ScrollTrigger; it's progress-mapped, so
+    // refresh timing can't strand it.)
     const pins = Array.from(track.querySelectorAll("[data-pin]")) as HTMLElement[];
     let io: IntersectionObserver | null = null;
     if (!reduced) {
@@ -186,30 +188,32 @@ export function RoadSoFar() {
   return (
     <section id="road" className="paper-bg relative">
       {/* Sticky scope: header + track. The headline stays pinned while the
-          road scrolls beneath it, releasing just before the closing aside. */}
+          road scrolls beneath it. */}
       <div className="relative">
         <div
           className="pointer-events-none sticky top-0 z-20 px-6 pb-10 pt-24 text-center md:pt-28"
           style={{
-            // Solid paper at the top fading out — passing pins melt under
-            // the pinned headline instead of colliding with it.
+            // Solid paper at the top fading out — passing pins melt under the
+            // pinned headline instead of colliding with it.
             background:
               "linear-gradient(to bottom, #faf8f2 0%, #faf8f2 70%, rgba(250,248,242,0) 100%)",
           }}
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-black/35">
-            The road so far
-          </span>
-          <h2 className="mt-5 font-serif text-4xl tracking-tight text-[#0a0a0a] md:text-5xl">
-            Always the curious kid.
-          </h2>
+          <div className="mx-auto max-w-2xl">
+            <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-ink/35">
+              The road so far
+            </span>
+            <h2 className="mt-5 font-serif text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl">
+              No single thing proves it. The order does.
+            </h2>
+          </div>
         </div>
 
         {/* The track: the Line + its pins, all positioned from shared
             fractions + the shared --wob horizontal offsets. */}
         <div
           ref={trackRef}
-          className="relative mx-auto h-[185vh] max-w-3xl px-6 md:h-[170vh]"
+          className="relative mx-auto h-[160vh] max-w-3xl px-6 md:h-[150vh]"
         >
           <svg
             ref={svgRef}
@@ -227,7 +231,7 @@ export function RoadSoFar() {
             />
           </svg>
 
-          {MILESTONES.map((m, i) => {
+          {BEATS.map((b, i) => {
             const left = i % 2 === 0; // text sits on this side of its dot
             return (
               <div
@@ -241,10 +245,16 @@ export function RoadSoFar() {
                   } as React.CSSProperties
                 }
               >
-                {/* The dot — exactly on the waypoint, the wrapper's anchor. */}
+                {/* The dot — exactly on the waypoint, the wrapper's anchor.
+                    The live beat earns the sky accent; the rest stay ink. */}
                 <span
                   aria-hidden
-                  className="absolute left-0 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0b1f3a]/70"
+                  className={
+                    "absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full " +
+                    (b.accent
+                      ? "h-[9px] w-[9px] bg-accent-sky ring-4 ring-accent-sky/15"
+                      : "h-2 w-2 bg-ink/70")
+                  }
                 />
                 {/* The words ride beside their dot, out into the curve. */}
                 <div
@@ -253,28 +263,25 @@ export function RoadSoFar() {
                     (left ? "right-5 text-right" : "left-5 text-left")
                   }
                 >
-                  <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-black/35">
-                    {m.when}
+                  <span
+                    className={
+                      "font-mono text-[10px] uppercase tracking-[0.4em] " +
+                      (b.accent ? "text-accent-deep" : "text-ink/35")
+                    }
+                  >
+                    {b.when}
                   </span>
-                  <h3 className="mt-1.5 font-serif text-2xl tracking-tight text-[#0a0a0a] md:text-3xl">
-                    {m.phrase}
+                  <h3 className="mt-1.5 font-serif text-2xl tracking-tight text-ink md:text-3xl">
+                    {b.phrase}
                   </h3>
-                  <p className="mt-1 font-mono text-[11px] leading-relaxed tracking-wide text-black/45">
-                    {m.sub}
+                  <p className="mt-1 font-mono text-[11px] leading-relaxed tracking-wide text-ink/45">
+                    {b.sub}
                   </p>
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
-
-      {/* The honest close — his own words, the section's real proof. */}
-      <div className="mx-auto max-w-2xl px-6 pb-32 pt-16 text-center">
-        <p className="font-serif text-2xl italic leading-snug text-black/45 md:text-3xl">
-          Most of it isn&rsquo;t finished yet — that&rsquo;s why you
-          haven&rsquo;t heard about it.
-        </p>
       </div>
     </section>
   );

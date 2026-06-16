@@ -36,6 +36,13 @@ export default function HeroSequence() {
   // ridge LINES slightly lean blue (no overlay wash — the mountains
   // themselves tint). Eased here so it breathes in/out over ~0.6s.
   const hillsTintRef = useRef(0);
+  // Pointer-following tint: a SECOND band the shader centres on the cursor.
+  // cursorXRef is the live pointer-X (0→1, left→right); cursorActiveRef is
+  // its eased 0→1 strength — both READ PER-FRAME by the shader (NOT in any
+  // effect deps, mirroring hillsTintRef). cursorTargetRef is the easing goal.
+  const cursorXRef = useRef(0.5);
+  const cursorActiveRef = useRef(0);
+  const cursorTargetRef = useRef(0); // 0 = rest, 1 = pointer over the ridge
 
   useEffect(() => {
     const target = ctaHover ? 1 : 0;
@@ -49,6 +56,42 @@ export default function HeroSequence() {
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
   }, [ctaHover]);
+
+  // Cursor-follow tint: track the pointer over the hero and ease a glow band
+  // toward it. DISABLED under prefers-reduced-motion (freeze, no travelling
+  // light). The ~0.09/frame lerp gives the ~0.6s breathe-in / decay-on-leave.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const onMove = (e: PointerEvent) => {
+      cursorXRef.current = Math.min(1, Math.max(0, e.clientX / window.innerWidth));
+      cursorTargetRef.current = 1;
+    };
+    const onLeave = () => {
+      cursorTargetRef.current = 0;
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerout", onLeave);
+    window.addEventListener("blur", onLeave);
+
+    // A persistent rAF eases cursorActiveRef toward its target every frame.
+    let raf = 0;
+    const ease = () => {
+      const cur = cursorActiveRef.current;
+      const t = cursorTargetRef.current;
+      cursorActiveRef.current = cur + (t - cur) * 0.09;
+      raf = requestAnimationFrame(ease);
+    };
+    raf = requestAnimationFrame(ease);
+
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerout", onLeave);
+      window.removeEventListener("blur", onLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   useEffect(() => {
     // The loader owns the screen: pin to top and lock scroll while it plays.
@@ -83,22 +126,41 @@ export default function HeroSequence() {
     <section className="paper-bg relative h-screen w-full overflow-hidden">
       {/* The flowing monochrome mountains — pre-warmed behind the loader.
           On CTA hover the shader slightly tints the central ridge lines blue
-          (hillsTintRef) — the mountains themselves colour, no overlay wash. */}
+          (hillsTintRef); a second band (cursorXRef/cursorActiveRef) FOLLOWS
+          the pointer across the ridge — the mountains themselves colour, no
+          overlay wash. lineColor deepened to a cooler slate so the ridges
+          carry tonal weight AT REST, not only on hover. */}
       <div className="absolute inset-0 z-0">
         <GLSLHills
-          lineColor="#8b9199"
+          lineColor="#6b7480"
           opacity={2.0}
           speed={0.32}
           segments={150}
           tintRef={hillsTintRef}
+          cursorXRef={cursorXRef}
+          cursorActiveRef={cursorActiveRef}
           tintColor="#38bdf8"
         />
 
+        {/* Paper vignette — keeps the centre clean behind the headline.
+            Raised the clear radius so the brought-up ridges still read. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 120% at 50% 42%, rgba(250,248,242,0) 38%, rgba(250,248,242,0.92) 100%)",
+              "radial-gradient(120% 120% at 50% 40%, rgba(250,248,242,0) 42%, rgba(250,248,242,0.9) 100%)",
+          }}
+        />
+
+        {/* Standing weight: a low ink gradient anchored at the bottom third,
+            BEHIND the text. Grounds the headline + CTA so they stop floating
+            in white. Paper stays dominant — this is depth at the base, not a
+            dark hero (top ~62% untouched, peaks at a soft deep-navy ~0.22). */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5"
+          style={{
+            background:
+              "linear-gradient(to top, rgba(11,31,58,0.22) 0%, rgba(11,31,58,0.1) 38%, rgba(11,31,58,0) 100%)",
           }}
         />
       </div>

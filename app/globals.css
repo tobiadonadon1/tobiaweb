@@ -9,6 +9,26 @@
   --border: #e7e3d8;
   --primary: #0a0a0a;
   --primary-foreground: #fafafa;
+
+  /* ---- Ink depth (Direction A): the deep navy that ARRIVES at the
+     beats for weight. One hue, three close shades — never a second
+     family. Paper (#faf8f2) stays dominant; ink is the punctuation. */
+  --paper: #faf8f2;
+  --ink: #0b1f3a;
+  --ink-2: #0c2342;
+  --ink-3: #0e2949;
+
+  /* ---- Live/interactive accent (cursor, hover, the Line's dot).
+     Reserved for live moments — NOT decoration. */
+  --accent-sky: #38bdf8;
+  --accent-mist: #cfe9ee;
+  --accent-deep: #083344;
+
+  /* ---- Hairlines: ink-on-paper for editorial rules, paper-on-ink
+     for rules that sit inside an ink ground. */
+  --hairline: rgba(11, 31, 58, 0.12);
+  --hairline-strong: rgba(11, 31, 58, 0.22);
+  --hairline-on-ink: rgba(207, 233, 238, 0.16);
 }
 
 @theme inline {
@@ -22,6 +42,20 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-instrument-serif);
+
+  /* Ink-depth + accent tokens exposed to Tailwind utilities so every
+     section pulls EXACT shared values (bg-ink, text-paper, border-hairline,
+     text-accent-deep, …) instead of re-typing hex and drifting. */
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-accent-sky: var(--accent-sky);
+  --color-accent-mist: var(--accent-mist);
+  --color-accent-deep: var(--accent-deep);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-hairline-on-ink: var(--hairline-on-ink);
 }
 
 html,
@@ -60,6 +94,130 @@ canvas {
 .paper-bg {
   background-color: var(--background);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0 0.30 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   INK DEPTH — the navy that ARRIVES at the beats (Direction A).
+   Shared backgrounds so every section that goes deep speaks the
+   SAME ink. Two hard lessons are baked in:
+   • BANDING: alpha falloffs use many close stops (~smoothstep),
+     never a few far-apart ones (those step visibly).
+   • WATERLINE: an ink section's edges MELT into the paper around
+     it (alpha → 0 at top & bottom), so there is never a crisp
+     seam/"border" line where paper meets ink.
+   ============================================================ */
+
+/* The cool paper-fibre speckle, recoloured to read INSIDE the ink
+   (light steel-blue grain at low alpha) — the navy equivalent of
+   .paper-bg's warm grain. Layered as a child or via .ink-field. */
+.ink-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.65 0 0 0 0 0.72 0 0 0 0 0.85 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Solid ink GROUND — for a block that lives fully in the deep navy
+   (the About landing, an ink testimonial spread without melted edges).
+   A faint top-lit radial keeps it from reading as a flat fill, plus
+   the cool speckle. Set text to paper tones on top of this. */
+.ink-field {
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(
+      135% 92% at 50% -12%,
+      rgba(22, 52, 88, 0.6) 0%,
+      rgba(13, 38, 68, 0.28) 34%,
+      rgba(11, 31, 58, 0) 60%
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.65 0 0 0 0 0.72 0 0 0 0 0.85 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* INK SPREAD — the one deliberate big colour beat. A band of solid
+   ink whose TOP and BOTTOM edges dissolve to transparent over a long
+   eased multi-stop ramp, so the paper above and below melts straight
+   into the navy with no visible waterline. The element is transparent
+   at its very edges: place it between paper sections and the page's
+   own paper shows through the melt. (Add a child .ink-grain for fibre.) */
+.ink-spread {
+  background-color: transparent;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(11, 31, 58, 0) 0%,
+    rgba(11, 31, 58, 0.04) 2.5%,
+    rgba(11, 31, 58, 0.14) 4.5%,
+    rgba(11, 31, 58, 0.34) 6.5%,
+    rgba(11, 31, 58, 0.62) 8.5%,
+    rgba(11, 31, 58, 0.86) 10.5%,
+    var(--ink) 14%,
+    var(--ink) 86%,
+    rgba(11, 31, 58, 0.86) 89.5%,
+    rgba(11, 31, 58, 0.62) 91.5%,
+    rgba(11, 31, 58, 0.34) 93.5%,
+    rgba(11, 31, 58, 0.14) 95.5%,
+    rgba(11, 31, 58, 0.04) 97.5%,
+    rgba(11, 31, 58, 0) 100%
+  );
+}
+
+/* EDGE MELT — a paper gradient laid over an ink block's edge so the navy
+   dissolves into the paper of the neighbouring section with no waterline.
+   Use as an absolutely-positioned, pointer-events-none CHILD pinned to the
+   edge (it paints over the ink GROUND but sits below the content, which
+   carries its own higher stacking). The ramp is long + eased (banding
+   lesson). Pair an ink block's solid edge against another ink block (butt
+   navy-to-navy, no melt) and melt only the edges that face PAPER. */
+.melt-to-paper-b,
+.melt-to-paper-t {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 17vh;
+  pointer-events: none;
+}
+.melt-to-paper-b {
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(250, 248, 242, 0) 0%,
+    rgba(250, 248, 242, 0.04) 16%,
+    rgba(250, 248, 242, 0.12) 30%,
+    rgba(250, 248, 242, 0.26) 44%,
+    rgba(250, 248, 242, 0.45) 58%,
+    rgba(250, 248, 242, 0.66) 72%,
+    rgba(250, 248, 242, 0.85) 85%,
+    rgba(250, 248, 242, 0.96) 94%,
+    #faf8f2 100%
+  );
+}
+.melt-to-paper-t {
+  top: 0;
+  background: linear-gradient(
+    to top,
+    rgba(250, 248, 242, 0) 0%,
+    rgba(250, 248, 242, 0.04) 16%,
+    rgba(250, 248, 242, 0.12) 30%,
+    rgba(250, 248, 242, 0.26) 44%,
+    rgba(250, 248, 242, 0.45) 58%,
+    rgba(250, 248, 242, 0.66) 72%,
+    rgba(250, 248, 242, 0.85) 85%,
+    rgba(250, 248, 242, 0.96) 94%,
+    #faf8f2 100%
+  );
+}
+
+/* EDITORIAL INDEX — a stack of hairline-ruled rows (the Projects
+   companion rows, any typeset list). Hairlines BETWEEN and around the
+   children; rows shift on hover/focus-within. Ink-on-paper by default;
+   add .editorial-index--on-ink for the paper-on-ink hairline. */
+.editorial-index > * {
+  border-top: 1px solid var(--hairline);
+}
+.editorial-index > *:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+.editorial-index--on-ink > * {
+  border-top-color: var(--hairline-on-ink);
+}
+.editorial-index--on-ink > *:last-child {
+  border-bottom-color: var(--hairline-on-ink);
 }
 
 /* Images spawned by the pointer trail on the intro loader */

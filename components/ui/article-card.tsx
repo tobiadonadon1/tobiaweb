@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface ArticleCardProps {
   headline: string;
   excerpt: string;
-  /** Cover photo (Tobia's own — rendered with the sea-tone grade). */
+  /** Cover photo (Tobia's own — rendered natural/ungraded). */
   cover?: string;
   tag?: string;
   readTime?: string; // e.g. "4 min read"
@@ -13,6 +15,8 @@ export interface ArticleCardProps {
   writer?: string;
   clampLines?: number;
   className?: string;
+  /** When set, the whole card becomes a link to the post (e.g. /thoughts/slug). */
+  href?: string;
 }
 
 // Same coloured-glass-on-paper language as the rest of the site.
@@ -26,7 +30,7 @@ const HOVER_SHADOW =
 /**
  * Blog card in the house voice (structure from Tobia's 21st.dev pick:
  * cover → tag · read time → headline → excerpt → byline/date): serif
- * headline, mono facts set small, glass on paper, sea-toned cover.
+ * headline, mono facts set small, glass on paper, natural/ungraded cover.
  */
 export function ArticleCard({
   headline,
@@ -38,11 +42,12 @@ export function ArticleCard({
   writer,
   clampLines = 3,
   className,
+  href,
 }: ArticleCardProps) {
   const hasMeta = tag || readTime;
-  const hasFooter = writer || date;
+  const hasFooter = writer || date || href;
 
-  return (
+  const card = (
     <article
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-[24px] border p-3",
@@ -70,14 +75,8 @@ export function ArticleCard({
             alt=""
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-            style={{ filter: "saturate(0.82) contrast(0.97)" }}
           />
-          {/* Sea-tone grade: shadows lean toward the ink. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{ background: "rgba(11,31,58,0.08)", mixBlendMode: "multiply" }}
-          />
+          {/* Covers are natural/ungraded — no sea-tone grade (redesign canon). */}
         </div>
       )}
 
@@ -114,11 +113,32 @@ export function ArticleCard({
 
         {hasFooter && (
           <div className="mt-auto flex items-center justify-between pt-5 font-mono text-[10px] uppercase tracking-[0.3em] text-black/35">
-            {writer && <span>{writer}</span>}
-            {date && <span>{date}</span>}
+            <span>
+              {writer}
+              {writer && date && <span className="text-black/20"> · </span>}
+              {date}
+            </span>
+            {href && (
+              // The clickability cue — same typographic "Enter ↗" language as
+              // the project cards, so a thought reads as openable, not inert.
+              <span className="flex items-center gap-1 text-black/40 opacity-60 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-cyan-900/80 group-hover:opacity-100">
+                Read <ArrowUpRight className="h-3 w-3" />
+              </span>
+            )}
           </div>
         )}
       </div>
     </article>
+  );
+
+  // A thought with an href is a real link to its reading page; otherwise the
+  // card renders plain (e.g. previews). The hover lift + "Read ↗" make the
+  // link obvious — the card no longer does nothing when clicked.
+  return href ? (
+    <Link href={href} className="block h-full rounded-[24px]" aria-label={headline}>
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }

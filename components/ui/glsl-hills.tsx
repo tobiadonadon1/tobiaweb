@@ -26,6 +26,20 @@ interface GLSLHillsProps {
    * fading to plain monochrome at the edges. 0 = untinted rest state.
    */
   tintRef?: { current: number };
+  /**
+   * Live pointer-X (0→1, left→right), read every frame. Drives a SECOND tint
+   * band that FOLLOWS the cursor across the ridge (see `cursorActiveRef`).
+   * 0..1 is mapped to world-X ~-95..95 to match the shader's existing
+   * `abs(vPosition.x)` 18..95 scale, so the band lands under the pointer.
+   */
+  cursorXRef?: { current: number };
+  /**
+   * Live 0→1 cursor-tint level (read every frame, eased by the parent):
+   * the strength of the pointer-following band. 0 = no cursor glow. The
+   * cursor band ADDS to the central `tintRef` band; the combined mix is
+   * clamped in-shader so it stays a SLIGHT tint, never a colour wash.
+   */
+  cursorActiveRef?: { current: number };
   /** Colour the lines lean toward while tinted (slightly — capped in-shader). */
   tintColor?: string;
   className?: string;
@@ -42,6 +56,8 @@ const GLSLHills = ({
   segments = 150,
   timeScaleRef,
   tintRef,
+  cursorXRef,
+  cursorActiveRef,
   tintColor = "#38bdf8",
   className,
 }: GLSLHillsProps) => {
@@ -60,6 +76,9 @@ const GLSLHills = ({
         uOpacity: { value: number };
         uTint: { value: number };
         uTintColor: { value: THREE.Color };
+        // Pointer-following tint: world-X centre of the band + its strength.
+        uCursorX: { value: number };
+        uCursorActive: { value: number };
       };
       mesh: THREE.Mesh;
       time: number;
@@ -71,6 +90,8 @@ const GLSLHills = ({
           uOpacity: { value: opacity },
           uTint: { value: 0 },
           uTintColor: { value: new THREE.Color(tintColor) },
+          uCursorX: { value: 0 },
+          uCursorActive: { value: 0 },
         };
         this.mesh = this.createMesh();
         this.time = speed;
@@ -197,6 +218,8 @@ const GLSLHills = ({
               uniform float uOpacity;
               uniform float uTint;
               uniform vec3 uTintColor;
+              uniform float uCursorX;      // pointer centre, world-X
+              uniform float uCursorActive; // 0→1 pointer-tint strength
 
               void main(void) {
                 float opacity = (96.0 - length(vPosition)) / 256.0 * 0.6;
@@ -205,8 +228,23 @@ const GLSLHills = ({
                 // edges. Capped at 0.55 so even full hover stays a SLIGHT
                 // tint of the mountains — never a wash of colour.
                 float band = 1.0 - smoothstep(18.0, 95.0, abs(vPosition.x));
-                vec3 col = mix(uColor, uTintColor, uTint * band * 0.55);
-                gl_FragColor = vec4(col, opacity * uOpacity);
+                float ctaTint = uTint * band * 0.55;
+                // Cursor tint: a SECOND band centred on the pointer's world-X
+                // (uCursorX) — a wide, travelling pool of light under the
+                // cursor. Tobia wanted this to read STRONGER than the CTA tint,
+                // so it's capped higher (0.92) and the band is wide and soft.
+                float cursorBand = 1.0 - smoothstep(0.0, 80.0, abs(vPosition.x - uCursorX));
+                float cursorTint = uCursorActive * cursorBand * 0.92;
+                // The two tints COEXIST — add their strengths, then clamp the
+                // combined amount. The cursor pool is allowed to lean the lines
+                // clearly blue (it's the live, interactive moment); the cap
+                // still stops it short of a flat single-colour wash.
+                float tintAmt = clamp(ctaTint + cursorTint, 0.0, 0.96);
+                vec3 col = mix(uColor, uTintColor, tintAmt);
+                // Under the cursor, also lift the line opacity a touch so the
+                // highlighted ridge reads brighter, not only bluer.
+                float glowLift = 1.0 + uCursorActive * cursorBand * 0.5;
+                gl_FragColor = vec4(col, opacity * uOpacity * glowLift);
               }
             `,
             transparent: true,
@@ -252,6 +290,14 @@ const GLSLHills = ({
       const scale = timeScaleRef ? timeScaleRef.current : 1;
       // Live hover tint (0→1), eased by the parent.
       plane.uniforms.uTint.value = tintRef ? tintRef.current : 0;
+      // Live cursor-following tint (both eased by the parent). cursorXRef is
+      // 0..1 (left→right); map to world-X ~-95..95 so the band tracks the
+      // pointer on the same scale the central band uses.
+      plane.uniforms.uCursorActive.value = cursorActiveRef
+        ? cursorActiveRef.current
+        : 0;
+      const cx = cursorXRef ? cursorXRef.current : 0.5;
+      plane.uniforms.uCursorX.value = (cx - 0.5) * 190.0;
       plane.render(clock.getDelta() * scale);
       renderer.render(scene, camera);
     };

@@ -4,7 +4,7 @@ import { Mail } from "lucide-react";
 const MAIN_LINKS = [
   { href: "/#home", label: "Home" },
   { href: "/#projects", label: "Projects" },
-  { href: "/#about", label: "About" },
+  { href: "/#road", label: "About" },
   { href: "/#thoughts", label: "Thoughts" },
 ];
 
@@ -35,16 +35,38 @@ function LinkedinIcon({ className }: { className?: string }) {
   );
 }
 
-const SOCIAL_LINKS = [
-  { href: "mailto:tobia@donadon.com", label: "Email", Icon: Mail },
-  { href: "https://www.instagram.com/tobia.donadon/", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://www.linkedin.com/in/tobia-donadon", label: "LinkedIn", Icon: LinkedinIcon },
+// Labeled MONO channel links (funnel §3.9): the handle is shown; the two
+// external profiles carry rel="me" (identity verification, IndieAuth). IG is
+// the personal channel, LinkedIn the professional one, email the direct line.
+const CHANNELS = [
+  {
+    href: "https://www.instagram.com/tobia.donadon/",
+    label: "Instagram",
+    handle: "@tobia.donadon",
+    Icon: InstagramIcon,
+    external: true,
+  },
+  {
+    href: "https://www.linkedin.com/in/tobia-donadon",
+    label: "LinkedIn",
+    handle: "Tobia Donadon",
+    Icon: LinkedinIcon,
+    external: true,
+  },
+  {
+    href: "mailto:tobia@donadon.com",
+    label: "Email",
+    handle: "tobia@donadon.com",
+    Icon: Mail,
+    external: false,
+  },
 ];
 
 /**
- * The site's last page (21st.dev footer, re-set in Ink & Paper): the comet
- * mark + serif name, quiet mono links, social circles — and beneath it all,
- * the Line finally ends in its single dot.
+ * The site's last page (21st.dev footer, re-set in Ink & Paper): the logo
+ * mark + serif name, quiet mono nav, then the labeled channels captioned by
+ * "Figuring it out in public." — and beneath it all, the Line finally ends in
+ * its single dot.
  */
 export function SiteFooter() {
   return (
@@ -60,28 +82,7 @@ export function SiteFooter() {
             </span>
           </Link>
 
-          <ul className="mt-8 flex list-none gap-3 md:mt-0">
-            {SOCIAL_LINKS.map(({ href, label, Icon }) => (
-              <li key={label}>
-                <a
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noreferrer" : undefined}
-                  aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 text-black/50 transition-all duration-300 hover:-translate-y-0.5 hover:border-black/25 hover:text-cyan-900"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-10 border-t border-black/10 pt-8 md:flex md:items-baseline md:justify-between">
-          <p className="font-serif text-base italic text-black/40">
-            Figuring it out in public.
-          </p>
-          <nav className="mt-6 md:mt-0">
+          <nav className="mt-8 md:mt-1">
             <ul className="flex list-none flex-wrap gap-x-7 gap-y-2">
               {MAIN_LINKS.map((link) => (
                 <li key={link.href}>
@@ -97,7 +98,36 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-4">
+        {/* The channels, captioned by the line Tobia liked (Option B): the
+            tagline now sits directly above the labeled mono channel links. */}
+        <div className="mt-10 border-t border-black/10 pt-8">
+          <p className="font-serif text-base italic text-black/40">
+            Figuring it out in public.
+          </p>
+          <ul className="mt-5 flex list-none flex-col gap-y-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-9">
+            {CHANNELS.map(({ href, label, handle, Icon, external }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target={external ? "_blank" : undefined}
+                  // rel="me" claims these profiles as Tobia's (identity links);
+                  // noreferrer/noopener for the external tabs.
+                  rel={external ? "me noopener noreferrer" : undefined}
+                  className="group inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-black/45 transition-colors hover:text-cyan-900"
+                >
+                  <Icon className="h-3.5 w-3.5 text-black/35 transition-colors group-hover:text-cyan-900" />
+                  <span>{label}</span>
+                  <span aria-hidden className="text-black/20">·</span>
+                  <span className="tracking-[0.15em] text-black/35 transition-colors group-hover:text-cyan-900/80 normal-case">
+                    {handle}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-14 flex flex-col items-center gap-4">
           {/* The sign-off: the name, not a copyright formality. */}
           <span className="font-serif text-2xl italic text-black/50">
             Tobia Donadon

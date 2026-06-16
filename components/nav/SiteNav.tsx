@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { name: "Home", url: "/#home", icon: Home },
   { name: "Projects", url: "/#projects", icon: Layers },
-  { name: "About", url: "/#about", icon: User },
+  { name: "About", url: "/#road", icon: User },
   { name: "Thoughts", url: "/#thoughts", icon: PenLine },
 ];
 

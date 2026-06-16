@@ -40,14 +40,19 @@ const GLASS_BG =
 const MAX_TILT_DEG = 10;
 
 // Aurora intensity dials (group opacity over the blobs' own gradients).
-const AURORA_REST = "0.35"; // ambient — present but clearly translucent
-const AURORA_HOVER = "0.45"; // hover — a breath deeper than rest, never heavy
+// The blobs run deep ocean-blue/steel-navy — raising their group opacity is
+// how the INK arrives inside the glass (the plasma carries more navy weight),
+// without touching the shared .aurora gradients. Still clearly translucent.
+const AURORA_REST = "0.42"; // ambient — ink present, never heavy
+const AURORA_HOVER = "0.56"; // hover — the plasma comes alive, deeper navy
 
 // Real shade: clearly visible at rest, deepens when the card lifts on hover.
+// The long cast shadow now leans toward the navy ink (not neutral warm-grey)
+// so each card pools a little of the arriving depth onto the ground beneath.
 const REST_SHADOW =
-  "0 30px 70px rgba(28,24,14,0.18), 0 10px 22px rgba(28,24,14,0.1), inset 0 1px 0 rgba(255,255,255,0.7)";
+  "0 30px 70px rgba(11,31,58,0.2), 0 10px 22px rgba(28,24,14,0.1), inset 0 1px 0 rgba(255,255,255,0.7)";
 const HOVER_SHADOW =
-  "0 48px 110px rgba(28,24,14,0.28), 0 14px 30px rgba(28,24,14,0.15), inset 0 1px 0 rgba(255,255,255,0.78)";
+  "0 48px 110px rgba(11,31,58,0.32), 0 14px 30px rgba(28,24,14,0.15), inset 0 1px 0 rgba(255,255,255,0.78)";
 
 interface PhraseCardProps {
   eyebrow: string;
@@ -169,7 +174,7 @@ const PhraseCard: React.FC<PhraseCardProps> = ({
             background: GLASS_BG,
             backdropFilter: "blur(22px) saturate(150%)",
             WebkitBackdropFilter: "blur(22px) saturate(150%)",
-            border: "1px solid rgba(30,26,14,0.07)",
+            border: "1px solid rgba(11,31,58,0.1)",
             boxShadow: REST_SHADOW,
             transformStyle: "preserve-3d",
             willChange: "transform",
@@ -243,17 +248,33 @@ const PhraseCard: React.FC<PhraseCardProps> = ({
 
 export function StackedPhrases() {
   return (
-    <section id="phrases" className="w-full bg-background">
-      {phrases.map((p, index) => (
-        <PhraseCard
-          key={p.id}
-          eyebrow={p.eyebrow}
-          title={p.title}
-          description={p.description}
-          index={index}
-          totalCards={phrases.length}
-        />
-      ))}
+    <section id="phrases" className="relative w-full bg-background">
+      {/* Ink ARRIVES in the ground: a single-hue navy pool eased over a long
+          multi-stop alpha ramp (banding lesson) blooms behind the sticky
+          stack and fades to transparent paper at every edge (waterline
+          lesson — no visible seam to the neighbours). Paper stays dominant;
+          the depth gathers only where the cards live. Achieved here in the
+          component, not in the shared .aurora gradients. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(120% 60% at 50% 50%, rgba(11,31,58,0.12) 0%, rgba(11,31,58,0.085) 28%, rgba(11,31,58,0.045) 52%, rgba(11,31,58,0.018) 74%, rgba(11,31,58,0) 100%)",
+        }}
+      />
+      <div className="relative z-10">
+        {phrases.map((p, index) => (
+          <PhraseCard
+            key={p.id}
+            eyebrow={p.eyebrow}
+            title={p.title}
+            description={p.description}
+            index={index}
+            totalCards={phrases.length}
+          />
+        ))}
+      </div>
     </section>
   );
 }
