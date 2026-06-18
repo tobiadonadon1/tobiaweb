@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 // Root-relative hashes so the nav also works from subpages (/projects/…).
 const navItems = [
   { name: "Home", url: "/#home", icon: Home },
-  { name: "Projects", url: "/#projects", icon: Layers },
   { name: "About", url: "/#road", icon: User },
+  { name: "Projects", url: "/#projects", icon: Layers },
   { name: "Thoughts", url: "/#thoughts", icon: PenLine },
 ];
 

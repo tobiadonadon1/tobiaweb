@@ -169,7 +169,7 @@ export function FeaturePanel({
       href={entry.href}
       onClick={(e) => expand(e, entry.href, true)}
       className={cn(
-        "group relative flex h-full min-h-[clamp(360px,52vh,520px)] flex-col justify-between",
+        "group relative flex h-full min-h-[clamp(300px,40vh,420px)] flex-col justify-between",
         "overflow-hidden rounded-[20px] outline-none",
         "ink-field ink-grain border border-[color:var(--hairline-on-ink)]",
         "p-8 md:p-11",
@@ -198,7 +198,7 @@ export function FeaturePanel({
         <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#7dd3fc]/80">
           {entry.status}
         </span>
-        <h3 className="mt-6 font-serif text-5xl leading-[0.98] tracking-tight text-[#faf8f2] md:text-7xl">
+        <h3 className="mt-6 font-serif text-4xl leading-[0.98] tracking-tight text-[#faf8f2] md:text-6xl">
           {entry.title}
         </h3>
         <p className="mt-6 max-w-md text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
@@ -212,7 +212,7 @@ export function FeaturePanel({
             CTA mailto is on the product page; here it just reads as the cue to
             open. (Kept as text, not a second nav target, to avoid nested <a>.) */}
         <span className="font-serif text-lg italic text-[#faf8f2]/85 md:text-xl">
-          Write me &mdash; tell me what you&rsquo;re building.
+          Write me. Tell me what you&rsquo;re building.
         </span>
         <EnterCue onInk />
       </div>

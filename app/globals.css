@@ -24,6 +24,12 @@
   --accent-mist: #cfe9ee;
   --accent-deep: #083344;
 
+  /* ---- Clay: the bold warm accent. Introduced for "The Road" — a
+     terracotta that punches on warm paper the way the Swiss posters do,
+     yet stays warm enough to live beside the ink. The road, its discs. */
+  --accent-clay: #ce4631;
+  --accent-clay-soft: rgba(206, 70, 49, 0.16);
+
   /* ---- Hairlines: ink-on-paper for editorial rules, paper-on-ink
      for rules that sit inside an ink ground. */
   --hairline: rgba(11, 31, 58, 0.12);
@@ -53,6 +59,8 @@
   --color-accent-sky: var(--accent-sky);
   --color-accent-mist: var(--accent-mist);
   --color-accent-deep: var(--accent-deep);
+  --color-accent-clay: var(--accent-clay);
+  --color-accent-clay-soft: var(--accent-clay-soft);
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
   --color-hairline-on-ink: var(--hairline-on-ink);

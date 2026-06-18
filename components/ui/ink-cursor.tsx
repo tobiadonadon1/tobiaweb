@@ -32,6 +32,7 @@ export function InkCursor() {
     let scale = 1;
     let targetScale = 1;
     let visible = false;
+    let onDark = false; // over a [data-cursor-ink] region (e.g. the desktop)
     let raf = 0;
 
     const onMove = (e: MouseEvent) => {
@@ -46,7 +47,15 @@ export function InkCursor() {
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as Element | null;
-      targetScale = t?.closest("a, button, [role='button']") ? 1.9 : 1;
+      // Sections marked [data-cursor-quiet] (the Thoughts desktop) opt OUT of
+      // the grow-on-hover — the enlarged dot looks wrong over the file icons.
+      const quiet = t?.closest("[data-cursor-quiet]");
+      targetScale =
+        !quiet && t?.closest("a, button, [role='button']") ? 1.9 : 1;
+      // Dark-ground regions (the Thoughts desktop) flip the dot to paper-white
+      // so it stays visible — same rule as body[data-ink], but scoped to the
+      // region so it never races with the ProjectsSection flag.
+      onDark = !!t?.closest("[data-cursor-ink]");
     };
     const onLeave = () => {
       visible = false;
@@ -60,9 +69,10 @@ export function InkCursor() {
       pos.y += (target.y - pos.y) * k;
       scale += (targetScale - scale) * (reduced ? 1 : 0.18);
       dot.style.transform = `translate3d(${pos.x.toFixed(1)}px, ${pos.y.toFixed(1)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
-      // Paper-white over the ink, sky-blue over the paper.
+      // Paper-white over the ink (or any dark-ground region), sky-blue over
+      // the paper/white parts.
       dot.style.backgroundColor =
-        document.body.dataset.ink === "1" ? "#faf8f2" : "#38bdf8";
+        document.body.dataset.ink === "1" || onDark ? "#faf8f2" : "#38bdf8";
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });

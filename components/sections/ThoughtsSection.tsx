@@ -77,7 +77,7 @@ export function ThoughtsSection() {
             Watch me think.
           </h2>
           <p className="mx-auto mt-4 max-w-md font-mono text-[10px] uppercase tracking-[0.3em] text-black/30">
-            Drafts in public — the thinking before it&rsquo;s finished
+            Drafts in public: the thinking before it&rsquo;s finished
           </p>
         </div>
 

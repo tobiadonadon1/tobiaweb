@@ -4,7 +4,7 @@ import { ProjectPageShell } from "@/components/ui/project-page";
 export const metadata: Metadata = {
   title: "Superhuman",
   description:
-    "A guided journey of small, deliberate practices that compound into superhuman abilities. Not a course — a journey you take.",
+    "A guided journey of small, deliberate practices that compound into superhuman abilities. Not a course, a journey you take.",
 };
 
 export default function SuperhumanPage() {
@@ -18,12 +18,12 @@ export default function SuperhumanPage() {
         {
           kicker: "The premise",
           heading: "Abilities that compound",
-          body: "Superhuman starts from a simple observation: with the tools we suddenly have, an ordinary person who practices deliberately can do things that looked impossible five years ago. The journey is built around that compounding — small daily practices that stack into abilities that feel, honestly, a little superhuman.",
+          body: "Superhuman starts from a simple observation: with the tools we suddenly have, an ordinary person who practices deliberately can do things that looked impossible five years ago. The journey is built around that compounding: small daily practices that stack into abilities that feel, honestly, a little superhuman.",
         },
         {
           kicker: "Not a course",
           heading: "I don't sell courses",
-          body: "A course is something you watch. This is a journey you take — with stages, with effort, with someone walking alongside you. You don't finish it with a certificate; you finish it different. That distinction matters to me more than almost anything on this site.",
+          body: "A course is something you watch. This is a journey you take, with stages, with effort, with someone walking alongside you. You don't finish it with a certificate; you finish it different. That distinction matters to me more than almost anything on this site.",
         },
         {
           kicker: "The path",

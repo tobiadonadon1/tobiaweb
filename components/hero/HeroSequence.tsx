@@ -180,7 +180,7 @@ export default function HeroSequence() {
         </h1>
         <p className="mt-7 max-w-md text-sm leading-relaxed text-black/55 md:text-base">
           I build tools, write about consciousness, and help people launch
-          things. I&rsquo;m 20, and I think about the future a lot — this is
+          things. I&rsquo;m 20, and I think about the future a lot. This is
           where I share what I&rsquo;m working on.
         </p>
         <div className="pointer-events-auto relative mt-8">

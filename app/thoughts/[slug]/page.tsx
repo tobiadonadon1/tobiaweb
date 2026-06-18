@@ -117,7 +117,14 @@ export default async function ThoughtPage({
         </p>
 
         <div className="mt-10 border-t border-black/10 pt-10">
-          {t.body && t.body.length > 0 ? (
+          {t.bodyHtml ? (
+            // Trusted, authored HTML from Tobia's own blog export (build-time
+            // only) — styled via scoped child utilities (no prose plugin).
+            <div
+              className="text-base leading-relaxed text-black/70 md:text-lg [&>*+*]:mt-5 [&_h2]:mt-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:leading-tight [&_h2]:tracking-tight [&_h2]:text-[#0a0a0a] [&_h3]:mt-9 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:tracking-tight [&_h3]:text-[#0a0a0a] [&_strong]:font-semibold [&_strong]:text-[#0a0a0a] [&_em]:italic [&_a]:underline [&_a]:decoration-black/30 [&_a]:underline-offset-4 [&_a:hover]:text-cyan-900"
+              dangerouslySetInnerHTML={{ __html: t.bodyHtml }}
+            />
+          ) : t.body && t.body.length > 0 ? (
             <div className="space-y-6 text-base leading-relaxed text-black/70 md:text-lg">
               {t.body.map((para, i) => (
                 <p key={i}>{para}</p>
@@ -130,7 +137,7 @@ export default async function ThoughtPage({
                 Still forming
               </p>
               <p className="mt-5 text-base leading-relaxed text-black/60 md:text-lg">
-                This one is still a draft — I write these in public, so the full
+                This one is still a draft. I write these in public, so the full
                 piece arrives a little after the thought does. The line above is
                 the seed of it.
               </p>
@@ -144,8 +151,8 @@ export default async function ThoughtPage({
                   className="underline decoration-black/25 underline-offset-4 transition-colors hover:text-cyan-900"
                 >
                   LinkedIn
-                </a>{" "}
-                — or just{" "}
+                </a>
+                , or just{" "}
                 <a
                   href="mailto:tobia@donadon.com?subject=Your%20writing"
                   className="underline decoration-black/25 underline-offset-4 transition-colors hover:text-cyan-900"

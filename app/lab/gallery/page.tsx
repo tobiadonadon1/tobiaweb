@@ -4,7 +4,7 @@ import PhotoWave from "@/components/ui/photo-wave";
 // Unlisted prototype — not in the nav, not indexed. A place to judge the
 // adapted 3D photo wave before deciding where (if anywhere) it lives.
 export const metadata: Metadata = {
-  title: "Photo wave — prototype",
+  title: "Photo wave · prototype",
   robots: { index: false, follow: false },
 };
 

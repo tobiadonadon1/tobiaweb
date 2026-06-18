@@ -23,17 +23,17 @@ const instrumentSerif = Instrument_Serif({
 });
 
 const DESCRIPTION =
-  "I'm Tobia — 20, building tools, writing a book about AI and consciousness, and helping people launch things. This is where I share what I'm working on, and figure it out in public.";
+  "I'm Tobia: 20, building tools, writing a book about AI and consciousness, and helping people launch things. This is where I share what I'm working on, and figure it out in public.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tobiadonadon.com"),
   title: {
-    default: "Tobia Donadon — figuring it out in public",
-    template: "%s — Tobia Donadon",
+    default: "Tobia Donadon, figuring it out in public",
+    template: "%s · Tobia Donadon",
   },
   description: DESCRIPTION,
   openGraph: {
-    title: "Tobia Donadon — figuring it out in public",
+    title: "Tobia Donadon, figuring it out in public",
     description: DESCRIPTION,
     url: "/",
     siteName: "Tobia Donadon",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tobia Donadon — figuring it out in public",
+    title: "Tobia Donadon, figuring it out in public",
     description: DESCRIPTION,
     images: ["/trail/trail-07.jpg"],
   },

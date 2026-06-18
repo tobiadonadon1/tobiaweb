@@ -2,7 +2,8 @@ import HeroSequence from "@/components/hero/HeroSequence";
 import { StackedPhrases } from "@/components/sections/StackedPhrases";
 import { RoadSoFar } from "@/components/sections/RoadSoFar";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
-import { ThoughtsSection } from "@/components/sections/ThoughtsSection";
+import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
+import { ThoughtsDesktop } from "@/components/sections/ThoughtsDesktop";
 
 /**
  * The funnel, top to bottom: the hero states the stance, the identity
@@ -23,7 +24,9 @@ export default function Home() {
 
       <ProjectsSection />
 
-      <ThoughtsSection />
+      <TestimonialsSection />
+
+      <ThoughtsDesktop />
     </main>
   );
 }

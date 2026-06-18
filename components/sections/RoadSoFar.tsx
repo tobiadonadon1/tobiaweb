@@ -10,16 +10,15 @@ if (typeof window !== "undefined") {
 
 /**
  * The Road So Far — the centred winding Line (the design Tobia preferred),
- * carrying the tighter funnel COPY. A single thin ink line draws itself down
- * the MIDDLE of the section as you scroll (SVG stroke-dashoffset, scrubbed),
- * winding wide left↔right through one dot per beat. Pins ALTERNATE sides on
- * desktop; on mobile they hang right of a left-edge spine. Entrances settle
- * once (rise + unblur); the line is the only scroll-tied motion.
+ * breathable. A single thin ink line draws itself down the MIDDLE of the
+ * section as you scroll, winding wide left↔right through one dot per beat.
+ * Pins ALTERNATE sides on desktop; on mobile they hang right of a left spine.
+ * Generous air between beats. Entrances settle once (rise + unblur); the line
+ * is the only scroll-tied motion.
  *
  * COPY = the compounding through-line (funnel spec §2): a kid building real
- * things → an agency at 15 → Miami → real AI work now → a major company pays
- * him for exactly this. The SEQUENCE is the proof; no single beat carries it.
- * `accent` marks the LIVE beat (the payoff) — its dot earns the sky accent.
+ * things → an agency at 15 → Miami → AI now → a major company pays him for
+ * exactly this. `accent` marks the LIVE payoff beat.
  */
 type Beat = {
   when: string;
@@ -42,7 +41,7 @@ const BEATS: Beat[] = [
   {
     when: "at 18",
     phrase: "Left for Miami.",
-    sub: "college in the US — graduated in three years",
+    sub: "college in the US, graduated in three years",
   },
   {
     when: "now",
@@ -57,18 +56,16 @@ const BEATS: Beat[] = [
   },
 ];
 
-// The track's vertical rhythm: beat i sits at these fractions of the track
-// height (first/last keep margin for the line's entry/exit).
-const yFrac = (i: number) => 0.05 + (0.9 * i) / (BEATS.length - 1);
+// Beat i sits at this fraction down the track. Generous top/bottom margin for
+// air and the line's lead-in/tail.
+const yFrac = (i: number) => 0.08 + (0.84 * i) / (BEATS.length - 1);
 
-// Deterministic horizontal sweep for the line's waypoints (no Math.random —
-// SSR/hydration must match; the path itself is built client-side anyway).
-// Wide on purpose: the road develops horizontally, not just down. Pins are
-// anchored to these same offsets via --wob, so text rides the curve with its
-// dot. Signs alternate with i%2 so the dot swings to the side OPPOSITE its
-// text, keeping the words in the readable central band. Mobile uses 0.18×
-// around a left-edge spine.
-const WOBBLE = [120, -150, 135, -150, 115];
+// Deterministic horizontal sweep (no Math.random — SSR/hydration parity). Wide
+// on purpose: the road develops sideways, not just down. Pins ride these same
+// offsets via --wob, so text follows its dot. Signs alternate so the dot swings
+// OPPOSITE its text, keeping the words in the readable central band. Mobile
+// uses 0.18× around a left-edge spine.
+const WOBBLE = [135, -165, 145, -165, 125];
 
 export function RoadSoFar() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -144,12 +141,10 @@ export function RoadSoFar() {
     window.addEventListener("resize", onResize);
 
     // Pins settle in once as they enter (rise + unblur). IntersectionObserver,
-    // NOT a per-pin ScrollTrigger: the intro loader's teardown forces a
-    // ScrollTrigger refresh, and an instant jump into the section right after
-    // it (fast scroll, nav anchor click) left `once` triggers stale — pins
-    // stuck invisible. IO fires on actual visibility, however you arrived.
-    // (The line scrub above keeps ScrollTrigger; it's progress-mapped, so
-    // refresh timing can't strand it.)
+    // NOT a per-pin ScrollTrigger: the intro loader's teardown forces a refresh
+    // and an instant jump into the section strands `once` triggers. IO fires on
+    // real visibility, however you arrived. (The line scrub keeps ScrollTrigger;
+    // it's progress-mapped, so refresh timing can't strand it.)
     const pins = Array.from(track.querySelectorAll("[data-pin]")) as HTMLElement[];
     let io: IntersectionObserver | null = null;
     if (!reduced) {
@@ -165,16 +160,15 @@ export function RoadSoFar() {
               filter: "blur(0px)",
               duration: 0.7,
               ease: "power3.out",
-              // ONLY the animated props — clearProps:"all" wipes the whole
-              // inline style, including the `top`/`--wob` that POSITION the
-              // pin (revealed pins collapsed into one stacked heap).
+              // ONLY the animated props — clearProps:"all" wipes the inline
+              // top/--wob that POSITION each pin.
               clearProps: "opacity,transform,filter",
             });
           }
         },
         { rootMargin: "0px 0px -12% 0px", threshold: 0.1 }
       );
-      pins.forEach((pin) => io?.observe(pin));
+      pins.forEach((p) => io?.observe(p));
     }
 
     return () => {
@@ -187,14 +181,12 @@ export function RoadSoFar() {
 
   return (
     <section id="road" className="paper-bg relative">
-      {/* Sticky scope: header + track. The headline stays pinned while the
-          road scrolls beneath it. */}
+      {/* Sticky scope: header + track. The headline stays pinned while the road
+          scrolls beneath it. */}
       <div className="relative">
         <div
           className="pointer-events-none sticky top-0 z-20 px-6 pb-10 pt-24 text-center md:pt-28"
           style={{
-            // Solid paper at the top fading out — passing pins melt under the
-            // pinned headline instead of colliding with it.
             background:
               "linear-gradient(to bottom, #faf8f2 0%, #faf8f2 70%, rgba(250,248,242,0) 100%)",
           }}
@@ -209,11 +201,11 @@ export function RoadSoFar() {
           </div>
         </div>
 
-        {/* The track: the Line + its pins, all positioned from shared
-            fractions + the shared --wob horizontal offsets. */}
+        {/* The track: the Line + its pins, positioned from shared fractions +
+            the shared --wob offsets. Tall = generous air between beats. */}
         <div
           ref={trackRef}
-          className="relative mx-auto h-[160vh] max-w-3xl px-6 md:h-[150vh]"
+          className="relative mx-auto h-[205vh] max-w-3xl px-6 md:h-[190vh]"
         >
           <svg
             ref={svgRef}
@@ -225,7 +217,7 @@ export function RoadSoFar() {
               ref={pathRef}
               fill="none"
               stroke="#0b1f3a"
-              strokeOpacity="0.55"
+              strokeOpacity="0.5"
               strokeWidth="1.5"
               strokeLinecap="round"
             />
@@ -245,8 +237,8 @@ export function RoadSoFar() {
                   } as React.CSSProperties
                 }
               >
-                {/* The dot — exactly on the waypoint, the wrapper's anchor.
-                    The live beat earns the sky accent; the rest stay ink. */}
+                {/* The dot — exactly on the waypoint. The live beat earns the
+                    sky accent; the rest stay ink. */}
                 <span
                   aria-hidden
                   className={
@@ -260,7 +252,7 @@ export function RoadSoFar() {
                 <div
                   className={
                     "absolute top-0 w-[250px] -translate-y-1/2 max-md:left-5 max-md:right-auto max-md:w-[230px] max-md:text-left " +
-                    (left ? "right-5 text-right" : "left-5 text-left")
+                    (left ? "right-6 text-right" : "left-6 text-left")
                   }
                 >
                   <span

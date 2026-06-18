@@ -8,12 +8,12 @@ import { PhotoSlideshow } from "@/components/ui/photo-slideshow";
 export const metadata: Metadata = {
   title: "The Book",
   description:
-    "A long book about minds — AI, consciousness, and what we become. Written in public, arriving late 2026.",
+    "A long book about minds: AI, consciousness, and what we become. Written in public, arriving late 2026.",
 };
 
 // The four currents the book runs through.
 const CURRENTS: [string, string][] = [
-  ["Lifestyle", "how a life actually gets built — day after ordinary day."],
+  ["Lifestyle", "how a life actually gets built, day after ordinary day."],
   ["Spirituality", "the parts of being human a model can’t reach."],
   ["Creativity", "making things as a way of thinking, not decorating."],
   ["Mindset", "the quiet discipline running underneath all of it."],
@@ -22,7 +22,7 @@ const CURRENTS: [string, string][] = [
 // What a reader carries away — honest, not a feature list.
 const TAKEAWAYS = [
   "A way to think about AI that is neither hype nor doom.",
-  "The questions worth sitting with — not a stack of tidy answers.",
+  "The questions worth sitting with, not a stack of tidy answers.",
   "Permission to build slowly, and on purpose.",
   "A companion for your own figuring-out.",
 ];
@@ -92,7 +92,7 @@ export default function BookPage() {
             />
           </div>
           <p className="mt-7 max-w-xl font-serif text-2xl italic leading-snug text-black/55 md:text-3xl">
-            A long book about minds — the ones we’re building, and the ones we
+            A long book about minds: the ones we’re building, and the ones we
             already are.
           </p>
         </header>
@@ -101,7 +101,7 @@ export default function BookPage() {
         <div className="mt-16">
           <VideoSlot
             poster="/trail/trail-07.jpg"
-            label="Why I’m writing this — a short film, soon"
+            label="Why I’m writing this: a short film, soon"
           />
         </div>
 
@@ -109,8 +109,8 @@ export default function BookPage() {
         <div className="mt-20 space-y-8">
           <Movement kicker="What it is" heading="Long-form, on purpose">
             A book about artificial intelligence, consciousness, and what we
-            become when the two start to blur. Not a hot take, not a manifesto —
-            a slow attempt to think clearly about the strangest decade any of us
+            become when the two start to blur. Not a hot take, not a manifesto.
+            A slow attempt to think clearly about the strangest decade any of us
             will live through. I’m writing it because I couldn’t find the book I
             wanted to read.
           </Movement>
@@ -172,7 +172,7 @@ export default function BookPage() {
             >
               Thoughts
             </Link>{" "}
-            as they form. Writing in public keeps me honest — you’ll watch the
+            as they form. Writing in public keeps me honest. You’ll watch the
             ideas change as I do. Some of it will be wrong on arrival, and
             that’s part of the method.
           </Movement>
@@ -189,7 +189,7 @@ export default function BookPage() {
           </div>
 
           <p className="mt-8 max-w-xl font-serif text-xl italic leading-snug text-black/55 md:text-2xl">
-            Following along is how you read it as it’s written — the chapters
+            Following along is how you read it as it’s written: the chapters
             and the thinking on{" "}
             <a
               href="https://www.linkedin.com/in/tobia-donadon"
@@ -218,8 +218,8 @@ export default function BookPage() {
               className="font-mono text-sm uppercase tracking-[0.15em] text-cyan-900 underline decoration-cyan-900/30 underline-offset-4 hover:decoration-cyan-900/70"
             >
               “first chapter”
-            </a>{" "}
-            — that’s the whole list.
+            </a>
+            . That’s the whole list.
           </p>
 
           <p className="mt-10 font-serif text-lg italic text-black/40">
