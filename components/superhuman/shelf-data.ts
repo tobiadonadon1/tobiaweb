@@ -153,7 +153,7 @@ export const SHELF: ShelfFamily[] = [
       ],
       /**
        * MATERIAL'S CONTENTS ARE NOT HERE. It outgrew a flat list and has a
-       * room of its own now — three folders, each with its own page — in
+       * room of its own now — two folders, each with its own page — in
        * components/superhuman/material/. `items` stays empty and `empty`
        * stays written because the type requires both and because a family
        * that ever loses its room should fall back to something honest rather
@@ -161,7 +161,7 @@ export const SHELF: ShelfFamily[] = [
        */
       items: [],
       empty:
-        "The material lives in three folders rather than in one list. Open any of them from the room above.",
+        "The material lives in two folders rather than in one list. Open any of them from the room above.",
     },
   },
   {

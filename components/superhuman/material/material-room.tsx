@@ -16,7 +16,7 @@ import type { MaterialFolder } from "./material-types";
  * THE ROOM — /projects/construct/material
  *
  * Material is the only family with enough in it to need somewhere to stand
- * before you start reading, so it gets a room rather than a list: three folders
+ * before you start reading, so it gets a room rather than a list: two folders
  * as cards, each with a drawn cover, and nothing to do on this page except
  * choose one.
  *
@@ -28,7 +28,7 @@ import type { MaterialFolder } from "./material-types";
  * about the MATERIAL instead: how much of what is listed is actually
  * finished. A folder of six unfilmed videos says so on its own face.
  *
- * THE FILM COMES FIRST. Three folders is a choice, and a choice is easier to
+ * THE FILM COMES FIRST. Two folders is a choice, and a choice is easier to
  * make after somebody has told you how the thing is meant to be used. The
  * frame sits above the grid and says out loud that it is not shot yet — the
  * same rule the video folder runs on, and the reason there is no fake play
@@ -112,7 +112,7 @@ export function MaterialRoom() {
          * TODO(tobia): when the film exists, add source={{ kind: "youtube",
          * id: "..." }} and the frame stops saying it is unmade. */}
         <h2 className="mt-16 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)] md:mt-20">
-          Three folders
+          Two folders
         </h2>
 
         <ul className="mt-10 grid list-none grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">
