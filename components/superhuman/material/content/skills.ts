@@ -63,6 +63,12 @@ When the job can be used by someone else without you standing next to it.`,
         text: "A list of next jobs is not a shop. It is a stall. Keep the list somewhere else.",
       },
     ],
+    link: {
+      label: "Download atelier SKILL.md",
+      href: "/construct/skills/atelier/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "page-copy",
@@ -116,6 +122,12 @@ End with the words a visitor will actually read, in order, nothing else.`,
         text: "If a sentence would embarrass you said to one person across a table, cut it.",
       },
     ],
+    link: {
+      label: "Download page-copy SKILL.md",
+      href: "/construct/skills/page-copy/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "motion-scale",
@@ -165,6 +177,12 @@ Name the scale, the one move, and what reduced motion looks like. Then stop.`,
         text: "Animation in the morning is how a day of building dies. Scale first. Motion last.",
       },
     ],
+    link: {
+      label: "Download motion-scale SKILL.md",
+      href: "/construct/skills/motion-scale/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "the-spec",
@@ -215,6 +233,12 @@ Then stop and wait for agreement. After that, build to the spec. If the spec is 
         text: "A spec that grows during the build is not a spec. It is a conversation you refused to have at the start.",
       },
     ],
+    link: {
+      label: "Download the-spec SKILL.md",
+      href: "/construct/skills/the-spec/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "tester",
@@ -261,6 +285,12 @@ Do not offer a redesign. Do not start coding. If you cannot reach the thing, tha
         text: "If you found yourself fixing it, you stopped testing.",
       },
     ],
+    link: {
+      label: "Download tester SKILL.md",
+      href: "/construct/skills/tester/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "house-style",
@@ -474,6 +504,12 @@ End with the single most important thing to fix, and nothing else.`,
         text: "Report, do not fix. The check and the change are two different jobs and they need two different moments.",
       },
     ],
+    link: {
+      label: "Download ship-check SKILL.md",
+      href: "/construct/skills/ship-check/SKILL.md",
+      download: true,
+    },
+
   },
   {
     slug: "the-argument",
