@@ -15,7 +15,7 @@ import {
 import type { MaterialFolder } from "./material-types";
 
 /**
- * THE ROOM — /projects/superhuman/material
+ * THE ROOM — /projects/construct/material
  *
  * Material is the only family with enough in it to need somewhere to stand
  * before you start reading, so it gets a room rather than a list: six folders
@@ -99,7 +99,7 @@ export function MaterialRoom() {
 
   return (
     <main className="paper-bg relative overflow-x-clip text-[#0a0a0a]">
-      <BackLink href="/projects/superhuman#shelf" label="The shelf" tone="ink" />
+      <BackLink href="/projects/construct#shelf" label="The shelf" tone="ink" />
 
       <ShelfHead
         title={family.name}

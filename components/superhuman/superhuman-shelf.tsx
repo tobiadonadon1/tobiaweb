@@ -470,7 +470,7 @@ export function SuperhumanShelf() {
                   locked, one is paid and being built, and each has real
                   contents that a card cannot hold. So the card is a door
                   again — name, one line, what it costs, where it has got to —
-                  and everything else lives at /projects/superhuman/[shelf],
+                  and everything else lives at /projects/construct/[shelf],
                   which is generated from the same data this card reads.
 
                   The subgrid went with the field. It existed to absorb a card

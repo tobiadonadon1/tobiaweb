@@ -108,7 +108,7 @@ export function ShelfPage({ family }: { family: ShelfFamily }) {
 
   return (
     <main className="paper-bg relative overflow-x-clip text-[#0a0a0a]">
-      <BackLink href="/projects/superhuman#shelf" label="The shelf" tone="ink" />
+      <BackLink href="/projects/construct#shelf" label="The shelf" tone="ink" />
 
       <ShelfHead
         title={family.name}

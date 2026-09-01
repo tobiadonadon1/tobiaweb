@@ -15,11 +15,11 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: "Construct",
   description: DESCRIPTION,
-  alternates: { canonical: "/projects/superhuman" },
+  alternates: { canonical: "/projects/construct" },
   openGraph: {
     title: "Construct",
     description: DESCRIPTION,
-    url: "/projects/superhuman",
+    url: "/projects/construct",
     type: "website",
     images: [
       {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
  * structured data is a bad place to start inventing them.
  *
  * The item URLs are back, because the routes are back: each family now has a
- * real page of its own under /projects/superhuman/[shelf], generated from
+ * real page of its own under /projects/construct/[shelf], generated from
  * this same array.
  */
 const ITEM_LIST = {

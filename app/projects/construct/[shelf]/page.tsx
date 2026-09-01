@@ -10,7 +10,7 @@ import {
 } from "@/components/superhuman/shelf-data";
 
 /**
- * /projects/superhuman/[shelf]
+ * /projects/construct/[shelf]
  *
  * One route for every family on the shelf. Everything it renders comes out of
  * SHELF in shelf-data.ts, so a family is added, renamed or filled in there and

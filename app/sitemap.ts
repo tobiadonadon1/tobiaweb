@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const fixed: MetadataRoute.Sitemap = [
     { url: SITE, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE}/projects/mynd`, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE}/projects/superhuman`, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE}/projects/construct`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE}/projects/book`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE}/lab/gallery`, changeFrequency: "monthly", priority: 0.4 },
   ];

@@ -30,7 +30,7 @@ const SUPERHUMAN: ProjectEntry = {
   description:
     "A place you fill.",
   status: "open, taking on a few",
-  href: "/projects/superhuman",
+  href: "/projects/construct",
 };
 
 // Mynd + The Book — the two editorial index rows. ORDER MATTERS: Mynd (the

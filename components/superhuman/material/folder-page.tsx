@@ -22,7 +22,7 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
-      <BackLink href="/projects/superhuman/material" label="Material" tone="ink" />
+      <BackLink href="/projects/construct/material" label="Material" tone="ink" />
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-28 md:pb-32 md:pt-32">
         {/* ---------------------------------------------------------------- *

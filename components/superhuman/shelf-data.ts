@@ -20,7 +20,7 @@
  *   Design       paid. Finished templates you ship as they are.
  *
  * The card no longer takes an address, because the card is no longer the
- * whole thing: each family has a route now (see app/projects/superhuman/
+ * whole thing: each family has a route now (see app/projects/construct/
  * [shelf]/page.tsx) and the page carries the contents, the honest empty
  * state and the field. The card's only job is to be a door that says what is
  * behind it.
@@ -224,7 +224,7 @@ export function isShelfId(value: string): value is ShelfId {
 }
 
 /** A family's route. One place, so no page hand-writes the path. */
-export const shelfHref = (id: ShelfId) => `/projects/superhuman/${id}`;
+export const shelfHref = (id: ShelfId) => `/projects/construct/${id}`;
 
 export const EMAIL = "tobia@donadon.com";
 export const mailto = (subject: string) =>

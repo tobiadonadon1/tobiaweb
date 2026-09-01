@@ -107,7 +107,7 @@ export function isFolderId(value: string): boolean {
 }
 
 /** A folder's route. One place, so nothing hand-writes the path. */
-export const folderHref = (id: string) => `/projects/superhuman/material/${id}`;
+export const folderHref = (id: string) => `/projects/construct/material/${id}`;
 
 /**
  * What each kind is called in the open, so a row never needs a legend.

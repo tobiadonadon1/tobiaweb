@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/projects/sole", destination: "/projects/mynd", permanent: true },
+      { source: "/projects/superhuman", destination: "/projects/construct", permanent: true },
+      { source: "/projects/superhuman/:path*", destination: "/projects/construct/:path*", permanent: true },
     ];
   },
 };
