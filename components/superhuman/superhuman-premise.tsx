@@ -176,12 +176,12 @@ export function SuperhumanPremise() {
               data-premise-claim
               className="font-helvetica max-w-[19ch] text-[clamp(2rem,4.6vw,3.5rem)] font-medium leading-[1.04] tracking-[-0.035em] text-[var(--ink)] lg:col-span-7"
             >
-              Everyone has the tools. Most are sure they are using them right.{" "}
+              Most people have the tools. They still fall behind.{" "}
               {/* The turn takes its own line. It is the half of the claim the
                   reader is supposed to argue with, so it is not allowed to
                   start halfway along a line of the half they agreed with. */}
               <span className="block" style={{ color: TURN }}>
-                That is exactly why they are falling behind.
+                The work has nowhere to live.
               </span>
             </h2>
 

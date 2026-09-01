@@ -43,11 +43,11 @@ export async function generateMetadata({
   const family = SHELF_BY_ID[shelf];
 
   return {
-    title: `${family.page.title} · Superhuman`,
+    title: `${family.page.title} · Construct`,
     description: `${family.page.lede} ${family.status}`,
     alternates: { canonical: shelfHref(family.id) },
     openGraph: {
-      title: `${family.page.title} · Superhuman`,
+      title: `${family.page.title} · Construct`,
       description: family.page.lede,
       url: shelfHref(family.id),
       type: "website",

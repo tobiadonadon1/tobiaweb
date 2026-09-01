@@ -99,13 +99,13 @@ const PORTRAIT: Portrait = {
 const WAYS = [
   {
     n: "01",
-    label: "Side by side",
-    body: "We build it together, in your tools, so it stays yours.",
+    label: "Coach",
+    body: "We sit with your work. You keep doing it.",
   },
   {
     n: "02",
-    label: "Hand it over",
-    body: "You say what you need. I build it and show you how it runs.",
+    label: "I build it",
+    body: "You bring the mess. I build the system.",
   },
 ];
 
@@ -136,7 +136,7 @@ function Head({ accent = false }: { accent?: boolean }) {
         className="mt-6 max-w-[14ch] pb-[0.06em] font-serif text-[clamp(2.6rem,6.4vw,4.9rem)] leading-[0.95] tracking-[-0.03em]"
         style={tone("var(--ink)")}
       >
-        Or we build it together.
+        Two doors. One to one.
       </h2>
 
     </>
@@ -482,7 +482,7 @@ export function SuperhumanTogether() {
               href={mailto("One to one")}
               className="group inline-flex items-center gap-2.5 bg-[var(--ink)] px-7 py-4 text-[0.95rem] text-[var(--paper)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]"
             >
-              Tell me what you are building
+              Write me
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
 

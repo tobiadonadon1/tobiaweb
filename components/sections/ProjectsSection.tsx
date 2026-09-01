@@ -25,10 +25,10 @@ import { EmberField } from "@/components/ui/ember-field";
    ============================================================================ */
 
 const SUPERHUMAN: ProjectEntry = {
-  title: "Superhuman",
-  // funnel §3.4 — the REWRITE.
+  title: "Construct",
+  // funnel §3.4 — Construct is a place you fill.
   description:
-    "The systems and playbooks I actually run, written down so you can run them.",
+    "A place you fill.",
   status: "open, taking on a few",
   href: "/projects/superhuman",
 };

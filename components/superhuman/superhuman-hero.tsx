@@ -166,7 +166,7 @@ export function SuperhumanHero() {
         // bottom padding gives every character its full body back.
         className="mt-10 pb-[0.08em] font-serif text-[clamp(3.4rem,14vw,11.5rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)]"
       >
-        Superhuman
+        Construct
       </h1>
 
       {/* A hero sub earns its place only by carrying a fact the headline does
@@ -179,14 +179,7 @@ export function SuperhumanHero() {
         data-hero-fade
         className="mt-9 max-w-[36ch] text-pretty text-[1.15rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)] sm:text-[1.3rem]"
       >
-        I was early to AI for code. Tried all of it, failed plenty,{" "}
-        {/* The claim is the only part of the line that is a claim. The two
-            admissions in front of it are what make it credible, so they stay
-            light and this goes heavy: the sentence ends on the one thing the
-            reader is being asked to believe. */}
-        <strong className="font-semibold text-[var(--ink)]">
-          got good at most of it.
-        </strong>
+        A place you fill.
       </p>
     </section>
   );

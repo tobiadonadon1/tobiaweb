@@ -151,7 +151,7 @@ export function SuperhumanClose() {
         data-close-fade
         className="mt-12 font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1] tracking-[-0.025em] text-[var(--ink)]"
       >
-        Start with one thing.
+        If you want the next thing I ship, write me.
       </h2>
 
       {/* The three names used to be repeated here as links to three offer
@@ -161,7 +161,7 @@ export function SuperhumanClose() {
           you: write. */}
       <a
         data-close-fade
-        href={mailto("Superhuman")}
+        href={mailto("Construct")}
         className="group mt-11 inline-flex items-center gap-2 border-b border-[rgba(11,31,58,0.2)] pb-1 text-sm text-[var(--ink)] transition-colors hover:border-[rgba(56,189,248,0.9)]"
       >
         {EMAIL}

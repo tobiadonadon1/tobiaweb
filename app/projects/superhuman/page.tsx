@@ -10,14 +10,14 @@ import { SHELF, shelfHref } from "@/components/superhuman/shelf-data";
 import { SECTION_ORDER } from "@/components/superhuman/sections";
 
 const DESCRIPTION =
-  "Free material on working with AI and AI for code, short expert masterclasses, and website templates you can ship as they are. Plus a small amount of one to one work.";
+  "A place you fill. Free material, a locked masterclass, templates later, and two one-to-one doors.";
 
 export const metadata: Metadata = {
-  title: "Superhuman",
+  title: "Construct",
   description: DESCRIPTION,
   alternates: { canonical: "/projects/superhuman" },
   openGraph: {
-    title: "Superhuman",
+    title: "Construct",
     description: DESCRIPTION,
     url: "/projects/superhuman",
     type: "website",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 const ITEM_LIST = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Superhuman",
+  name: "Construct",
   description: DESCRIPTION,
   numberOfItems: SHELF.length,
   itemListOrder: "https://schema.org/ItemListUnordered",
