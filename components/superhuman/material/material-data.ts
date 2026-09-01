@@ -9,8 +9,8 @@ import { SETUPS } from "./content/setups";
 /**
  * THE ROOM, ASSEMBLED.
  *
- * Two folders are the public room: Skills, Guides, in that order.
- * Videos, Do this, Tools, and Setups stay in the data so old URLs still resolve, but
+ * Three folders are the public room: Skills, Guides, Videos, in that order.
+ * Do this, Tools, and Setups stay in the data so old URLs still resolve, but
  * they are parked — hidden from the cards and from the room's counts.
  *
  * EVERY DESCRIPTION IS ONE PARAGRAPH. Tobia, on the first version: "within
@@ -92,15 +92,15 @@ const SETUPS_FOLDER: MaterialFolder = {
   entries: SETUPS,
 };
 
-/** The two cards in the room, in this order. */
+/** The three cards in the room, in this order. */
 export const MATERIAL_ROOM_FOLDERS: MaterialFolder[] = [
   SKILLS_FOLDER,
   GUIDES_FOLDER,
+  VIDEOS_FOLDER,
 ];
 
 /** Hidden from the room. Files stay; old URLs still resolve. */
 export const MATERIAL_PARKED_FOLDERS: MaterialFolder[] = [
-  VIDEOS_FOLDER,
   DO_THIS_FOLDER,
   TOOLS_FOLDER,
   SETUPS_FOLDER,
@@ -158,9 +158,6 @@ export function folderCount(folder: MaterialFolder): {
   const ready = folder.entries.filter((e) => e.status === "ready").length;
   const filming = folder.entries.filter((e) => e.status === "filming").length;
 
-  // The middle case is derived, not assumed. "None filmed" is only true of a
-  // folder whose unfinished pieces are ALL waiting on a camera; a folder of
-  // half-written drafts must not inherit the video folder's sentence.
   const label =
     ready === total
       ? `${total} ${total === 1 ? "piece" : "pieces"}`

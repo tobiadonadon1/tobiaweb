@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { FolderReader } from "./folder-reader";
+import { SkillRows } from "./skill-rows";
 import { MATERIAL_ROOM_FOLDERS, folderCount, folderHref } from "./material-data";
 import type { MaterialFolder } from "./material-types";
 
@@ -57,7 +58,11 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
          * THE READER.
          * ---------------------------------------------------------------- */}
         <div className="mt-14 border-t border-[var(--hairline)] pt-10 md:mt-20">
-          <FolderReader folder={folder} />
+          {folder.id === "skills" ? (
+            <SkillRows folder={folder} />
+          ) : (
+            <FolderReader folder={folder} />
+          )}
         </div>
 
         {/* ---------------------------------------------------------------- *
