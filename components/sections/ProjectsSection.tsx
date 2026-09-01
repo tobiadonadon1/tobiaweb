@@ -26,9 +26,8 @@ import { EmberField } from "@/components/ui/ember-field";
 
 const SUPERHUMAN: ProjectEntry = {
   title: "Construct",
-  // funnel §3.4 — Construct is a place you fill.
   description:
-    "A place you fill.",
+    "The systems and playbooks I actually run, written down so you can run them.",
   status: "open, taking on a few",
   href: "/projects/construct",
 };

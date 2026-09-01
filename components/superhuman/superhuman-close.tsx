@@ -151,7 +151,7 @@ export function SuperhumanClose() {
         data-close-fade
         className="mt-12 font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1] tracking-[-0.025em] text-[var(--ink)]"
       >
-        If you want the next thing I ship, write me.
+        Start with one thing.
       </h2>
 
       {/* The three names used to be repeated here as links to three offer

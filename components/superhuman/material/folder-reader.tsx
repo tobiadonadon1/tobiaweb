@@ -170,7 +170,7 @@ function Piece({
         <Meta entry={entry} />
 
         <div className="mt-10">
-          <Blocks blocks={entry.body} />
+          <Blocks blocks={folder.id === "skills" ? entry.body.filter((b) => b.type === "p") : entry.body} />
         </div>
 
         {/* A link that saves a file and a link that opens a page are two

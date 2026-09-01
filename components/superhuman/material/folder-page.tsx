@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { FolderReader } from "./folder-reader";
-import { SkillRows } from "./skill-rows";
-import { ConstructHorizon } from "../construct-horizon";
 import { MATERIAL_ROOM_FOLDERS, folderCount, folderHref } from "./material-data";
 import type { MaterialFolder } from "./material-types";
 
@@ -24,7 +22,6 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
-      <ConstructHorizon className="pointer-events-none absolute inset-x-0 bottom-0 h-[42vh] w-full opacity-70" />
       <BackLink href="/projects/construct/material" label="Material" tone="ink" />
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-28 md:pb-32 md:pt-32">
@@ -60,11 +57,7 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
          * THE READER.
          * ---------------------------------------------------------------- */}
         <div className="mt-14 border-t border-[var(--hairline)] pt-10 md:mt-20">
-          {folder.id === "skills" ? (
-            <SkillRows folder={folder} />
-          ) : (
-            <FolderReader folder={folder} />
-          )}
+          <FolderReader folder={folder} />
         </div>
 
         {/* ---------------------------------------------------------------- *

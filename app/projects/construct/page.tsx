@@ -8,9 +8,8 @@ import { SuperhumanClose } from "@/components/superhuman/superhuman-close";
 import { SuperhumanCompass } from "@/components/superhuman/superhuman-compass";
 import { SHELF, shelfHref } from "@/components/superhuman/shelf-data";
 import { SECTION_ORDER } from "@/components/superhuman/sections";
-
 const DESCRIPTION =
-  "A place you fill. Free material, a locked masterclass, templates later, and two one-to-one doors.";
+  "Free material on working with AI and AI for code, short expert masterclasses, and website templates you can ship as they are. Plus a small amount of one to one work.";
 
 export const metadata: Metadata = {
   title: "Construct",

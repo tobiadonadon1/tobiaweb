@@ -155,7 +155,10 @@ export function SuperhumanHero() {
         data-hero-fade
         className="mt-9 max-w-[36ch] text-pretty text-[1.15rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)] sm:text-[1.3rem]"
       >
-        A place you fill.
+        I was early to AI for code. Tried all of it, failed plenty,{" "}
+        <strong className="font-semibold text-[var(--ink)]">
+          got good at most of it.
+        </strong>
       </p>
     </section>
   );

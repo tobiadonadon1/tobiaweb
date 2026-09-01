@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
-import { VideoFrame } from "@/components/ui/video-frame";
 import { ShelfHead, ShelfRest } from "../shelf-chrome";
 import { SHELF_BY_ID } from "../shelf-data";
-import { FolderCover } from "./folder-cover";
 import {
   MATERIAL_READY,
   MATERIAL_ROOM_FOLDERS,
@@ -18,7 +16,7 @@ import type { MaterialFolder } from "./material-types";
  * THE ROOM — /projects/construct/material
  *
  * Material is the only family with enough in it to need somewhere to stand
- * before you start reading, so it gets a room rather than a list: three folders
+ * before you start reading, so it gets a room rather than a list: two folders
  * as cards, each with a drawn cover, and nothing to do on this page except
  * choose one.
  *
@@ -30,7 +28,7 @@ import type { MaterialFolder } from "./material-types";
  * about the MATERIAL instead: how much of what is listed is actually
  * finished. A folder of six unfilmed videos says so on its own face.
  *
- * THE FILM COMES FIRST. Three folders is a choice, and a choice is easier to
+ * THE FILM COMES FIRST. Two folders is a choice, and a choice is easier to
  * make after somebody has told you how the thing is meant to be used. The
  * frame sits above the grid and says out loud that it is not shot yet — the
  * same rule the video folder runs on, and the reason there is no fake play
@@ -51,15 +49,6 @@ function Card({ folder }: { folder: MaterialFolder }) {
         href={folderHref(folder.id)}
         className="group flex h-full flex-col bg-transparent transition-colors duration-[600ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-sky)]"
       >
-        {/* ---- the cover ---- */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-[var(--muted)]">
-          <FolderCover
-            id={folder.id}
-            accent={folder.accent}
-            className="absolute inset-0 h-full w-full"
-          />
-        </div>
-
         {/* ---- the type ---- */}
         <div className="flex flex-1 flex-col p-6">
           <h3 className="font-serif text-[1.5rem] leading-tight tracking-tight text-[var(--ink)]">
@@ -122,18 +111,8 @@ export function MaterialRoom() {
         {/* ---- the approach, in Tobia's own voice ---- *
          * TODO(tobia): when the film exists, add source={{ kind: "youtube",
          * id: "..." }} and the frame stops saying it is unmade. */}
-        <div className="mt-14 max-w-[52rem] md:mt-16">
-          <VideoFrame
-            tone="paper"
-            poster="/construct/horizon.svg"
-            posterAlt=""
-            caption="How I actually work, and how to use what is in here"
-            pending="Not filmed yet"
-          />
-        </div>
-
         <h2 className="mt-16 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)] md:mt-20">
-          Three folders
+          Two folders
         </h2>
 
         <ul className="mt-10 grid list-none grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">

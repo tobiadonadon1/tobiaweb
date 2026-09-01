@@ -139,21 +139,21 @@ export const SHELF: ShelfFamily[] = [
     name: "Material",
     tier: "free",
     tag: "Free",
-    line: "Free. The room of skills, guides, and tools I actually use.",
+    line: "Guides, skills, and the tools I build with. Basics that scale.",
     status: "Free, and it stays free.",
-    cta: "Open the room",
+    cta: "Open the material",
     subject: "Construct: material",
     spineRay: 2,
     dividerRay: 4,
     page: {
       title: "Material",
-      lede: "A room of three folders. Free, and it stays free.",
+      lede: "The basics, done properly, and free.",
       intro: [
-        "The material is already in the room. Open a folder. Nothing here is a fake catalogue.",
+        "Guides and skills that take you from nothing to working with AI, and then to working with AI on code. No theory you cannot use the same afternoon.",
       ],
       /**
        * MATERIAL'S CONTENTS ARE NOT HERE. It outgrew a flat list and has a
-       * room of its own now — three folders, each with its own page — in
+       * room of its own now — two folders, each with its own page — in
        * components/superhuman/material/. `items` stays empty and `empty`
        * stays written because the type requires both and because a family
        * that ever loses its room should fall back to something honest rather
@@ -161,7 +161,7 @@ export const SHELF: ShelfFamily[] = [
        */
       items: [],
       empty:
-        "The material lives in three folders rather than in one list. Open any of them from the room above.",
+        "The material lives in two folders rather than in one list. Open any of them from the room above.",
     },
   },
   {
@@ -169,7 +169,7 @@ export const SHELF: ShelfFamily[] = [
     name: "Masterclass",
     tier: "locked",
     tag: "Locked",
-    line: "Paid. A path, not a pile. Locked until it is real.",
+    line: "Ten minutes, one advanced move. None of it is on YouTube.",
     status: "Not open yet.",
     cta: "See what is coming",
     subject: "Construct: masterclass",
@@ -177,9 +177,9 @@ export const SHELF: ShelfFamily[] = [
     dividerRay: 1,
     page: {
       title: "Masterclass",
-      lede: "Paid. Locked. Not a shop yet.",
+      lede: "One advanced thing, in ten to fifteen minutes.",
       intro: [
-        "When it opens, one advanced move at a time. Not on YouTube. Not for sale yet.",
+        "Expert level and tightly cut. One technique per class, taken to the end, with the parts that usually break already broken and fixed on camera.",
       ],
       items: [],
       empty:
@@ -188,24 +188,24 @@ export const SHELF: ShelfFamily[] = [
   },
   {
     id: "design",
-    name: "Templates",
+    name: "Design",
     tier: "paid",
     tag: "Templates",
-    line: "Paid. Later. Not for sale here yet.",
-    status: "Not for sale yet.",
-    cta: "Not for sale yet",
-    subject: "Construct: templates",
+    line: "Website templates you can ship as they are.",
+    status: "First set in build.",
+    cta: "See the templates",
+    subject: "Construct: design",
     spineRay: 6,
     dividerRay: 5,
     page: {
-      title: "Templates",
-      lede: "Paid templates later. No shop here.",
+      title: "Design",
+      lede: "Templates you can ship as they are.",
       intro: [
-        "These will be finished sites, not a catalogue of prices. Nothing to buy yet, so nothing is listed as if you could.",
+        "Whole builds, not snippets: a site you can put a client on the week you buy it, with the animation, the type and the responsive work already done.",
       ],
       items: [],
       empty:
-        "Not for sale yet. I will not put a shop here until there is something to buy.",
+        "The first set is in build. They are being cut out of real client work, so each one ships only after it has been used for something.",
     },
   },
 ];
