@@ -8,9 +8,11 @@ const nextConfig: NextConfig = {
   // existing link or indexed result lands on the new page instead of a 404.
   async redirects() {
     return [
-      { source: "/projects/sole", destination: "/projects/mynd", permanent: true },
-      { source: "/projects/superhuman", destination: "/projects/construct", permanent: true },
-      { source: "/projects/superhuman/:path*", destination: "/projects/construct/:path*", permanent: true },
+      { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
+      { source: "/projects/superhuman", destination: "/projects/construct", statusCode: 301 },
+      { source: "/projects/superhuman/:path*", destination: "/projects/construct/:path*", statusCode: 301 },
+      { source: "/projects/construct/materials", destination: "/projects/construct/material", statusCode: 301 },
+      { source: "/projects/construct/materials/:path*", destination: "/projects/construct/material/:path*", statusCode: 301 },
     ];
   },
 };
