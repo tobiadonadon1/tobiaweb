@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { THOUGHTS } from "@/lib/thoughts";
 import { SHELF_IDS, shelfHref } from "@/components/superhuman/shelf-data";
 import {
-  FOLDER_IDS,
+  MATERIAL_ROOM_FOLDERS,
   folderHref,
 } from "@/components/superhuman/material/material-data";
 
@@ -12,8 +12,8 @@ const SITE = "https://tobiadonadon.com";
  * The sitemap is generated, never hand-listed. The Thoughts routes come from
  * the same corpus that renders them, the shelf routes from the same array
  * that renders the cards, and Material's folders from the same array that
- * renders the room — so nothing can be published and silently left out of
- * the index.
+ * renders the public room — parked folders stay off the sitemap — so nothing
+ * in the room can be published and silently left out of the index.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -32,10 +32,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // Material's folders. Deeper than the families and updated more often,
-  // since a folder changes every time a piece lands in it.
-  const folders: MetadataRoute.Sitemap = FOLDER_IDS.map((id) => ({
-    url: `${SITE}${folderHref(id)}`,
+  // Public room only. Parked folders keep their routes; they are not indexed.
+  const folders: MetadataRoute.Sitemap = MATERIAL_ROOM_FOLDERS.map((folder) => ({
+    url: `${SITE}${folderHref(folder.id)}`,
     changeFrequency: "weekly",
     priority: 0.6,
   }));

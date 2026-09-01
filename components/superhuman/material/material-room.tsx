@@ -6,8 +6,8 @@ import { ShelfHead, ShelfRest } from "../shelf-chrome";
 import { SHELF_BY_ID } from "../shelf-data";
 import { FolderCover } from "./folder-cover";
 import {
-  MATERIAL_FOLDERS,
   MATERIAL_READY,
+  MATERIAL_ROOM_FOLDERS,
   MATERIAL_TOTAL,
   folderCount,
   folderHref,
@@ -18,19 +18,19 @@ import type { MaterialFolder } from "./material-types";
  * THE ROOM — /projects/construct/material
  *
  * Material is the only family with enough in it to need somewhere to stand
- * before you start reading, so it gets a room rather than a list: six folders
+ * before you start reading, so it gets a room rather than a list: three folders
  * as cards, each with a drawn cover, and nothing to do on this page except
  * choose one.
  *
  * WHAT IS BORROWED FROM A CLASSROOM AND WHAT IS NOT. The grid of covered
  * cards is borrowed, because it is genuinely the clearest way to show that
- * six unlike things sit at the same level. The progress bar is not. A
+ * three unlike things sit at the same level. The progress bar is not. A
  * progress bar on a card like this is a claim about the reader, and the
  * reader has not agreed to be measured. The rule under each card is a claim
  * about the MATERIAL instead: how much of what is listed is actually
  * finished. A folder of six unfilmed videos says so on its own face.
  *
- * THE FILM COMES FIRST. Six folders is a choice, and a choice is easier to
+ * THE FILM COMES FIRST. Three folders is a choice, and a choice is easier to
  * make after somebody has told you how the thing is meant to be used. The
  * frame sits above the grid and says out loud that it is not shot yet — the
  * same rule the video folder runs on, and the reason there is no fake play
@@ -49,14 +49,14 @@ function Card({ folder }: { folder: MaterialFolder }) {
     <li>
       <Link
         href={folderHref(folder.id)}
-        className="group flex h-full flex-col border border-[var(--hairline)] bg-[var(--paper)] transition-[transform,border-color] duration-300 hover:-translate-y-1 hover:border-[var(--hairline-strong)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-sky)]"
+        className="group flex h-full flex-col bg-transparent transition-colors duration-[600ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-sky)]"
       >
         {/* ---- the cover ---- */}
         <div className="relative aspect-[16/10] overflow-hidden bg-[var(--muted)]">
           <FolderCover
             id={folder.id}
             accent={folder.accent}
-            className="absolute inset-0 h-full w-full transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
+            className="absolute inset-0 h-full w-full"
           />
         </div>
 
@@ -125,19 +125,19 @@ export function MaterialRoom() {
         <div className="mt-14 max-w-[52rem] md:mt-16">
           <VideoFrame
             tone="paper"
-            poster="/trail/trail-06.jpg"
-            posterAlt="Tobia standing outside at night in a white t-shirt, hands in his pockets."
+            poster="/construct/horizon.svg"
+            posterAlt=""
             caption="How I actually work, and how to use what is in here"
             pending="Not filmed yet"
           />
         </div>
 
         <h2 className="mt-16 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)] md:mt-20">
-          Six folders
+          Three folders
         </h2>
 
-        <ul className="mt-6 grid list-none grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {MATERIAL_FOLDERS.map((folder) => (
+        <ul className="mt-10 grid list-none grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">
+          {MATERIAL_ROOM_FOLDERS.map((folder) => (
             <Card key={folder.id} folder={folder} />
           ))}
         </ul>

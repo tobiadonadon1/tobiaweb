@@ -1,57 +1,20 @@
----
-name: page-copy
-description: Use this when writing or rewriting words that must belong to a locked graphic-design school (atelier). Headlines, sections, buttons, metadata. Do not use before a school is locked, for legal or policy text, or to invent a brand voice from slogans.
----
-
 # Page copy
 
-Copy is part of the school, not a layer on top of it. Swiss type does not speak like a California New Wave poster. If atelier has not locked a school, stop and send them there.
+Write the page as words. Do not write markup. Do not invent a shop.
 
-## Before a sentence
+Voice: humble, short, straight, valuable. No guru. Never "become".
 
-Read the atelier lock: school, type, grid, colour, crop, signature move. The copy has to live in that type size, on that measure, next to that crop.
+Order, unless I change it:
+1. Why people have tools and still fall behind.
+2. The shelf. Name what is free, what is paid and locked, what is later. Do not fake a buy button.
+3. Two one-to-one doors, side by side. Coach. I build it.
+4. Email. One ask.
 
-Ask only what changes the words:
+Rules:
+- One idea per sentence.
+- Facts only. No invented prices, numbers, or testimonials.
+- If something is locked, say locked.
+- If something is not for sale yet, say so. Do not dress the empty shelf.
+- Stop when the point is made.
 
-- Who this is for, in one clause.
-- What they should do, or understand, before they leave.
-- What must never be claimed (prices, results, testimonials that do not exist).
-
-No mood-board adjectives. No "make it punchy".
-
-## How the school writes
-
-Match the school's public language, not a marketing blog.
-
-- Short schools (Swiss, industrial) get short lines, concrete nouns, no warmth performed for the camera.
-- Poster schools get a few loaded words and then silence. They do not explain themselves in a second paragraph.
-- New Wave and late-century graphic can be more spoken, still specific. Wit is allowed; filler is not.
-
-Line length follows the grid. A 12-column Swiss lock does not get a 90-character marketing sentence. If a heading cannot sit in the display size without wrapping into a paragraph, the heading is wrong.
-
-## What you produce
-
-For a page, in this order:
-
-1. Title and description that would look right in a tab and in a pasted link.
-2. The display line (usually one).
-3. The supporting line, only if the display line cannot carry the fact.
-4. Section heads that are facts or invitations, not labels ("Solutions").
-5. Body that a person could say out loud.
-6. The one action, in the same voice. Not "Get started". Not "Learn more" unless learning is the actual job.
-
-Do not add a summary at the end. Stop.
-
-## Banned by default
-
-Em dashes as decoration. "It's not just X, it's Y." Three items purely for rhythm. Invented numbers. Testimonials. Unlock, elevate, seamless, journey, leverage. Questions the page then answers itself.
-
-## When this is not the skill
-
-- No school locked yet (atelier).
-- Motion copy that is really a motion spec (motion-scale).
-- Legal, medical, or financial language that needs a specialist.
-
-## Test
-
-Read it in the display face at the locked size. If you have to shrink the type to make the sentence fit, the sentence lost. Cut words, not point size.
+End with the words a visitor will actually read, in order, nothing else.
