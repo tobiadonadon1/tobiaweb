@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
       { source: "/projects/superhuman", destination: "/projects/construct", statusCode: 301 },
+      { source: "/projects/superhuman/materials", destination: "/projects/construct/material", statusCode: 301 },
+      { source: "/projects/superhuman/materials/:path*", destination: "/projects/construct/material/:path*", statusCode: 301 },
       { source: "/projects/superhuman/:path*", destination: "/projects/construct/:path*", statusCode: 301 },
       { source: "/projects/construct/materials", destination: "/projects/construct/material", statusCode: 301 },
       { source: "/projects/construct/materials/:path*", destination: "/projects/construct/material/:path*", statusCode: 301 },
