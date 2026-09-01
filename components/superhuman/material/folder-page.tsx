@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
 import { FolderReader } from "./folder-reader";
-import { MATERIAL_FOLDERS, folderCount, folderHref } from "./material-data";
+import { MATERIAL_ROOM_FOLDERS, folderCount, folderHref } from "./material-data";
 import type { MaterialFolder } from "./material-types";
 
 /**
@@ -13,16 +13,16 @@ import type { MaterialFolder } from "./material-types";
  * start reading as the page's background. One ink thing per screen.
  *
  * Everything below the head comes out of the folder object, so a new folder
- * is a new entry in MATERIAL_FOLDERS and a content file. There is no
+ * is a new entry in MATERIAL_ROOM_FOLDERS and a content file. There is no
  * per-folder page to write, and there should never be one.
  */
 export function FolderPage({ folder }: { folder: MaterialFolder }) {
   const count = folderCount(folder);
-  const others = MATERIAL_FOLDERS.filter((f) => f.id !== folder.id);
+  const others = MATERIAL_ROOM_FOLDERS.filter((f) => f.id !== folder.id);
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
-      <BackLink href="/projects/superhuman/material" label="Material" tone="ink" />
+      <BackLink href="/projects/construct/material" label="Material" tone="ink" />
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-28 md:pb-32 md:pt-32">
         {/* ---------------------------------------------------------------- *

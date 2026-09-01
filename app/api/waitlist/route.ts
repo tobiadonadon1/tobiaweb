@@ -34,7 +34,7 @@ const SOURCES = new Set(["superhuman", "book"]);
  * What the visitor said they want first. Free text is not accepted.
  *
  * The three shelf values are the same strings as `ShelfId` and the URL
- * segments under /projects/superhuman. They are repeated as literals rather
+ * segments under /projects/construct. They are repeated as literals rather
  * than imported because this is the trust boundary: the allowed set must be
  * readable in the file that enforces it, and a route handler should not widen
  * silently because a component's type changed. If a family is added, add it

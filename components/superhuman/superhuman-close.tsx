@@ -161,7 +161,7 @@ export function SuperhumanClose() {
           you: write. */}
       <a
         data-close-fade
-        href={mailto("Superhuman")}
+        href={mailto("Construct")}
         className="group mt-11 inline-flex items-center gap-2 border-b border-[rgba(11,31,58,0.2)] pb-1 text-sm text-[var(--ink)] transition-colors hover:border-[rgba(56,189,248,0.9)]"
       >
         {EMAIL}

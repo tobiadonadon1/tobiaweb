@@ -20,7 +20,7 @@
  *   Design       paid. Finished templates you ship as they are.
  *
  * The card no longer takes an address, because the card is no longer the
- * whole thing: each family has a route now (see app/projects/superhuman/
+ * whole thing: each family has a route now (see app/projects/construct/
  * [shelf]/page.tsx) and the page carries the contents, the honest empty
  * state and the field. The card's only job is to be a door that says what is
  * behind it.
@@ -139,21 +139,21 @@ export const SHELF: ShelfFamily[] = [
     name: "Material",
     tier: "free",
     tag: "Free",
-    line: "Guides, short videos, and the tools and skills I build with. Basics that scale.",
+    line: "Guides, skills, and the tools I build with. Basics that scale.",
     status: "Free, and it stays free.",
     cta: "Open the material",
-    subject: "Superhuman: material",
+    subject: "Construct: material",
     spineRay: 2,
     dividerRay: 4,
     page: {
       title: "Material",
       lede: "The basics, done properly, and free.",
       intro: [
-        "Guides, short videos and skills that take you from nothing to working with AI, and then to working with AI on code. No theory you cannot use the same afternoon.",
+        "Guides and skills that take you from nothing to working with AI, and then to working with AI on code. No theory you cannot use the same afternoon.",
       ],
       /**
        * MATERIAL'S CONTENTS ARE NOT HERE. It outgrew a flat list and has a
-       * room of its own now — six folders, each with its own page — in
+       * room of its own now — two folders, each with its own page — in
        * components/superhuman/material/. `items` stays empty and `empty`
        * stays written because the type requires both and because a family
        * that ever loses its room should fall back to something honest rather
@@ -161,7 +161,7 @@ export const SHELF: ShelfFamily[] = [
        */
       items: [],
       empty:
-        "The material lives in six folders rather than in one list. Open any of them from the room above.",
+        "The material lives in two folders rather than in one list. Open any of them from the room above.",
     },
   },
   {
@@ -172,7 +172,7 @@ export const SHELF: ShelfFamily[] = [
     line: "Ten minutes, one advanced move. None of it is on YouTube.",
     status: "Not open yet.",
     cta: "See what is coming",
-    subject: "Superhuman: masterclass",
+    subject: "Construct: masterclass",
     spineRay: 7,
     dividerRay: 1,
     page: {
@@ -180,7 +180,6 @@ export const SHELF: ShelfFamily[] = [
       lede: "One advanced thing, in ten to fifteen minutes.",
       intro: [
         "Expert level and tightly cut. One technique per class, taken to the end, with the parts that usually break already broken and fixed on camera.",
-        "These are the things that took me a year to work out, which is exactly why they are not on the YouTube channel.",
       ],
       items: [],
       empty:
@@ -195,7 +194,7 @@ export const SHELF: ShelfFamily[] = [
     line: "Website templates you can ship as they are.",
     status: "First set in build.",
     cta: "See the templates",
-    subject: "Superhuman: design",
+    subject: "Construct: design",
     spineRay: 6,
     dividerRay: 5,
     page: {
@@ -225,7 +224,7 @@ export function isShelfId(value: string): value is ShelfId {
 }
 
 /** A family's route. One place, so no page hand-writes the path. */
-export const shelfHref = (id: ShelfId) => `/projects/superhuman/${id}`;
+export const shelfHref = (id: ShelfId) => `/projects/construct/${id}`;
 
 export const EMAIL = "tobia@donadon.com";
 export const mailto = (subject: string) =>

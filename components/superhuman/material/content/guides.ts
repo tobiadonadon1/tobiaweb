@@ -7,6 +7,102 @@ import type { MaterialEntry } from "../material-types";
  */
 export const GUIDES: MaterialEntry[] = [
   {
+    slug: "pick-a-school",
+    title: "How to pick a school",
+    kind: "guide",
+    summary: "One way of making. Stay until you can do a piece without looking.",
+    minutes: 7,
+    status: "ready",
+    when: "You have a pile of courses, tools, or teachers, and none of them has stuck.",
+    level: "Anyone",
+    body: [
+      {
+        type: "p",
+        text: "A school is a way of making, held long enough that your hands know it. It is not a brand, a guru, or a folder of half-watched videos.",
+      },
+      { type: "h", text: "What you are actually choosing" },
+      {
+        type: "p",
+        text: "You are choosing constraints. One stack, one voice, one kind of piece you will finish. The rest is noise that feels like progress.",
+      },
+      { type: "h", text: "How to pick" },
+      {
+        type: "steps",
+        items: [
+          "Name the piece you need to ship in the next two weeks. Not the career. The piece.",
+          "Pick the school that has already shipped that kind of piece, in public, recently.",
+          "Ignore anything that talks about becoming someone. You need a method you can copy this afternoon.",
+          "Stay until you can make one piece without opening the notes. Then you are allowed another school.",
+        ],
+      },
+      {
+        type: "list",
+        items: [
+          "If two schools both work, pick the quieter one. Loud is usually selling.",
+          "If you cannot point at three finished pieces from that school, it is not a school yet.",
+          "If you are collecting teachers, you are stalling.",
+        ],
+      },
+      {
+        type: "pull",
+        text: "One school, one piece, finished. That is the whole test.",
+      },
+      {
+        type: "watch",
+        text: "Switching schools every week is not curiosity. It is a way to never be bad at something in public.",
+      },
+    ],
+  },
+  {
+    slug: "motion-that-doesnt-sicken",
+    title: "Motion that does not make people sick",
+    kind: "guide",
+    summary: "Keep the page usable when nothing moves, and kind when it does.",
+    minutes: 8,
+    status: "ready",
+    when: "You are about to add motion, or someone already said the page made them feel off.",
+    level: "Some code",
+    body: [
+      {
+        type: "p",
+        text: "Some motion looks expensive and costs the reader their stomach. You will not notice if you are the one who built it. They will leave.",
+      },
+      { type: "h", text: "The cheap way to hurt people" },
+      {
+        type: "list",
+        items: [
+          "Parallax on the whole page, especially with the scrollbar.",
+          "Large loops that never rest, next to text they are trying to read.",
+          "Zooming, spinning, or sliding the viewport itself.",
+          "Autoplaying video with movement in the frame, no controls, no pause.",
+        ],
+      },
+      { type: "h", text: "What to do instead" },
+      {
+        type: "steps",
+        items: [
+          "Write the page so it works with motion off. That version is the real page.",
+          "Add one move, small, on one thing. Opacity and a few pixels beat a journey.",
+          "Respect prefers-reduced-motion by not running the move at all. Not a weaker copy of it.",
+          "Look at it on a phone, in the hand, for a full scroll. If you feel it in your eyes, cut it.",
+        ],
+      },
+      { type: "h", text: "A useful test" },
+      {
+        type: "p",
+        text: "Turn the motion off. Can a visitor still tell what the page is, where to go, and what just happened? If not, the motion was doing the explaining, which means the page was not finished.",
+      },
+      {
+        type: "pull",
+        text: "Stillness is not a lack of craft. It is the default that most people asked for.",
+      },
+      {
+        type: "watch",
+        text: "Do not ask a friend who likes your work. Ask someone who gets carsick. Believe them the first time.",
+      },
+    ],
+  },
+  {
     slug: "from-nothing",
     title: "From nothing to actually using it",
     kind: "guide",

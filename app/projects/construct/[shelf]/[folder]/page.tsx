@@ -8,11 +8,11 @@ import {
 } from "@/components/superhuman/material/material-data";
 
 /**
- * /projects/superhuman/material/[folder]
+ * /projects/construct/material/[folder]
  *
  * MATERIAL IS THE ONLY FAMILY WITH FOLDERS, and this route says so by
  * generating both segments itself: every path it produces has `material` in
- * the shelf position, so /projects/superhuman/design/anything cannot exist.
+ * the shelf position, so /projects/construct/design/anything cannot exist.
  * With `dynamicParams` off, that is enforced at routing rather than by a
  * check inside the page.
  *

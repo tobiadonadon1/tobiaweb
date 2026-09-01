@@ -8,18 +8,17 @@ import { SuperhumanClose } from "@/components/superhuman/superhuman-close";
 import { SuperhumanCompass } from "@/components/superhuman/superhuman-compass";
 import { SHELF, shelfHref } from "@/components/superhuman/shelf-data";
 import { SECTION_ORDER } from "@/components/superhuman/sections";
-
 const DESCRIPTION =
   "Free material on working with AI and AI for code, short expert masterclasses, and website templates you can ship as they are. Plus a small amount of one to one work.";
 
 export const metadata: Metadata = {
-  title: "Superhuman",
+  title: "Construct",
   description: DESCRIPTION,
-  alternates: { canonical: "/projects/superhuman" },
+  alternates: { canonical: "/projects/construct" },
   openGraph: {
-    title: "Superhuman",
+    title: "Construct",
     description: DESCRIPTION,
-    url: "/projects/superhuman",
+    url: "/projects/construct",
     type: "website",
     images: [
       {
@@ -38,13 +37,13 @@ export const metadata: Metadata = {
  * structured data is a bad place to start inventing them.
  *
  * The item URLs are back, because the routes are back: each family now has a
- * real page of its own under /projects/superhuman/[shelf], generated from
+ * real page of its own under /projects/construct/[shelf], generated from
  * this same array.
  */
 const ITEM_LIST = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Superhuman",
+  name: "Construct",
   description: DESCRIPTION,
   numberOfItems: SHELF.length,
   itemListOrder: "https://schema.org/ItemListUnordered",

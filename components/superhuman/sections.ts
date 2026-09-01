@@ -17,7 +17,7 @@
  * is where you actually are, which is the one-to-one.
  */
 export const SECTION_LABELS = {
-  hero: "Superhuman",
+  hero: "Construct",
   premise: "The premise",
   shelf: "The shelf",
   together: "One to one",

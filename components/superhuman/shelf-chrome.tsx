@@ -7,7 +7,7 @@ import { SHELF, shelfHref, type ShelfId } from "./shelf-data";
  *
  * Material outgrew the generic list page (it has a room of its own now, see
  * material/material-room.tsx) and the moment there were two page shapes under
- * /projects/superhuman there were two copies of the head and two copies of
+ * /projects/construct there were two copies of the head and two copies of
  * the footer nav. This file is what stops that: the ink head and the rest-of-
  * the-shelf nav live here once, and both page shapes call them.
  *

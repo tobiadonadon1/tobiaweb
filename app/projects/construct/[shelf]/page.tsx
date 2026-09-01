@@ -10,7 +10,7 @@ import {
 } from "@/components/superhuman/shelf-data";
 
 /**
- * /projects/superhuman/[shelf]
+ * /projects/construct/[shelf]
  *
  * One route for every family on the shelf. Everything it renders comes out of
  * SHELF in shelf-data.ts, so a family is added, renamed or filled in there and
@@ -43,11 +43,11 @@ export async function generateMetadata({
   const family = SHELF_BY_ID[shelf];
 
   return {
-    title: `${family.page.title} · Superhuman`,
+    title: `${family.page.title} · Construct`,
     description: `${family.page.lede} ${family.status}`,
     alternates: { canonical: shelfHref(family.id) },
     openGraph: {
-      title: `${family.page.title} · Superhuman`,
+      title: `${family.page.title} · Construct`,
       description: family.page.lede,
       url: shelfHref(family.id),
       type: "website",

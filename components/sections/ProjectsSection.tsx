@@ -25,12 +25,11 @@ import { EmberField } from "@/components/ui/ember-field";
    ============================================================================ */
 
 const SUPERHUMAN: ProjectEntry = {
-  title: "Superhuman",
-  // funnel §3.4 — the REWRITE.
+  title: "Construct",
   description:
     "The systems and playbooks I actually run, written down so you can run them.",
   status: "open, taking on a few",
-  href: "/projects/superhuman",
+  href: "/projects/construct",
 };
 
 // Mynd + The Book — the two editorial index rows. ORDER MATTERS: Mynd (the

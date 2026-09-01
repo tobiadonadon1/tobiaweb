@@ -2,13 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { SplitText } from "gsap/SplitText";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { SuperhumanStar, STAR_TIGHT_BOX } from "./superhuman-star";
 import { SECTION_LABELS } from "./sections";
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(SplitText, DrawSVGPlugin);
+  gsap.registerPlugin(DrawSVGPlugin);
 }
 
 /** Rendered height of the hero mark, in px. */
@@ -55,18 +54,6 @@ export function SuperhumanHero() {
 
       ctx = gsap.context(() => {
         const cuts = gsap.utils.toArray<SVGPathElement>(".sh-hero-cut");
-        const solid = root.querySelector<HTMLElement>("[data-star-solid]");
-        const title = root.querySelector<HTMLElement>("[data-hero-title]");
-        const rest = gsap.utils.toArray<HTMLElement>("[data-hero-fade]");
-
-        const split = title
-          ? SplitText.create(title, { type: "chars", mask: "chars" })
-          : null;
-
-        gsap.set(solid, { opacity: 0 });
-        if (split) gsap.set(split.chars, { yPercent: 108 });
-        gsap.set(rest, { opacity: 0, y: 14 });
-
         const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
         // Each ray cuts itself out, one after another.
@@ -77,17 +64,7 @@ export function SuperhumanHero() {
           ease: "power2.inOut",
         });
         // Then the paper fills in behind the cut lines, and the lines go.
-        tl.to(solid, { opacity: 1, duration: 0.5 }, "-=0.22");
-        tl.to(".sh-hero-outline", { opacity: 0, duration: 0.45 }, "<");
-
-        if (split) {
-          tl.to(
-            split.chars,
-            { yPercent: 0, duration: 0.72, stagger: 0.03, ease: "power3.out" },
-            "-=0.4",
-          );
-        }
-        tl.to(rest, { opacity: 1, y: 0, duration: 0.7 }, "-=0.32");
+        tl.to(".sh-hero-outline", { opacity: 0, duration: 0.45 }, "-=0.22");
 
         // Once it has arrived, it keeps turning. 96 seconds a revolution is
         // slow enough that you never catch it moving, and just fast enough
@@ -104,7 +81,6 @@ export function SuperhumanHero() {
 
         return () => {
           spin.kill();
-          split?.revert();
         };
       }, scope);
     });
@@ -166,7 +142,7 @@ export function SuperhumanHero() {
         // bottom padding gives every character its full body back.
         className="mt-10 pb-[0.08em] font-serif text-[clamp(3.4rem,14vw,11.5rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)]"
       >
-        Superhuman
+        Construct
       </h1>
 
       {/* A hero sub earns its place only by carrying a fact the headline does
@@ -180,10 +156,6 @@ export function SuperhumanHero() {
         className="mt-9 max-w-[36ch] text-pretty text-[1.15rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)] sm:text-[1.3rem]"
       >
         I was early to AI for code. Tried all of it, failed plenty,{" "}
-        {/* The claim is the only part of the line that is a claim. The two
-            admissions in front of it are what make it credible, so they stay
-            light and this goes heavy: the sentence ends on the one thing the
-            reader is being asked to believe. */}
         <strong className="font-semibold text-[var(--ink)]">
           got good at most of it.
         </strong>

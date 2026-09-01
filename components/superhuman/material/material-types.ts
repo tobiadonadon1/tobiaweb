@@ -119,7 +119,7 @@ export type MaterialEntry = {
 export type MaterialAccent = "ink" | "sky" | "clay" | "mist";
 
 export type MaterialFolder = {
-  /** URL segment under /projects/superhuman/material. */
+  /** URL segment under /projects/construct/material. */
   id: string;
   name: string;
   /** One line, on the card. */
