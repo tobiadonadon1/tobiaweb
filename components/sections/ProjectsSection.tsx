@@ -12,7 +12,7 @@ import { EmberField } from "@/components/ui/ember-field";
    PROJECTS — full-screen, layout 1b. Copy per funnel §3.4.
 
    THE LEAD is Superhuman (the OPEN/sellable B2B AI work — what businesses, and
-   a major company, actually pay him for). It is the INK FEATURE. Sole + The
+   a major company, actually pay him for). It is the INK FEATURE. Mynd + The
    Book are flat editorial index rows beside it.
 
    ONE CONTINUOUS INK (the seam fix): the whole chapter is a SINGLE navy ground
@@ -28,39 +28,39 @@ const SUPERHUMAN: ProjectEntry = {
   title: "Superhuman",
   // funnel §3.4 — the REWRITE.
   description:
-    "Consulting that makes you or your business superhuman with AI: the systems, the infrastructure, built with you and left running.",
+    "The systems and playbooks I actually run, written down so you can run them.",
   status: "open, taking on a few",
   href: "/projects/superhuman",
 };
 
-// Sole + The Book — the two editorial index rows. ORDER MATTERS: Sole (the
-// other OPEN offer) leads; The Book sits beneath it as the horizon. The Book
-// is the soul, kept quiet in size until launch (see bookShift below).
+// Mynd + The Book — the two editorial index rows. ORDER MATTERS: Mynd (the
+// live build) leads; The Book sits beneath it as the horizon. The Book is the
+// soul, kept quiet in size until launch (see bookShift below).
 const INDEX_ROWS: ProjectEntry[] = [
   {
-    title: "Sole",
+    title: "Myynd",
     // funnel §3.4
     description:
-      "Hands-on help when the thing is built but won't quite ship: positioning, decisions, and the final push to press publish.",
+      "A brain the company owns, and the automations that run on top of it.",
     unfurl:
-      "Not for scaling something that already works. Sole stays with first things. If you're at the start, the door is open: write me one paragraph about what you're building. I read and answer every email myself.",
-    status: "open, for first launches",
-    href: "/projects/sole",
+      "A working product, two people, and no customers yet. The real thing lives at soleagency.co.",
+    status: "early, building",
+    href: "/projects/mynd",
   },
   {
     title: "The Book",
     // funnel §3.4 — the soul, finishing. A date is a magnet, kept honest.
     description:
-      "The horizon this whole site bends toward: the intersection of technology and the inner world, written in public.",
+      "On the minds we are building, and the ones we already have.",
     unfurl:
-      "The first draft is done; I'm deep in revisions, the slow part where a book becomes good. It comes out at the end of 2026. That's a real date, and I mean to keep it. Want the first chapter the week it lands? That's the whole list.",
-    status: "finishing, out late 2026",
+      "Still being written. Leave an address and I write once, when it is real.",
+    status: "being written",
     href: "/projects/book",
   },
 ];
 
 /* bookShift — POST-LAUNCH SEAM ───────────────────────────────────────────────
-   When The Book launches (late 2026), it flips from a quiet index row to the
+   When The Book launches, it flips from a quiet index row to the
    ink feature, and Superhuman drops into the index rows. To make that switch:
      • set FEATURE = THE_BOOK entry, INDEX = [SUPERHUMAN, SOLE]
      • update The Book's status to its launched line ("out now" / a buy link)
@@ -117,7 +117,7 @@ export function ProjectsSection() {
             the one net stay put the whole time, so the seam can't come back. */}
         <div className="relative h-[185vh]">
           <div className="sticky top-0 flex h-screen flex-col items-center justify-center px-6 text-center">
-            <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-[#faf8f2]/60">
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-[#faf8f2]/60">
               Projects
             </span>
             <h2 className="mt-5 font-serif text-4xl tracking-tight text-[#faf8f2] md:text-6xl">
@@ -126,7 +126,7 @@ export function ProjectsSection() {
           </div>
         </div>
 
-        {/* Layout 1b: the ink feature (Superhuman) + Sole/Book index rows. */}
+        {/* Layout 1b: the ink feature (Superhuman) + Mynd/Book index rows. */}
         <div className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-6 py-20 md:py-24">
           <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-[1.1fr_1fr] md:gap-12">
             <FeaturePanel entry={FEATURE} />

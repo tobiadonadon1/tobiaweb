@@ -33,6 +33,7 @@ export function InkCursor() {
     let targetScale = 1;
     let visible = false;
     let onDark = false; // over a [data-cursor-ink] region (e.g. the desktop)
+    let hidden = false; // over a [data-cursor-hide] region — dot fully out
     let raf = 0;
 
     const onMove = (e: MouseEvent) => {
@@ -56,6 +57,10 @@ export function InkCursor() {
       // so it stays visible — same rule as body[data-ink], but scoped to the
       // region so it never races with the ProjectsSection flag.
       onDark = !!t?.closest("[data-cursor-ink]");
+      // Regions marked [data-cursor-hide] provide their OWN pointer feedback
+      // (the statement block's clay spotlight) — the blue dot would compete,
+      // so it steps aside entirely while the pointer is inside them.
+      hidden = !!t?.closest("[data-cursor-hide]");
     };
     const onLeave = () => {
       visible = false;
@@ -73,6 +78,7 @@ export function InkCursor() {
       // the paper/white parts.
       dot.style.backgroundColor =
         document.body.dataset.ink === "1" || onDark ? "#faf8f2" : "#38bdf8";
+      if (visible) dot.style.opacity = hidden ? "0" : "1";
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });

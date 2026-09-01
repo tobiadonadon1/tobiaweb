@@ -63,7 +63,7 @@ export function PhotoSlideshow({
               style={{ background: "rgba(11,31,58,0.08)", mixBlendMode: "multiply" }}
             />
             {s.caption && (
-              <span className="absolute bottom-3 left-4 font-mono text-[10px] uppercase tracking-[0.3em] text-[#faf8f2]/80">
+              <span className="absolute bottom-3 left-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#faf8f2]/80">
                 {s.caption}
               </span>
             )}

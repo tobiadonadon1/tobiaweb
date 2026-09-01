@@ -82,7 +82,7 @@ export function ArticleCard({
 
       <div className="flex flex-grow flex-col p-4 pb-2">
         {hasMeta && (
-          <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">
+          <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-black/40">
             {tag && (
               <span
                 className="rounded-full border px-2.5 py-1"
@@ -112,7 +112,7 @@ export function ArticleCard({
         </p>
 
         {hasFooter && (
-          <div className="mt-auto flex items-center justify-between pt-5 font-mono text-[10px] uppercase tracking-[0.3em] text-black/35">
+          <div className="mt-auto flex items-center justify-between pt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">
             <span>
               {writer}
               {writer && date && <span className="text-black/20"> · </span>}

@@ -30,11 +30,35 @@
   --accent-clay: #ce4631;
   --accent-clay-soft: rgba(206, 70, 49, 0.16);
 
+  /* ---- myynd's own family. Taken from the live product at soleagency.co
+     rather than invented, so the case study and the thing it is about agree
+     with each other. Terracotta leads and does the structural work; forest is
+     the one dark band at the close; bark and cream are its ground. Amber is
+     kept for one job only, marking the sources under an answer, because it has
+     to stay distinguishable from the terracotta lighting the path.
+     Used ONLY on /projects/mynd — blue stays the site's primary elsewhere. */
+  --myynd-terracotta: #c4623b;
+  --myynd-terracotta-soft: rgba(196, 98, 59, 0.14);
+  --myynd-terracotta-deep: #a8502c;
+  --myynd-forest: #1c3a2e;
+  --myynd-bark: #241813;
+  --myynd-cream: #efe8e0;
+  --mynd-green: #2f7d5e;
+  --mynd-green-soft: rgba(47, 125, 94, 0.14);
+  --mynd-amber: #d97b2f;
+  --mynd-amber-soft: rgba(217, 123, 47, 0.14);
+
   /* ---- Hairlines: ink-on-paper for editorial rules, paper-on-ink
      for rules that sit inside an ink ground. */
   --hairline: rgba(11, 31, 58, 0.12);
   --hairline-strong: rgba(11, 31, 58, 0.22);
   --hairline-on-ink: rgba(207, 233, 238, 0.16);
+
+  /* Swiss grotesk for the statement block. Deliberately a SYSTEM stack,
+     not a webfont: real Helvetica Neue on macOS/iOS, Arial (metrically
+     near-identical) elsewhere — so the block reveal never has to wait on
+     a font load to measure where its lines break. */
+  --font-helvetica: var(--font-host), "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 @theme inline {
@@ -45,9 +69,16 @@
   --color-border: var(--border);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-instrument-serif);
+  /* ONE family. `font-serif`, `font-sans`, `font-mono` and `font-helvetica`
+     all resolve to Host Grotesk now. The utility NAMES are kept rather than
+     rewritten across several hundred call sites: they have stopped meaning
+     "a serif" and started meaning "the display role", "the body role" and
+     "the label role". Roles get their weight and tracking in the TYPE ROLES
+     block below, at zero specificity, so any call site still overrides them
+     with an ordinary Tailwind class. */
+  --font-sans: var(--font-host);
+  --font-mono: var(--font-host);
+  --font-serif: var(--font-host);
 
   /* Ink-depth + accent tokens exposed to Tailwind utilities so every
      section pulls EXACT shared values (bg-ink, text-paper, border-hairline,
@@ -57,6 +88,13 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-accent-sky: var(--accent-sky);
+  --color-mynd-green: var(--mynd-green);
+  --color-mynd-amber: var(--mynd-amber);
+  --color-myynd-terracotta: var(--myynd-terracotta);
+  --color-myynd-terracotta-deep: var(--myynd-terracotta-deep);
+  --color-myynd-forest: var(--myynd-forest);
+  --color-myynd-bark: var(--myynd-bark);
+  --color-myynd-cream: var(--myynd-cream);
   --color-accent-mist: var(--accent-mist);
   --color-accent-deep: var(--accent-deep);
   --color-accent-clay: var(--accent-clay);
@@ -66,10 +104,47 @@
   --color-hairline-on-ink: var(--hairline-on-ink);
 }
 
+
+/* ---------------------------------------------------------------------------
+   TYPE ROLES
+
+   Host Grotesk is variable 300-800. These give each role its resting weight
+   and tracking. Wrapped in :where() so they carry ZERO specificity: every one
+   loses to an ordinary Tailwind utility on the element, so a call site that
+   already says `tracking-tight` or `font-medium` still wins.
+
+   Display wants 300 and negative tracking. At 100px+ the light cut is what
+   makes a geometric face look drawn rather than typed, and the default
+   tracking is far too loose at that size. Body wants 400 and no tracking.
+   --------------------------------------------------------------------------- */
+:where(.font-serif) {
+  font-weight: 300;
+  letter-spacing: -0.022em;
+}
+
+:where(.font-helvetica) {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+/* What `font-mono` used to mean: 10px, uppercase, tracked to 0.4em, at 30-45%
+   black. Tobia on that treatment: "the font is disgusting, the colour is
+   disgusting, the positioning is disgusting". It is no longer monospace and
+   no longer microscopic. */
+:where(.font-mono) {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
 html,
 body {
   background: var(--background);
   color: var(--foreground);
+  /* Nothing may ever scroll the page sideways. `clip`, NOT `hidden`:
+     `hidden` turns these into scroll containers, which silently kills every
+     `position: sticky` on the site (the pinned Who-Am-I sequence included).
+     `clip` blocks the overflow without creating a scroll box. */
+  overflow-x: clip;
 }
 
 html {
@@ -99,6 +174,10 @@ canvas {
 }
 
 /* Warm paper sheet: the site's background tone plus a faint fibrous grain. */
+.font-helvetica {
+  font-family: var(--font-helvetica);
+}
+
 .paper-bg {
   background-color: var(--background);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0 0.30 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -485,5 +564,147 @@ canvas {
   }
   .aurora {
     transition: opacity 200ms ease;
+  }
+}
+
+/* The video frame's slow ken-burns drift. Lives here rather than in a
+   styled-jsx block so the keyframe is emitted once, globally, and does not
+   depend on styled-jsx being wired up in the App Router. */
+@keyframes vf-drift {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(0, -1.5%, 0);
+  }
+}
+
+/* ---- Ground-aware nav -------------------------------------------------
+   The site nav is global, fixed, and designed for paper: inactive labels are
+   near-black and the tubelight bar is #0a0a0a. Over an ink ground that is
+   black on navy, which is unreadable.
+
+   A page declares its ground with `data-ground="ink"` on its <main>; these
+   rules key off the nav's own data attributes, never off Tailwind utility
+   classes, so they survive a refactor of the component's className strings.
+   The pill is near-opaque rather than a tint because the nav also floats over
+   the paper footer at the bottom of an ink page, and a half-transparent dark
+   tint went muddy grey there. */
+body:has(main[data-ground="ink"]) [data-nav-pill] {
+  background-color: rgba(9, 24, 45, 0.82);
+  border-color: rgba(207, 233, 238, 0.24);
+}
+
+body:has(main[data-ground="ink"]) [data-nav-link]:not([data-nav-active]) {
+  color: rgba(250, 248, 242, 0.78);
+}
+
+body:has(main[data-ground="ink"]) [data-nav-link]:not([data-nav-active]):hover {
+  color: #faf8f2;
+}
+
+/* Recolour the lamp to a soft paper line and drop its blurred halo entirely:
+   a coloured glow on this ground reads as neon, which these pages do not do. */
+body:has(main[data-ground="ink"]) [data-nav-lamp] {
+  background-color: rgba(250, 248, 242, 0.55);
+}
+
+body:has(main[data-ground="ink"]) [data-nav-glow] {
+  background-color: transparent;
+}
+
+
+/* ---------------------------------------------------------------------------
+   THE REVEALED FOOTER.
+
+   The footer is pinned to the bottom of the viewport BEHIND the page, and the
+   page slides up off it at the end of the scroll. Two rules do all of it:
+   the content is opaque and sits above, and it reserves exactly the footer's
+   height underneath itself so the last scroll uncovers it and stops.
+
+   `--footer-h` is the one number that has to stay in step with the footer's
+   real content height. It is set here, not measured in JavaScript, so there is
+   no layout thrash and no flash of a wrongly sized gap on first paint.
+   --------------------------------------------------------------------------- */
+:root {
+  --footer-h: 27rem;
+}
+@media (min-width: 768px) {
+  :root {
+    --footer-h: 30rem;
+  }
+}
+
+/* The space the footer is revealed in belongs to BODY, not to this element.
+   A margin-bottom here collapses straight through body and adds nothing to the
+   scroll height, so the content stayed exactly as tall as the document and
+   covered the footer at every scroll position. Padding on body cannot
+   collapse, so the document really does get taller by one footer. */
+.site-content {
+  position: relative;
+  z-index: 10;
+  background: var(--paper);
+}
+
+body {
+  padding-bottom: var(--footer-h);
+}
+
+.site-footer {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 0;
+  height: var(--footer-h);
+  background: var(--paper);
+}
+
+/* A reader who cannot scroll should still reach the footer normally. */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    padding-bottom: 0;
+  }
+  .site-footer {
+    position: static;
+    height: auto;
+  }
+}
+
+/* GET OFF THE LAST PAGE.
+
+   The footer is fixed behind the site and the page slides up off it at the
+   end of the scroll, which means anything else fixed to the viewport — the
+   Superhuman compass — ends up floating over the footer's own type. It is a
+   page instrument, and the footer is not a page, so it leaves.
+
+   `data-footer-open` is raised on <body> by footer-reveal.tsx the moment any
+   of the footer is uncovered. Two class selectors deep, so it beats the
+   component's own `opacity-100` utility without an !important. */
+body[data-footer-open] .sh-compass {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* THE TRAVELLING LIGHT on the footer name. A narrow highlight sweeps across
+   the word on a slow loop; the layer it lives on is masked to whatever part
+   of the name has already filled (see SiteFooter.tsx), so the light only ever
+   plays over blue, never over the ghost. Background-position only — nothing
+   here reflows, and it is the one animation on the site that runs without
+   being asked for by the scroll, which is exactly why it is this slow. */
+.footer-name-fill {
+  animation: footer-sheen 11s linear infinite;
+}
+
+@keyframes footer-sheen {
+  from {
+    background-position: -30% 0;
+  }
+  to {
+    background-position: 130% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-name-fill {
+    animation: none;
   }
 }

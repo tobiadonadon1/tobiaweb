@@ -61,14 +61,14 @@ export function VideoSlot({ poster, label, youtubeId }: VideoSlotProps) {
               </svg>
             </span>
             {!ready && (
-              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[10px] uppercase tracking-[0.35em] text-[#faf8f2]/70">
+              <span className="absolute bottom-5 left-1/2 -translate-x-1/2 font-mono text-[11px] uppercase tracking-[0.15em] text-[#faf8f2]/70">
                 Soon
               </span>
             )}
           </button>
         )}
       </div>
-      <figcaption className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.32em] text-black/35">
+      <figcaption className="mt-3 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">
         {label}
       </figcaption>
     </figure>

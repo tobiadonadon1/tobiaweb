@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
    PROJECTS — layout 1b.
 
    Superhuman is the INK FEATURE (deep-navy panel, the OPEN/sellable lead).
-   Sole + The Book are FLAT EDITORIAL INDEX ROWS beside it — hairline rules,
+   Mynd + The Book are FLAT EDITORIAL INDEX ROWS beside it — hairline rules,
    mono status, serif title, NO glass, NO equal floats. Hover unfurls a row
    (it grows; its sibling recedes; more copy surfaces). Click runs the shared-
    element expand into the project page (a body-level sheet that grows to
@@ -27,8 +27,12 @@ export interface ProjectEntry {
   description: string;
   /** Extra copy that surfaces only when a row unfurls (hover/focus). */
   unfurl?: string;
-  /** Quiet mono status — e.g. "open — for first launches". */
-  status: string;
+  /**
+   * Retired from the UI. The cards no longer print a status: it was a label
+   * the reader had to decode before reaching the title. Kept optional so the
+   * back-compat shim below and any stray call site still typecheck.
+   */
+  status?: string;
   href: string;
   /**
    * Optional REAL, ungraded photo to reveal on unfurl. Omit until Tobia
@@ -173,8 +177,11 @@ export function FeaturePanel({
         "overflow-hidden rounded-[20px] outline-none",
         "ink-field ink-grain border border-[color:var(--hairline-on-ink)]",
         "p-8 md:p-11",
-        "transition-[transform,opacity,box-shadow] duration-300 ease-out",
-        "hover:-translate-y-1 focus-visible:-translate-y-1",
+        // A 4px lift on a panel this size reads as a lurch. The hover is
+        // carried by the border and the light inside instead, and nothing
+        // moves. Slower, too: 300ms on a large surface feels twitchy.
+        "transition-[opacity,box-shadow,border-color] duration-500 ease-out",
+        "hover:border-[color:rgba(56,189,248,0.4)] focus-visible:border-[color:rgba(56,189,248,0.4)]",
         opening && "opacity-40 duration-500",
         className
       )}
@@ -194,26 +201,23 @@ export function FeaturePanel({
         }}
       />
 
+      {/* No status kicker. "open, taking on a few" is a label the reader has
+          to decode before reaching the title, and it says nothing the page
+          itself will not say better. The card is a door: name it, describe it
+          in one line, and get out of the way. */}
       <div className="relative z-10">
-        <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#7dd3fc]/80">
-          {entry.status}
-        </span>
-        <h3 className="mt-6 font-serif text-4xl leading-[0.98] tracking-tight text-[#faf8f2] md:text-6xl">
+        <h3 className="font-serif text-4xl leading-[0.98] tracking-tight text-[#faf8f2] md:text-6xl">
           {entry.title}
         </h3>
-        <p className="mt-6 max-w-md text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
+        <p className="mt-5 max-w-sm text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
           {entry.description}
         </p>
       </div>
 
-      <div className="relative z-10 mt-10 flex items-end justify-between gap-6">
-        {/* The "write me" CTA — the sellable lead's real call. It lives inside
-            the card link, so we stop the row-open and route nowhere: the page
-            CTA mailto is on the product page; here it just reads as the cue to
-            open. (Kept as text, not a second nav target, to avoid nested <a>.) */}
-        <span className="font-serif text-lg italic text-[#faf8f2]/85 md:text-xl">
-          Write me. Tell me what you&rsquo;re building.
-        </span>
+      {/* The slogan that used to sit here ("Write me. Tell me what you're
+          building.") asked for a conversation before the reader knew what the
+          thing was. The arrow is the whole call to action. */}
+      <div className="relative z-10 mt-10 flex items-end justify-end">
         <EnterCue onInk />
       </div>
     </Link>
@@ -221,7 +225,7 @@ export function FeaturePanel({
 }
 
 /* ----------------------------------------------------------------------------
-   EDITORIAL INDEX — Sole + The Book as flat hairline rows on the ink.
+   EDITORIAL INDEX — Mynd + The Book as flat hairline rows on the ink.
    Hover/focus UNFURLS a row: it grows (flex-grow) and reveals its extra copy
    (and a real ungraded photo if provided); the sibling recedes. No glass.
    The whole stack uses .editorial-index--on-ink for paper-on-ink hairlines.
@@ -272,10 +276,7 @@ export function EditorialIndex({
           >
             <div className="flex items-baseline justify-between gap-5">
               <div className="min-w-0">
-                <span className="font-mono text-[10px] uppercase tracking-[0.34em] text-[#cfe9ee]/55 transition-colors duration-300 group-hover:text-[#7dd3fc]/90 group-focus-visible:text-[#7dd3fc]/90">
-                  {entry.status}
-                </span>
-                <h3 className="mt-3 font-serif text-3xl leading-tight tracking-tight text-[#faf8f2] md:text-4xl">
+                <h3 className="font-serif text-3xl leading-tight tracking-tight text-[#faf8f2] md:text-4xl">
                   {entry.title}
                 </h3>
               </div>

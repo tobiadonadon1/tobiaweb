@@ -2,41 +2,46 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Home, Layers, User, PenLine } from "lucide-react";
+import { Home, Layers, PenLine } from "lucide-react";
 import { NavBar } from "@/components/ui/tubelight-navbar";
 import { cn } from "@/lib/utils";
 
 // Root-relative hashes so the nav also works from subpages (/projects/…).
 const navItems = [
   { name: "Home", url: "/#home", icon: Home },
-  { name: "About", url: "/#road", icon: User },
   { name: "Projects", url: "/#projects", icon: Layers },
   { name: "Thoughts", url: "/#thoughts", icon: PenLine },
 ];
 
 export function SiteNav() {
   const pathname = usePathname();
-  // The nav stays hidden until the loader finishes, then fades in. The
-  // intro only runs on the homepage — everywhere else (direct loads of
-  // /projects/*, the 404 page) "intro:done" never fires, so reveal on
-  // mount instead of waiting out the fallback.
-  const [visible, setVisible] = useState(false);
+  const isHome = pathname === "/";
+
+  /**
+   * The nav stays hidden while the homepage loader owns the screen, then
+   * fades in. Everywhere else there is no loader, so it is simply there.
+   *
+   * `isHome` is derived during render rather than written to state: setting
+   * it from an effect meant a synchronous setState and a second render on
+   * every project page, for a value already known from the URL.
+   */
+  const [introDone, setIntroDone] = useState(false);
+  const visible = !isHome || introDone;
 
   useEffect(() => {
-    if (pathname !== "/") {
-      setVisible(true);
-      return;
-    }
-    const reveal = () => setVisible(true);
+    if (!isHome) return;
+    // Fires from an event, so this is never a synchronous set.
+    const reveal = () => setIntroDone(true);
     window.addEventListener("intro:done", reveal);
-    // Fallback in case the intro event is missed (e.g. reduced-motion skip).
-    // Longer than the loader so it never reveals the nav mid-intro.
-    const fallback = setTimeout(reveal, 5000);
+    // Backstop only. The loader dispatches on its own, including on the
+    // return-visit path where it skips straight to the finished frame.
+    // Comfortably past the loader's own release, which now lands at ~5.0s.
+    const fallback = setTimeout(reveal, 8000);
     return () => {
       window.removeEventListener("intro:done", reveal);
       clearTimeout(fallback);
     };
-  }, [pathname]);
+  }, [isHome]);
 
   return (
     <NavBar

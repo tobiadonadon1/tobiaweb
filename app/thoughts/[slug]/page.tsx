@@ -56,7 +56,7 @@ export default async function ThoughtPage({
       <article className="page-rise mx-auto w-full max-w-3xl">
         <Link
           href="/#thoughts"
-          className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-black/40 transition-colors hover:text-black/70"
+          className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-black/40 transition-colors hover:text-black/70"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Thoughts
@@ -64,7 +64,7 @@ export default async function ThoughtPage({
 
         {/* ---- Title block ---- */}
         <header className="pt-16">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.4em] text-black/40">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-black/40">
             {t.tag &&
               (tagHref ? (
                 <Link
@@ -133,7 +133,7 @@ export default async function ThoughtPage({
           ) : (
             // Honest in-progress state — never a fabricated essay.
             <div className="max-w-xl">
-              <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-black/35">
+              <p className="font-mono text-[11px] uppercase tracking-[0.15em] text-black/50">
                 Still forming
               </p>
               <p className="mt-5 text-base leading-relaxed text-black/60 md:text-lg">
@@ -168,11 +168,11 @@ export default async function ThoughtPage({
         {/* ---- Close ---- */}
         <div className="mt-16 flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           {t.writer && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/40">
               {t.writer}
             </span>
           )}
-          <div className="flex items-center gap-5 font-mono text-[10px] uppercase tracking-[0.3em] text-black/40">
+          <div className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.14em] text-black/40">
             <Link href="/#thoughts" className="hover:text-black/70">
               All thoughts
             </Link>

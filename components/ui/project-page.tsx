@@ -35,7 +35,7 @@ export function ProjectPageShell({
       <div className="page-rise mx-auto w-full max-w-3xl">
         <Link
           href="/#projects"
-          className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-black/40 transition-colors hover:text-black/70"
+          className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-black/40 transition-colors hover:text-black/70"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back
@@ -43,11 +43,11 @@ export function ProjectPageShell({
 
         <header className="pt-20 md:pt-28">
           <div className="flex items-center gap-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-black/35">
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-black/50">
               {eyebrow}
             </span>
             <span className="h-px w-8 bg-black/15" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-black/35">
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-black/50">
               {status}
             </span>
           </div>
@@ -64,7 +64,7 @@ export function ProjectPageShell({
         <div className="flex flex-col gap-16 py-16 md:gap-20 md:py-20">
           {sections.map((section) => (
             <section key={section.kicker}>
-              <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-black/35">
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/50">
                 {section.kicker}
               </span>
               <h2 className="mt-4 font-serif text-3xl leading-tight tracking-tight md:text-4xl">
@@ -82,7 +82,7 @@ export function ProjectPageShell({
         <footer className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-6 py-12 md:py-14">
           <Link
             href="/#projects"
-            className="font-mono text-xs uppercase tracking-[0.3em] text-black/40 transition-colors hover:text-black/70"
+            className="font-mono text-xs uppercase tracking-[0.14em] text-black/40 transition-colors hover:text-black/70"
           >
             All projects
           </Link>

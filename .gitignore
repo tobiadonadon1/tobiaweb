@@ -42,3 +42,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Waitlist rows written when no WAITLIST_WEBHOOK_URL is configured
+.data/

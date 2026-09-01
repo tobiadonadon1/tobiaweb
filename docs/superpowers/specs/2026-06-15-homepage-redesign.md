@@ -96,3 +96,29 @@ macOS blocks READING pre-existing repo files for some session processes (TCC/pro
 
 ## 6. Facts still to collect (non-blocking; scaffold with placeholders)
 `{{AGENCY_NAME}}` (the agency at 15 — and what it actually did), `{{AI_COMPANY_NAME}}`, real `{{CLIENT_RESULT}}`s, 2–3 `{{TESTIMONIAL}}`s + attributions, the photo set.
+
+---
+
+## Amendment, 2026-08-28
+
+**The "never name the employer" decision above is REVERSED.** Tobia has agreed
+to name the company. Until the name arrives, `components/sections/WhyMeSection.tsx`
+holds it in one constant:
+
+```ts
+const EMPLOYER: string | null = null;
+```
+
+Left `null`, the card falls back to an unnamed but honest sentence, so the page
+never renders a visible placeholder. Setting it to a string is the only edit
+needed. Reason for the reversal: "a major company", used twice and never named,
+reads as either an NDA or an exaggeration and the reader cannot tell which.
+
+**`TestimonialsSection.tsx` is now `WhyMeSection.tsx`** (the old name described
+content that was never there). It no longer uses `BentoGridShowcase`, which is
+consequently unused; the grid is purpose-built in the section itself.
+
+Cut in the same pass: the "Range / Built across many fronts" card (said nothing
+the Projects section had not shown) and the "Right now / What I'm building"
+chip strip (a duplicate of Projects, directly below it). Added: a card stating
+plainly what Tobia is NOT.

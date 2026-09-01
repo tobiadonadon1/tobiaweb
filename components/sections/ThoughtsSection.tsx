@@ -68,7 +68,7 @@ export function ThoughtsSection() {
               plain centered stack. */}
           <div className="mx-auto flex max-w-md items-center gap-4">
             <span className="h-px flex-1 bg-black/10" />
-            <span className="font-mono text-[10px] uppercase tracking-[0.45em] text-black/35">
+            <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-black/50">
               Thoughts
             </span>
             <span className="h-px flex-1 bg-black/10" />
@@ -76,7 +76,7 @@ export function ThoughtsSection() {
           <h2 className="mt-6 font-serif text-4xl tracking-tight text-[#0a0a0a] md:text-5xl">
             Watch me think.
           </h2>
-          <p className="mx-auto mt-4 max-w-md font-mono text-[10px] uppercase tracking-[0.3em] text-black/30">
+          <p className="mx-auto mt-4 max-w-md font-mono text-[11px] uppercase tracking-[0.14em] text-black/48">
             Drafts in public: the thinking before it&rsquo;s finished
           </p>
         </div>
@@ -93,7 +93,7 @@ export function ThoughtsSection() {
             disabled={exhausted}
             onClick={() => setVisible((v) => Math.min(v + PAGE_SIZE, THOUGHTS.length))}
             className={
-              "rounded-full border px-7 py-3 font-mono text-[11px] uppercase tracking-[0.3em] transition-all duration-300 " +
+              "rounded-full border px-7 py-3 font-mono text-[11px] uppercase tracking-[0.14em] transition-all duration-300 " +
               (exhausted
                 ? "cursor-default border-black/5 text-black/25"
                 : "border-black/10 text-black/55 hover:-translate-y-0.5 hover:border-black/20 hover:bg-muted hover:text-black/80")

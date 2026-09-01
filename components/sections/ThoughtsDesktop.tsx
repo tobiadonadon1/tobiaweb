@@ -279,7 +279,7 @@ export function ThoughtsDesktop() {
 
               {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto px-7 py-7 md:px-10 md:py-9">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.35em] text-black/40">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.15em] text-black/40">
                   {open.tag && <span>{open.tag}</span>}
                   {open.tag && open.date && <span className="text-black/20">·</span>}
                   {open.date && <span>{open.date}</span>}
@@ -317,7 +317,7 @@ export function ThoughtsDesktop() {
                 )}
 
                 {open.tag && TAG_HREF[open.tag] && (
-                  <div className="mt-9 border-t border-black/10 pt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-black/35">
+                  <div className="mt-9 border-t border-black/10 pt-6 font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">
                     <Link href={TAG_HREF[open.tag]} className="hover:text-cyan-900">
                       More on {open.tag} →
                     </Link>
