@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CLAIM_THIRD } from "@/lib/bio";
 import HeroSequence from "@/components/hero/HeroSequence";
 import { HeroStatement } from "@/components/sections/HeroStatement";
 import { IdentityScroll } from "@/components/sections/IdentityScroll";
@@ -20,21 +21,20 @@ const JSON_LD = {
   "@graph": [
     {
       "@type": "Person",
-      "@id": "https://tobiadonadon.com/#tobia",
+      "@id": "https://www.tobiadonadon.com/#tobia",
       name: "Tobia Donadon",
-      url: "https://tobiadonadon.com",
-      image: "https://tobiadonadon.com/trail/trail-07.jpg",
+      url: "https://www.tobiadonadon.com",
+      image: "https://www.tobiadonadon.com/trail/trail-07.jpg",
       jobTitle: "Builder and writer",
-      description:
-        "Builds tools, writes about consciousness, and helps people launch things.",
+      description: CLAIM_THIRD,
       sameAs: [],
     },
     {
       "@type": "WebSite",
-      "@id": "https://tobiadonadon.com/#site",
-      url: "https://tobiadonadon.com",
+      "@id": "https://www.tobiadonadon.com/#site",
+      url: "https://www.tobiadonadon.com",
       name: "Tobia Donadon",
-      publisher: { "@id": "https://tobiadonadon.com/#tobia" },
+      publisher: { "@id": "https://www.tobiadonadon.com/#tobia" },
       inLanguage: "en",
     },
   ],

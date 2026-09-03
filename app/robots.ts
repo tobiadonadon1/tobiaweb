@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "@/lib/site";
 
-const SITE = "https://tobiadonadon.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {

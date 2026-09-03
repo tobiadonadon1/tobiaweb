@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { SITE } from "@/lib/site";
 import { THOUGHTS } from "@/lib/thoughts";
 import { OPEN_SHELF_IDS, shelfHref } from "@/components/superhuman/shelf-data";
 import {
@@ -7,7 +8,6 @@ import {
   folderHref,
 } from "@/components/superhuman/material/material-data";
 
-const SITE = "https://tobiadonadon.com";
 
 /**
  * The sitemap is generated, never hand-listed. The Thoughts routes come from

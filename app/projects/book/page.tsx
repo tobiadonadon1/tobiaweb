@@ -39,12 +39,12 @@ const JSON_LD = {
   "@type": "Book",
   name: "The Book",
   description: DESCRIPTION,
-  url: "https://tobiadonadon.com/projects/book",
+  url: "https://www.tobiadonadon.com/projects/book",
   inLanguage: "en",
   author: {
     "@type": "Person",
     name: "Tobia Donadon",
-    url: "https://tobiadonadon.com",
+    url: "https://www.tobiadonadon.com",
   },
   about: [
     "Artificial intelligence",

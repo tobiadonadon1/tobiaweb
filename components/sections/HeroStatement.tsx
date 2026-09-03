@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { BlockReveal } from "@/components/ui/block-reveal";
+// The claim, the age and the share card all read from one file now, so a link
+// preview can no longer contradict the page it is advertising. See lib/bio.ts.
+import { CLAIM, CONTEXT } from "@/lib/bio";
 
 /**
  * The statement block, straight under the photo hero.
@@ -18,13 +21,6 @@ import { BlockReveal } from "@/components/ui/block-reveal";
  * a second, identical copy of the block masked to a circle; it arms only
  * once the reveal has finished, and only for real pointers.
  */
-const CLAIM =
-  "I build tools, write about consciousness, and help people launch things.";
-
-// NBSP binds "I'm 21" so an orphaned "21" never starts a line.
-const CONTEXT =
-  "I'm 21, and I think about the future a lot. This is where I share what I'm working on.";
-
 const UNDERSTATEMENT =
   "I'm figuring this out. Maybe we can figure it out together.";
 

@@ -4,6 +4,8 @@ import "./globals.css";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { CustomCursor } from "@/components/ui/custom-cursor";
+import { SHARE_DESCRIPTION } from "@/lib/bio";
+import { SITE } from "@/lib/site";
 
 /**
  * ONE TYPEFACE, everywhere.
@@ -48,30 +50,57 @@ const caveat = Caveat({
   display: "swap",
 });
 
-const DESCRIPTION =
-  "I'm Tobia: 20, building tools, writing a book about AI and consciousness, and helping people launch things. This is where I share what I'm working on, and figure it out in public.";
+const TITLE = "Tobia Donadon, figuring it out in public";
 
+/**
+ * THE ROOT METADATA, WHICH EVERY OTHER PAGE INHERITS FROM.
+ *
+ * `metadataBase` is the WWW host, which is the one the site actually serves on:
+ * the apex 308s to it. Every canonical, every Open Graph url and every sitemap
+ * entry used to name the apex, so each one cost a redirect hop on every crawl.
+ * See lib/site.ts.
+ *
+ * NO `images` HERE ON PURPOSE. app/opengraph-image.tsx generates the card, and
+ * the file convention outranks anything set in this object. Listing a second
+ * image here would only be a way for the two to disagree later.
+ *
+ * `robots.googleBot.max-image-preview: large` is the one directive on this
+ * object that visibly changes anything: without it Google may show the page
+ * with a thumbnail or with no image at all, rather than with the large preview
+ * the card is drawn for.
+ */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tobiadonadon.com"),
-  title: {
-    default: "Tobia Donadon, figuring it out in public",
-    template: "%s · Tobia Donadon",
+  metadataBase: new URL(SITE),
+  title: { default: TITLE, template: "%s · Tobia Donadon" },
+  description: SHARE_DESCRIPTION,
+  applicationName: "Tobia Donadon",
+  authors: [{ name: "Tobia Donadon", url: SITE }],
+  creator: "Tobia Donadon",
+  publisher: "Tobia Donadon",
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
-  description: DESCRIPTION,
   openGraph: {
-    title: "Tobia Donadon, figuring it out in public",
-    description: DESCRIPTION,
+    title: TITLE,
+    description: SHARE_DESCRIPTION,
     url: "/",
     siteName: "Tobia Donadon",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/trail/trail-07.jpg", width: 1000, height: 562, alt: "Tobia Donadon" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tobia Donadon, figuring it out in public",
-    description: DESCRIPTION,
-    images: ["/trail/trail-07.jpg"],
+    title: TITLE,
+    description: SHARE_DESCRIPTION,
   },
 };
 

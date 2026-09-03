@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { THOUGHTS, getThought, TAG_HREF } from "@/lib/thoughts";
+import { SITE, abs } from "@/lib/site";
 
 // All thought slugs are known at build time → fully static pages. Unknown
 // slugs 404 at routing (dynamicParams off).
@@ -10,6 +11,20 @@ export function generateStaticParams() {
   return THOUGHTS.map((t) => ({ slug: t.slug }));
 }
 export const dynamicParams = false;
+
+/**
+ * "Dec 18, 2025" as an ISO date, or undefined if it will not parse.
+ *
+ * Both `article:published_time` and schema.org want ISO 8601, and a malformed
+ * one is worse than none: a crawler that cannot read the date may treat the
+ * whole block as suspect. The corpus writes dates for humans, so this converts
+ * rather than asking anyone to write them twice.
+ */
+function iso(date?: string): string | undefined {
+  if (!date) return undefined;
+  const d = new Date(date);
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+}
 
 export async function generateMetadata({
   params,
@@ -19,14 +34,27 @@ export async function generateMetadata({
   const { slug } = await params;
   const t = getThought(slug);
   if (!t) return {};
+  const path = `/thoughts/${t.slug}`;
   return {
     title: t.headline,
     description: t.excerpt,
+    // Without this every post canonicalises to whatever URL it was crawled at.
+    alternates: { canonical: path },
     openGraph: {
       title: t.headline,
       description: t.excerpt,
+      url: path,
       type: "article",
+      publishedTime: iso(t.date),
+      authors: [t.writer ?? "Tobia Donadon"],
+      tags: t.tag ? [t.tag] : undefined,
       images: t.cover ? [{ url: t.cover }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.headline,
+      description: t.excerpt,
+      images: t.cover ? [t.cover] : undefined,
     },
   };
 }
@@ -53,6 +81,34 @@ export default async function ThoughtPage({
 
   return (
     <main className="paper-bg min-h-screen px-6 pb-28 pt-10 text-[#0a0a0a]">
+      {/* BlogPosting, so a post can be understood as a piece of writing with an
+          author and a date rather than as an anonymous page. This is the single
+          largest structured-data gap on the site: the person and the projects
+          were described and the writing was not. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: t.headline,
+            description: t.excerpt,
+            url: abs(`/thoughts/${t.slug}`),
+            mainEntityOfPage: abs(`/thoughts/${t.slug}`),
+            ...(t.cover ? { image: t.cover } : {}),
+            ...(iso(t.date) ? { datePublished: iso(t.date) } : {}),
+            author: {
+              "@type": "Person",
+              name: t.writer ?? "Tobia Donadon",
+              url: SITE,
+            },
+            publisher: { "@id": `${SITE}/#tobia` },
+            ...(t.tag ? { keywords: t.tag } : {}),
+            inLanguage: "en",
+          }),
+        }}
+      />
+
       <article className="page-rise mx-auto w-full max-w-3xl">
         <Link
           href="/#thoughts"

@@ -38,11 +38,11 @@ const JSON_LD = {
   "@type": "WebPage",
   name: "myynd",
   description: DESCRIPTION,
-  url: "https://tobiadonadon.com/projects/mynd",
+  url: "https://www.tobiadonadon.com/projects/mynd",
   author: {
     "@type": "Person",
     name: "Tobia Donadon",
-    url: "https://tobiadonadon.com",
+    url: "https://www.tobiadonadon.com",
   },
   about: {
     "@type": "SoftwareApplication",

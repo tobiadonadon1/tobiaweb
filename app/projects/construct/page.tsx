@@ -56,7 +56,7 @@ const ITEM_LIST = {
     name: family.name,
     description: `${family.line} ${family.status}`,
     ...(family.open
-      ? { url: `https://tobiadonadon.com${shelfHref(family.id)}` }
+      ? { url: `https://www.tobiadonadon.com${shelfHref(family.id)}` }
       : {}),
   })),
 };
