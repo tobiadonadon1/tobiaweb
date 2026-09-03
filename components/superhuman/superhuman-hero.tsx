@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
-import { SuperhumanStar, STAR_TIGHT_BOX } from "./superhuman-star";
+import { ConstructStar } from "./construct-star";
+import { HandNote } from "@/components/ui/hand-note";
 import { SECTION_LABELS } from "./sections";
 
 if (typeof window !== "undefined") {
@@ -11,19 +12,7 @@ if (typeof window !== "undefined") {
 }
 
 /** Rendered height of the hero mark, in px. */
-const STAR_PX = 132;
-
-/**
- * The mark, on paper.
- *
- * `--accent-sky` is tuned to sing on the navy shelf; on a cream ground at 300px
- * it was both too bright and completely flat, so it read as a sticker laid on
- * the page rather than an object cut out of it. This ramp runs from a lit
- * top-left edge to a shadowed bottom-right one, and sits several stops deeper
- * overall. The shelf's flying rays keep the bright sky, because on ink they
- * have to.
- */
-const STAR_GRADIENT = { from: "#5aa6cc", mid: "#2f7fae", to: "#12435f" } as const;
+const STAR_PX = 168;
 
 /**
  * SECTION 1, curiosity: a mark, a claim, almost nothing else.
@@ -53,35 +42,25 @@ export function SuperhumanHero() {
       if (cancelled || !scope.current) return;
 
       ctx = gsap.context(() => {
-        const cuts = gsap.utils.toArray<SVGPathElement>(".sh-hero-cut");
         const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
-        // Each ray cuts itself out, one after another.
-        tl.from(cuts, {
+        // IT IS DRAWN, so it arrives drawn: the blue outline strokes itself on
+        // the way a hand would put it down, and only then does the red get
+        // filled in behind it. That is the whole entrance.
+        tl.from(".cs-outline", {
           drawSVG: "0%",
-          duration: 0.7,
-          stagger: 0.055,
-          ease: "power2.inOut",
+          duration: 1.05,
+          ease: "power1.inOut",
         });
-        // Then the paper fills in behind the cut lines, and the lines go.
-        tl.to(".sh-hero-outline", { opacity: 0, duration: 0.45 }, "-=0.22");
+        tl.from(
+          ".cs-fill",
+          { opacity: 0, scale: 0.86, transformOrigin: "50% 50%", duration: 0.55 },
+          "-=0.3",
+        );
 
-        // Once it has arrived, it keeps turning. 96 seconds a revolution is
-        // slow enough that you never catch it moving, and just fast enough
-        // that the screen is never quite still.
-        const spin = gsap.to("[data-star-solid]", {
-          rotate: 360,
-          duration: 96,
-          ease: "none",
-          repeat: -1,
-          transformOrigin: "50% 50%",
-        });
-        spin.timeScale(0);
-        tl.call(() => gsap.to(spin, { timeScale: 1, duration: 3, ease: "power1.in" }));
-
-        return () => {
-          spin.kill();
-        };
+        // NOTHING SPINS. The old mark turned once every 96 seconds, which a
+        // computed star can carry and a drawing cannot: a hand drawn shape on
+        // a slow rotation reads as a sticker on a fan.
       }, scope);
     });
 
@@ -91,10 +70,6 @@ export function SuperhumanHero() {
     };
   }, []);
 
-  // Stroke width in user units, so the cut line lands at a true hairline
-  // whatever size the mark is rendered at.
-  const strokeWidth = (1.4 * STAR_TIGHT_BOX.h) / STAR_PX;
-
   return (
     <section
       ref={scope}
@@ -102,36 +77,10 @@ export function SuperhumanHero() {
       data-sh-section={SECTION_LABELS.hero}
       className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 pb-36 pt-28 text-center sm:pb-28 sm:pt-32"
     >
-      {/* The mark: two stacked copies of one geometry. The outline is what
-          draws; the solid is what stays. */}
-      <div
-        className="relative text-[var(--accent-sky)]"
-        style={{
-          height: STAR_PX,
-          width: Math.round(STAR_PX * (STAR_TIGHT_BOX.w / STAR_TIGHT_BOX.h)),
-        }}
-      >
-        <span className="sh-hero-outline absolute inset-0 block">
-          <SuperhumanStar
-            size={STAR_PX}
-            variant="rays"
-            className="h-full w-full"
-            rayProps={() => ({
-              className: "sh-hero-cut",
-              fill: "none",
-              stroke: "currentColor",
-              strokeWidth,
-            })}
-            coreProps={{ fill: "none" }}
-          />
-        </span>
-        <span data-star-solid className="absolute inset-0 block">
-          <SuperhumanStar
-            size={STAR_PX}
-            className="h-full w-full"
-            gradient={STAR_GRADIENT}
-          />
-        </span>
+      {/* The mark. One object now, not two stacked copies of a geometry:
+          the outline and the fill are the two layers of the drawing itself. */}
+      <div className="relative" style={{ height: STAR_PX, width: STAR_PX }}>
+        <ConstructStar id="hero" className="h-full w-full" />
       </div>
 
       <h1
@@ -160,6 +109,19 @@ export function SuperhumanHero() {
           got good at most of it.
         </strong>
       </p>
+
+      {/* THE HAND, pushing you down the page. It is the only thing on this
+          screen asking you to do something, and it does it in the margin
+          rather than as a button, because a button here would be the page
+          selling before it has said anything. */}
+      <HandNote
+        gesture="down"
+        label="free material, down here"
+        color="var(--accent-clay)"
+        size={104}
+        className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-0.5 sm:bottom-6"
+        labelClassName="-rotate-2"
+      />
     </section>
   );
 }

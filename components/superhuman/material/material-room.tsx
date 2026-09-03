@@ -1,127 +1,178 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
-import { ShelfHead, ShelfRest } from "../shelf-chrome";
-import { SHELF_BY_ID } from "../shelf-data";
-import {
-  MATERIAL_READY,
-  MATERIAL_ROOM_FOLDERS,
-  MATERIAL_TOTAL,
-  folderCount,
-  folderHref,
-} from "./material-data";
+import { HandNote } from "@/components/ui/hand-note";
+import { MATERIAL_GRID, folderHref } from "./material-data";
+import { Specimen } from "./specimens";
 import type { MaterialFolder } from "./material-types";
 
 /**
  * THE ROOM — /projects/construct/material
  *
- * Material is the only family with enough in it to need somewhere to stand
- * before you start reading, so it gets a room rather than a list: two folders
- * as cards, each with a drawn cover, and nothing to do on this page except
- * choose one.
+ * NO HEADER, NO HERO, NO FOOTER NAV. This page used to open with a full ink
+ * header carrying a title, a lede and a status line, then an intro paragraph,
+ * then a label saying "Two folders" above two folders. Four pieces of writing
+ * to get to a choice between two things. All of it is gone. What is left is
+ * one sentence and the grid, because the grid is the page and everything else
+ * was the page explaining the grid.
  *
- * WHAT IS BORROWED FROM A CLASSROOM AND WHAT IS NOT. The grid of covered
- * cards is borrowed, because it is genuinely the clearest way to show that
- * three unlike things sit at the same level. The progress bar is not. A
- * progress bar on a card like this is a claim about the reader, and the
- * reader has not agreed to be measured. The rule under each card is a claim
- * about the MATERIAL instead: how much of what is listed is actually
- * finished. A folder of six unfilmed videos says so on its own face.
+ * THE GRID IS A SAMPLE BOOK. A brand manual does not put an icon of the logo
+ * in the cell marked Logo. It puts the logo, at a size you can judge. This is
+ * the Material page, so it runs the same rule: each cell holds a specimen of
+ * what is behind the door (see specimens.tsx) rather than a symbol standing in
+ * for it. Nobody has to be told how Skills and Guides differ, because the two
+ * cells do not look alike.
  *
- * THE FILM COMES FIRST. Two folders is a choice, and a choice is easier to
- * make after somebody has told you how the thing is meant to be used. The
- * frame sits above the grid and says out loud that it is not shot yet — the
- * same rule the video folder runs on, and the reason there is no fake play
- * button on it.
+ * TWO OF THE FOUR ARE BLURRED. Not hidden, and not removed. A page showing two
+ * folders looks finished at two folders. A page showing two you can open and
+ * two you cannot read yet says the shelf is still being filled, which is true.
+ * The blur is the only place on this site where something is deliberately
+ * unreadable, so it is paid for immediately: every locked cell carries one
+ * checkable fact about what is written and what is missing. "Six written. None
+ * filmed." A count is honest in a way that a date is not.
  *
- * Nothing else on this page has state and nothing animates on scroll. It is
- * the junction between the shelf and the reading, and a junction should be
- * quick.
+ * THE RULES ARE THE LAYOUT. `gap-px` over a hairline ground gives real shared
+ * 1px rules between cells rather than borders that double up at every seam,
+ * which is how the printed reference draws it and the only way to get an
+ * unbroken grid without fighting collapsing borders.
+ *
+ * Nothing here has state. It is the junction between the shelf and the
+ * reading, and a junction should be quick.
  */
 
-function Card({ folder }: { folder: MaterialFolder }) {
-  const count = folderCount(folder);
-  const fraction = count.total === 0 ? 0 : count.ready / count.total;
+function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
+  const label = (
+    <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+      {folder.name}
+    </span>
+  );
 
+  /* ---- the specimen, and the blur that is the whole difference ----
+   *
+   * `h-auto w-full`, not a height cap. The composition is 400 x 300 and it
+   * scales to the cell's full width, so a specimen in a 500px cell is 375px
+   * tall and fills it. Capping the height instead letterboxes the drawing
+   * inside its own cell, and a sample that floats in the middle of a lot of
+   * paper reads as an icon rather than as the material. The reference this
+   * page is built on fills every cell to its edges, and that is most of why
+   * it looks certain of itself. */
+  const specimen = (
+    <div className="my-7 md:my-9">
+      <Specimen
+        id={folder.id}
+        className={`h-auto w-full transition-transform duration-[600ms] ease-out ${
+          folder.locked
+            ? "scale-[0.98] opacity-70 blur-[7px]"
+            : "group-hover:-translate-y-1"
+        }`}
+      />
+    </div>
+  );
+
+  /* ------------------------------------------------------------------ *
+   * LOCKED. A div, not a link: nothing here is clickable, so nothing here
+   * takes a tab stop or grows a hover state that promises a page.
+   * ------------------------------------------------------------------ */
+  if (folder.locked) {
+    return (
+      <li
+        className="material-cell relative flex h-full flex-col bg-[var(--paper)] p-6 md:p-8"
+        style={{ animationDelay: `${index * 90}ms` }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          {label}
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--hairline)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[color:rgba(11,31,58,0.5)]" />
+            Not open
+          </span>
+        </div>
+
+        {specimen}
+
+        <p className="mt-auto font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+          {folder.soon}
+        </p>
+      </li>
+    );
+  }
+
+  /* ------------------------------------------------------------------ *
+   * OPEN. The whole cell is the target, so there is no button inside a
+   * card competing with the card for the same click.
+   * ------------------------------------------------------------------ */
   return (
-    <li>
+    <li
+      className="material-cell bg-[var(--paper)]"
+      style={{ animationDelay: `${index * 90}ms` }}
+    >
       <Link
         href={folderHref(folder.id)}
-        className="group flex h-full flex-col bg-transparent transition-colors duration-[600ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-sky)]"
+        className="group flex h-full flex-col p-6 transition-colors duration-[600ms] ease-out hover:bg-[rgba(206,70,49,0.035)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--accent-clay)] md:p-8"
       >
-        {/* ---- the type ---- */}
-        <div className="flex flex-1 flex-col p-6">
-          <h3 className="font-serif text-[1.5rem] leading-tight tracking-tight text-[var(--ink)]">
-            {folder.name}
-          </h3>
-
-          <p className="mt-2 flex-1 text-pretty text-[0.98rem] leading-[1.55] text-[color:rgba(11,31,58,0.62)]">
-            {folder.line}
-          </p>
-
-          {/* ---- what the folder can honestly claim ---- */}
-          <div className="mt-6">
-            <div
-              aria-hidden
-              className="h-px w-full bg-[var(--hairline)]"
-            >
-              <div
-                className="h-px bg-[var(--ink)]"
-                style={{ width: `${Math.round(fraction * 100)}%` }}
-              />
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-4">
-              <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)]">
-                {count.label}
-              </span>
-              <ArrowUpRight className="h-4 w-4 shrink-0 text-[var(--accent-sky)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </div>
-          </div>
+        <div className="flex items-start justify-between gap-4">
+          {label}
+          <ArrowUpRight className="h-4 w-4 shrink-0 text-[color:rgba(11,31,58,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-clay)]" />
         </div>
+
+        {specimen}
+
+        <p className="mt-auto max-w-[32ch] text-pretty text-[0.98rem] leading-[1.5] text-[color:rgba(11,31,58,0.62)]">
+          {folder.line}
+        </p>
       </Link>
     </li>
   );
 }
 
 export function MaterialRoom() {
-  const family = SHELF_BY_ID.material;
-
   return (
     <main className="paper-bg relative overflow-x-clip text-[#0a0a0a]">
       <BackLink href="/projects/construct#shelf" label="The shelf" tone="ink" />
 
-      <ShelfHead
-        title={family.name}
-        lede={family.page.lede}
-        status={`${MATERIAL_TOTAL} pieces, ${MATERIAL_READY} finished. Free, and it stays free.`}
-      />
+      {/* ------------------------------------------------------------- *
+       * THE ONLY WRITING ON THE PAGE.
+       *
+       * One sentence and one fact. The sentence is a claim anybody can
+       * check by opening a folder, and the fact underneath it is set in
+       * the label voice rather than the prose voice, so it reads as a
+       * caption on the page instead of a second sentence.
+       * ------------------------------------------------------------- */}
+      <header className="mx-auto max-w-3xl px-6 pb-14 pt-32 text-center md:pb-20 md:pt-40">
+        {/* An h1, not a paragraph. This sentence is the page's title even
+            though it does not look like a title, and the page had no heading
+            of any level while it was a <p>: a screen reader landing here got
+            no rotor entry and no way into the grid except tabbing. Looking
+            like a title and being one are separate decisions. */}
+        <h1 className="text-balance font-serif text-[clamp(1.7rem,4.2vw,2.75rem)] leading-[1.12] tracking-[-0.032em] text-[var(--ink)]">
+          Everything here is something I use.
+        </h1>
+        <p className="mt-6 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+          Free, and it stays free
+        </p>
+      </header>
 
-      <section className="mx-auto w-full max-w-5xl px-6 pb-24 pt-4 md:pb-32">
-        <div className="max-w-[62ch] space-y-6">
-          {family.page.intro.map((paragraph) => (
-            <p
-              key={paragraph.slice(0, 32)}
-              className="text-pretty text-[1.08rem] leading-[1.7] text-[color:rgba(11,31,58,0.78)]"
-            >
-              {paragraph}
-            </p>
-          ))}
-        </div>
+      {/* ------------------------------------------------------------- *
+       * THE GRID.
+       * ------------------------------------------------------------- */}
+      <section className="relative mx-auto w-full max-w-6xl px-6 pb-32 md:pb-40">
+        {/* Four cells, two of them open, and the hand picks one so nobody has
+            to. It points across at the Skills cell rather than down at it,
+            because on this page the thing being pointed at is beside the
+            note, not under it. */}
+        <HandNote
+          gesture="right"
+          label="start here"
+          color="var(--accent-clay)"
+          size={86}
+          className="pointer-events-none absolute -top-2 left-6 hidden flex-col items-start gap-0.5 lg:flex"
+          labelClassName="-rotate-3"
+        />
 
-        {/* ---- the approach, in Tobia's own voice ---- *
-         * TODO(tobia): when the film exists, add source={{ kind: "youtube",
-         * id: "..." }} and the frame stops saying it is unmade. */}
-        <h2 className="mt-16 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)] md:mt-20">
-          Two folders
-        </h2>
-
-        <ul className="mt-10 grid list-none grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">
-          {MATERIAL_ROOM_FOLDERS.map((folder) => (
-            <Card key={folder.id} folder={folder} />
+        <ul className="grid list-none grid-cols-1 gap-px border border-[var(--hairline)] bg-[var(--hairline)] sm:grid-cols-2">
+          {MATERIAL_GRID.map((folder, i) => (
+            <Cell key={folder.id} folder={folder} index={i} />
           ))}
         </ul>
-
-        <ShelfRest currentId="material" />
       </section>
     </main>
   );

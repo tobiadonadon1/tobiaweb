@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
+import { Specimen } from "./material/specimens";
 import { mailto } from "./shelf-data";
 import { SECTION_LABELS } from "./sections";
 
@@ -96,14 +97,24 @@ const PORTRAIT: Portrait = {
   position: "44% 44%",
 };
 
+/**
+ * THE TWO WAYS.
+ *
+ * They carried "01" and "02" in clay above the label. The ordinals came off
+ * for the same reason they came off the skills and the guides: a number
+ * standing where a picture should be is a number pretending to be a picture,
+ * and there are real marks now. The two are a PAIR, drawn from the same two
+ * cut pieces arranged two ways, so the difference between the offers is
+ * visible before either sentence is read.
+ */
 const WAYS = [
   {
-    n: "01",
+    mark: "way-side-by-side",
     label: "Side by side",
     body: "We build it together, in your tools, so it stays yours.",
   },
   {
-    n: "02",
+    mark: "way-hand-it-over",
     label: "Hand it over",
     body: "You say what you need. I build it and show you how it runs.",
   },
@@ -450,15 +461,10 @@ export function SuperhumanTogether() {
                   className="block h-[2px] w-full origin-left"
                   style={{ background: CLAY, opacity: 0.85 }}
                 />
-                <div data-t2-way className="pt-5">
-                  <span
-                    className="font-mono text-[0.78rem] tracking-[0.14em]"
-                    style={{ color: CLAY }}
-                  >
-                    {way.n}
-                  </span>
+                <div data-t2-way className="pt-6">
+                  <Specimen id={way.mark} className="h-auto w-full max-w-[16rem]" />
                   <h3
-                    className="mt-3 font-serif text-[1.5rem] leading-none tracking-tight md:text-[1.8rem]"
+                    className="mt-5 font-serif text-[1.5rem] leading-none tracking-tight md:text-[1.8rem]"
                     style={{ color: "var(--ink)" }}
                   >
                     {way.label}

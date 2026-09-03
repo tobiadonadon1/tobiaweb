@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HandNote } from "@/components/ui/hand-note";
 
 /* ============================================================================
    PROJECTS — layout 1b.
@@ -22,6 +23,14 @@ import { cn } from "@/lib/utils";
    ============================================================================ */
 
 export interface ProjectEntry {
+  /**
+   * A scribble in the corner of the feature panel, in the hand. Optional and
+   * used by exactly one entry: it exists to say the thing a card cannot say
+   * about itself without sounding like an advert. A card that says "free" in
+   * its own body copy is marketing; a note in the margin is somebody telling
+   * you.
+   */
+  note?: string;
   title: string;
   /** Short body shown at rest in the row / under the feature title. */
   description: string;
@@ -217,7 +226,22 @@ export function FeaturePanel({
       {/* The slogan that used to sit here ("Write me. Tell me what you're
           building.") asked for a conversation before the reader knew what the
           thing was. The arrow is the whole call to action. */}
-      <div className="relative z-10 mt-10 flex items-end justify-end">
+      <div className="relative z-10 mt-10 flex items-end justify-between gap-6">
+        {/* GOLD, because the panel is navy and the note has to be the one warm
+            thing on it. Clay would sit too close to the ink; anything cool
+            would disappear into the ground. It points across at the way in. */}
+        {entry.note ? (
+          <HandNote
+            gesture="right"
+            label={entry.note}
+            color="#e8a41f"
+            size={74}
+            className="-mb-2 hidden flex-col items-start gap-0 sm:flex"
+            labelClassName="-rotate-2 text-[1.15rem] md:text-[1.3rem]"
+          />
+        ) : (
+          <span />
+        )}
         <EnterCue onInk />
       </div>
     </Link>

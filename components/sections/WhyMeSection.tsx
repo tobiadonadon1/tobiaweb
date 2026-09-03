@@ -1,6 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import { motion, type Variants } from "motion/react";
+
+import { WhyMeMascot } from "./why-me-mascot";
 
 /**
  * "Why me" — the credibility beat, sitting between Projects and Thoughts.
@@ -68,7 +71,12 @@ const CARD_STYLE = {
  */
 function Fact({ value, label }: { value: string; label: string }) {
   return (
-    <motion.article variants={item} className={CARD} style={CARD_STYLE}>
+    <motion.article
+      variants={item}
+      data-mascot-step
+      className={CARD}
+      style={CARD_STYLE}
+    >
       <span className="font-serif text-[4.5rem] leading-[0.85] tracking-tight text-accent-clay md:text-[5.5rem]">
         {value}
       </span>
@@ -80,6 +88,15 @@ function Fact({ value, label }: { value: string; label: string }) {
 }
 
 export function WhyMeSection() {
+  /**
+   * The grid is the mascot's stage. He measures every `data-mascot-step` card
+   * inside it, groups them into rows, and walks their top edges: across the
+   * top row, down to the next, and back up the ladder from the bottom one. So
+   * this has to be the positioned ancestor he is placed against, and which
+   * cards carry the attribute is what shapes his route. See why-me-mascot.tsx.
+   */
+  const stage = useRef<HTMLDivElement>(null);
+
   return (
     <section id="proof" className="paper-bg relative">
       <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
@@ -87,31 +104,30 @@ export function WhyMeSection() {
             asks the reader to agree there IS something apart before anything
             has been shown. This one states the claim the facts then prove. */}
         <div className="mb-14 text-center">
-          <div className="mx-auto flex max-w-md items-center gap-4">
-            <span className="h-px flex-1 bg-black/10" />
-            <span className="text-[0.85rem] text-[color:rgba(11,31,58,0.5)]">
-              Why me
-            </span>
-            <span className="h-px flex-1 bg-black/10" />
-          </div>
-          <h2 className="mt-6 font-serif text-4xl tracking-tight text-[#0a0a0a] md:text-5xl">
+          {/* No kicker. "Why me" between two rules announced the argument
+              before making it, and the heading already is the argument. */}
+          <h2 className="font-serif text-4xl tracking-tight text-[#0a0a0a] md:text-5xl">
             Longer than you would guess.
           </h2>
         </div>
 
         <motion.div
+          ref={stage}
           variants={container}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-12%" }}
-          className="grid w-full grid-cols-1 gap-4 md:grid-cols-3"
+          className="relative grid w-full grid-cols-1 gap-4 md:grid-cols-3"
         >
+          <WhyMeMascot scope={stage} />
+
           {/* Tall left, on ink: where he sits, and the standard that comes
               with it. Two sentences. It used to be a paragraph claiming
               proximity to "the brightest minds in the room", which is
               unverifiable, immodest, and the exact thing the voice forbids. */}
           <motion.article
             variants={item}
+            data-mascot-step
             className="relative flex flex-col overflow-hidden rounded-[24px] border border-[color:var(--hairline-on-ink)] bg-ink p-8 md:col-span-1 md:row-span-2 md:p-10"
             style={{
               boxShadow:
@@ -159,6 +175,7 @@ export function WhyMeSection() {
               said nothing the Projects section above had not already shown. */}
           <motion.article
             variants={item}
+            data-mascot-step
             className={`${CARD} md:col-span-2 md:p-9`}
             style={CARD_STYLE}
           >
@@ -178,6 +195,7 @@ export function WhyMeSection() {
               and it is what makes every fact above it land. */}
           <motion.article
             variants={item}
+            data-mascot-step
             className={`${CARD} md:col-span-3 md:p-9`}
             style={CARD_STYLE}
           >

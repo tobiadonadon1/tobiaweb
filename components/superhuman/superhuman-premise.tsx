@@ -189,7 +189,7 @@ export function SuperhumanPremise() {
             <div className="lg:col-span-5 lg:pl-10">
               <span
                 aria-hidden
-                className="mb-8 block h-px w-12 bg-[var(--accent-sky)] lg:mb-10"
+                className="mb-8 block h-px w-12 bg-[var(--accent-clay)] lg:mb-10"
               />
 
               <p
@@ -210,7 +210,7 @@ export function SuperhumanPremise() {
                     <span
                       aria-hidden
                       data-strike
-                      className="absolute left-0 top-1/2 block h-[2px] w-full origin-left -translate-y-1/2 bg-[var(--accent-sky)]"
+                      className="absolute left-0 top-1/2 block h-[2px] w-full origin-left -translate-y-1/2 bg-[var(--accent-clay)]"
                     />
                   </li>
                 ))}

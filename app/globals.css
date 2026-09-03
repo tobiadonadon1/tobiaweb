@@ -29,6 +29,13 @@
      yet stays warm enough to live beside the ink. The road, its discs. */
   --accent-clay: #ce4631;
   --accent-clay-soft: rgba(206, 70, 49, 0.16);
+  /* The same clay, darkened until it passes AA as SMALL text. #ce4631 is
+     4.35:1 on paper, which clears 3:1 for large type and misses 4.5:1 for
+     body and labels. So the fill colour and the text colour are two tokens
+     rather than one: clay stays clay for rules, blocks and display type, and
+     anything small or set in a caption uses this. Also used as the GROUND
+     under paper-coloured text, where the fill is what has to carry it. */
+  --accent-clay-text: #b93a26;
 
   /* ---- myynd's own family. Taken from the live product at soleagency.co
      rather than invented, so the case study and the thing it is about agree
@@ -98,6 +105,7 @@
   --color-accent-mist: var(--accent-mist);
   --color-accent-deep: var(--accent-deep);
   --color-accent-clay: var(--accent-clay);
+  --color-accent-clay-text: var(--accent-clay-text);
   --color-accent-clay-soft: var(--accent-clay-soft);
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
@@ -164,11 +172,12 @@ canvas {
   outline: none;
 }
 
-/* The ink cursor replaces the native one on fine pointers (class added by
-   the component on mount — no JS, no change). */
+/* The custom cursor replaces the native one on fine pointers (class added by
+   the component on mount, so a reader with no JavaScript keeps the real one).
+   See components/ui/custom-cursor.tsx. */
 @media (pointer: fine) {
-  html.has-ink-cursor,
-  html.has-ink-cursor * {
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
     cursor: none !important;
   }
 }
@@ -684,27 +693,353 @@ body[data-footer-open] .sh-compass {
   pointer-events: none;
 }
 
-/* THE TRAVELLING LIGHT on the footer name. A narrow highlight sweeps across
-   the word on a slow loop; the layer it lives on is masked to whatever part
-   of the name has already filled (see SiteFooter.tsx), so the light only ever
-   plays over blue, never over the ghost. Background-position only — nothing
-   here reflows, and it is the one animation on the site that runs without
-   being asked for by the scroll, which is exactly why it is this slow. */
-.footer-name-fill {
-  animation: footer-sheen 11s linear infinite;
+/* ---------------------------------------------------------------------------
+   THE FOOTER COLLAGE.
+
+   Every moving part below reads `--reveal` (0 to 1 across the last screen of
+   scroll, written by footer-reveal.tsx) DIRECTLY through calc(). Nothing here
+   is a keyframe, a transition or a threshold, so the whole collage assembles
+   under your thumb as you pull the page off it and takes itself apart again if
+   you scroll back up. There is no JavaScript in any of it beyond the one custom
+   property that was already being written.
+
+   Each piece derives its own `--p` first: the reveal, offset by its index for
+   the stagger and multiplied so it finishes early enough to be at rest before
+   the footer is fully open. clamp() keeps it inside 0..1 whatever the maths.
+
+   `var(--reveal, 1)` defaults to 1 on purpose. Before hydration, and under
+   reduced motion where the footer is a normal static block, the collage renders
+   fully assembled rather than invisible.
+   --------------------------------------------------------------------------- */
+
+/* The link patches: torn paper flying up into its tilt. */
+.footer-patch {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.06 * var(--i, 0)) * 2.4), 1);
+  transform: translateY(calc((1 - var(--p)) * 56px))
+    rotate(calc(var(--tilt, 0deg) * var(--p)));
+  opacity: var(--p);
 }
 
-@keyframes footer-sheen {
-  from {
-    background-position: -30% 0;
-  }
-  to {
-    background-position: 130% 0;
-  }
+/* Hover lives on the SVG, not on the patch. The patch's own transform is being
+   rewritten every frame by the scroll, so a transition on it would lag the
+   scroll rather than answer the pointer. */
+.footer-patch svg {
+  filter: drop-shadow(0 5px 9px rgba(11, 31, 58, 0.16));
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 240ms ease;
+}
+.footer-patch:hover svg,
+.footer-patch:focus-visible svg {
+  transform: scale(1.045) rotate(-1.2deg);
+  filter: drop-shadow(0 10px 18px rgba(11, 31, 58, 0.22));
+}
+.footer-patch:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+/* The scatter behind everything, drifting in at its own rates. */
+.footer-fleck {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.05 * var(--i, 0)) * 2), 1);
+  transform: translateY(calc((1 - var(--p)) * 34px)) rotate(var(--tilt, 0deg));
+  opacity: calc(var(--p) * 0.5);
+}
+
+/* The name, and the hand drawn rule under it.
+
+   `pathLength="1"` renames each path's own length to 1, so the dash array and
+   the offset are plain fractions and the stroke can be drawn on by arithmetic
+   with no getTotalLength, no layout read and no measurement of any kind. */
+.footer-name {
+  --p: clamp(0, calc(var(--reveal, 1) * 2), 1);
+  transform: translateY(calc((1 - var(--p)) * 18px));
+  opacity: var(--p);
+}
+.footer-rule path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: clamp(0, calc(1 - (var(--reveal, 1) - 0.1) * 1.7), 1);
+}
+
+/* The little arrow curling back up at "Back to the top", and the note beside
+   it. The arrow starts drawing a quarter of the way in so it is not already
+   finished by the time you can see it. */
+.footer-arrow path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: clamp(0, calc(1 - (var(--reveal, 1) - 0.25) * 2.2), 1);
+}
+.footer-hand {
+  opacity: clamp(0, calc((var(--reveal, 1) - 0.55) * 4), 1);
+  transform: rotate(-5deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .footer-name-fill {
+  /* The footer is a static block here and `--reveal` is pinned to 1, so every
+     calc above already resolves to the assembled state. Only the pointer
+     answers need silencing. */
+  .footer-patch svg {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   "NOW LOCKED" — the two closed doors on the Construct shelf.
+
+   Masterclass and Design have no page. Clicking either shakes the drawing (Web
+   Animations, in shelf-locked-card.tsx, so it can fire again on the next click)
+   and puts this up over it for two seconds.
+
+   The brief was "sweet, humble, very chill", so it is not a modal, a toast or a
+   grey disabled state, and there is nothing to dismiss. It rises a few pixels,
+   blooms red once, holds, and leaves. The bloom is on the same keyframes rather
+   than a second animation so the two can never drift apart, and it fades before
+   the label does: a glow still burning under a fading word looks like a bug.
+
+   The whole thing is 2000ms because that is how long the component keeps it
+   mounted. If one changes the other has to.
+   --------------------------------------------------------------------------- */
+@keyframes shelf-lock-flash {
+  0% {
+    opacity: 0;
+    transform: translateY(7px) rotate(-2.5deg) scale(0.92);
+    box-shadow: 0 0 0 0 rgba(240, 112, 92, 0);
+  }
+  9% {
+    opacity: 1;
+    transform: translateY(0) rotate(-2.5deg) scale(1);
+    box-shadow: 0 0 24px 2px rgba(240, 112, 92, 0.5);
+  }
+  30% {
+    box-shadow: 0 0 12px 0 rgba(240, 112, 92, 0.2);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(0) rotate(-2.5deg) scale(1);
+    box-shadow: 0 0 9px 0 rgba(240, 112, 92, 0.12);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px) rotate(-2.5deg) scale(0.98);
+    box-shadow: 0 0 0 0 rgba(240, 112, 92, 0);
+  }
+}
+.shelf-lock-flash {
+  animation: shelf-lock-flash 2000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The message still has to arrive; only the movement goes. It is mounted and
+     unmounted on a timer either way, so it still appears and still leaves. */
+  .shelf-lock-flash {
     animation: none;
+    transform: rotate(-2.5deg);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MATERIAL — the specimen grid's entrance.
+
+   Settle speed, once, blur to sharp with a small rise: the design language's
+   entrance, applied to four cells with a 90ms stagger set inline per cell.
+   `both` so a cell is invisible until its own delay elapses rather than
+   flashing at full opacity and then animating.
+
+   The stagger is small on purpose. Four cells at 90ms finish inside 1.1s, so
+   the grid assembles rather than parading.
+   --------------------------------------------------------------------------- */
+@keyframes material-cell-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.material-cell {
+  animation: material-cell-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Reduced motion freezes the entrance, it does not remove the cell: the
+   grid still has to be readable with everything switched off. The locked
+   cells keep their blur, because that blur is content, not decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .material-cell {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   REVEAL — the Construct page's scroll entrance.
+
+   Class based rather than inline styles so the hidden state can be applied
+   ONLY once JavaScript has armed it. A reader with scripting off never gets
+   `.reveal--armed`, so nothing is ever hidden from them: the failure mode of
+   an entrance must be a visible page, not an empty one.
+
+   Transform and opacity only, and the mark inside gets a little more travel
+   and a turn, so the picture settles a beat after the words it belongs to.
+   Cut paper is placed by hand, and a hand does not put it down square.
+   --------------------------------------------------------------------------- */
+.reveal--armed {
+  opacity: 0;
+  transform: translateY(26px);
+}
+
+.reveal--armed,
+.reveal--armed svg {
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal--armed svg {
+  opacity: 0;
+  transform: translateY(16px) rotate(-3.5deg) scale(0.94);
+  transition-delay: 120ms;
+}
+
+.reveal--in,
+.reveal--in svg {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal--armed,
+  .reveal--armed svg {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MYND — its own palette, and the ground that follows the reader.
+
+   The page used to run terracotta, forest, bark and cream: a muted, tasteful
+   set that made every section look like the one above it. This is the same
+   family pushed to full strength, because the layout it now sits in is flat
+   colour blocks and flat colour has to be SATURATED or it reads as a mistake.
+
+   THE GROUND IS A VARIABLE, not a per-section background. Each section
+   declares the tint it wants and the whole page moves to it as that section
+   arrives (see components/mynd/ground.tsx). Nothing has a hard edge against
+   the section above it, and the type never has to fight a boundary running
+   through the middle of the screen.
+   --------------------------------------------------------------------------- */
+:root {
+  --m-cream: #f2eee7;
+  --m-ink: #17130f;
+  --m-clay: #e0512a;
+  --m-green: #1f6b4a;
+  --m-blue: #2a52d6;
+  --m-gold: #e8a41f;
+  /* The soft one. Not a signal colour: it exists so the film has something
+     warm behind it instead of a saturated block competing with the frame. */
+  --m-salmon: #e9a189;
+
+  /* The five grounds, in the order the page uses them. Each is its section's
+     colour laid over cream at the weight that still passes AA for body text. */
+  --m-ground-open: #f2eee7;
+  --m-ground-problem: #f6e7df;
+  /* WARM, NOT BLUE. This was #e7e9f7, a cool lavender, and it was the only
+     cold thing on the page: you read the problem section on a warm ground and
+     then the film section slid the whole page to blue underneath you. The
+     grounds now run warm the whole way to the green close, and the change
+     between sections is a change of TEMPERATURE within one family rather than
+     a jump across the wheel. */
+  --m-ground-work: #f3e2d5;
+  --m-ground-steps: #f7eedd;
+  --m-ground-close: #1f6b4a;
+}
+
+/* The page ground, and the one thing on this page that is always moving. Two
+   seconds is deliberately slower than a scroll: you should arrive in a colour
+   without having watched it change. */
+.mynd-ground {
+  background-color: var(--m-ground, var(--m-ground-open));
+  transition: background-color 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mynd-ground {
+    transition: none;
+  }
+}
+
+/* Type flips to cream on the one dark ground. Set by ground.tsx, so a section
+   never has to know what colour it is sitting on. */
+.mynd-ground[data-on-dark="1"] {
+  color: var(--m-cream);
+}
+
+/* ---------------------------------------------------------------------------
+   HAND NOTES — the scribbles that point at things.
+
+   `pathLength: 1` on the paths means the dash values below are plain fractions
+   of the stroke, whatever its real length, so one rule animates every gesture
+   and nothing has to be measured in JavaScript.
+
+   The tail draws, the head lands a beat later, and then the whole note keeps
+   a slow bob so it reads as somebody still holding the pen. The bob is
+   transform-only and stops dead under reduced motion.
+   --------------------------------------------------------------------------- */
+.font-hand {
+  font-family: var(--font-hand), "Bradley Hand", "Segoe Script", cursive;
+}
+
+.hand-note--armed .hand-note__label {
+  opacity: 0;
+  transform: translateY(6px) rotate(-2deg);
+  transition:
+    opacity 0.5s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hand-note--armed .hand-note__tail,
+.hand-note--armed .hand-note__head {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.hand-note--armed .hand-note__tail {
+  transition: stroke-dashoffset 0.95s cubic-bezier(0.4, 0, 0.3, 1) 0.18s;
+}
+
+.hand-note--armed .hand-note__head {
+  transition: stroke-dashoffset 0.3s ease-out 1s;
+}
+
+.hand-note--in .hand-note__label {
+  opacity: 1;
+  transform: none;
+}
+
+.hand-note--in .hand-note__tail,
+.hand-note--in .hand-note__head {
+  stroke-dashoffset: 0;
+}
+
+/* IT DOES NOT BOB. There was a slow rise and fall on the arrow once it had
+   landed, meant to read as somebody still holding the pen. It reads as a jump:
+   the eye catches the loop moving against type that is perfectly still, and a
+   drawn line that repeats the same motion forever stops looking drawn and
+   starts looking like a GIF. The drawing on is the life. Once it is down, it
+   is down. */
+
+@media (prefers-reduced-motion: reduce) {
+  .hand-note--armed .hand-note__label,
+  .hand-note--armed .hand-note__tail,
+  .hand-note--armed .hand-note__head {
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+    transition: none;
   }
 }

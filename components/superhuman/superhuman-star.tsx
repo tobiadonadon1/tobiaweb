@@ -56,9 +56,28 @@ export const RAY_COUNT = STAR_RAYS.length;
 
 type Pt = { x: number; y: number };
 
-/** Half-width of a ray where it meets the core. Longer rays are a touch broader. */
-const CORE_HALF = 0.052;
-const halfBase = (length: number) => CORE_HALF * (0.6 + 0.4 * length);
+/**
+ * Half-width of a ray where it meets the core.
+ *
+ * IT WAS 0.052, WHICH IS A SPARKLE. At that weight the mark reads as a lens
+ * flare: eight hairlines meeting at a point, the shape every AI product on
+ * the internet puts next to the word "magic". The star is meant to be the
+ * pale blue paper cut-out off Tobia's desk, and paper has body. Nearly three
+ * times the weight turns eight needles into eight cut petals, and the mark
+ * stops being a glint and starts being an object.
+ */
+const CORE_HALF = 0.178;
+
+/**
+ * Longer rays are broader, and no two rays are quite the same. The second
+ * term is a fixed per-ray wobble rather than a random one: hand-cut paper is
+ * uneven, and an even taper applied to eight rays is a machine's evenness.
+ * Fixed, because the geometry is derived once at module load and every
+ * surface has to agree about it.
+ */
+const RAY_WOBBLE = [1.0, 0.86, 1.09, 0.94, 1.12, 0.88, 1.04, 0.96];
+const halfBase = (length: number, index: number) =>
+  CORE_HALF * (0.62 + 0.38 * length) * RAY_WOBBLE[index % RAY_WOBBLE.length];
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const rotate = (p: Pt, a: number): Pt => ({
@@ -66,12 +85,27 @@ const rotate = (p: Pt, a: number): Pt => ({
   y: p.x * Math.sin(a) + p.y * Math.cos(a),
 });
 
-const NEEDLES = STAR_RAYS.map((ray) => {
+/**
+ * How blunt each tip is, as a fraction of the ray's half-width at the core.
+ * A ray now ends in a short EDGE rather than a point, because scissors cannot
+ * make a point and the whole argument of the mark is that it was cut. The
+ * blunting is tiny, so the silhouette still reads as a star rather than as a
+ * cog: the eye sees the cut only when it looks.
+ */
+const TIP_BLUNT = 0.2;
+
+const NEEDLES = STAR_RAYS.map((ray, i) => {
   const a = toRad(ray.angle);
-  const b = halfBase(ray.length);
+  const b = halfBase(ray.length, i);
+  const t = b * TIP_BLUNT;
+  const tip = { x: ray.length * Math.cos(a), y: ray.length * Math.sin(a) };
   return {
     a,
-    tip: { x: ray.length * Math.cos(a), y: ray.length * Math.sin(a) },
+    tip,
+    /** The two corners of the cut across the end, counter-clockwise first. */
+    tipCcw: { x: tip.x, y: tip.y },
+    tipA: rotate({ x: ray.length, y: -t }, a),
+    tipB: rotate({ x: ray.length, y: t }, a),
     // The two points where this needle meets the core, counter-clockwise
     // side first.
     ccw: rotate({ x: 0, y: -b }, a),
@@ -99,7 +133,7 @@ function crossing(p1: Pt, p2: Pt, p3: Pt, p4: Pt): Pt | null {
  */
 const VALLEYS: Pt[] = NEEDLES.map((needle, i) => {
   const next = NEEDLES[(i + 1) % RAY_COUNT];
-  const hit = crossing(needle.cw, needle.tip, next.ccw, next.tip);
+  const hit = crossing(needle.cw, needle.tipB, next.ccw, next.tipA);
   if (hit) {
     const r = Math.hypot(hit.x, hit.y);
     if (r > 0.02 && r < 0.4) return hit;
@@ -110,7 +144,7 @@ const VALLEYS: Pt[] = NEEDLES.map((needle, i) => {
     (needle.tip.y + next.tip.y) / 2,
     (needle.tip.x + next.tip.x) / 2,
   );
-  return { x: 0.12 * Math.cos(mid), y: 0.12 * Math.sin(mid) };
+  return { x: 0.2 * Math.cos(mid), y: 0.2 * Math.sin(mid) };
 });
 
 const round = (n: number) => Math.round(n * 10000) / 10000;
@@ -122,7 +156,7 @@ const poly = (pts: Pt[]) =>
  * sixteen points around. Also the path the hero strokes on.
  */
 export const STAR_OUTLINE_D = poly(
-  NEEDLES.flatMap((needle, i) => [needle.tip, VALLEYS[i]]),
+  NEEDLES.flatMap((needle, i) => [needle.tipA, needle.tipB, VALLEYS[i]]),
 );
 
 /**
@@ -135,8 +169,15 @@ export function rayLocalD(index: number): string {
   const back = -NEEDLES[index].a;
   const before = rotate(VALLEYS[(index + RAY_COUNT - 1) % RAY_COUNT], back);
   const after = rotate(VALLEYS[index], back);
-  const tip = { x: STAR_RAYS[index].length, y: 0 };
-  return poly([{ x: 0, y: 0 }, before, tip, after]);
+  const len = STAR_RAYS[index].length;
+  const t = halfBase(len, index) * TIP_BLUNT;
+  return poly([
+    { x: 0, y: 0 },
+    before,
+    { x: len, y: -t },
+    { x: len, y: t },
+    after,
+  ]);
 }
 
 /**
@@ -184,7 +225,11 @@ export const rayAngle = (index: number) => STAR_RAYS[index].angle;
  * thing a rotation may pivot around. The compass uses it.
  */
 const PAD = 0.06;
-const OUTLINE_PTS = NEEDLES.flatMap((needle, i) => [needle.tip, VALLEYS[i]]);
+const OUTLINE_PTS = NEEDLES.flatMap((needle, i) => [
+  needle.tipA,
+  needle.tipB,
+  VALLEYS[i],
+]);
 const minX = Math.min(...OUTLINE_PTS.map((p) => p.x)) - PAD;
 const maxX = Math.max(...OUTLINE_PTS.map((p) => p.x)) + PAD;
 const minY = Math.min(...OUTLINE_PTS.map((p) => p.y)) - PAD;
@@ -209,6 +254,32 @@ export const STAR_VIEWBOX_SPIN = `${-SPIN_R} ${-SPIN_R} ${SPIN_R * 2} ${
 /** Aspect ratio of the tight box, so a caller can size by width alone. */
 export const STAR_TIGHT_ASPECT = STAR_TIGHT_BOX.w / STAR_TIGHT_BOX.h;
 
+/**
+ * THE MARK'S OWN COLOURS.
+ *
+ * It used to be painted with one blue ramp, which made it a logo. Eight cut
+ * petals in five colours make it a collage, which is what the rest of this
+ * site became. The order is chosen so that no two neighbours are the same
+ * temperature and the two long rays (0 and 3) get the two loudest colours,
+ * because they are the ones the eye finds first.
+ *
+ * These are the Material palette exactly (see material/specimens.tsx). One
+ * set of colours for the whole Construct, or it is two brands.
+ */
+export const STAR_PALETTE: readonly string[] = [
+  "#ce4631", // 0 the long ray, up and left: vermilion
+  "#e0952b", // 1 saffron
+  "#2743b8", // 2 ultramarine
+  "#ce4631", // 3 the second long ray, out right: vermilion
+  "#1f6b4f", // 4 forest
+  "#e0952b", // 5 saffron
+  "#0b1f3a", // 6 ink
+  "#2743b8", // 7 ultramarine
+];
+
+/** The core sits under the petals and never shows past them. */
+export const STAR_CORE_COLOUR = "#0b1f3a";
+
 type StarProps = {
   /** Rendered height in px. Width follows the box's aspect. */
   size?: number;
@@ -225,6 +296,13 @@ type StarProps = {
   coreProps?: SVGProps<SVGPathElement>;
   /** Paint the mark with a diagonal ramp instead of a flat currentColor. */
   gradient?: { from: string; mid?: string; to: string };
+  /**
+   * Paint each petal its own colour. `rays` only, because a single closed
+   * path cannot hold eight fills. Pass STAR_PALETTE for the house set.
+   */
+  palette?: readonly string[];
+  /** Give the fills tooth, the way the cut shapes elsewhere have it. */
+  grain?: boolean;
   title?: string;
 };
 
@@ -243,6 +321,8 @@ export function SuperhumanStar({
   rayProps,
   coreProps,
   gradient,
+  palette,
+  grain = false,
   title,
 }: StarProps) {
   const tight = box === "tight";
@@ -250,6 +330,7 @@ export function SuperhumanStar({
   // other's paint, so the id is scoped per instance.
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const gid = `sh-star-${uid}`;
+  const grainId = `sh-star-grain-${uid}`;
   return (
     <svg
       width={tight ? Math.round(size * STAR_TIGHT_ASPECT) : size}
@@ -266,30 +347,59 @@ export function SuperhumanStar({
           it a lit edge and a shadowed one, which is all the dimension a
           geometric mark can take before it starts looking like a logo from
           2010. */}
-      {gradient ? (
+      {gradient || grain ? (
         <defs>
-          <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor={gradient.from} />
-            <stop offset="58%" stopColor={gradient.mid ?? gradient.from} />
-            <stop offset="100%" stopColor={gradient.to} />
-          </linearGradient>
+          {gradient ? (
+            <linearGradient id={gid} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={gradient.from} />
+              <stop offset="58%" stopColor={gradient.mid ?? gradient.from} />
+              <stop offset="100%" stopColor={gradient.to} />
+            </linearGradient>
+          ) : null}
+          {/* Same tooth the cut shapes carry. objectBoundingBox units,
+              because this filter is applied to a group whose box is the
+              star's own tight box rather than a fixed pixel rectangle. */}
+          {grain ? (
+            <filter id={grainId} x="0" y="0" width="100%" height="100%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="1.6"
+                numOctaves="4"
+                stitchTiles="stitch"
+                result="noise"
+              />
+              <feColorMatrix in="noise" type="saturate" values="0" result="grey" />
+              <feComponentTransfer in="grey" result="soft">
+                <feFuncA type="linear" slope="0.34" />
+              </feComponentTransfer>
+              <feComposite operator="in" in="soft" in2="SourceGraphic" result="clipped" />
+              <feBlend mode="multiply" in="SourceGraphic" in2="clipped" />
+            </filter>
+          ) : null}
         </defs>
       ) : null}
-      {variant === "solid" ? (
-        <path ref={pathRef} d={STAR_OUTLINE_D} {...pathProps} />
-      ) : (
-        <>
-          <path d={STAR_CORE_D} {...coreProps} />
-          {STAR_RAYS.map((ray, i) => (
+      <g filter={grain ? `url(#${grainId})` : undefined}>
+        {variant === "solid" ? (
+          <path ref={pathRef} d={STAR_OUTLINE_D} {...pathProps} />
+        ) : (
+          <>
             <path
-              key={i}
-              d={RAY_LOCAL_D[i]}
-              transform={`rotate(${ray.angle})`}
-              {...rayProps?.(i)}
+              d={STAR_CORE_D}
+              {...(palette ? { fill: STAR_CORE_COLOUR } : null)}
+              {...coreProps}
             />
-          ))}
-        </>
-      )}
+            {STAR_RAYS.map((ray, i) => (
+              <path
+                key={i}
+                d={RAY_LOCAL_D[i]}
+                transform={`rotate(${ray.angle})`}
+                {...(palette ? { fill: palette[i % palette.length] } : null)}
+                {...rayProps?.(i)}
+              />
+            ))}
+          </>
+        )}
+      </g>
     </svg>
   );
 }

@@ -19,11 +19,17 @@
  *                deliberately not on YouTube.
  *   Design       paid. Finished templates you ship as they are.
  *
- * The card no longer takes an address, because the card is no longer the
- * whole thing: each family has a route now (see app/projects/construct/
- * [shelf]/page.tsx) and the page carries the contents, the honest empty
- * state and the field. The card's only job is to be a door that says what is
- * behind it.
+ * ONLY MATERIAL HAS A PAGE. Masterclass and Design each used to open a route
+ * of their own: a lede, an intro, an empty state and an email field. Three
+ * doors, and two of them led to a room with nothing in it and a form. Tobia:
+ * "you delete the page that is now present. You also delete 'See what's
+ * coming' and 'See the templates'. You just make it so that the card wiggles,
+ * and 'Now locked' comes up in a sweet, humble, very chill way."
+ *
+ * So `open` is the field that matters here now. An open family has a `cta` and
+ * a `page` and its card is a link; a closed one has neither and its card is a
+ * button that shakes its head at you. A closed family cannot accidentally grow
+ * a dead route, because there is no page object for a route to render.
  *
  * NOTHING here invents a title, a price, a testimonial or a number. `status`
  * is a fact or it is not written.
@@ -83,11 +89,17 @@ export type ShelfFamily = {
   name: string;
   tier: ShelfTier;
   /**
-   * The word on the chip. Only the LOCKED family shows one: a card that says
+   * Can it be opened today? This is the only thing on the shelf that changes
+   * what a card IS, so it is a field rather than something inferred from
+   * `tier`: "paid" and "locked" are both closed doors, and a card should not
+   * have to know the difference to know that it does not open.
+   */
+  open: boolean;
+  /**
+   * The word on the chip. Only a CLOSED family shows one: a card that says
    * "Free" next to a sentence that already says free is the page repeating
-   * itself, and three chips in a row turn a shelf into a pricing table. A
-   * chip earns its place when it changes what you can do, and only one of
-   * these does.
+   * itself, and three chips in a row turn a shelf into a pricing table. A chip
+   * earns its place when it changes what you can do.
    */
   tag: string;
   /** What it is. One sentence, on the card, and nothing longer there. */
@@ -97,10 +109,12 @@ export type ShelfFamily = {
    * the page's only proof, so it is never softened into a promise.
    */
   status: string;
-  /** The card's door. Verb first. */
-  cta: string;
-  /** Prefilled subject for the mail fallback on the family's own page. */
-  subject: string;
+  /**
+   * The card's door. Verb first. OPEN FAMILIES ONLY: a closed card has no door
+   * to describe, and "See what is coming" on a card that goes nowhere is the
+   * shelf writing a cheque the site cannot cash.
+   */
+  cta?: string;
   /**
    * Which of the star's eight rays becomes this card's leading rule, and
    * which becomes the short rule above its way in. Ordered by ray length:
@@ -110,11 +124,12 @@ export type ShelfFamily = {
   dividerRay: number;
 
   /** ------------------------------------------------------------------ *
-   * PAGE ONLY. None of this reaches the shelf card; it is what the family's
-   * own route renders. Adding a family means filling this in, not writing a
-   * page.
+   * PAGE ONLY, AND OPEN FAMILIES ONLY. None of this reaches the shelf card; it
+   * is what the family's own route renders. Absent means there is no route:
+   * generateStaticParams reads `open`, so a family with no page object cannot
+   * be built into one.
    * ------------------------------------------------------------------ */
-  page: {
+  page?: {
     /** Under the site's `%s · Tobia Donadon` template, and the OG title. */
     title: string;
     /** One sentence, for <meta description> and the top of the page. */
@@ -138,11 +153,11 @@ export const SHELF: ShelfFamily[] = [
     id: "material",
     name: "Material",
     tier: "free",
+    open: true,
     tag: "Free",
-    line: "Guides, skills, and the tools I build with. Basics that scale.",
+    line: "Three skills you download and three guides you read.",
     status: "Free, and it stays free.",
     cta: "Open the material",
-    subject: "Construct: material",
     spineRay: 2,
     dividerRay: 4,
     page: {
@@ -161,52 +176,33 @@ export const SHELF: ShelfFamily[] = [
        */
       items: [],
       empty:
-        "The material lives in two folders rather than in one list. Open any of them from the room above.",
+        "The material lives in folders rather than in one list. Open any of them from the room above.",
     },
   },
   {
     id: "masterclass",
     name: "Masterclass",
     tier: "locked",
+    open: false,
     tag: "Locked",
     line: "Ten minutes, one advanced move. None of it is on YouTube.",
     status: "Not open yet.",
-    cta: "See what is coming",
-    subject: "Construct: masterclass",
     spineRay: 7,
     dividerRay: 1,
-    page: {
-      title: "Masterclass",
-      lede: "One advanced thing, in ten to fifteen minutes.",
-      intro: [
-        "Expert level and tightly cut. One technique per class, taken to the end, with the parts that usually break already broken and fixed on camera.",
-      ],
-      items: [],
-      empty:
-        "The first classes are being recorded. Leave an address and I write once, when there is something to watch.",
-    },
   },
   {
     id: "design",
     name: "Design",
     tier: "paid",
-    tag: "Templates",
+    open: false,
+    // Was "Templates", which is a category rather than a state, and the line
+    // under it already says templates. The chip's whole job is to say whether
+    // the door opens.
+    tag: "Locked",
     line: "Website templates you can ship as they are.",
     status: "First set in build.",
-    cta: "See the templates",
-    subject: "Construct: design",
     spineRay: 6,
     dividerRay: 5,
-    page: {
-      title: "Design",
-      lede: "Templates you can ship as they are.",
-      intro: [
-        "Whole builds, not snippets: a site you can put a client on the week you buy it, with the animation, the type and the responsive work already done.",
-      ],
-      items: [],
-      empty:
-        "The first set is in build. They are being cut out of real client work, so each one ships only after it has been used for something.",
-    },
   },
 ];
 
@@ -215,8 +211,18 @@ export const SHELF_BY_ID: Record<ShelfId, ShelfFamily> = Object.fromEntries(
   SHELF.map((family) => [family.id, family]),
 ) as Record<ShelfId, ShelfFamily>;
 
-/** The URL segments, in shelf order. Used by the route and the sitemap. */
+/** Every segment, in shelf order. */
 export const SHELF_IDS: ShelfId[] = SHELF.map((family) => family.id);
+
+/**
+ * The segments that actually resolve to a page. This is what the route builds
+ * and what the sitemap publishes, so a closed family cannot be linked to, be
+ * indexed, or render an empty shell: it 404s at routing, and next.config sends
+ * the two retired URLs back to the shelf.
+ */
+export const OPEN_SHELF_IDS: ShelfId[] = SHELF.filter((f) => f.open).map(
+  (family) => family.id,
+);
 
 /** Narrowing for anything that receives a segment from outside. */
 export function isShelfId(value: string): value is ShelfId {

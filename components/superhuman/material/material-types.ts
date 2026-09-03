@@ -72,7 +72,17 @@ export type Block =
    * unfilmed videos run on. `need` is written so that it works twice: it is
    * the brief for the shot, and it becomes the alt text once `src` lands.
    */
-  | { type: "shot"; need: string; src?: string };
+  | { type: "shot"; need: string; src?: string }
+  /**
+   * A DRAWN DIAGRAM.
+   *
+   * The guides needed pictures and there are no photographs to take: a context
+   * window filling up is not a thing you can point a camera at. So the figures
+   * are drawn, keyed by id into figures.tsx, and they carry a caption that has
+   * to make sense with the picture missing. A diagram nobody can read from its
+   * caption alone is decoration.
+   */
+  | { type: "figure"; id: string; caption: string };
 
 export type MaterialEntry = {
   /** Stable, lowercase, hyphenated. It is the deep link into the folder. */
@@ -122,8 +132,20 @@ export type MaterialFolder = {
   /** URL segment under /projects/construct/material. */
   id: string;
   name: string;
-  /** One line, on the card. */
+  /** One line, under the specimen in the room. The folder's subtitle. */
   line: string;
+  /**
+   * NOT OPEN YET, AND SAYING WHAT IS BEHIND IT.
+   *
+   * The room draws a locked folder blurred: you can see there is something
+   * there and you cannot read it. A blur on its own is a tease, so a locked
+   * folder must also carry `soon` — one concrete fact about what is written
+   * and what is missing. The copy rules ban "coming soon" with no window, and
+   * a count is better than a window anyway: "Six written. None filmed." is
+   * checkable, and a date is not.
+   */
+  locked?: boolean;
+  soon?: string;
   /** One sentence at the top of the folder's own page. */
   lede: string;
   /** Two short paragraphs. What is in here and how to use it. */

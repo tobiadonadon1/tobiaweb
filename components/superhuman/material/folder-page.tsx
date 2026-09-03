@@ -1,91 +1,86 @@
-import Link from "next/link";
 import { BackLink } from "@/components/ui/back-link";
-import { FolderReader } from "./folder-reader";
-import { MATERIAL_ROOM_FOLDERS, folderCount, folderHref } from "./material-data";
+import { MaterialList } from "./material-list";
+import { MaterialRack } from "./material-rack";
+import { folderCount } from "./material-data";
 import type { MaterialFolder } from "./material-types";
 
 /**
  * A FOLDER'S OWN PAGE.
  *
- * Paper head, then the reader. The head is deliberately NOT the family's tall
- * ink header: the reading pane on this page is already ink, and a full ink
- * header above an ink panel makes the panel stop reading as an object and
- * start reading as the page's background. One ink thing per screen.
+ * Paper head, then the list. There is no ink header any more and no nav to the
+ * other folder at the foot. Both were removed for the same reason: the back
+ * link at the top already goes to a grid showing every folder there is, so a
+ * footer repeating that is the page offering you a door you are standing next
+ * to.
  *
- * Everything below the head comes out of the folder object, so a new folder
- * is a new entry in MATERIAL_ROOM_FOLDERS and a content file. There is no
- * per-folder page to write, and there should never be one.
+ * The head is three things and stops. A label carrying the only number worth
+ * printing, the name at display size, and one sentence. The paragraph under it
+ * is the folder's `intro`, which is a single paragraph by rule: the list below
+ * is about to say what is in here far better than a preamble can.
+ *
+ * Everything below the head comes out of the folder object, so a new folder is
+ * an entry in MATERIAL_ROOM_FOLDERS and a content file. There is no per folder
+ * page to write, and there should never be one.
  */
 export function FolderPage({ folder }: { folder: MaterialFolder }) {
   const count = folderCount(folder);
-  const others = MATERIAL_ROOM_FOLDERS.filter((f) => f.id !== folder.id);
+  // BOTH OPEN FOLDERS GET THE RACK. The parked folders have no marks drawn
+  // for their entries, so they keep the list and cannot render an empty
+  // picture frame.
+  const isRack = folder.id === "skills" || folder.id === "guides";
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
       <BackLink href="/projects/construct/material" label="Material" tone="ink" />
 
-      <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-28 md:pb-32 md:pt-32">
-        {/* ---------------------------------------------------------------- *
-         * THE HEAD, on paper.
-         * ---------------------------------------------------------------- */}
-        <header className="max-w-[62ch]">
-          <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)]">
+      {/* THE FRAME FOLLOWS THE CONTENTS. The rack needs three columns and the
+          list needs a reading measure, and one width cannot serve both: at
+          6xl the guides rows stranded half the page, and at 4xl the skill
+          columns were too narrow to give a mark any size. */}
+      <div
+        className={`mx-auto w-full px-6 pb-28 pt-28 md:pb-36 md:pt-36 ${
+          isRack ? "max-w-6xl" : "max-w-4xl"
+        }`}
+      >
+        <header>
+          <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
             Material · {count.label}
           </span>
 
-          <h1 className="mt-4 font-serif text-[clamp(2.4rem,7vw,4.4rem)] leading-[0.98] tracking-[-0.03em] text-[var(--ink)]">
+          <h1 className="mt-5 font-serif text-[clamp(2.8rem,9vw,5rem)] leading-[0.95] tracking-[-0.035em] text-[var(--ink)]">
             {folder.name}
           </h1>
 
-          <p className="mt-5 text-pretty text-[1.2rem] leading-[1.45] text-[color:rgba(11,31,58,0.72)] md:text-[1.35rem]">
-            {folder.lede}
-          </p>
+          {/* Both are empty on the two open folders now, and the head simply
+              stops. A folder page that opens with a slogan and then a
+              paragraph about what a folder is has put two things between you
+              and the three items you came for. The parked folders still carry
+              theirs, so both still render wherever they exist. */}
+          {folder.lede ? (
+            <p className="mt-6 max-w-[36ch] text-pretty text-[1.3rem] leading-[1.35] tracking-[-0.01em] text-[var(--ink)] md:text-[1.55rem]">
+              {folder.lede}
+            </p>
+          ) : null}
 
-          <div className="mt-7 space-y-5">
-            {folder.intro.map((paragraph) => (
-              <p
-                key={paragraph.slice(0, 32)}
-                className="text-pretty text-[1.05rem] leading-[1.7] text-[color:rgba(11,31,58,0.7)]"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          {folder.intro.map((paragraph) => (
+            <p
+              key={paragraph.slice(0, 32)}
+              className="mt-6 max-w-[58ch] text-pretty text-[1.05rem] leading-[1.7] text-[color:rgba(11,31,58,0.68)]"
+            >
+              {paragraph}
+            </p>
+          ))}
         </header>
 
-        {/* ---------------------------------------------------------------- *
-         * THE READER.
-         * ---------------------------------------------------------------- */}
-        <div className="mt-14 border-t border-[var(--hairline)] pt-10 md:mt-20">
-          <FolderReader folder={folder} />
+        {/* The two open folders get the rack. The parked ones keep the list,
+            because nothing has drawn marks for their entries. */}
+        <div className="mt-14 md:mt-16">
+          {isRack ? (
+            <MaterialRack folder={folder} />
+          ) : (
+            <MaterialList folder={folder} />
+          )}
         </div>
-
-        {/* ---------------------------------------------------------------- *
-         * THE REST OF THE ROOM.
-         * ---------------------------------------------------------------- */}
-        <nav
-          aria-label="The other folders"
-          className="mt-20 border-t border-[var(--hairline)] pt-8 md:mt-28"
-        >
-          <h2 className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.45)]">
-            Elsewhere in Material
-          </h2>
-          <ul className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-            {others.map((other) => (
-              <li key={other.id}>
-                <Link
-                  href={folderHref(other.id)}
-                  className="group inline-flex items-baseline gap-2 text-[1.05rem] text-[color:rgba(11,31,58,0.6)] transition-colors hover:text-[var(--ink)]"
-                >
-                  {other.name}
-                  <span className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.38)]">
-                    {folderCount(other).total}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
       </div>
     </main>
   );

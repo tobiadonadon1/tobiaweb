@@ -47,12 +47,17 @@ const ITEM_LIST = {
   description: DESCRIPTION,
   numberOfItems: SHELF.length,
   itemListOrder: "https://schema.org/ItemListUnordered",
+  // A `url` only where there is a page to point at. Masterclass and Design are
+  // still listed, because they are still real parts of the shelf, but a
+  // ListItem carrying a link to a 404 is worse than one carrying no link.
   itemListElement: SHELF.map((family, i) => ({
     "@type": "ListItem",
     position: i + 1,
     name: family.name,
     description: `${family.line} ${family.status}`,
-    url: `https://tobiadonadon.com${shelfHref(family.id)}`,
+    ...(family.open
+      ? { url: `https://tobiadonadon.com${shelfHref(family.id)}` }
+      : {}),
   })),
 };
 

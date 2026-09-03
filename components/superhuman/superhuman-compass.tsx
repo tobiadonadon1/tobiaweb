@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { gsap } from "gsap";
-import { RAY_LOCAL_D, STAR_CORE_D, STAR_RAYS } from "./superhuman-star";
+import {
+  OUTER_STAR_D,
+  INNER_STAR_D,
+  STAR_BLUE,
+  STAR_RED,
+} from "./construct-star";
 
 /** Radius of the dial and of the star inside it, in the compass's own units. */
 const DIAL_R = 27;
 const STAR_R = 23;
 /** How far the needle swings between the first section and the last. */
 const SWEEP = 300;
-/** How far a ray reaches toward the pointer, at most. */
-const REACH = 0.19;
-
-const shortestTurn = (deg: number) => ((((deg + 180) % 360) + 360) % 360) - 180;
-const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
 
 /**
  * THE COMPASS. The star persists as a small instrument in the corner, and
@@ -52,16 +51,26 @@ const clamp01 = (n: number) => (n < 0 ? 0 : n > 1 ? 1 : n);
  */
 export function SuperhumanCompass({ labels }: { labels: string[] }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const dialRef = useRef<SVGGElement>(null);
-  const rays = useRef<(SVGPathElement | null)[]>([]);
   const [index, setIndex] = useState(0);
   const [onInk, setOnInk] = useState(false);
   /** True once the close has arrived. The instrument is done at that point. */
   const [retired, setRetired] = useState(false);
 
-  // Live rotation, shared between the section tween and the pointer maths.
-  const spin = useRef({ rot: 0 });
-  const stretch = useRef(STAR_RAYS.map(() => ({ v: 1 })));
+  /**
+   * NOTHING SPINS AND NOTHING STRETCHES ANY MORE.
+   *
+   * This instrument used the mark itself as its needle: the star sat in the
+   * dial and turned so that its longest ray pointed at whichever section you
+   * were in, and a pointer handler stretched individual rays toward the
+   * cursor as it passed. Both were built on a star made of eight addressable
+   * rays and neither can survive a drawn one. Tobia, on the new symbol:
+   * "Don't make it rotate."
+   *
+   * The dial still works, because the needle was never the part carrying the
+   * information: the lit tick and the label under it already say where you
+   * are, and they said it before the needle finished swinging. What is lost
+   * is a flourish. What is kept is the instrument.
+   */
 
   useEffect(() => {
     const sections = Array.from(
@@ -69,27 +78,6 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
     );
     if (sections.length < 2) return;
 
-    const spinState = spin.current;
-    const stretchState = stretch.current;
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
-      .matches;
-
-    /* ---- drawing ---- */
-    const applyRay = (i: number) => {
-      rays.current[i]?.setAttribute(
-        "transform",
-        `rotate(${STAR_RAYS[i].angle}) scale(${stretchState[i].v.toFixed(4)},1)`,
-      );
-    };
-    const applyDial = () => {
-      dialRef.current?.setAttribute(
-        "transform",
-        `rotate(${spinState.rot.toFixed(2)}) scale(${STAR_R})`,
-      );
-    };
-    STAR_RAYS.forEach((_, i) => applyRay(i));
-    applyDial();
 
     /* ---- which section are we in ---- */
     const seen = new Set<number>();
@@ -135,77 +123,12 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
       : null;
     if (close && endObserver) endObserver.observe(close);
 
-    /* ---- the pointer ---- */
-    let quickTo: ((v: number) => void)[] = [];
-    if (!reduced) {
-      quickTo = STAR_RAYS.map((_, i) =>
-        gsap.quickTo(stretchState[i], "v", {
-          duration: 0.45,
-          ease: "power3.out",
-          onUpdate: () => applyRay(i),
-        }),
-      );
-    }
-
-    const onPointerMove = (event: PointerEvent) => {
-      const el = rootRef.current?.querySelector("[data-dial]");
-      if (!el || !quickTo.length) return;
-      const box = el.getBoundingClientRect();
-      const dx = event.clientX - (box.left + box.width / 2);
-      const dy = event.clientY - (box.top + box.height / 2);
-      const dist = Math.hypot(dx, dy);
-      const near = clamp01(1 - dist / 280);
-      const toward = (Math.atan2(dy, dx) * 180) / Math.PI;
-
-      for (let i = 0; i < STAR_RAYS.length; i++) {
-        const world = STAR_RAYS[i].angle + spinState.rot;
-        const off = Math.abs(shortestTurn(toward - world));
-        const facing = Math.max(0, 1 - off / 48);
-        quickTo[i](1 + REACH * facing * near);
-      }
-    };
-
-    if (!reduced && window.matchMedia("(pointer: fine)").matches) {
-      window.addEventListener("pointermove", onPointerMove, { passive: true });
-    }
-
     return () => {
       sectionObserver.disconnect();
       inkObserver.disconnect();
       endObserver?.disconnect();
-      window.removeEventListener("pointermove", onPointerMove);
-      gsap.killTweensOf(spinState);
-      stretchState.forEach((s) => gsap.killTweensOf(s));
     };
   }, []);
-
-  // Swing the needle whenever the section changes.
-  useEffect(() => {
-    if (labels.length < 2) return;
-    const tick = -90 + (index / (labels.length - 1)) * SWEEP;
-    const target = tick - STAR_RAYS[0].angle;
-    const applyDial = () => {
-      dialRef.current?.setAttribute(
-        "transform",
-        `rotate(${spin.current.rot.toFixed(2)}) scale(${STAR_R})`,
-      );
-    };
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      spin.current.rot = target;
-      applyDial();
-      return;
-    }
-    const tween = gsap.to(spin.current, {
-      rot: target,
-      duration: 1.15,
-      ease: "power3.inOut",
-      onUpdate: applyDial,
-    });
-    return () => {
-      tween.kill();
-    };
-  }, [index, labels.length]);
 
   const visible = index > 0 && labels.length > 1 && !retired;
   const line = onInk ? "rgba(207,233,238,0.28)" : "rgba(11,31,58,0.18)";
@@ -224,7 +147,7 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
         width={62}
         height={62}
         viewBox="-40 -40 80 80"
-        className="text-[var(--accent-sky)]"
+        className="text-[var(--accent-clay)]"
       >
         <circle r={DIAL_R} fill="none" stroke={line} strokeWidth={1} />
         {labels.map((label, i) => {
@@ -242,18 +165,17 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
             />
           );
         })}
-        <g ref={dialRef} fill="currentColor" transform={`rotate(0) scale(${STAR_R})`}>
-          <path d={STAR_CORE_D} />
-          {STAR_RAYS.map((ray, i) => (
-            <path
-              key={i}
-              ref={(el) => {
-                rays.current[i] = el;
-              }}
-              d={RAY_LOCAL_D[i]}
-              transform={`rotate(${ray.angle})`}
-            />
-          ))}
+        {/* The mark, held still in the middle of the dial. */}
+        <g transform={`scale(${STAR_R / 50}) translate(-50 -50)`}>
+          <path
+            d={OUTER_STAR_D}
+            fill="none"
+            stroke={STAR_BLUE}
+            strokeWidth={4.4}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+          <path d={INNER_STAR_D} fill={STAR_RED} />
         </g>
       </svg>
 

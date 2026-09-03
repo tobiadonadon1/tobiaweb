@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Host_Grotesk } from "next/font/google";
+import { Caveat, Host_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { SiteFooter } from "@/components/sections/SiteFooter";
-import { InkCursor } from "@/components/ui/ink-cursor";
+import { CustomCursor } from "@/components/ui/custom-cursor";
 
 /**
  * ONE TYPEFACE, everywhere.
@@ -30,6 +30,22 @@ const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
   display: "swap",
   style: ["normal", "italic"],
+});
+
+/**
+ * THE ONE EXCEPTION TO ONE TYPEFACE.
+ *
+ * Everything on this site is Host Grotesk, deliberately, and that rule is not
+ * being relaxed. This face is not for typography: it is only ever used inside
+ * the drawn annotations (components/ui/hand-note.tsx), which are scribbles in
+ * the margin pointing at things. A scribble set in the same grotesk as the
+ * headline reads as a caption, which is the opposite of the point. Nothing
+ * that is part of the page's actual text is ever set in it.
+ */
+const caveat = Caveat({
+  variable: "--font-hand",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const DESCRIPTION =
@@ -74,7 +90,7 @@ export default function RootLayout({
       // own bottom. The attribute tells Next to force `auto` for the duration
       // of a route transition, and hands smooth scrolling back afterwards.
       data-scroll-behavior="smooth"
-      className={`${hostGrotesk.variable} h-full antialiased`}
+      className={`${hostGrotesk.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <SiteNav />
@@ -82,7 +98,7 @@ export default function RootLayout({
             beneath itself. See `.site-content` in globals.css. */}
         <div className="site-content">{children}</div>
         <SiteFooter />
-        <InkCursor />
+        <CustomCursor />
       </body>
     </html>
   );

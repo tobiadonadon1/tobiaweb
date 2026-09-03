@@ -9,9 +9,29 @@ import { SETUPS } from "./content/setups";
 /**
  * THE ROOM, ASSEMBLED.
  *
- * Two folders are the public room: Skills, Guides, in that order.
- * Videos, Do this, Tools, and Setups stay in the data so old URLs still resolve, but
- * they are parked — hidden from the cards and from the room's counts.
+ * FOUR CELLS, TWO OPEN. The room is a grid of four now rather than a list of
+ * two, and the two that are not ready are drawn blurred instead of being left
+ * off. That is a deliberate promise about the size of the thing: a page
+ * showing two folders looks finished at two folders, and a page showing two
+ * plus two you cannot read yet says the shelf is still being filled.
+ *
+ * A BLUR ON ITS OWN IS A TEASE, so every locked folder carries `soon`: one
+ * checkable fact about what is written and what is missing. The copy rules ban
+ * "coming soon" with no window, and a count beats a window, because a count is
+ * true today and a date is a promise made by somebody who does not know.
+ *
+ * Do this and Tools stay in the data so old URLs still resolve. They are not
+ * in the grid and not in the sitemap.
+ *
+ * NO LEDE, NO INTRO, ON THE OPEN FOLDERS. Both carried a sentence and a
+ * paragraph above their contents. Tobia on the skills one, which read "Written
+ * once, loaded every time": "this cocky language I don't love". He is right
+ * about more than the tone. A folder page that opens with a slogan and a
+ * paragraph explaining what a folder is has put two things between you and the
+ * three items you came for. The name and the list are enough, and the room
+ * already gave each folder a line before you clicked. The fields stay on the
+ * type as empty strings rather than being deleted, because the parked folders
+ * still use them.
  *
  * EVERY DESCRIPTION IS ONE PARAGRAPH. Tobia, on the first version: "within
  * each section, you just write too much". The folder page already carries a
@@ -23,11 +43,9 @@ import { SETUPS } from "./content/setups";
 const SKILLS_FOLDER: MaterialFolder = {
   id: "skills",
   name: "Skills",
-  line: "Instruction packs that make an agent work my way by default.",
-  lede: "Written once, loaded every time.",
-  intro: [
-    "Every entry carries the actual text, not a description of it. Copy it, change the parts that are about me rather than about the job, and use it.",
-  ],
+  line: "Three roles you put into the agent for the length of a job.",
+  lede: "",
+  intro: [],
   accent: "clay",
   entries: SKILLS,
 };
@@ -35,26 +53,48 @@ const SKILLS_FOLDER: MaterialFolder = {
 const GUIDES_FOLDER: MaterialFolder = {
   id: "guides",
   name: "Guides",
-  line: "Long walkthroughs of things I have shipped, including what went wrong.",
-  lede: "Records, not lessons.",
-  intro: [
-    "Each one is a walkthrough of something I actually did. Read them against a real task; almost nothing here survives being read as theory.",
-  ],
+  line: "Set up the tools, pick the model, find the idea.",
+  lede: "",
+  intro: [],
   accent: "ink",
   entries: GUIDES,
 };
+
+/* ---------------------------------------------------------------- *
+ * THE TWO THAT ARE NOT OPEN.
+ * ---------------------------------------------------------------- */
 
 const VIDEOS_FOLDER: MaterialFolder = {
   id: "videos",
   name: "Videos",
   line: "Three to six minutes each. Screen recordings of the working rhythm.",
   lede: "Written first, filmed second.",
+  locked: true,
+  soon: "Six written. None filmed.",
   intro: [
     "None of these exist yet, and every row says so. What is here is the notes each will be cut from, which are worth reading on their own.",
   ],
   accent: "mist",
   entries: VIDEOS,
 };
+
+const SETUPS_FOLDER: MaterialFolder = {
+  id: "setups",
+  name: "Setups",
+  line: "The configuration layer. Rules that hold whether you remember them or not.",
+  lede: "The dull folder that compounds.",
+  locked: true,
+  soon: "Five written. Not open.",
+  intro: [
+    "Instruction files, hooks, subagents and housekeeping. None of it is interesting and all of it pays for itself within a week.",
+  ],
+  accent: "sky",
+  entries: SETUPS,
+};
+
+/* ---------------------------------------------------------------- *
+ * PARKED. Off the grid, off the sitemap, routes still resolve.
+ * ---------------------------------------------------------------- */
 
 const DO_THIS_FOLDER: MaterialFolder = {
   id: "do-this",
@@ -74,28 +114,36 @@ const TOOLS_FOLDER: MaterialFolder = {
   line: "What I build with, and when each one earns its place.",
   lede: "The stack, with the reasoning attached.",
   intro: [
-    "Everything here is something this site is actually built on. Each note answers the same three questions, and the third one — what I would not use it for — is usually the useful part.",
+    "Everything here is something this site is actually built on. Each note answers the same three questions, and the third one, what I would not use it for, is usually the useful part.",
   ],
   accent: "ink",
   entries: TOOLS,
 };
 
-const SETUPS_FOLDER: MaterialFolder = {
-  id: "setups",
-  name: "Setups",
-  line: "The configuration layer. Rules that hold whether you remember them or not.",
-  lede: "The dull folder that compounds.",
-  intro: [
-    "Instruction files, hooks, subagents and housekeeping. None of it is interesting and all of it pays for itself within a week.",
-  ],
-  accent: "sky",
-  entries: SETUPS,
-};
-
-/** The two cards in the room, in this order. */
+/**
+ * THE OPEN FOLDERS, in this order. These are the ones with routes, sitemap
+ * entries and links pointing at them. A folder is in here only when you can
+ * actually read it.
+ */
 export const MATERIAL_ROOM_FOLDERS: MaterialFolder[] = [
   SKILLS_FOLDER,
   GUIDES_FOLDER,
+];
+
+/** Drawn blurred in the grid. Not links, not indexed. */
+export const MATERIAL_LOCKED_FOLDERS: MaterialFolder[] = [
+  VIDEOS_FOLDER,
+  SETUPS_FOLDER,
+];
+
+/**
+ * THE GRID, reading order. Two you can open, then two you cannot. The reading
+ * order is the point: the eye lands on something it can use before it lands on
+ * something it has to wait for.
+ */
+export const MATERIAL_GRID: MaterialFolder[] = [
+  ...MATERIAL_ROOM_FOLDERS,
+  ...MATERIAL_LOCKED_FOLDERS,
 ];
 
 /** Hidden from the room. Files stay; old URLs still resolve. */
@@ -127,6 +175,19 @@ export function isFolderId(value: string): boolean {
 
 /** A folder's route. One place, so nothing hand-writes the path. */
 export const folderHref = (id: string) => `/projects/construct/material/${id}`;
+
+/**
+ * A PIECE'S OWN ROUTE.
+ *
+ * Pieces used to have no URL of their own: the reader swapped them in place
+ * and rewrote the hash. That is right when a folder holds thirty things and
+ * you are browsing. It is wrong now that a folder holds three and each one is
+ * a finished document somebody might want to send to a person, because a hash
+ * on a client component is not a page a search engine or a preview card can
+ * see. Three pieces, three routes.
+ */
+export const entryHref = (folderId: string, slug: string) =>
+  `/projects/construct/material/${folderId}/${slug}`;
 
 /**
  * What each kind is called in the open, so a row never needs a legend.
@@ -170,17 +231,6 @@ export function folderCount(folder: MaterialFolder): {
 
   return { ready, total, label };
 }
-
-/** Total pieces across the public room, for the head of the material page. */
-export const MATERIAL_TOTAL = MATERIAL_ROOM_FOLDERS.reduce(
-  (n, folder) => n + folder.entries.length,
-  0,
-);
-
-export const MATERIAL_READY = MATERIAL_ROOM_FOLDERS.reduce(
-  (n, folder) => n + folder.entries.filter((e) => e.status === "ready").length,
-  0,
-);
 
 /** The neighbours of an entry inside its folder, for the reading pane's feet. */
 export function neighbours(

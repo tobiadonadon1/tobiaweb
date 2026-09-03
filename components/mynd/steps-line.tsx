@@ -1,219 +1,180 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ParticleSphere } from "@/components/mynd/particle-sphere";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { HandFrame, HandMark } from "./hand";
 
 /**
- * The four steps, in the product's own words rather than a paraphrase of
- * them. The old set described a search tool that stayed tidy: "it plugs in",
- * "it keeps reading", "plain language, with sources". True, and it left the
- * reader with no idea what actually changes on a Tuesday.
+ * THE FOUR STEPS.
  *
- * These name the thing that happens at each step, and the last one carries
- * the whole point of the page: the automations are where the time and the
- * money come back.
+ * WHAT THIS REPLACES. Four names hung off one unbroken horizontal rule, with
+ * the body text reassembling as it arrived. A clean timeline, and completely
+ * anonymous: cover the words and there is nothing left. Tobia: "on the
+ * timeline, I'd like to change that, switch it up a bit, and make it a bit
+ * more creative."
+ *
+ * WHAT IT IS NOW. Four hand drawn cards, each with its own flat mark and its
+ * own colour, threaded on a line that wanders across the row the way somebody
+ * would draw it between four boxes on a napkin. The line is still the thing
+ * that says these happen in an order. It just stopped being a ruler.
+ *
+ * THE CARDS SIT AT DIFFERENT HEIGHTS. A row of four boxes with their tops
+ * aligned is a table. Nudging alternate cards down by a few percent is what
+ * makes it read as things placed rather than things arranged, and it is the
+ * only reason the eye travels left to right instead of taking the row in as
+ * one block.
+ *
+ * The reveal is one observer and a class, matching the rest of the site.
  */
-const STEPS: { name: string; body: string }[] = [
+
+const STEPS: {
+  name: string;
+  body: string;
+  mark: string;
+  color: string;
+  drop: string;
+}[] = [
   {
     name: "Connect",
     body: "Files, mail, calendars, notes. Nothing new to install.",
+    mark: "connect",
+    color: "var(--m-blue)",
+    drop: "lg:mt-0",
   },
   {
     name: "Capture",
     body: "Sit-downs with your people surface what was never written down.",
+    mark: "capture",
+    color: "var(--m-gold)",
+    drop: "lg:mt-10",
   },
   {
     name: "Answer",
     body: "Ask anything. The whole company history answers back.",
+    mark: "answer",
+    color: "var(--m-green)",
+    drop: "lg:mt-2",
   },
   {
     name: "Automate",
     body: "Agents take the repetitive work. Your people keep the judgment calls.",
+    mark: "automate",
+    color: "var(--m-clay)",
+    drop: "lg:mt-12",
   },
 ];
 
-/**
- * The four steps, all four on screen at once.
- *
- * The old version panned them sideways past a sticky stage, which meant the
- * heading promised four and the screen showed two and a half. Everything is
- * visible here, hung off a single rule that is one element rather than four
- * card borders with gutters between them, so the line genuinely runs the whole
- * track. The stations sit ON that rule, centred on it, instead of being half
- * a dot clipped by a card's top edge.
- *
- * Device: the rule draws as the section is scrolled, left to right on a wide
- * screen and top to bottom on a narrow one, and each station lands as the line
- * reaches it. Scale and opacity only. The markup is served in its finished
- * state, so with no JavaScript, or with prefers-reduced-motion, the section is
- * simply already drawn.
- *
- * AND THE SHELL COMES BACK. The sphere that came apart over the sentence at
- * the top of the page gathers itself again here, out of nothing, in the air
- * above the section; then it falls, lands, and stays for good. It is put HERE
- * and nowhere else because this is the section that claims nothing gets
- * migrated and nothing gets replaced, and a body that reassembles out of its
- * own pieces and then refuses to move is that claim without a sentence.
- *
- * The canvas is hung off the top of the section rather than fitted to it, so
- * the gathering happens above the heading and the fall has somewhere to fall
- * from. It sits at z-0 with every word above it at z-10, and it is inert:
- * aria-hidden, no pointer events.
- */
 export function StepsLine() {
-  const rootRef = useRef<HTMLElement>(null);
+  const scope = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const root = rootRef.current;
+    const root = scope.current;
     if (!root) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const mm = gsap.matchMedia();
+    const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-step]"));
+    cards.forEach((c) => c.classList.add("reveal--armed"));
 
-    const build = (rule: string, prop: "scaleX" | "scaleY") => () => {
-      const line = root.querySelector<HTMLElement>(rule);
-      const dots = gsap.utils.toArray<HTMLElement>("[data-station]", root);
-      const grid = root.querySelector<HTMLElement>("[data-track]");
-      if (!line || !grid) return;
-
-      // A staggered fromTo only renders the from-state of the element whose
-      // sub-tween starts at zero, so before the trigger fires the first
-      // station sat hidden while the other three showed. Hide all four up
-      // front and let the timeline bring them back.
-      gsap.set(dots, { scale: 0, opacity: 0 });
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: grid,
-          start: "top 82%",
-          end: "bottom 62%",
-          scrub: 0.5,
-          invalidateOnRefresh: true,
-        },
-      });
-      tl.fromTo(line, { [prop]: 0 }, { [prop]: 1, ease: "none" }, 0);
-      tl.fromTo(
-        dots,
-        { scale: 0, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          ease: "back.out(2)",
-          duration: 0.22,
-          stagger: 0.24,
-        },
-        0.02,
-      );
-
-      return () => {
-        tl.scrollTrigger?.kill();
-        tl.kill();
-        gsap.set([line, ...dots], { clearProps: "transform,opacity" });
-      };
-    };
-
-    mm.add("(min-width: 1024px)", build("[data-rule-x]", "scaleX"));
-    mm.add("(max-width: 1023px)", build("[data-rule-y]", "scaleY"));
-
-    let cancelled = false;
-    document.fonts?.ready.then(() => {
-      if (!cancelled) ScrollTrigger.refresh();
-    });
-
-    return () => {
-      cancelled = true;
-      mm.revert();
-    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          e.target.classList.add("reveal--in");
+          io.unobserve(e.target);
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.2 },
+    );
+    cards.forEach((c) => io.observe(c));
+    return () => io.disconnect();
   }, []);
 
   return (
     <section
-      ref={rootRef}
-      data-sphere-reform
+      ref={scope}
       aria-labelledby="myynd-steps"
-      className="relative"
-      style={{ background: "var(--myynd-cream)" }}
+      data-tint="steps"
+      className="relative px-6 py-28 lg:py-36"
     >
-      {/* The shell's return. Hung a little off the top of the section so the
-          pieces gather in the air just above the heading and the drop has
-          somewhere to fall from — but not so far that they form on top of the
-          film in the section above. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 -top-[14vh] z-0"
-      >
-        <ParticleSphere mode="reform" />
-      </div>
-
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-24 md:py-32 lg:py-40">
+      <div className="relative mx-auto w-full max-w-6xl">
         <h2
           id="myynd-steps"
-          className="max-w-[16ch] font-serif text-[2.1rem] leading-[1.04] tracking-tight md:text-[3.1rem]"
-          style={{ color: "var(--ink)" }}
+          className="max-w-[16ch] font-serif text-[2rem] leading-[1.04] tracking-[-0.03em] md:text-[2.7rem]"
+          style={{ color: "var(--m-ink)" }}
         >
-          Nothing gets migrated.{" "}
-          <span
-            className="block"
-            style={{ color: "var(--myynd-terracotta)" }}
-          >
-            Nothing gets replaced.
-          </span>
+          Four steps, in this order.
         </h2>
 
-        <div
-          data-track
-          className="relative mt-16 grid gap-11 lg:mt-24 lg:grid-cols-4 lg:gap-x-9"
+        {/* The thread. Drawn once across the whole row, behind the cards, and
+            only on the width where the cards actually sit in a row. */}
+        <svg
+          aria-hidden
+          viewBox="0 0 1000 120"
+          preserveAspectRatio="none"
+          className="pointer-events-none absolute left-0 top-[52%] hidden h-24 w-full lg:block"
         >
-          {/* One rule for the whole track. Vertical on a narrow screen,
-              horizontal on a wide one, continuous on both. */}
-          <span
-            aria-hidden
-            data-rule-y
-            className="absolute bottom-0 left-0 top-0 w-px origin-top lg:hidden"
-            style={{ background: "var(--myynd-terracotta)", opacity: 0.55 }}
+          <defs>
+            <filter id="steps-thread" x="-5%" y="-40%" width="110%" height="180%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="5" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </defs>
+          <path
+            d="M20 74 C 160 40, 200 96, 330 62 S 560 30, 660 76 S 880 52, 984 40"
+            fill="none"
+            stroke="var(--m-ink)"
+            strokeOpacity="0.28"
+            strokeWidth="2"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+            filter="url(#steps-thread)"
           />
-          <span
-            aria-hidden
-            data-rule-x
-            className="absolute left-0 right-0 top-0 hidden h-px origin-left lg:block"
-            style={{ background: "var(--myynd-terracotta)", opacity: 0.55 }}
-          />
+        </svg>
 
-          {STEPS.map((step) => (
-            <article key={step.name} className="relative pl-8 lg:pl-0 lg:pt-11">
-              {/* The station sits centred on the rule, not clipped by a border. */}
-              <span
-                aria-hidden
-                data-station
-                className="absolute left-0 top-0 block h-[11px] w-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{
-                  // Matches the ground this section sits on, so the station
-                  // reads as a ring ON the rule, not a bead beside it.
-                  background: "var(--myynd-cream)",
-                  border: "2px solid var(--myynd-terracotta)",
-                }}
-              />
-              <h3
-                className="font-serif text-[1.9rem] leading-none tracking-tight md:text-[2.35rem]"
-                style={{ color: "var(--ink)" }}
+        <ol className="relative mt-14 grid list-none grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-6">
+          {STEPS.map((step, i) => (
+            <li
+              key={step.name}
+              data-step
+              className={step.drop}
+              style={{ transitionDelay: `${i * 110}ms` }}
+            >
+              <div
+                className="relative h-full px-6 pb-7 pt-6"
+                style={{ background: "var(--m-cream)" }}
               >
-                {step.name}
-              </h3>
-              <p
-                className="mt-3 max-w-[26ch] text-[15px] leading-relaxed md:text-base"
-                style={{ color: "rgba(11,31,58,0.66)" }}
-              >
-                {step.body}
-              </p>
-            </article>
+                <HandFrame id={`step-${i}`} color="var(--m-ink)" weight={1.5} />
+
+                <div className="relative">
+                  <span
+                    className="font-mono text-[0.68rem] uppercase tracking-[0.16em]"
+                    style={{ color: "rgba(23,19,15,0.5)" }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+
+                  <HandMark
+                    id={`step-${i}`}
+                    name={step.mark}
+                    className="mt-4 h-auto w-full max-w-[8.5rem]"
+                  />
+
+                  <h3
+                    className="mt-6 font-serif text-[1.35rem] leading-none tracking-[-0.03em]"
+                    style={{ color: step.color }}
+                  >
+                    {step.name}
+                  </h3>
+                  <p
+                    className="mt-2.5 text-[0.92rem] leading-[1.6]"
+                    style={{ color: "rgba(23,19,15,0.72)" }}
+                  >
+                    {step.body}
+                  </p>
+                </div>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

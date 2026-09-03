@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   FeaturePanel,
   EditorialIndex,
   type ProjectEntry,
 } from "@/components/ui/bento-grid";
-import { EmberField } from "@/components/ui/ember-field";
+import { Galaxy } from "@/components/ui/galaxy";
 
 /* ============================================================================
    PROJECTS — full-screen, layout 1b. Copy per funnel §3.4.
@@ -16,7 +16,7 @@ import { EmberField } from "@/components/ui/ember-field";
    Book are flat editorial index rows beside it.
 
    ONE CONTINUOUS INK (the seam fix): the whole chapter is a SINGLE navy ground
-   (`bg-ink`) with ONE EmberField net pinned behind everything. The old build
+   (`bg-ink`) with ONE Galaxy sky pinned behind everything. The old build
    stacked two navy blocks (a sticky tide + a content panel), each with its own
    net canvas — they could never line up, so a hard seam showed. Now there is
    exactly one background and one net: nothing to mismatch. The chapter melts in
@@ -30,6 +30,7 @@ const SUPERHUMAN: ProjectEntry = {
     "The systems and playbooks I actually run, written down so you can run them.",
   status: "open, taking on a few",
   href: "/projects/construct",
+  note: "free material in here",
 };
 
 // Mynd + The Book — the two editorial index rows. ORDER MATTERS: Mynd (the
@@ -73,25 +74,15 @@ const INDEX = INDEX_ROWS;
 export function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   // The net is always fully alive across the whole chapter (one continuous
-  // field) — EmberField reads this every frame; 1 = full intensity.
+  // field) — Galaxy reads this every frame; 1 = full intensity.
   const liveRef = useRef(1);
 
-  // Flip the ink-cursor to paper-white while the navy chapter fills the screen.
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        document.body.dataset.ink = e.isIntersecting ? "1" : "";
-      },
-      { threshold: 0.35 }
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      delete document.body.dataset.ink;
-    };
-  }, []);
+  /* THE `data-ink` FLAG IS GONE WITH THE CURSOR THAT READ IT.
+     This was an IntersectionObserver whose only job was to tell the old blue
+     dot to turn paper-white while the navy chapter filled the screen. The dot
+     is gone and nothing else ever read the flag, so this was an observer
+     running on every visit to the homepage to set an attribute no code
+     looked at. */
 
   return (
     <section
@@ -99,11 +90,15 @@ export function ProjectsSection() {
       id="projects"
       className="bg-ink ink-grain relative"
     >
-      {/* ONE living net for the WHOLE chapter — a single canvas pinned to the
-          viewport, so the constellation is continuous everywhere (no two-canvas
-          seam, ever). Sits behind all content. */}
+      {/* ONE sky for the WHOLE chapter — a single canvas pinned to the
+          viewport, so the galaxy is continuous everywhere (no two-canvas seam,
+          ever). Sits behind all content.
+
+          It was a constellation NET here: nodes with links drawing themselves
+          between neighbours. That is the house style of every developer tool
+          landing page and it said "graph", not "sky". See galaxy.tsx. */}
       <div aria-hidden className="pointer-events-none sticky top-0 z-0 h-screen">
-        <EmberField progressRef={liveRef} className="absolute inset-0 opacity-90" />
+        <Galaxy progressRef={liveRef} className="absolute inset-0" />
       </div>
 
       {/* The content rides OVER the pinned net (pulled up one viewport). */}

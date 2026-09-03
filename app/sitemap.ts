@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { THOUGHTS } from "@/lib/thoughts";
-import { SHELF_IDS, shelfHref } from "@/components/superhuman/shelf-data";
+import { OPEN_SHELF_IDS, shelfHref } from "@/components/superhuman/shelf-data";
 import {
   MATERIAL_ROOM_FOLDERS,
+  entryHref,
   folderHref,
 } from "@/components/superhuman/material/material-data";
 
@@ -26,7 +27,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE}/lab/gallery`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
-  const shelf: MetadataRoute.Sitemap = SHELF_IDS.map((id) => ({
+  // Open families only. Masterclass and Design have no page, so publishing
+  // their URLs would be advertising two 404s.
+  const shelf: MetadataRoute.Sitemap = OPEN_SHELF_IDS.map((id) => ({
     url: `${SITE}${shelfHref(id)}`,
     changeFrequency: "monthly",
     priority: 0.7,
@@ -39,13 +42,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  // Every piece in an open folder is its own page and its own document now, so
+  // each one is indexed on its own rather than only as a row on its folder.
+  const pieces: MetadataRoute.Sitemap = MATERIAL_ROOM_FOLDERS.flatMap((folder) =>
+    folder.entries.map((entry) => ({
+      url: `${SITE}${entryHref(folder.id, entry.slug)}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  );
+
   const thoughts: MetadataRoute.Sitemap = THOUGHTS.map((t) => ({
     url: `${SITE}/thoughts/${t.slug}`,
     changeFrequency: "yearly",
     priority: 0.6,
   }));
 
-  return [...fixed, ...shelf, ...folders, ...thoughts].map((entry) => ({
+  return [...fixed, ...shelf, ...folders, ...pieces, ...thoughts].map((entry) => ({
     lastModified: now,
     ...entry,
   }));

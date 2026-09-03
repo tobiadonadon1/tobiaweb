@@ -68,7 +68,112 @@ const D = 2.7;
 const P_MIN = D / (D + 1.06);
 const P_MAX = D / (D - 1.06);
 const P_SPAN = P_MAX - P_MIN;
-const BUCKETS = 14;
+/**
+ * THE NODES ARE CUT, NOT COMPASSED.
+ *
+ * Every point on this shell was `ctx.arc`, which is seven hundred identical
+ * mathematically perfect circles, and that is what made it read as a data
+ * visualisation rather than as something somebody made. These are six small
+ * irregular outlines in unit space, picked per point by index, so no two
+ * neighbours are the same shape and none of them is a circle.
+ *
+ * WRITTEN OUT RATHER THAN GENERATED. A random jitter per frame would shimmer
+ * and a random jitter per point would still have to be stored, so these are
+ * simply chosen once: eight vertices each, radius wandering between about
+ * 0.78 and 1.15, which is as far as a hand goes when it means to draw a dot.
+ *
+ * It costs eight `lineTo` calls where an arc cost one call, on a path that is
+ * already batched into one fill per alpha bucket. Measured on the same frame
+ * budget the arcs had.
+ */
+const NODE_SHAPES: Float32Array[] = [
+  [1.28, 0.05, 0.68, 0.86, -0.12, 1.3, -0.9, 0.74, -1.22, -0.1, -0.66, -0.92, 0.14, -1.18, 0.86, -0.7],
+  [0.98, -0.18, 0.9, 0.72, 0.06, 1.34, -0.76, 0.9, -1.3, 0.08, -0.72, -0.78, -0.05, -1.02, 0.78, -0.94],
+  [1.34, 0.12, 0.62, 0.98, -0.16, 1.02, -1.02, 0.7, -0.94, -0.2, -0.6, -1.06, 0.2, -1.3, 0.94, -0.62],
+  [0.9, -0.1, 0.98, 0.6, 0.1, 1.26, -0.64, 1.04, -1.32, -0.04, -0.78, -0.66, -0.14, -1.1, 0.68, -0.98],
+  [1.22, 0.16, 0.6, 1.06, -0.04, 0.96, -1.08, 0.58, -1.0, -0.16, -0.58, -1.12, 0.08, -0.94, 1.02, -0.7],
+  [0.94, -0.06, 0.86, 0.9, 0.16, 1.32, -0.82, 0.78, -1.26, 0.14, -0.94, -0.84, -0.1, -1.22, 0.62, -0.86],
+].map((a) => new Float32Array(a));
+
+/**
+ * WHY THIS IS 64, NOT THE 14 IT WAS.
+ *
+ * These buckets exist to batch draw calls: sort every edge into a handful of
+ * alpha groups and stroke each group once, instead of setting strokeStyle and
+ * calling stroke() nine hundred times a frame. At 14 buckets that batching was
+ * invisible, because the only thing a bucket controlled was OPACITY, and a
+ * jump between two adjacent opacities is not something an eye catches.
+ *
+ * Then the buckets started controlling HUE (see shellRGB below), and 14 steps
+ * across a three colour ramp is fourteen visible colour jumps. Alpha is a
+ * smooth function of the sphere's rotation, so as it turns, particles near a
+ * bucket boundary cross it constantly, and each crossing snaps that particle
+ * from one hue straight to a visibly different one. Across hundreds of edges
+ * rotating at once, that is the flicker: not noise, not randomness, a
+ * genuinely discontinuous colour at every boundary, all the time.
+ *
+ * 64 buckets makes each step roughly a twentieth of what it was, which is
+ * below what the eye resolves as a jump rather than a gradient, and it costs
+ * nothing new: still one strokeStyle set and one stroke() per bucket, just
+ * more of them, and 64 is still a rounding error next to nine hundred edges.
+ */
+const BUCKETS = 64;
+
+/**
+ * THE FOUR COLOURS MYND IS BUILT FROM, as exact RGB, so the canvas draw and
+ * the CSS custom properties in globals.css can never drift apart:
+ * m-blue #2A52D6, m-clay #E0512A, m-gold #E8A41F, m-green #1F6B4A.
+ */
+const PALETTE: readonly [number, number, number][] = [
+  [42, 82, 214],
+  [224, 81, 42],
+  [232, 164, 31],
+  [31, 107, 74],
+];
+
+/**
+ * WHICH OF THE FOUR A GIVEN POINT IS, and it is fixed for that point's whole
+ * life. A cheap multiplicative hash rather than `i % 4`: the points are
+ * generated in a fixed geometric order (see geometry()), and a plain modulo
+ * against that order reads as stripes or rings across the shell rather than
+ * as a scatter. The hash breaks that correlation for a few instructions.
+ */
+function pointHue(i: number): number {
+  let x = (i + 1) >>> 0;
+  x = Math.imul(x ^ (x >>> 16), 2654435761) >>> 0;
+  return x % PALETTE.length;
+}
+/**
+ * THE SHELL'S COLOUR, BY DEPTH.
+ *
+ * Three stops rather than one hue: ultramarine at the back of the shell,
+ * through clay in the middle, to gold at the front. The buckets both the edges
+ * and the points are already sorted into ARE depth, so running a ramp across
+ * them costs nothing and turns a single colour mesh into a lit object.
+ *
+ * The edges used to be `rgba(196,98,59)` flat, the old muted terracotta, which
+ * is why the network read as one brownish net no matter what the points did.
+ *
+ * `t` is 0 at the far side and 1 at the near one.
+ */
+function shellRGB(t: number): [number, number, number] {
+  // 0 → 0.5: ultramarine to clay. 0.5 → 1: clay to gold.
+  if (t < 0.5) {
+    const k = t * 2;
+    return [
+      Math.round(42 + (224 - 42) * k),
+      Math.round(82 + (81 - 82) * k),
+      Math.round(214 + (42 - 214) * k),
+    ];
+  }
+  const k = (t - 0.5) * 2;
+  return [
+    Math.round(224 + (232 - 224) * k),
+    Math.round(81 + (164 - 81) * k),
+    Math.round(42 + (31 - 42) * k),
+  ];
+}
+
 const EDGE_ALPHA_MAX = 0.8;
 
 /** Where, along the stage's scroll, the shell leaves the hero and arrives. */
@@ -95,7 +200,26 @@ const TRAVEL_OUT = 0.32;
  * Net: the break runs over roughly twice the scroll it used to, and the gap
  * after it is a third shorter.
  */
-const BREAK_IN = 0.52;
+/**
+ * MEASURED, NOT GUESSED.
+ *
+ * The stage (`data-sphere-stage`) is one continuous ScrollTrigger from
+ * "top top" to "bottom top", so its whole height maps onto journey.p's 0..1.
+ * The sentence beside the dock (`data-statement`) inks in on its OWN
+ * trigger, "top 82%" to "bottom 46%" of the viewport, which is a different
+ * coordinate system. Converting one into the other at a real 913px viewport:
+ * the sentence finishes inking at journey.p ≈ 0.50. BREAK_IN was 0.52, a
+ * hair AFTER that, so the reader reached the finished sentence and found a
+ * perfectly whole sphere sitting next to it. Tobia: "when I get there and
+ * the text completes, the sphere can start breaking down."
+ *
+ * 0.40 sits after TRAVEL_OUT (0.32), so the shell still fully arrives and
+ * rests before anything happens to it, and it gives the break roughly a
+ * sixth of its run by the time the text is done: not finished, not just
+ * twitching, genuinely underway, with the rest of the runway still ahead to
+ * watch it through.
+ */
+const BREAK_IN = 0.4;
 const BREAK_OUT = 1;
 
 /**
@@ -237,9 +361,9 @@ function makeGlow(): HTMLCanvasElement {
   const g = c.getContext("2d");
   if (g) {
     const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, "rgba(196,98,59,0.85)");
-    grad.addColorStop(0.35, "rgba(196,98,59,0.30)");
-    grad.addColorStop(1, "rgba(196,98,59,0)");
+    grad.addColorStop(0, "rgba(224,81,42,0.85)");
+    grad.addColorStop(0.35, "rgba(224,81,42,0.30)");
+    grad.addColorStop(1, "rgba(224,81,42,0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, size, size);
   }
@@ -255,10 +379,10 @@ function makeHaze(): HTMLCanvasElement {
   const g = c.getContext("2d");
   if (g) {
     const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-    grad.addColorStop(0, "rgba(196,98,59,0.14)");
-    grad.addColorStop(0.42, "rgba(196,98,59,0.07)");
-    grad.addColorStop(0.78, "rgba(196,98,59,0.014)");
-    grad.addColorStop(1, "rgba(196,98,59,0)");
+    grad.addColorStop(0, "rgba(224,81,42,0.14)");
+    grad.addColorStop(0.42, "rgba(224,81,42,0.07)");
+    grad.addColorStop(0.78, "rgba(224,81,42,0.014)");
+    grad.addColorStop(1, "rgba(224,81,42,0)");
     g.fillStyle = grad;
     g.fillRect(0, 0, size, size);
   }
@@ -320,9 +444,20 @@ export function ParticleSphere({
     // Alpha buckets of edges, each a flat [x1,y1,x2,y2] run.
     const segs: Float32Array[] = [];
     const segN = new Int32Array(BUCKETS);
-    for (let b = 0; b < BUCKETS; b++) segs.push(new Float32Array(edgeCount * 4));
+    // Five floats per edge now, not four: x1, y1, x2, y2, and a stable sign
+    // for the wobble, carried alongside the geometry so the draw pass never
+    // has to guess it back out of bucket position (see the flicker note by
+    // BUCKETS above this).
+    for (let b = 0; b < BUCKETS; b++) segs.push(new Float32Array(edgeCount * 5));
     // Points bucketed the same way, so a bucket is one fill.
-    const PT_BUCKETS = 8;
+    //
+    // A BUCKET IS NOW (HUE, BRIGHTNESS), not (DEPTH) alone. 48 buckets is
+    // exactly 4 hues times 12 brightness tiers: which hue a point is never
+    // changes and never blends, only which of the 12 tiers it falls into
+    // moves as it turns through the light, so grouping still batches into
+    // one fillStyle per bucket the way it always did.
+    const PT_BUCKETS = 48;
+    const BRIGHT_TIERS = PT_BUCKETS / PALETTE.length;
     const ptIdx: Int32Array[] = [];
     const ptN = new Int32Array(PT_BUCKETS);
     for (let b = 0; b < PT_BUCKETS; b++) ptIdx.push(new Int32Array(COUNT));
@@ -566,10 +701,15 @@ export function ParticleSphere({
         }
         alpha *= bodyFade;
         if (alpha > 0.98) alpha = 0.98;
-        pr[i] = radius;
-        let b = ((alpha / 0.98) * PT_BUCKETS) | 0;
-        if (b > PT_BUCKETS - 1) b = PT_BUCKETS - 1;
-        if (b < 0) b = 0;
+        // A LITTLE BIGGER, so the cut outline is actually visible. At the
+        // old radius the irregular shape was three or four pixels across
+        // and every one of them read as a dot again, which is exactly the
+        // thing the shapes were drawn to stop.
+        pr[i] = radius * 1.62;
+        let tier = ((alpha / 0.98) * BRIGHT_TIERS) | 0;
+        if (tier > BRIGHT_TIERS - 1) tier = BRIGHT_TIERS - 1;
+        if (tier < 0) tier = 0;
+        const b = pointHue(i) * BRIGHT_TIERS + tier;
         ptIdx[b][ptN[b]++] = i;
       }
 
@@ -604,6 +744,10 @@ export function ParticleSphere({
           buf[n++] = ay;
           buf[n++] = ax + (sx[bE] - ax) * reach;
           buf[n++] = ay + (sy[bE] - ay) * reach;
+          // Tied to k, the edge's own fixed index, so the same wire wobbles
+          // the same way on every frame regardless of which bucket it falls
+          // into or where it lands inside that bucket's buffer.
+          buf[n++] = k % 2 ? 1 : -1;
           segN[bu] = n;
         }
 
@@ -612,11 +756,49 @@ export function ParticleSphere({
           const n = segN[b];
           if (!n) continue;
           const buf = segs[b];
-          ctx.strokeStyle = `rgba(196,98,59,${(((b + 0.5) / BUCKETS) * EDGE_ALPHA_MAX).toFixed(3)})`;
+          const et = (b + 0.5) / BUCKETS;
+          const [er, eg, eb] = shellRGB(et);
+          // A FLOOR ON THE ALPHA. Straight `t * MAX` takes the far side of the
+          // shell to nearly nothing, so half the network was invisible and the
+          // colour on it could not be seen at all. 0.32 (raised from 0.2, which
+          // was still faint enough to read as grey against warm paper) keeps
+          // the back genuinely readable and still leaves range for depth.
+          ctx.strokeStyle = `rgba(${er},${eg},${eb},${(
+            (0.32 + et * 0.68) * EDGE_ALPHA_MAX
+          ).toFixed(3)})`;
           ctx.beginPath();
-          for (let s = 0; s < n; s += 4) {
-            ctx.moveTo(buf[s], buf[s + 1]);
-            ctx.lineTo(buf[s + 2], buf[s + 3]);
+          // DRAWN, NOT RULED.
+          //
+          // The first pass at this put a single control point on each edge,
+          // which bows a line and does not make it look drawn: a hand does
+          // not curve smoothly from one node to the next, it wanders and
+          // corrects. Two control points offset in OPPOSITE directions give
+          // the S that a drawn line actually has, and the amplitudes are big
+          // enough to see, which the bow was not.
+          //
+          // The sign came off the bucket write position before, which is
+          // not a stable identity for an edge and made the bow flip
+          // direction at random every frame. It is read out of the buffer
+          // now, set once per edge when the buffer was filled above.
+          for (let s2 = 0; s2 < n; s2 += 5) {
+            const x1 = buf[s2];
+            const y1 = buf[s2 + 1];
+            const x2 = buf[s2 + 2];
+            const y2 = buf[s2 + 3];
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const flip = buf[s2 + 4];
+            const a1 = 0.115 * flip;
+            const a2 = -0.085 * flip;
+            ctx.moveTo(x1, y1);
+            ctx.bezierCurveTo(
+              x1 + dx / 3 - dy * a1,
+              y1 + dy / 3 + dx * a1,
+              x1 + (dx * 2) / 3 - dy * a2,
+              y1 + (dy * 2) / 3 + dx * a2,
+              x2,
+              y2,
+            );
           }
           ctx.stroke();
         }
@@ -628,13 +810,27 @@ export function ParticleSphere({
         const n = ptN[b];
         if (!n) continue;
         const list = ptIdx[b];
-        ctx.fillStyle = `rgba(196,98,59,${(((b + 0.5) / PT_BUCKETS) * 0.98).toFixed(3)})`;
+        // The hue never moves: it is the point's own fixed identity, one of
+        // the four Mynd colours, always at full saturation. Depth moves the
+        // OPACITY only, and the floor is high enough (0.4) that nothing on
+        // the far side of the shell is ever allowed to read as grey.
+        const hueIdx = (b / BRIGHT_TIERS) | 0;
+        const tier = b % BRIGHT_TIERS;
+        const t = (tier + 0.5) / BRIGHT_TIERS;
+        const [cr, cg, cb] = PALETTE[hueIdx];
+        ctx.fillStyle = `rgba(${cr},${cg},${cb},${(0.4 + t * 0.58).toFixed(3)})`;
         ctx.beginPath();
         for (let s = 0; s < n; s++) {
           const i = list[s];
           const r = pr[i];
-          ctx.moveTo(sx[i] + r, sy[i]);
-          ctx.arc(sx[i], sy[i], r, 0, Math.PI * 2);
+          const shape = NODE_SHAPES[i % NODE_SHAPES.length];
+          const px = sx[i];
+          const py = sy[i];
+          ctx.moveTo(px + shape[0] * r, py + shape[1] * r);
+          for (let v = 2; v < shape.length; v += 2) {
+            ctx.lineTo(px + shape[v] * r, py + shape[v + 1] * r);
+          }
+          ctx.closePath();
         }
         ctx.fill();
       }
