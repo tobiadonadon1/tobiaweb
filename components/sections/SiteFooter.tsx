@@ -1,6 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import { FooterReveal } from "@/components/sections/footer-reveal";
-import { ConstructStar } from "@/components/superhuman/construct-star";
 
 /**
  * THE LAST PAGE.
@@ -13,247 +13,272 @@ import { ConstructStar } from "@/components/superhuman/construct-star";
  * JavaScript: this footer is `fixed` at z-0, and `.site-content` is `relative`,
  * z-10, opaque, and carries a bottom padding on body exactly `--footer-h` tall.
  *
- * WHAT CHANGED, AND WHY. The previous version was one huge name that FILLED
- * with blue from the bottom as the page left, plus a sheen running across it.
- * Tobia: "I don't like the footer because of how it fills up the color, the
- * shade. I want it more creative, like in the style that we're making now, more
- * playful, like the little animations, the little arrows, the colors that we
- * used in construct stuff, more patches."
+ * WHAT CHANGED, AND WHY. The last version was a torn-paper COLLAGE on the same
+ * paper as every other section: four cut-out link patches, five flecks of
+ * colour, a drawn arrow and the name at display size. It was busy, it was the
+ * same ground as the page above it, and it ended the site on a NAME — which is
+ * the one thing a reader already knows by then and the least interesting thing
+ * this site has to say.
  *
- * So the gradient is gone entirely and this is a COLLAGE, in the language the
- * Construct marks are drawn in (see material/specimens.tsx): torn paper, five
- * colours, real grain, nothing geometric. The links are patches you could pick
- * out of the page with the labels covered, which is the whole point of that
- * language. The crayon star signs it, and does not rotate, ever.
+ * Tobia sent a reference (Set Space) and named exactly what he wanted from it:
+ * "I like this footer because it's bright. I like the font, but we can use
+ * ours. That little star at the bottom, just put it as our logo. I like this
+ * color. I like the spacing." And then the real brief: a message that UNITES
+ * the site — "not cocky, short, direct, simple, humble" — and his links, plain.
+ *
+ * SO THE LAST PAGE IS NOW A POSTER, and everything on it is doing one of two
+ * jobs: saying the one thing, or getting out of the way.
+ *
+ *   1. A FULL-BLEED HOT GROUND. The whole footer is one flat colour, so the
+ *      moment it appears from under the paper is the loudest moment on the
+ *      site. It is the only place this colour is used; it cannot dilute.
+ *   2. ONE SENTENCE, SPLIT TO THE EDGES. "Keep" at the far left, "thinking."
+ *      at the far right, the way the reference splits its own name. It is a
+ *      sentence you finish by reading across the whole page.
+ *   3. THE MESSAGE, in one short paragraph, first person, admitting it is
+ *      unfinished — see MESSAGE below for why it says what it says.
+ *   4. THE LINKS, as three plain columns. No patches, no tilt, no drawing.
+ *   5. THE LOGO SIGNS IT, small, bottom right, exactly where the reference
+ *      puts its own star. It is the only image left on the page.
  *
  * EVERY ANIMATION HERE IS `--reveal`, AND NONE OF IT IS JAVASCRIPT.
  * footer-reveal.tsx already writes `--reveal` (0 to 1) across the last screen
  * of scroll. Rather than switching things on at a threshold, every moving part
- * reads it directly through calc(): the patches fly up and rotate into their
- * tilts on a stagger, the flecks drift in behind them at their own rates, and
- * the arrow and the underline DRAW THEMSELVES with `pathLength="1"` and a
- * dashoffset. The whole collage assembles under your thumb as you pull the page
- * off it, and it runs backwards if you scroll back up. See `.footer-*` in
- * globals.css.
+ * reads it directly through calc(): the two halves of the sentence arrive from
+ * their own edges, the rule draws itself left to right, the message and the
+ * columns rise on a stagger, and the logo lands last. The whole poster
+ * assembles under your thumb as you pull the page off it, and runs backwards
+ * if you scroll back up. See `.footer-*` in globals.css.
  */
 
-/* The Construct palette, the same five that the material marks are cut from. */
-const INK = "#0b1f3a";
-const VERMILION = "#ce4631";
-const ULTRAMARINE = "#2743b8";
-const SAFFRON = "#e0952b";
-const FOREST = "#1f6b4f";
-
 /**
- * Torn tags, in a 240 x 76 box. Two of them so a row of four is not the same
- * silhouette four times, and neither has one true straight edge: a machine's
- * edge is exactly what this language is not.
+ * THE SENTENCE.
  *
- * THE TEAR RATE IS THE WHOLE TRICK. The first pass put eight deviations along
- * each long edge, which at the size these actually render (about 110px wide)
- * is a wobble every thirteen pixels: that is not torn paper, it is a sawtooth,
- * and it read as a cartoon badge. Five shallow deviations over the same run,
- * about a pixel and a half each once scaled, is what a tear looks like.
- */
-const TAG_A =
-  "M3 11 L58 5 L112 9 L168 4 L222 8 L237 14 L235 38 L238 62 L214 70 L160 66 L106 71 L52 67 L10 70 L2 47 L6 29 Z";
-const TAG_B =
-  "M6 6 L62 11 L118 4 L174 10 L228 5 L238 20 L233 42 L237 66 L206 71 L152 65 L98 72 L44 66 L8 71 L3 50 L7 26 Z";
-
-/**
- * The scatter behind everything: a torn scrap and a torn disc. Both are calm
- * on purpose. The spiky little fleck the material marks use is right at 200px
- * inside a composition; at 30px on its own it reads as a spark, not as paper.
- */
-const SCRAP =
-  "M8 5 L28 2 L48 7 L66 3 L70 20 L67 38 L71 55 L52 60 L32 56 L12 61 L4 44 L7 26 Z";
-const DISC =
-  "M32 2 L44 5 L54 12 L60 22 L62 33 L58 45 L49 55 L38 61 L27 62 L16 57 L7 49 L2 38 L3 26 L9 15 L19 6 Z";
-
-/**
- * The links, as patches.
+ * The brief was "maybe it shouldn't be my name — maybe curiosity, something
+ * like that", and the test was whether one line could carry BOTH halves of
+ * this site: the building (Construct, Myynd, the tools) and the human part
+ * (the book, the essays, awareness).
  *
- * Text colour is picked by measurement, not by eye. Against paper white
- * (#faf8f2) vermilion lands at 4.35:1, which misses AA for text this size, so
- * the labels are pure white: 4.62:1 on vermilion, 8.15:1 on ultramarine, 6.40:1
- * on forest. Saffron is far too light to carry white at all (2.47:1), so it
- * takes ink instead, at 6.59:1.
+ * It reads across the footer: KEEP … THINKING. That is the site's own
+ * argument, in two words. "You are replaceable. Your thinking is not." is an
+ * essay here. "I create to understand" is an identity beat. "Deciding what is
+ * worth doing" is what the whole Construct shelf is for. And it is an
+ * invitation rather than a boast: it asks nothing of the reader except the one
+ * thing this site believes is still theirs.
+ *
+ * Two words, so the split to the page edges has something to split.
  */
-const PATCHES = [
-  { href: "/#projects", label: "Projects", fill: ULTRAMARINE, on: "#ffffff", tilt: -2.6, d: TAG_A },
-  { href: "/#thoughts", label: "Thoughts", fill: FOREST, on: "#ffffff", tilt: 1.9, d: TAG_B },
-  { href: "/projects/construct/material", label: "Free material", fill: SAFFRON, on: INK, tilt: -1.4, d: TAG_A },
-  { href: "mailto:tobia@donadon.com", label: "Say hi", fill: VERMILION, on: "#ffffff", tilt: 2.4, d: TAG_B },
+const WORD_LEFT = "Keep";
+const WORD_RIGHT = "thinking.";
+
+/**
+ * THE MESSAGE.
+ *
+ * Three sentences, and each one is load-bearing:
+ *
+ *   "The tools keep getting better at doing."  — the premise the whole
+ *     Construct chapter runs on, stated as a fact rather than a warning.
+ *   "Deciding what is worth doing, and why, is the part that stays human."
+ *     — the bridge. It is the one line that makes the AI work and the writing
+ *     about consciousness the same subject instead of two hobbies.
+ *   "So I build things, write about minds, and leave what I learn here, still
+ *     working it out in public."  — what the site IS, in the order the site is
+ *     in, ending on the admission. The site's own title is "figuring it out in
+ *     public"; this is that promise kept at the bottom of the page.
+ *
+ * NO DASH IN IT. The last clause was hung off an em dash, which is the punctu-
+ * ation of an aside, and the admission is not an aside — it is the point of the
+ * sentence. A comma keeps it in the same breath as the rest. (Tobia: "remove
+ * the em dash".) Nothing else about the line changed.
+ *
+ * What it deliberately does NOT do: predict, sell, instruct the reader, or
+ * claim anything that cannot be checked on the pages above it.
+ */
+const MESSAGE =
+  "The tools keep getting better at doing. Deciding what is worth doing, and why, is the part that stays human. So I build things, write about minds, and leave what I learn here, still working it out in public.";
+
+/**
+ * THE LINKS, in three columns, in the order a reader actually needs them: the
+ * page they are on, the work, then how to reach him.
+ *
+ * Instagram and X are NOT here. Both are placeholder hrefs elsewhere in the
+ * codebase (see ThoughtsDesktop) and a dead link in a footer is worse than a
+ * missing one. When those accounts are real, they are two lines in COLUMN 3.
+ */
+type FooterLink = { href: string; label: string; external?: boolean };
+
+const COLUMNS: FooterLink[][] = [
+  [
+    { href: "/#home", label: "Home" },
+    { href: "/#projects", label: "Projects" },
+    { href: "/#thoughts", label: "Thoughts" },
+  ],
+  [
+    { href: "/projects/construct", label: "Construct" },
+    { href: "/projects/construct/material", label: "Free material" },
+    { href: "/projects/mynd", label: "Myynd" },
+    { href: "/projects/book", label: "The Book" },
+  ],
+  [
+    { href: "mailto:tobia@donadon.com", label: "tobia@donadon.com" },
+    {
+      href: "https://www.linkedin.com/in/tobia-donadon",
+      label: "LinkedIn",
+      external: true,
+    },
+  ],
 ];
 
 /**
- * The scatter. Kept to the outer margins on purpose: a scrap of colour sitting
- * under a line of type is not collage, it is litter.
+ * Small type on this ground, measured rather than eyeballed. Ink (#0b1f3a) on
+ * the footer's ember (#f5501a) is 4.75:1, which clears AA for body text — so
+ * every word down here is FULL ink and hierarchy is carried by size, weight
+ * and tracking only. Nothing is faded: ink at 80% over this ground drops to
+ * 3.9:1 and stops being readable, which is exactly the trap a "quiet" footer
+ * link colour would have walked into.
  */
-const FLECKS = [
-  { x: "2%", y: "22%", s: 74, c: SAFFRON, r: -14, i: 0, d: SCRAP, vb: "0 0 74 64" },
-  { x: "92%", y: "12%", s: 52, c: ULTRAMARINE, r: 19, i: 1, d: DISC, vb: "0 0 64 64" },
-  { x: "86%", y: "66%", s: 88, c: VERMILION, r: -7, i: 2, d: SCRAP, vb: "0 0 74 64" },
-  { x: "4%", y: "72%", s: 46, c: FOREST, r: 24, i: 3, d: DISC, vb: "0 0 64 64" },
-  { x: "95%", y: "40%", s: 38, c: SAFFRON, r: -22, i: 4, d: SCRAP, vb: "0 0 74 64" },
-];
+const LABEL =
+  "footer-link relative inline-block py-[0.26rem] text-[0.78rem] font-medium uppercase tracking-[0.11em] text-[var(--ink)] md:text-[0.82rem]";
 
 export function SiteFooter() {
   return (
-    <footer className="site-footer relative overflow-hidden" aria-label="Site footer">
+    <footer
+      className="site-footer relative overflow-hidden"
+      aria-label="Site footer"
+      // The site cursor is a red dot (#ff4c24). On this ground it is the same
+      // colour as the ground and simply vanishes, so the whole footer asks for
+      // the ink one. See custom-cursor.tsx.
+      data-cursor-ink
+    >
       <FooterReveal />
 
-      {/* GRAIN. One filter for the whole footer rather than one per shape: the
-          cost of this effect is in the number of filter regions, and a collage
-          of ten cut shapes would otherwise pay ten times. */}
-      <svg aria-hidden className="pointer-events-none absolute h-0 w-0">
-        <defs>
-          <filter id="footer-tooth" x="0%" y="0%" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="n" />
-            <feColorMatrix in="n" type="saturate" values="0" result="g" />
-            <feBlend in="SourceGraphic" in2="g" mode="multiply" />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* The scatter. Behind everything, drifting in at its own rates. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        {FLECKS.map((f) => (
-          <svg
-            key={`${f.x}-${f.y}`}
-            className="footer-fleck absolute"
-            style={
-              {
-                left: f.x,
-                top: f.y,
-                width: f.s,
-                height: f.s,
-                "--i": f.i,
-                "--tilt": `${f.r}deg`,
-              } as React.CSSProperties
-            }
-            viewBox={f.vb}
-          >
-            <path d={f.d} fill={f.c} filter="url(#footer-tooth)" />
-          </svg>
-        ))}
-      </div>
-
-      <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-between px-6 pb-10 pt-12 md:pb-12 md:pt-14">
-        {/* TOP: back to the top, with an arrow that draws itself as the page
-            leaves, and the year. */}
-        <div className="flex items-start justify-between gap-8">
-          <div className="relative">
-            <Link
-              href="/#home"
-              className="group inline-flex items-center gap-x-3"
-              aria-label="Tobia Donadon, back to the top"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element -- small static brand mark */}
-              <img src="/logo.png" alt="" className="h-6 w-6 transition-transform duration-300 group-hover:-translate-y-1" />
-              <span className="text-[0.95rem] text-[color:rgba(11,31,58,0.62)] transition-colors duration-300 group-hover:text-[var(--ink)]">
-                Back to the top
-              </span>
-            </Link>
-
-            {/* The little arrow, curling up and back at the link. Drawn twice,
-                a heavier stroke with a lighter one just off it, which is what a
-                person does going back over a line. */}
-            <svg
-              aria-hidden
-              viewBox="0 0 120 78"
-              className="footer-arrow pointer-events-none absolute left-1 top-[-52px] h-[54px] w-[84px] overflow-visible"
-            >
-              <g fill="none" stroke={VERMILION} strokeLinecap="round" strokeLinejoin="round">
-                <path
-                  pathLength="1"
-                  d="M14 74 C 10 44, 30 20, 58 18 C 84 16, 100 30, 96 44"
-                  strokeWidth="2.4"
-                  opacity="0.9"
-                />
-                <path pathLength="1" d="M6 58 L14 74 L26 66" strokeWidth="2.4" opacity="0.9" />
-                <path
-                  pathLength="1"
-                  d="M17 71 C 13 43, 32 23, 58 21 C 82 19, 97 31, 94 43"
-                  strokeWidth="1.1"
-                  opacity="0.55"
-                />
-              </g>
-            </svg>
-            <span
-              aria-hidden
-              className="footer-hand absolute left-[92px] top-[-40px] whitespace-nowrap font-hand text-[1.3rem] leading-none text-[color:#ce4631]"
-            >
-              start it again
+      <div className="flex h-full flex-col">
+        {/* ── THE SENTENCE ─────────────────────────────────────────────────
+            Split to the two edges, so reading it takes the full width of the
+            page. Below `sm` there is no room for that: the halves stack, and
+            the second one still sits hard right, which keeps the gesture. */}
+        <div className="mx-auto flex w-full max-w-[96rem] flex-1 items-center px-6 pt-12 pb-7 md:px-10 md:pt-14">
+          <h2 className="flex w-full flex-col font-serif text-[clamp(3rem,12.5vw,9rem)] font-medium leading-[0.88] tracking-[-0.04em] text-[var(--ink)] sm:flex-row sm:items-baseline sm:justify-between">
+            <span className="footer-word footer-word-a">{WORD_LEFT}</span>
+            {/* sr-only is position:absolute, so this space is read aloud
+                between the two halves without becoming a third flex item and
+                breaking `justify-between`. */}
+            <span className="sr-only"> </span>
+            <span className="footer-word footer-word-b self-end sm:self-auto">
+              {WORD_RIGHT}
             </span>
-          </div>
-
-          <span className="pt-1 text-[0.8rem] text-[color:rgba(11,31,58,0.4)]">2026</span>
-        </div>
-
-        {/* THE NAME. Ink, once, at size, with a hand-drawn rule under it that
-            draws on with the reveal. No fill, no sheen, no second colour. */}
-        <div className="footer-name relative select-none">
-          <h2 className="flex items-end gap-4 whitespace-nowrap font-serif text-[clamp(2.4rem,10.5vw,8rem)] leading-[0.84] tracking-[-0.035em] text-[var(--ink)]">
-            Tobia Donadon
-            {/* The crayon star signs it. It never rotates. */}
-            <ConstructStar
-              id="footer"
-              className="mb-[0.35em] h-[0.42em] w-[0.42em] shrink-0"
-              weight={3.4}
-            />
           </h2>
-          <svg
-            aria-hidden
-            viewBox="0 0 600 14"
-            preserveAspectRatio="none"
-            className="footer-rule mt-3 block h-[9px] w-full max-w-[92%] overflow-visible"
-          >
-            <path
-              pathLength="1"
-              d="M2 9 C 74 3, 148 12, 222 6 C 296 1, 370 11, 444 5 C 508 1, 556 9, 598 5"
-              fill="none"
-              stroke={VERMILION}
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-          </svg>
         </div>
 
-        {/* THE PATCHES. */}
-        <nav aria-label="Footer">
-          <ul className="flex list-none flex-wrap items-center gap-3 md:gap-4">
-            {PATCHES.map((p, i) => (
-              <li key={p.href}>
-                <Link
-                  href={p.href}
-                  className="footer-patch group relative inline-flex items-center justify-center px-7 py-4 md:px-9 md:py-[1.15rem]"
-                  style={{ "--i": i, "--tilt": `${p.tilt}deg` } as React.CSSProperties}
-                >
-                  <svg
-                    aria-hidden
-                    viewBox="0 0 240 76"
-                    preserveAspectRatio="none"
-                    className="absolute inset-0 h-full w-full"
-                  >
-                    <path d={p.d} fill={p.fill} filter="url(#footer-tooth)" />
-                  </svg>
-                  <span
-                    className="relative text-[0.95rem] font-medium tracking-[-0.01em] md:text-[1rem]"
-                    style={{ color: p.on }}
-                  >
-                    {p.label}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* The rule runs edge to edge, like the reference's. It draws itself
+            left to right as the page leaves. */}
+        <div
+          aria-hidden
+          className="footer-rule h-px w-full bg-[color:rgba(11,31,58,0.32)]"
+        />
 
-        {/* THE CLOSING LINE. */}
-        <p className="font-serif text-lg italic text-[color:rgba(11,31,58,0.5)]">
-          Figuring it out in public.
-        </p>
+        {/* The bottom padding is not symmetry, it is clearance: on mobile the
+            site nav is a pill fixed to the BOTTOM of the viewport (see
+            tubelight-navbar), and the footer is the one screen it can land on
+            top of. 5.5rem puts the signature row clear above it. From `md` the
+            nav is at the top of the screen and the padding goes back to
+            normal. */}
+        <div className="mx-auto w-full max-w-[96rem] px-6 pt-7 pb-[5.5rem] md:px-10 md:pt-9 md:pb-9">
+          {/* ── THE MESSAGE ──
+              `--i` counts UP the page, not down it, because that is the order
+              the reveal uncovers things in: 0 is the signature row at the very
+              bottom, 4 is this. See `.footer-rise` in globals.css. */}
+          <p
+            className="footer-rise max-w-[58ch] text-[0.98rem] leading-[1.5] text-[var(--ink)] md:text-[1.12rem] md:leading-[1.45]"
+            style={{ "--i": 4 } as React.CSSProperties}
+          >
+            {MESSAGE}
+          </p>
+
+          {/* ── THE LINKS ── */}
+          <nav
+            aria-label="Footer"
+            // Capped well short of the footer's own width, so the three
+            // columns cluster in the left half rather than stretching to the
+            // far edge. That is the reference's proportion exactly: the
+            // sentence owns the full width, everything under it is packed
+            // left, and the right side stays open for the mark.
+            className="mt-8 grid max-w-[64rem] grid-cols-2 gap-x-8 gap-y-0 sm:grid-cols-3 md:mt-10 md:gap-x-12"
+          >
+            {COLUMNS.map((column, ci) => (
+              <ul
+                key={column[0].href}
+                className="footer-rise list-none"
+                style={{ "--i": ci + 1 } as React.CSSProperties}
+              >
+                {column.map((item) => (
+                  <li key={item.href}>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        className={LABEL}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link href={item.href} className={LABEL}>
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </nav>
+
+          {/* ── THE SIGNATURE ROW ── */}
+          <div
+            className="footer-rise mt-9 flex items-end justify-between gap-6 md:mt-11"
+            style={{ "--i": 0 } as React.CSSProperties}
+          >
+            <span className="text-[0.68rem] uppercase tracking-[0.13em] text-[var(--ink)] md:text-[0.72rem]">
+              © 2026 Tobia Donadon
+            </span>
+
+            <div className="flex items-end gap-5 md:gap-7">
+              {/* Not on mobile: the nav pill down there already has Home in
+                  it, and three items plus the mark do not fit on one line at
+                  390px without wrapping into each other. */}
+              <Link
+                href="/#home"
+                className="footer-link group hidden text-[0.68rem] uppercase tracking-[0.13em] text-[var(--ink)] sm:inline md:text-[0.72rem]"
+              >
+                Back to the top
+                <span
+                  aria-hidden
+                  className="ml-1.5 inline-block transition-transform duration-300 group-hover:-translate-y-0.5"
+                >
+                  ↑
+                </span>
+              </Link>
+
+              {/* THE MARK: the logo, where the reference puts its star.
+
+                  It needs no recolouring to sit here, which is the nice part —
+                  the file is drawn in #0b1f3a on transparent, the same ink as
+                  every word around it, so on the ember it reads as one more
+                  mark in the same hand rather than an image dropped on top.
+
+                  `alt=""` on purpose. The name is already set in words half an
+                  inch to the left; a screen reader announcing "Tobia Donadon"
+                  twice in one row is noise, not access. */}
+              <Image
+                src="/logo.png"
+                alt=""
+                width={40}
+                height={40}
+                className="footer-mark h-8 w-8 shrink-0 md:h-10 md:w-10"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
   );

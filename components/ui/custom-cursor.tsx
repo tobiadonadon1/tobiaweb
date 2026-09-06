@@ -34,6 +34,10 @@ import {
  *   [data-cursor-quiet]  the region is fine with the dot but not with it
  *                        growing (the Thoughts desktop, whose file icons look
  *                        wrong under a 48px ring).
+ *   [data-cursor-ink]    the region's ground is the same colour as the dot,
+ *                        so the dot changes colour rather than disappearing
+ *                        (the footer's ember). Ink, because that is what every
+ *                        other mark on that ground is.
  *
  * Fine pointers only, and nothing at all under reduced motion: a spring that
  * chases the pointer is exactly the kind of movement that setting turns off.
@@ -41,6 +45,8 @@ import {
 
 /** Straight from the reference. */
 const COLOR = "#ff4c24";
+/** The one alternative, for grounds this red would vanish into. */
+const INK = "#0b1f3a";
 const DOT = 16;
 const RING = 48;
 
@@ -52,6 +58,7 @@ export function CustomCursor() {
   const [fine, setFine] = useState(false);
   const [hovering, setHovering] = useState(false);
   const [hidden, setHidden] = useState(true);
+  const [ink, setInk] = useState(false);
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
@@ -93,6 +100,8 @@ export function CustomCursor() {
         return;
       }
       setHidden(false);
+      // A ground the dot's own red would disappear into recolours it.
+      setInk(Boolean(t.closest("[data-cursor-ink]")));
       // A quiet region keeps the dot and refuses the ring.
       setHovering(
         !t.closest("[data-cursor-quiet]") && Boolean(t.closest(TARGETS)),
@@ -112,6 +121,8 @@ export function CustomCursor() {
   if (!on) return null;
 
   const size = hovering ? RING : DOT;
+  const tint = ink ? INK : COLOR;
+  const wash = ink ? "rgba(11,31,58,0.28)" : "rgba(255,76,36,0.3)";
 
   return (
     <motion.div
@@ -123,8 +134,8 @@ export function CustomCursor() {
         height: size,
         // Solid at rest, a transparent wash once it opens, so the thing under
         // it stays readable through the ring.
-        backgroundColor: hovering ? "rgba(255,76,36,0.3)" : COLOR,
-        borderColor: COLOR,
+        backgroundColor: hovering ? wash : tint,
+        borderColor: tint,
         opacity: hidden ? 0 : 1,
       }}
       style={{

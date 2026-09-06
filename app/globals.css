@@ -37,6 +37,22 @@
      under paper-coloured text, where the fill is what has to carry it. */
   --accent-clay-text: #b93a26;
 
+  /* ---- Ember: the last page, and NOWHERE else.
+
+     The footer is one flat, hot ground — the only full-bleed colour on the
+     site — so the moment it comes out from under the paper is the loudest
+     moment there is. It is clay pushed to full volume: same warm family,
+     hue 15 instead of 8, saturation up to 92%, and it is deliberately not
+     reused anywhere, because a colour that appears twice stops being an
+     ending.
+
+     THE VALUE IS PICKED BY MEASUREMENT, not by eye. Ink (#0b1f3a) on it is
+     4.75:1, which clears AA for body text, so every word in the footer can
+     be FULL ink and hierarchy is carried by size and tracking alone. Clay
+     itself was tried here first and cannot do that: ink on clay is 3.57:1
+     and the small links would have failed. */
+  --footer-ember: #f5501a;
+
   /* ---- myynd's own family. Taken from the live product at soleagency.co
      rather than invented, so the case study and the thing it is about agree
      with each other. Terracotta leads and does the structural work; forest is
@@ -153,6 +169,30 @@ body {
      `position: sticky` on the site (the pinned Who-Am-I sequence included).
      `clip` blocks the overflow without creating a scroll box. */
   overflow-x: clip;
+
+  /* NO RUBBER BAND, AND THIS IS WHY.
+
+     Flick past either end of the page and the browser bounces the document,
+     which exposes the CANVAS — the background painted behind everything,
+     taken from <html> — as a band at the edge of the screen. That band has
+     always been there. Nobody could see it, because the canvas is paper and
+     the old footer was paper too, so the bounce at the bottom uncovered
+     paper on top of paper.
+
+     The footer is ember now, and the same bounce reads as a white bar
+     sliding out from under it. Tobia: "when I scroll up, there's a kind of
+     white bar."
+
+     `overscroll-behavior-y: none` keeps the affordance from happening at
+     all, at BOTH ends, so nothing behind the page is ever uncovered. On the
+     axis, not `overscroll-behavior`, because sideways scrolling is already
+     dealt with by `overflow-x: clip` above and there is no chaining to
+     suppress. Declared on both elements because the viewport takes its value
+     from <body> when <html> leaves it at `auto`.
+
+     A browser too old for this (Safari before 16) simply keeps the bounce it
+     has today. See also the `body` backstop by `--footer-h`. */
+  overscroll-behavior-y: none;
 }
 
 html {
@@ -634,13 +674,31 @@ body:has(main[data-ground="ink"]) [data-nav-glow] {
    `--footer-h` is the one number that has to stay in step with the footer's
    real content height. It is set here, not measured in JavaScript, so there is
    no layout thrash and no flash of a wrongly sized gap on first paint.
+
+   BOTH VALUES ARE MEASURED, at fourteen widths from 360 to 1920, and each is
+   the tallest the content gets on its side of the break plus a little slack.
+
+   Wide is the SHORTER of the two, which is the opposite of what a footer
+   usually does: the sentence fits on one line, the links sit three across, and
+   nothing wraps. Narrow is taller because everything there is stacked — the
+   sentence in two lines, the links in two columns — AND because the mobile nav
+   is a pill fixed to the bottom of the viewport that the signature row has to
+   clear (see the padding in SiteFooter.tsx). 768px is not a round number
+   chosen here; it is Tailwind's `md`, which is where that padding changes.
+
+   Anywhere the content wants less than its value, the sentence block absorbs
+   the difference — it is the `flex-1` child — and simply sits with more air
+   around it, which is the one thing in this footer that improves with room.
+   If the message or the columns are ever edited, RE-MEASURE: too small and the
+   signature row is clipped by `overflow-hidden`, too large and the page ends
+   on a band of empty ember.
    --------------------------------------------------------------------------- */
 :root {
-  --footer-h: 27rem;
+  --footer-h: 42rem;
 }
 @media (min-width: 768px) {
   :root {
-    --footer-h: 30rem;
+    --footer-h: 38rem;
   }
 }
 
@@ -657,6 +715,22 @@ body:has(main[data-ground="ink"]) [data-nav-glow] {
 
 body {
   padding-bottom: var(--footer-h);
+
+  /* THE BACKSTOP. Paper everywhere on this site is the colour of the page,
+     and the page is the thing that SLIDES OFF here — so at the bottom, the
+     colour behind everything should be the footer's, not the page's. Nothing
+     normally shows it: `.site-content` is opaque and covers the body wherever
+     there is content, and the fixed footer covers the padding underneath it.
+     It matters at exactly one place, the seam where the two meet, where a
+     sub-pixel scroll offset or a frame of late rasterisation can otherwise
+     put a line of paper between the page and the ember. This makes that line
+     ember, which is to say invisible.
+
+     `background-color`, not `background`: the shorthand up in the `html,
+     body` rule has already set every other background property, and this is
+     only meant to change the colour under the body's own box. The canvas
+     stays paper. */
+  background-color: var(--footer-ember);
 }
 
 .site-footer {
@@ -664,7 +738,7 @@ body {
   inset: auto 0 0 0;
   z-index: 0;
   height: var(--footer-h);
-  background: var(--paper);
+  background: var(--footer-ember);
 }
 
 /* A reader who cannot scroll should still reach the footer normally. */
@@ -694,91 +768,114 @@ body[data-footer-open] .sh-compass {
 }
 
 /* ---------------------------------------------------------------------------
-   THE FOOTER COLLAGE.
+   THE LAST PAGE, ASSEMBLING.
 
    Every moving part below reads `--reveal` (0 to 1 across the last screen of
    scroll, written by footer-reveal.tsx) DIRECTLY through calc(). Nothing here
-   is a keyframe, a transition or a threshold, so the whole collage assembles
+   is a keyframe, a transition or a threshold, so the whole poster assembles
    under your thumb as you pull the page off it and takes itself apart again if
    you scroll back up. There is no JavaScript in any of it beyond the one custom
    property that was already being written.
 
-   Each piece derives its own `--p` first: the reveal, offset by its index for
-   the stagger and multiplied so it finishes early enough to be at rest before
-   the footer is fully open. clamp() keeps it inside 0..1 whatever the maths.
+   Each piece derives its own `--p` first: the reveal, offset so it starts
+   later than the piece above it, and multiplied so it finishes before the
+   footer is fully open rather than still moving when it stops. clamp() keeps
+   it inside 0..1 whatever the maths.
 
    `var(--reveal, 1)` defaults to 1 on purpose. Before hydration, and under
-   reduced motion where the footer is a normal static block, the collage renders
-   fully assembled rather than invisible.
+   reduced motion where the footer is a normal static block, the poster renders
+   finished rather than invisible.
    --------------------------------------------------------------------------- */
 
-/* The link patches: torn paper flying up into its tilt. */
-.footer-patch {
-  --p: clamp(0, calc((var(--reveal, 1) - 0.06 * var(--i, 0)) * 2.4), 1);
-  transform: translateY(calc((1 - var(--p)) * 56px))
-    rotate(calc(var(--tilt, 0deg) * var(--p)));
+/* THE ORDER IS BOTTOM UP, BECAUSE THAT IS THE ORDER YOU SEE IT IN.
+
+   The page slides up off a footer that is pinned to the bottom of the
+   viewport, so the strip of footer you can see grows from its BOTTOM EDGE
+   upwards: the signature row appears first and the sentence appears last. The
+   first cut of this staggered the other way — sentence first, signature last —
+   which meant that at a third of the way through the reveal the link columns
+   were on screen at zero opacity and the bottom of the footer was an empty
+   band of ember. It read as a rendering bug, because it was one.
+
+   Every start below was set from a MEASUREMENT of where each block sits inside
+   the 608px footer, converted to the fraction of the reveal at which that
+   block's own bottom edge clears the page: the signature row at 0.09, the
+   columns from 0.21, the message at 0.46, the rule at 0.63, the sentence from
+   0.67. Each piece starts a little before its number and is at rest a little
+   after, so nothing is ever fully on screen and still moving.
+
+   The payoff is that the sentence is the LAST thing to land, exactly as you
+   reach the bottom of the site. */
+
+/* The message, the link columns and the signature row. `--i` is set per block
+   in SiteFooter.tsx, and it counts UP THE PAGE: 0 is the signature row at the
+   very bottom, 4 is the message just under the rule. */
+.footer-rise {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.04 - 0.09 * var(--i, 0)) * 6), 1);
+  transform: translateY(calc((1 - var(--p)) * 20px));
   opacity: var(--p);
 }
 
-/* Hover lives on the SVG, not on the patch. The patch's own transform is being
-   rewritten every frame by the scroll, so a transition on it would lag the
-   scroll rather than answer the pointer. */
-.footer-patch svg {
-  filter: drop-shadow(0 5px 9px rgba(11, 31, 58, 0.16));
+/* The rule, drawing itself left to right under the sentence. A scale rather
+   than a stroke: it is a one pixel box, and a box has nothing to dash. */
+.footer-rule {
+  transform: scaleX(clamp(0, calc((var(--reveal, 1) - 0.56) * 3.4), 1));
+  transform-origin: left center;
+}
+
+/* THE SENTENCE, last. Each half comes in from the edge it is set against, so
+   the line does not so much fade in as close from both sides. The right half
+   is held back a fraction: they arrive as two words of one sentence, in the
+   order you read them, not as a matched pair. */
+.footer-word {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.6) * 3), 1);
+  opacity: var(--p);
+  transform: translateX(calc((var(--p) - 1) * 5vw));
+}
+.footer-word-b {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.66) * 3), 1);
+  transform: translateX(calc((1 - var(--p)) * 5vw));
+}
+
+/* THE MARK, landing with the sentence — a signature goes on after the thing
+   is written, and the sentence is the thing. */
+.footer-mark {
+  --p: clamp(0, calc((var(--reveal, 1) - 0.62) * 4), 1);
+  opacity: var(--p);
+  transform: scale(calc(0.8 + var(--p) * 0.2));
+}
+
+/* The links.
+
+   A real `text-decoration` rather than a drawn box: it follows the descenders,
+   it survives a line wrap, and both of the properties being animated here are
+   cheap. The underline sits low and pale at rest and PULLS UP to the word in
+   full ink on hover, which reads as the link coming to meet the pointer. */
+.footer-link {
+  text-decoration: underline;
+  text-decoration-color: rgba(11, 31, 58, 0.32);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
   transition:
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 240ms ease;
+    text-decoration-color 200ms ease,
+    text-underline-offset 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.footer-patch:hover svg,
-.footer-patch:focus-visible svg {
-  transform: scale(1.045) rotate(-1.2deg);
-  filter: drop-shadow(0 10px 18px rgba(11, 31, 58, 0.22));
+.footer-link:hover,
+.footer-link:focus-visible {
+  text-decoration-color: var(--ink);
+  text-underline-offset: 4px;
 }
-.footer-patch:focus-visible {
+.footer-link:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 6px;
-  border-radius: 4px;
-}
-
-/* The scatter behind everything, drifting in at its own rates. */
-.footer-fleck {
-  --p: clamp(0, calc((var(--reveal, 1) - 0.05 * var(--i, 0)) * 2), 1);
-  transform: translateY(calc((1 - var(--p)) * 34px)) rotate(var(--tilt, 0deg));
-  opacity: calc(var(--p) * 0.5);
-}
-
-/* The name, and the hand drawn rule under it.
-
-   `pathLength="1"` renames each path's own length to 1, so the dash array and
-   the offset are plain fractions and the stroke can be drawn on by arithmetic
-   with no getTotalLength, no layout read and no measurement of any kind. */
-.footer-name {
-  --p: clamp(0, calc(var(--reveal, 1) * 2), 1);
-  transform: translateY(calc((1 - var(--p)) * 18px));
-  opacity: var(--p);
-}
-.footer-rule path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: clamp(0, calc(1 - (var(--reveal, 1) - 0.1) * 1.7), 1);
-}
-
-/* The little arrow curling back up at "Back to the top", and the note beside
-   it. The arrow starts drawing a quarter of the way in so it is not already
-   finished by the time you can see it. */
-.footer-arrow path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: clamp(0, calc(1 - (var(--reveal, 1) - 0.25) * 2.2), 1);
-}
-.footer-hand {
-  opacity: clamp(0, calc((var(--reveal, 1) - 0.55) * 4), 1);
-  transform: rotate(-5deg);
+  outline-offset: 5px;
+  border-radius: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   /* The footer is a static block here and `--reveal` is pinned to 1, so every
      calc above already resolves to the assembled state. Only the pointer
      answers need silencing. */
-  .footer-patch svg {
+  .footer-link {
     transition: none;
   }
 }
