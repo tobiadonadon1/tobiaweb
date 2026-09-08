@@ -33,6 +33,7 @@ const SPOTS = [
   { x: 30, y: 46 },
   { x: 72, y: 47 },
   { x: 20, y: 74 },
+  { x: 52, y: 68 },
 ];
 
 // Scoped styling for the authored HTML body (no prose plugin).
@@ -302,8 +303,12 @@ export function ThoughtsDesktop() {
                     {/* eslint-disable-next-line @next/next/no-img-element -- cover */}
                     <img
                       src={open.cover}
-                      alt=""
-                      className="block max-h-[320px] w-full object-cover"
+                      alt={open.coverAlt ?? ""}
+                      className={
+                        open.coverFit === "contain"
+                          ? "block h-[320px] w-full bg-white object-contain"
+                          : "block max-h-[320px] w-full object-cover"
+                      }
                     />
                   </div>
                 )}

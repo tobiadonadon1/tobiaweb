@@ -27,7 +27,7 @@ export const AGE = 21;
  * around, so it is the one thing here that should be edited with care.
  */
 export const CLAIM =
-  "I build for the world outside. I explore the world within.";
+  "I build tools, write about consciousness, and help people launch things.";
 
 /**
  * The same claim in the third person, for schema.org, which describes a person
@@ -35,7 +35,7 @@ export const CLAIM =
  * mangling the verbs, so it sits next to it instead: change one, change both.
  */
 export const CLAIM_THIRD =
-  "Builds for the world outside and explores the world within.";
+  "Builds tools, writes about consciousness, and helps people launch things.";
 
 /**
  * The line under the claim on the homepage.

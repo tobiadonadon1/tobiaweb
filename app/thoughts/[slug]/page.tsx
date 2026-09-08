@@ -48,7 +48,9 @@ export async function generateMetadata({
       publishedTime: iso(t.date),
       authors: [t.writer ?? "Tobia Donadon"],
       tags: t.tag ? [t.tag] : undefined,
-      images: t.cover ? [{ url: t.cover }] : undefined,
+      images: t.cover
+        ? [{ url: t.cover, alt: t.coverAlt ?? t.headline }]
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -156,12 +158,22 @@ export default async function ThoughtPage({
             className="mt-10 overflow-hidden rounded-2xl border"
             style={{ borderColor: "rgba(30,26,14,0.08)" }}
           >
-            <div className="relative aspect-[3/2] w-full">
+            <div
+              className={
+                t.coverFit === "contain"
+                  ? "relative w-full bg-white p-4 md:p-8"
+                  : "relative aspect-[3/2] w-full"
+              }
+            >
               {/* eslint-disable-next-line @next/next/no-img-element -- local photo */}
               <img
                 src={t.cover}
-                alt=""
-                className="absolute inset-0 h-full w-full object-cover"
+                alt={t.coverAlt ?? ""}
+                className={
+                  t.coverFit === "contain"
+                    ? "mx-auto block max-h-[72vh] w-full object-contain"
+                    : "absolute inset-0 h-full w-full object-cover"
+                }
               />
             </div>
           </div>

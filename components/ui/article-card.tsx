@@ -9,6 +9,8 @@ export interface ArticleCardProps {
   excerpt: string;
   /** Cover photo (Tobia's own — rendered natural/ungraded). */
   cover?: string;
+  coverAlt?: string;
+  coverFit?: "cover" | "contain";
   tag?: string;
   readTime?: string; // e.g. "4 min read"
   date?: string; // e.g. "Jun 4, 2026"
@@ -36,6 +38,8 @@ export function ArticleCard({
   headline,
   excerpt,
   cover,
+  coverAlt,
+  coverFit = "cover",
   tag,
   readTime,
   date,
@@ -72,9 +76,12 @@ export function ArticleCard({
           {/* eslint-disable-next-line @next/next/no-img-element -- local photo, object-cover plate */}
           <img
             src={cover}
-            alt=""
+            alt={coverAlt ?? ""}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+            className={cn(
+              "absolute inset-0 h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.04]",
+              coverFit === "contain" ? "bg-white object-contain" : "object-cover"
+            )}
           />
           {/* Covers are natural/ungraded — no sea-tone grade (redesign canon). */}
         </div>
