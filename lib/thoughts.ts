@@ -149,17 +149,6 @@ export const THOUGHTS: Thought[] = [
     writer: "Tobia Donadon",
     bodyHtml: "<p>If you outsource your thinking, you outsource your life. Productivity has never been about doing more. It has always been about becoming more, creating more, giving more. Most of today's tools don't help us become anything.</p><p>They give us lists, reminders, endless notifications. They make us busier, not better. They add clutter to our lives without moving us in a straight direction.</p><p>Al changes that. But only if we use it with intention. Al should not be the one making our choices.</p><p>It should not decide our direction. That is our responsibility, the responsibility of thought, of vision, of clarity.</p><p>I am a firm believer in Al doing the heavy lifting. It can execute, build, organize, and carry out the structures we design. It can turn a thought into a system, a vision into a routine, an idea into a living framework.</p><p><strong>Humans lead with thought. Al follows with execution. That is the future we should be moving toward.</strong></p><p>Not a world where machines think for us, but a world where we think with more freedom, because the machine handles the weight.</p>",
   },
-  {
-    slug: "make-funnels-release",
-    headline: "Make Funnels Release",
-    excerpt: "MakeFunnels is already generating thousands of dollars for users who have been on the platform for just one week.",
-    cover: "https://framerusercontent.com/images/meo9Qfc4vq0ZQs96sJo8Q5AEE.jpeg",
-    tag: "Start Up",
-    readTime: "1 min read",
-    date: "Jan 26, 2026",
-    writer: "Tobia Donadon",
-    bodyHtml: "<p dir=\"auto\">It’s been 24 hours since we officially launched MakeFunnels to all of you.<br><br>But the real story isn’t the numbers.<br><br>It’s what happened before them, and what we set out to solve for anyone with an idea who wants to bring it into the world.<br><br>We spent months building this.<br>No announcements. No hype.<br><br>Just me and Tommaso; my friend since middle school, working quietly, day after day, focused on the problem.<br><br>We didn’t want to ship another funnel builder.<br><br>We wanted to build an all-in-one tool that actually helps people launch, scale, and bring their business to life, fast.<br><br>The moment this became real for me wasn’t yesterday when we went live.<br><br>It was a few weeks ago, when one of our early users crossed $10k in monthly revenue using a funnel built on MakeFunnels.<br><br>That’s when I looked at Tommaso; who’s been grinding on the marketing side with the same intensity he’s had since we were kids, and said;<br>“Okay. We’re ready.”<br><br>It still feels surreal to see this out in the world.<br><br>To everyone who tested, broke, and helped us improve the early versions: thank you.<br><br>We’re just two friends building the tool we wish we had years ago.<br><br>Now, back to work.<br>We want to give you the best version of it possible.</p>",
-  },
 ];
 
 export function getThought(slug: string): Thought | undefined {
