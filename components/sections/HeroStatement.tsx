@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { BlockReveal } from "@/components/ui/block-reveal";
 // The claim, the age and the share card all read from one file now, so a link
 // preview can no longer contradict the page it is advertising. See lib/bio.ts.
 import { CLAIM, CONTEXT } from "@/lib/bio";
@@ -18,8 +17,8 @@ import { CLAIM, CONTEXT } from "@/lib/bio";
  *
  * A soft circular spotlight follows the pointer and RECOLOURS the type to
  * clay as it passes — same words underneath, only the colour changes. It's
- * a second, identical copy of the block masked to a circle; it arms only
- * once the reveal has finished, and only for real pointers.
+ * a second, identical copy of the block masked to a circle; it arms
+ * only for real pointers. The text itself is always visible.
  */
 const UNDERSTATEMENT =
   "I'm figuring this out. Maybe we can figure it out together.";
@@ -94,12 +93,8 @@ function Beats({ accent }: { accent?: boolean }) {
 export function HeroStatement() {
   const stage = useRef<HTMLDivElement>(null);
   const spotlight = useRef<HTMLDivElement>(null);
-  const [armed, setArmed] = useState(false);
-
-  const onRevealed = useCallback(() => setArmed(true), []);
 
   useEffect(() => {
-    if (!armed) return;
     const stageEl = stage.current;
     const spot = spotlight.current;
     if (!stageEl || !spot) return;
@@ -173,7 +168,7 @@ export function HeroStatement() {
       window.removeEventListener("resize", remeasure);
       gsap.killTweensOf(spot);
     };
-  }, [armed]);
+  }, []);
 
   return (
     <section
@@ -183,13 +178,9 @@ export function HeroStatement() {
       className="paper-bg relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden px-6 py-28"
     >
       <div ref={stage} className="relative w-full max-w-[62rem]">
-        <BlockReveal
-          className="flex flex-col items-center"
-          blockColor="#0a0a0a"
-          onRevealed={onRevealed}
-        >
+        <div className="flex flex-col items-center">
           <Beats />
-        </BlockReveal>
+        </div>
 
         {/* The spotlight copy: identical type, clay, clipped to a circle that
             follows the pointer. Hidden from assistive tech — it is the same

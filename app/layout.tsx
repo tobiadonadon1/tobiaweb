@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Caveat, Host_Grotesk } from "next/font/google";
 import "./globals.css";
+import "./project-chapters.css";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { CustomCursor } from "@/components/ui/custom-cursor";

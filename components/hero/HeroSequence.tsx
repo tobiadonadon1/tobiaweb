@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { resolveIntroVisit } from "@/lib/intro-policy";
 
 /**
  * Tobia's own photos, web-optimized from assets/trail-originals/. They stack
@@ -47,13 +48,7 @@ const NAME = "Tobia Donadon";
  */
 let reloadSpent = false;
 
-// Loader beats, in seconds. Each photo wipes down over the one before it;
-// once the last has landed the frame opens out to full bleed, the vignette
-// arrives, and the name rises from the bottom-left.
-// Slower than it was. The whole sequence used to finish in 3.75s, which read
-// as a flicker rather than a sequence: eleven photographs went past faster
-// than any of them could be looked at. These four numbers ARE the pacing, and
-// they are the only place to change it. Now ~5.0s to the name.
+// Preserve the deployed rhythm: the gaps between photographs accelerate.
 const FIRST_REVEAL_DELAY = 0.45;
 const REVEAL_STAGGER = 0.2;
 const REVEAL_DURATION = 1.15;
@@ -95,49 +90,38 @@ function MaskedWords({ text }: { text: string }) {
 
 export default function HeroSequence() {
   const scope = useRef<HTMLElement>(null);
+  const visit = useRef<ReturnType<typeof resolveIntroVisit> | null>(null);
 
   useEffect(() => {
-    /**
-     * Should the loader play at all?
-     *
-     * It must NOT when the reader is coming BACK to the homepage. Returning
-     * from a project page used to replay the whole photo sequence, lock the
-     * scroll for four seconds and slam the page to y=0, which threw away the
-     * place the reader had left from. Two signals mean "this is a return":
-     *
-     *   a hash in the URL   the back links point at /#projects, and the loader
-     *                       would fight the browser's own scroll to it
-     *   a session flag      set the first time the intro finishes, so any
-     *                       later visit to / in the same tab lands instantly
-     *
-     * A fresh tab on a bare "/" still gets the full loader, which is the only
-     * place it was ever earning its keep.
-     */
-    const nav = performance.getEntriesByType(
-      "navigation",
-    )[0] as PerformanceNavigationTiming | undefined;
-
-    // A REFRESH is a deliberate "start again", so it always plays, session
-    // flag or not. Without this, the flag below swallowed the loader on every
-    // reload of the homepage: it had played once in the tab, so it never
-    // played again. Scoped to a reload OF THE HOMEPAGE, because refreshing a
-    // project page and then walking back here is a return, not a restart.
-    let restarted = false;
-    if (!reloadSpent) {
+    if (!visit.current) {
+      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+      let navigationPath = "";
+      let played = false;
+      let savedScrollY = 0;
+      try { navigationPath = nav ? new URL(nav.name).pathname : ""; } catch { /* Ignore malformed timing entries. */ }
       try {
-        restarted =
-          nav?.type === "reload" && new URL(nav.name).pathname === "/";
-      } catch {
-        // A malformed navigation entry is not worth failing the hero over.
-      }
+        played = sessionStorage.getItem("intro:played") === "1";
+        savedScrollY = Number(sessionStorage.getItem("intro:scroll-y") ?? 0);
+      } catch { /* The intro also works with storage disabled. */ }
+      visit.current = resolveIntroVisit({
+        navigationType: nav?.type ?? "navigate",
+        navigationPath,
+        firstMount: !reloadSpent,
+        hash: window.location.hash,
+        played,
+        savedScrollY,
+      });
+      reloadSpent = true;
     }
-    reloadSpent = true;
-
-    const hash = window.location.hash;
-    const returning =
-      !restarted &&
-      ((hash && hash !== "#home") ||
-        sessionStorage.getItem("intro:played") === "1");
+    // Capture once, before the effect is replayed in Strict Mode. Otherwise
+    // the first run consumes reloadSpent and the second skips mid-intro.
+    const { skip: returning, hash, restoreScrollY } = visit.current;
+    const rememberScroll = () => {
+      try { sessionStorage.setItem("intro:scroll-y", String(window.scrollY)); } catch { /* Optional storage. */ }
+    };
+    window.addEventListener("pagehide", rememberScroll);
+    let releaseFrame = 0;
+    let landingFrame = 0;
 
     // The loader owns the screen: pin to top and lock scroll while it plays.
     // Neither applies to a return visit.
@@ -169,7 +153,7 @@ export default function HeroSequence() {
       // attached its listener; the nav would then sit invisible until its
       // five second backstop. A frame is enough for every mount effect to
       // have run, and is imperceptible on the paths that animate.
-      requestAnimationFrame(() =>
+      releaseFrame = requestAnimationFrame(() =>
         window.dispatchEvent(new CustomEvent("intro:done")),
       );
     };
@@ -195,15 +179,16 @@ export default function HeroSequence() {
       // A return visit lands on the finished frame with no animation at all,
       // exactly like the reduced-motion path, and then gets out of the way so
       // the browser can scroll to whatever hash brought us here.
-      // Arriving at a section is also a cut. Next scrolls to the hash itself,
-      // but `scroll-behavior: smooth` can still turn that into a long glide
-      // down the page, so the landing is asserted here directly.
-      if (returning && hash && hash !== "#home") {
-        const target = document.getElementById(hash.slice(1));
-        if (target) {
-          const top = target.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top, left: 0, behavior: "instant" });
-        }
+      // Let all homepage effects establish their layout before restoring a
+      // reading position. Never run the loader on top of a section landing.
+      if (returning) {
+        landingFrame = requestAnimationFrame(() => {
+          if (restoreScrollY > 0) {
+            window.scrollTo({ top: restoreScrollY, left: 0, behavior: "instant" });
+          } else if (hash && hash !== "#home") {
+            document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "instant", block: "start" });
+          }
+        });
       }
 
       if (reduced || returning) {
@@ -255,6 +240,9 @@ export default function HeroSequence() {
     }, scope);
 
     return () => {
+      window.removeEventListener("pagehide", rememberScroll);
+      cancelAnimationFrame(releaseFrame);
+      cancelAnimationFrame(landingFrame);
       ctx.revert();
       document.body.style.overflow = prevOverflow;
     };
