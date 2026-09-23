@@ -1,7 +1,7 @@
 import type { MaterialEntry } from "../material-types";
 
 /**
- * THREE SKILLS, NOT SIX, AND NAMED AS ROLES.
+ * FOUR SKILLS, NAMED AS ROLES. THE FOURTH HAS A PRICE.
  *
  * They were called Atelier, The Spec and The Sweep, which are codenames: you
  * had to already know what they did before the name told you anything. A skill
@@ -22,6 +22,9 @@ import type { MaterialEntry } from "../material-types";
  *
  * The `body` here is the skill's own page. It is the argument for the skill
  * plus how to install it, and it never repeats the summary that got you here.
+ *
+ * Motion Director is sold, not downloaded: it names a product, and the page
+ * shows its price and a buy button where the others have a download.
  */
 
 /** Where a skill's bundle and its raw instructions live. One place. */
@@ -157,5 +160,64 @@ export const SKILLS: MaterialEntry[] = [
       },
     ],
     link: { label: "Download Code Reviewer", href: bundle("code-reviewer"), download: true },
+  },
+  /* ---------------------------------------------------------------- *
+   * 04 · the first one with a price
+   * ---------------------------------------------------------------- */
+  {
+    slug: "motion-director",
+    title: "Motion Director",
+    kind: "skill",
+    summary: "Turns any idea into a finished short video with its own original soundtrack.",
+    // Minutes to a finished video, which is what matters here.
+    minutes: 10,
+    status: "ready",
+    when: "You need a video for a launch, a post or an idea, and you have ten minutes, not a video team.",
+    level: "Anyone",
+    product: "motion-director",
+    body: [
+      {
+        type: "p",
+        text: "Type what the video is about and answer two quick rounds of questions. About ten minutes later, a finished 10 to 20 second MP4 with music written for it is on your Desktop, ready to post.",
+      },
+      {
+        type: "reel",
+        caption: "Four videos Motion Director made, one in each look. Tap one for sound.",
+        items: [
+          { src: "/shop/motion-director/explainer.mp4", poster: "/shop/motion-director/explainer.jpg", label: "Motion-graphics explainer", aspect: "16/9" },
+          { src: "/shop/motion-director/kinetic.mp4", poster: "/shop/motion-director/kinetic.jpg", label: "Kinetic typography", aspect: "9/16" },
+          { src: "/shop/motion-director/neon.mp4", poster: "/shop/motion-director/neon.jpg", label: "Neon, cinematic", aspect: "9/16" },
+          { src: "/shop/motion-director/ink.mp4", poster: "/shop/motion-director/ink.jpg", label: "Hand-drawn ink", aspect: "1/1" },
+        ],
+      },
+      { type: "h", text: "What you get" },
+      {
+        type: "list",
+        items: [
+          "A video that looks like a studio made it. Claude gives your idea a twist, designs and animates every frame, and checks its own work frame by frame before you see it.",
+          "A soundtrack nobody else has. The music is composed from scratch for your video and cut to the picture, so every hit lands on a beat.",
+          "Four looks: bold kinetic typography, a clean motion-graphics explainer, neon and cinematic, or hand-drawn ink. Vertical for X, TikTok, Reels and Shorts, or landscape, square and 4:5, as a crisp 1080p MP4.",
+          "Yours to use, commercially too. There is no stock footage, no licensed music, no watermark and no editing app.",
+          "A project you can open. The picture and the music of every video are plain code in a small folder, so you can tweak it, reuse it, and see exactly how it was made.",
+        ],
+      },
+      { type: "h", text: "How it works" },
+      {
+        type: "steps",
+        items: [
+          "Unzip the folder, open it in Claude Code and type hi. It installs itself in about two minutes.",
+          "Tell Claude what the video is about, then pick where it's going, how long, and a look.",
+          "Claude writes it, animates it, scores it and checks it. The MP4 lands in a folder on your Desktop.",
+        ],
+      },
+      {
+        type: "p",
+        text: "Want a change? Say \"faster\", \"change the headline\" or \"make a square version\" and it renders again.",
+      },
+      {
+        type: "watch",
+        text: "You need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. Windows and Linux should work but haven't been tested yet. Everything renders on your own computer and nothing is uploaded.",
+      },
+    ],
   },
 ];

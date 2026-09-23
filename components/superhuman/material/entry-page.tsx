@@ -3,6 +3,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { Blocks } from "./material-blocks";
 import { SkillContents } from "./skill-contents";
+import { BuyForm } from "./product/buy-form";
+import { ProductSection } from "./product/product-section";
+import { StickyBuy } from "./product/sticky-buy";
+import { PRODUCTS } from "@/lib/shop/products";
+import { abs } from "@/lib/site";
 import { KIND_LABEL, entryHref, folderHref, neighbours } from "./material-data";
 import type { MaterialEntry, MaterialFolder } from "./material-types";
 
@@ -39,6 +44,9 @@ export function EntryPage({
   entry: MaterialEntry;
 }) {
   const { prev, next } = neighbours(folder, entry.slug);
+  // A piece with a price keeps its folder's format and swaps the download
+  // for a buy button (see product/product-section.tsx).
+  const product = entry.product ? PRODUCTS[entry.product] : undefined;
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
@@ -50,7 +58,8 @@ export function EntryPage({
          * ------------------------------------------------------------- */}
         <header className="text-center">
           <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-            {KIND_LABEL[entry.kind]} · {entry.minutes} min · {entry.level}
+            {KIND_LABEL[entry.kind]} ·{" "}
+            {product ? product.priceLabel : `${entry.minutes} min`} · {entry.level}
           </span>
 
           <h1 className="mx-auto mt-6 max-w-[18ch] text-balance font-serif text-[clamp(2.4rem,7.5vw,4rem)] leading-[0.98] tracking-[-0.035em] text-[var(--ink)]">
@@ -60,6 +69,16 @@ export function EntryPage({
           <p className="mx-auto mt-6 max-w-[38ch] text-balance text-[1.2rem] leading-[1.42] text-[color:rgba(11,31,58,0.66)] md:text-[1.3rem]">
             {entry.summary}
           </p>
+
+          {/* The button is on the first screen, where most buyers decide. */}
+          {product ? (
+            <div id="buy" className="mt-9 flex scroll-mt-28 flex-col items-center">
+              <BuyForm productId={product.id} price={product.priceLabel} reportErrors />
+              <p className="mt-4 text-[0.92rem] text-[color:rgba(11,31,58,0.62)]">
+                One payment · Instant download · Yours to keep
+              </p>
+            </div>
+          ) : null}
 
           <span
             aria-hidden
@@ -88,7 +107,7 @@ export function EntryPage({
          * ------------------------------------------------------------- */}
         <p className="mt-12 border-l-2 border-[var(--hairline-strong)] py-1 pl-6 text-[1.05rem] leading-[1.65] text-[color:rgba(11,31,58,0.62)]">
           <span className="font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-            Read this when
+            {product ? "Use it when" : "Read this when"}
           </span>
           <span className="mt-1.5 block">{entry.when}</span>
         </p>
@@ -103,6 +122,8 @@ export function EntryPage({
         {/* ------------------------------------------------------------- *
          * THE FILE, FOR THE THINGS THAT ARE FILES.
          * ------------------------------------------------------------- */}
+        {product ? <ProductSection product={product} id="buy-close" /> : null}
+
         {entry.kind === "skill" && entry.link?.download ? (
           <SkillContents
             slug={entry.slug}
@@ -162,6 +183,39 @@ export function EntryPage({
           </nav>
         ) : null}
       </article>
+
+      {product ? (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Product",
+                name: product.name,
+                description: product.share.description,
+                image: abs(`/shop/${product.id}.png`),
+                url: abs(product.href),
+                brand: { "@type": "Person", name: "Tobia Donadon" },
+                offers: {
+                  "@type": "Offer",
+                  price: (product.priceCents / 100).toFixed(2),
+                  priceCurrency: product.currency.toUpperCase(),
+                  availability: "https://schema.org/InStock",
+                  url: abs(product.href),
+                },
+              }),
+            }}
+          />
+          <StickyBuy
+            productId={product.id}
+            name={product.name}
+            price={product.priceLabel}
+            heroId="buy"
+            closeId="buy-close"
+          />
+        </>
+      ) : null}
     </main>
   );
 }

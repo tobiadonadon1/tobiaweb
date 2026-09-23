@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { the98cTradeSvg } from "@/components/superhuman/material/specimens";
+import { flatSpecimenSvg } from "@/components/superhuman/material/specimen-svg";
 import { hostGrotesk } from "@/lib/og-font";
 import { PRODUCTS, productById } from "@/lib/shop/products";
 import { SITE_LABEL } from "@/lib/site";
@@ -42,7 +42,8 @@ export async function GET(
     medium && { name: "Host", data: medium, weight: 500 as const, style: "normal" as const },
   ].filter((f) => f !== null && f !== undefined);
 
-  const mark = `data:image/svg+xml;utf8,${encodeURIComponent(the98cTradeSvg())}`;
+  const svg = flatSpecimenSvg(product.id);
+  const mark = svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : null;
 
   return new ImageResponse(
     (
@@ -65,14 +66,15 @@ export async function GET(
               color: "rgba(11,31,58,0.55)",
             }}
           >
-            SETUP · FOR CLAUDE CODE
+            {product.share.kicker.toUpperCase()}
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div
               style={{
                 display: "flex",
-                fontSize: 104,
+                // Longer names step down so the name always stays on one line.
+                fontSize: product.name.length > 13 ? 84 : 104,
                 whiteSpace: "nowrap",
                 fontWeight: 400,
                 letterSpacing: "-0.045em",
@@ -92,7 +94,7 @@ export async function GET(
                 color: "rgba(11,31,58,0.7)",
               }}
             >
-              A prediction-market bot that sets itself up in Claude Code.
+              {product.share.line}
             </div>
           </div>
 
@@ -122,7 +124,7 @@ export async function GET(
                 color: "rgba(11,31,58,0.6)",
               }}
             >
-              8,318 trades tested · 99% paid out
+              {product.share.proof}
             </div>
           </div>
         </div>
@@ -137,7 +139,7 @@ export async function GET(
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- Satori only renders <img> */}
-          <img src={mark} width={320} height={264} alt="" style={{ marginTop: 10 }} />
+          {mark ? <img src={mark} width={320} height={264} alt="" style={{ marginTop: 10 }} /> : <div />}
           <div style={{ display: "flex", alignItems: "center" }}>
             <div style={{ display: "flex", width: 90, height: 6, background: CLAY, marginRight: 20 }} />
             <div style={{ display: "flex", fontSize: 24, color: "rgba(11,31,58,0.5)" }}>

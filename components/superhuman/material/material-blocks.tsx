@@ -1,5 +1,6 @@
 import { Image as ImageIcon } from "lucide-react";
 import { Figure } from "./figures";
+import { Reel } from "./reel";
 import type { Block } from "./material-types";
 
 /**
@@ -51,6 +52,9 @@ export function Blocks({ blocks }: { blocks: Block[] }) {
                 {block.text}
               </h2>
             );
+
+          case "reel":
+            return <Reel key={i} items={block.items} caption={block.caption} />;
 
           case "steps":
             // Numbers in clay, hanging outside the text. The one place a list

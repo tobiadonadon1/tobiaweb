@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DownloadGate } from "./download-gate";
+import { BuyForm } from "./product/buy-form";
+import { PRODUCTS } from "@/lib/shop/products";
 import { Specimen } from "./specimens";
 import { entryHref } from "./material-data";
 import type { MaterialEntry, MaterialFolder } from "./material-types";
@@ -38,6 +40,8 @@ import type { MaterialEntry, MaterialFolder } from "./material-types";
 function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntry }) {
   const href = entryHref(folder.id, entry.slug);
   const download = entry.link?.download ? entry.link : undefined;
+  // A skill with a price: the pill buys instead of downloading.
+  const product = entry.product ? PRODUCTS[entry.product] : undefined;
 
   return (
     <li className="flex flex-col bg-[var(--paper)] p-6 md:p-8">
@@ -72,7 +76,18 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
              buttons up ---- */}
       <div className="mt-auto pt-8">
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-          {download ? (
+          {product ? (
+            <>
+              <BuyForm productId={product.id} price={product.priceLabel} compact />
+              <Link
+                href={href}
+                className="group/read inline-flex items-center gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
+              >
+                What it does
+                <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/read:translate-x-0.5" />
+              </Link>
+            </>
+          ) : download ? (
             <>
               <DownloadGate
                 href={download.href}
@@ -101,7 +116,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         </div>
 
         <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {entry.minutes} min · {entry.level}
+          {product ? `${product.priceLabel} · ${entry.minutes} min a video` : `${entry.minutes} min · ${entry.level}`}
         </p>
       </div>
     </li>
@@ -110,7 +125,13 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
 
 export function MaterialRack({ folder }: { folder: MaterialFolder }) {
   return (
-    <ul className="grid list-none grid-cols-1 gap-px border border-[var(--hairline)] bg-[var(--hairline)] md:grid-cols-3">
+    <ul
+      className={`grid list-none grid-cols-1 gap-px border border-[var(--hairline)] bg-[var(--hairline)] ${
+        // Four in a row on wide screens, a 2 x 2 below that; never a 3 + 1
+        // with an empty cell. Three stay three.
+        folder.entries.length === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3"
+      }`}
+    >
       {folder.entries.map((entry) => (
         <Column key={entry.slug} folder={folder} entry={entry} />
       ))}

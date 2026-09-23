@@ -165,20 +165,23 @@ function Cut({
  * ================================================================== */
 
 /**
- * SKILLS — three cut cards, fanned, one per skill.
+ * SKILLS — cut cards, fanned, one per skill.
  *
- * The count is the meaning: three cards, three skills. They overlap because a
+ * The count is the meaning: four cards, four skills. They overlap because a
  * skill sits on top of how the agent already behaves rather than beside it.
+ * The fourth, forest, arrived with Motion Director.
  */
 function Skills() {
   return (
     <>
-      <Cut d={CARD} x={22} y={128} s={0.72} fill={SHADE} rotate={-11} />
-      <Cut d={CARD} x={14} y={120} s={0.72} fill={ULTRAMARINE} rotate={-11} />
-      <Cut d={CARD} x={144} y={98} s={0.76} fill={SHADE} rotate={-2} />
-      <Cut d={CARD} x={137} y={90} s={0.76} fill={SAFFRON} rotate={-2} />
-      <Cut d={CARD} x={266} y={72} s={0.8} fill={SHADE} rotate={7} />
-      <Cut d={CARD} x={259} y={64} s={0.8} fill={VERMILION} rotate={7} />
+      <Cut d={CARD} x={16} y={140} s={0.6} fill={SHADE} rotate={-12} />
+      <Cut d={CARD} x={9} y={133} s={0.6} fill={ULTRAMARINE} rotate={-12} />
+      <Cut d={CARD} x={104} y={112} s={0.62} fill={SHADE} rotate={-4} />
+      <Cut d={CARD} x={97} y={105} s={0.62} fill={SAFFRON} rotate={-4} />
+      <Cut d={CARD} x={192} y={88} s={0.64} fill={SHADE} rotate={4} />
+      <Cut d={CARD} x={185} y={81} s={0.64} fill={VERMILION} rotate={4} />
+      <Cut d={CARD} x={280} y={62} s={0.6} fill={SHADE} rotate={11} />
+      <Cut d={CARD} x={273} y={55} s={0.6} fill={FOREST} rotate={11} />
     </>
   );
 }
@@ -258,8 +261,7 @@ function Setups() {
  * matters. It is the only mark in the set made of one thing and its own
  * missing piece.
  *
- * T98 is where the coin and its slice sit, shared by the component and the
- * flat SVG below so the two cannot drift apart.
+ * T98 is where the coin and its slice sit.
  */
 const T98 = { s: 1.66, coin: [38, 56], slice: [74.5, 20.2], turn: -8, drop: 7 } as const;
 
@@ -272,25 +274,6 @@ function The98cTrade() {
       <Cut d={SLICE} x={slice[0] + 6} y={slice[1] + 6} s={s} fill={SHADE} rotate={turn} />
       <Cut d={SLICE} x={slice[0]} y={slice[1]} s={s} fill={VERMILION} rotate={turn} />
     </>
-  );
-}
-
-/**
- * The same mark as a flat SVG string, for places that cannot render the
- * component: the share card (Satori takes no filters, so no grain) and the
- * product image Stripe shows at checkout. Same shapes, same placement.
- */
-export function the98cTradeSvg(shade = SHADE): string {
-  const { s, coin, slice, turn, drop } = T98;
-  const g = (d: string, x: number, y: number, fill: string, rotate = 0) =>
-    `<g transform="translate(${x} ${y}) rotate(${rotate}) scale(${s})"><path d="${d}" fill="${fill}"/></g>`;
-  return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 330" width="400" height="330">` +
-    g(DISC_CUT, coin[0] + drop, coin[1] + drop, shade) +
-    g(DISC_CUT, coin[0], coin[1], SAFFRON) +
-    g(SLICE, slice[0] + 6, slice[1] + 6, shade, turn) +
-    g(SLICE, slice[0], slice[1], VERMILION, turn) +
-    `</svg>`
   );
 }
 
@@ -378,6 +361,54 @@ function CodeReviewer() {
       {/* The fault: lifted, turned, and the only colour on the mark. */}
       <Cut d={FLECK} x={188} y={118} s={1.9} rotate={-14} fill={SHADE} />
       <Cut d={FLECK} x={182} y={112} s={1.9} rotate={-14} fill={VERMILION} />
+    </>
+  );
+}
+
+/**
+ * MOTION DIRECTOR — one disc, caught at every frame of a bounce.
+ *
+ * Animation is a still drawn over and over, so the mark is a strobe: the same
+ * disc falling, squashing flat where it hits the floor, and rising again,
+ * ghosted in ultramarine until the last frame lands in vermilion. The row of
+ * flecks under the floor is the soundtrack, one tick per beat, with the hit
+ * on the beat where the disc lands. The only mark in the set that is a
+ * sequence in time rather than an arrangement in space.
+ */
+function MotionDirector() {
+  // x, y, horizontal and vertical scale, opacity: a fall, a squash, a rise.
+  // The squash sits ON the floor (its bottom meets the bar's top edge).
+  const frames: [number, number, number, number, number][] = [
+    [14, 22, 0.44, 0.44, 0.2],
+    [66, 104, 0.44, 0.44, 0.34],
+    [120, 190, 0.52, 0.33, 0.5],
+    [186, 116, 0.44, 0.44, 0.66],
+    [246, 58, 0.44, 0.44, 0.84],
+  ];
+  return (
+    <>
+      {frames.map(([x, y, sx, sy, o], i) => (
+        <Cut key={i} d={DISC} x={x} y={y} s={sx} sy={sy} fill={ULTRAMARINE} opacity={o} />
+      ))}
+      {/* The last frame, where it lands: the only colour that means "now". */}
+      <Cut d={DISC} x={310} y={26} s={0.5} fill={SHADE} />
+      <Cut d={DISC} x={304} y={20} s={0.5} fill={VERMILION} />
+      {/* The floor it bounces on. */}
+      <Cut d={BAR} x={30} y={242} s={1.2} fill={SHADE} rotate={-1} />
+      <Cut d={BAR} x={24} y={236} s={1.2} fill={SAFFRON} rotate={-1} />
+      {/* The beat, under the floor. The hit is the one under the squash. */}
+      {[40, 88, 136, 184, 232, 280, 328].map((x, i) => (
+        <Cut
+          key={x}
+          d={FLECK}
+          x={x}
+          y={i === 2 ? 286 : 292}
+          s={i === 2 ? 0.9 : 0.55}
+          rotate={(i % 3) * 5 - 5}
+          fill={i === 2 ? VERMILION : INK}
+          opacity={i === 2 ? 1 : 0.7}
+        />
+      ))}
     </>
   );
 }
@@ -609,6 +640,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "art-director": ArtDirector,
   "product-manager": ProductManager,
   "code-reviewer": CodeReviewer,
+  "motion-director": MotionDirector,
   // the guides
   "set-up-the-tools": SetUpTheTools,
   "pick-the-model": PickTheModel,
@@ -622,6 +654,11 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "family-masterclass": FamilyMasterclass,
   "family-design": FamilyDesign,
 };
+
+/** A mark's composition, for renderers that need it without the grain filter. */
+export function specimenComposition(id: string): (() => React.ReactElement) | undefined {
+  return MARKS[id];
+}
 
 export function Specimen({
   id,

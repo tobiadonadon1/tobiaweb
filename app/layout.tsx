@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Caveat, Host_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./project-chapters.css";
 import { SiteNav } from "@/components/nav/SiteNav";
@@ -129,6 +130,11 @@ export default function RootLayout({
         <div className="site-content">{children}</div>
         <SiteFooter />
         <CustomCursor />
+        {/* Vercel Web Analytics: visitors, pages, referrers, countries and
+            devices. Cookieless, so no consent banner stands between a post
+            and the page it links to. Switched on for the project in Vercel;
+            it only reports from production deployments. */}
+        <Analytics />
       </body>
     </html>
   );

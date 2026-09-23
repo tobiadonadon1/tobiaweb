@@ -67,20 +67,16 @@ export async function generateMetadata({
 
   if (entry.product) {
     const product = PRODUCTS[entry.product];
-    const description =
-      "A prediction-market bot that sets itself up in Claude Code. Tested on 8,318 past Polymarket trades: 99% paid out. " +
-      `${product.priceLabel}, instant download.`;
+    const description = product.share.description;
     const card = {
       url: `/shop/${product.id}/card`,
       width: 1200,
       height: 630,
-      alt: `${product.name}. A prediction-market bot for Claude Code. ${product.priceLabel}.`,
+      alt: `${product.name}. ${product.share.line} ${product.priceLabel}.`,
     };
     return {
-      // `absolute`: the layout's template would make it "The 98¢ Trade ·
-      // Tobia Donadon", which is right, but the product name should lead a
-      // browser tab on its own.
-      title: { absolute: `${product.name} · A prediction-market bot for Claude Code` },
+      // `absolute`: the product name leads the browser tab on its own.
+      title: { absolute: `${product.name} · ${product.share.kicker.replace(" · ", " ")}` },
       description,
       alternates: { canonical: entryHref(folder.id, entry.slug) },
       openGraph: {
@@ -127,15 +123,17 @@ export default async function MaterialEntryRoute({
   // narrows the two segments for TypeScript.
   if (!found) notFound();
 
-  if (found.entry.product) return <ProductPage id={found.entry.product} />;
+  // A product with a bespoke sales page gets it. Every other product is a
+  // piece in its folder's own format, with a price instead of a download
+  // (EntryPage handles that), so a skill for sale still looks like a skill.
+  if (found.entry.product && BESPOKE[found.entry.product]) {
+    const Page = BESPOKE[found.entry.product]!;
+    return <Page />;
+  }
 
   return <EntryPage folder={found.folder} entry={found.entry} />;
 }
 
-/** One product today. A second one is a new page component and a new line here. */
-function ProductPage({ id }: { id: ProductId }) {
-  switch (id) {
-    case "the-98c-trade":
-      return <The98cTradePage />;
-  }
-}
+const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
+  "the-98c-trade": The98cTradePage,
+};

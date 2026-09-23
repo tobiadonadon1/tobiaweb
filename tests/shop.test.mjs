@@ -32,6 +32,8 @@ const ZIP = Buffer.from("PK\u0003\u0004 not really a zip, but the bytes have to 
 const cwd = mkdtempSync(path.join(tmpdir(), "shop-test-"));
 mkdirSync(path.join(cwd, "private"));
 writeFileSync(path.join(cwd, "private", "the-98c-trade.zip.enc"), seal(ZIP, parseKey(fileKey)));
+const MD_ZIP = Buffer.from("PK\u0003\u0004 a different product, so the files can't be confused " + "y".repeat(2048));
+writeFileSync(path.join(cwd, "private", "motion-director.zip.enc"), seal(MD_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -51,7 +53,7 @@ const { POST: webhook } = await import("../app/api/stripe/webhook/route.ts");
 const { GET: download } = await import("../app/api/download/route.ts");
 const { POST: checkout } = await import("../app/api/checkout/route.ts");
 const { GET: health } = await import("../app/api/shop/health/route.ts");
-const { THE_98C_TRADE, productById } = await import("../lib/shop/products.ts");
+const { THE_98C_TRADE, MOTION_DIRECTOR, productById } = await import("../lib/shop/products.ts");
 
 const ORIGIN = "http://localhost:3000";
 const signer = new Stripe("sk_test_mock").webhooks;
@@ -66,6 +68,7 @@ beforeEach(() => {
   };
   globalThis.__mail = [];
   globalThis.__mailDown = false;
+  globalThis.__mailRefusesZips = false;
   resendCalls.length = 0;
 });
 
@@ -125,6 +128,9 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(THE_98C_TRADE.priceCents, 500);
   assert.equal(THE_98C_TRADE.priceLabel, "€5");
   assert.equal(THE_98C_TRADE.currency, "eur");
+  assert.equal(MOTION_DIRECTOR.href, entryHref("skills", "motion-director"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "motion-director")?.product, "motion-director");
+  assert.equal(MOTION_DIRECTOR.priceLabel, "€5");
   assert.equal(productById("__proto__"), undefined);
   assert.equal(productById("nope"), undefined);
 });
@@ -196,6 +202,47 @@ test("email: without a Gmail password it falls back to Resend, still with the at
   } finally {
     process.env.GMAIL_APP_PASSWORD = saved;
   }
+});
+
+test("webhook: each product ships its own file and its own email", async () => {
+  const md = purchase({ product: "motion-director", name: "Grace Hopper" });
+  const trade = purchase();
+  await webhook(signedEvent(md));
+  await webhook(signedEvent(trade));
+  assert.equal(mail().length, 2);
+
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Motion Director");
+  // Its engine is .mjs files, which Gmail refuses inside a zip: link only.
+  assert.equal(m.attachments.length, 0, "the video skill travels as a link");
+  assert.ok(m.text.includes(`${ORIGIN}/api/download?session_id=${md}`));
+  assert.ok(m.html.includes(`${ORIGIN}/api/download?session_id=${md}`));
+  assert.ok(m.html.includes("motion-director.zip") && !/attached/i.test(m.html + m.text), "never promises an attachment");
+  assert.ok(m.text.includes("/motion-director"));
+  assert.ok(m.html.includes(">/motion-director<"), "the command is set as code");
+  assert.ok(!/TypeSafe|financial advice|paper money/i.test(m.text), "none of the bot's copy");
+
+  const t = mail()[1].message;
+  assert.equal(t.attachments[0].filename, "the-98c-trade.zip");
+  assert.deepEqual(t.attachments[0].content, ZIP);
+  assert.ok(t.text.includes("TypeSafe") && t.text.includes("Not financial advice."));
+});
+
+test("email: a refused attachment goes again as a link, and the buyer gets one email", async () => {
+  globalThis.__mailRefusesZips = true;
+  const id = purchase();
+  const res = await webhook(signedEvent(id));
+  assert.equal(res.status, 200);
+  assert.equal((await res.json()).delivery, "sent");
+  assert.equal(mail().length, 2, "one refused by the server, one delivered");
+  assert.equal(mail()[0].message.attachments.length, 1);
+  const sent = mail()[1].message;
+  assert.equal(sent.attachments.length, 0);
+  assert.ok(sent.text.includes(`${ORIGIN}/api/download?session_id=${id}`));
+  assert.ok(!/attached/i.test(sent.text), "the resent email does not claim an attachment");
+  const meta = globalThis.__stripe.paymentIntents.get(`pi_${id}`).metadata;
+  assert.ok(meta.delivered_at);
+  assert.equal(meta.delivery_file, "link");
 });
 
 test("webhook: the same event twice sends one email", async () => {
@@ -314,6 +361,29 @@ test("checkout: the first sale creates the Stripe product, then every sale reuse
   assert.equal(params.cancel_url, `${ORIGIN}${THE_98C_TRADE.href}`);
 });
 
+test("checkout: Motion Director charges its own price on its own product", async () => {
+  globalThis.__stripe.products.add("motion-director");
+  const res = await buy("motion-director");
+  assert.equal(res.status, 303);
+  const params = globalThis.__stripe.createdSessions[0];
+  assert.equal(params.line_items[0].price_data.product, "motion-director");
+  assert.equal(params.line_items[0].price_data.unit_amount, 500);
+  assert.equal(params.line_items[0].price_data.currency, "eur");
+  assert.equal(params.metadata.product, "motion-director");
+  assert.equal(
+    params.success_url,
+    `${ORIGIN}/projects/construct/material/skills/motion-director/thanks?session_id={CHECKOUT_SESSION_ID}`,
+  );
+});
+
+test("download: each purchase gets its own product's file", async () => {
+  const md = purchase({ product: "motion-director" });
+  const res = await download(new Request(`${ORIGIN}/api/download?session_id=${md}`));
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-disposition"), /filename="motion-director.zip"/);
+  assert.deepEqual(Buffer.from(await res.arrayBuffer()), MD_ZIP);
+});
+
 test("checkout: Stripe down sends the buyer back to the page with a message", async () => {
   globalThis.__stripe.products.add(THE_98C_TRADE.stripeProductId);
   globalThis.__stripe.failCreate = true;
@@ -339,6 +409,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.stripeMode, "test");
   assert.equal(body.emailVia, "gmail");
   assert.equal(body.files["the-98c-trade"].bytes, ZIP.length);
+  assert.equal(body.files["motion-director"].bytes, MD_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

@@ -155,9 +155,9 @@ export const SHELF: ShelfFamily[] = [
     tier: "free",
     open: true,
     tag: "Free",
-    line: "Three skills, three guides, and the first setup.",
-    // Setups are paid, so the promise names what it covers.
-    status: "The skills and guides are free, and stay free.",
+    line: "Four skills, three guides, and the first setup.",
+    // Two things here have a price, so the promise names what it covers.
+    status: "Free unless it shows a price.",
     cta: "Open the material",
     spineRay: 2,
     dividerRay: 4,

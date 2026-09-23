@@ -3,7 +3,12 @@
  *
  * The page prints the price, Stripe charges the price, and the email names the
  * thing that was bought. All three read this object, so the page can never
- * say $5 while the checkout asks for something else.
+ * say one price while the checkout asks for another.
+ *
+ * Each product also carries its own words for the places that are not its
+ * page: the share card, the delivery email and the thank-you page. Those used
+ * to be written for The 98¢ Trade inside the components, which was fine for
+ * one product and wrong the moment there were two.
  *
  * NOTHING SECRET LIVES HERE. This file is imported by the page as well as by
  * the API routes, so it only describes the product. Keys, the decryption of
@@ -13,10 +18,10 @@
  * `href` is written out rather than built with `entryHref` from the material
  * data, because that module pulls in every piece of written content on the
  * site and the payment routes should not have to load a library of guides to
- * find a URL. `products.test.mjs` checks the two agree.
+ * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade";
+export type ProductId = "the-98c-trade" | "motion-director";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -28,7 +33,7 @@ export const SHOP_EMAIL = "tobia10donadon@gmail.com";
 
 export type Product = {
   id: ProductId;
-  /** As it is printed. The cent sign is part of the name. */
+  /** As it is printed. The cent sign is part of the 98¢ Trade's name. */
   name: string;
   /** One line, for Stripe's checkout page and the receipt. */
   description: string;
@@ -43,9 +48,16 @@ export type Product = {
    * THE FILE. `sealed` is the encrypted copy committed to the repository's
    * private/ folder (see scripts/seal-product.mjs), `filename` is what the
    * buyer's browser saves it as. The repository is public, so the zip itself
-   * never is.
+   * never is. Keep it under about 4 MB: Vercel caps a function's response at
+   * 4.5 MB, and the download is served by one.
+   *
+   * `attach: false` sends the delivery email with the download link only.
+   * Gmail refuses any message whose zip holds a script file (.js, .mjs and
+   * friends), whatever the script does, so a product whose folder carries
+   * code it runs cannot travel as an attachment. The link serves the same
+   * file and keeps working.
    */
-  file: { sealed: string; filename: string };
+  file: { sealed: string; filename: string; attach?: boolean };
   /**
    * The product in Stripe, so every sale lands on ONE product in the
    * dashboard rather than on a new inline product per checkout. The price is
@@ -54,6 +66,16 @@ export type Product = {
    * the checkout route creates it on first use.
    */
   stripeProductId: string;
+  /** Meta and share descriptions, and the share card's lines. */
+  share: { description: string; kicker: string; line: string; proof: string };
+  /** The delivery email, after the three setup steps. */
+  email: { after: string[]; footnote?: string };
+  /** The thank-you page: what they need, and what happens next. */
+  thanks: { needs: string; next: [string, string][]; footnote?: string };
+  /** The three steps, in the email and on the thank-you page. */
+  steps: [string, string, string];
+  /** What is in the zip, for pages that list it: [name, what it is]. */
+  contents?: [string, string][];
 };
 
 const SYMBOL = { eur: "€", usd: "$" } as const;
@@ -74,10 +96,91 @@ export const THE_98C_TRADE: Product = {
     filename: "the-98c-trade.zip",
   },
   stripeProductId: "prod_VJUGojh9orpbsI",
+  share: {
+    description:
+      "A prediction-market bot that sets itself up in Claude Code. Tested on 8,318 past Polymarket trades: 99% paid out. €5, instant download.",
+    kicker: "Setup · for Claude Code",
+    line: "A prediction-market bot that sets itself up in Claude Code.",
+    proof: "8,318 trades tested · 99% paid out",
+  },
+  steps: [
+    "Unzip the folder and put it somewhere you'll keep, like Documents.",
+    "Open a terminal in the folder and type claude",
+    "Type hi",
+  ],
+  email: {
+    after: [
+      "Claude takes it from there. It installs what the bot needs, helps you create your one TypeSafe key, runs the first scan and schedules it for every day. About ten minutes.",
+      "It starts on paper money, on real prices. It only suggests real trades after it passes its go-live checklist, and you place every one yourself.",
+    ],
+    footnote: "Not financial advice.",
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code, and you'll create one TypeSafe key when Claude asks for it. Keep the key in the .env file, not in the chat.",
+    next: [
+      ["Tomorrow", "The first paper orders either fill, because real trades reached their price, or expire."],
+      ["In about a week", "The first positions settle. About 99 in 100 pay out; about 1 in 100 loses its stake."],
+      ["In 4 to 8 weeks", "The go-live checklist has enough data to judge. Type /status any time to see how close it is."],
+    ],
+    footnote: "Not financial advice.",
+  },
+};
+
+export const MOTION_DIRECTOR: Product = {
+  id: "motion-director",
+  name: "Motion Director",
+  description:
+    "A Claude Code skill that turns any idea into a finished 10 to 20 second video with its own original soundtrack. Instant download.",
+  priceCents: 500,
+  currency: "eur",
+  priceLabel: money(500, "eur"),
+  href: "/projects/construct/material/skills/motion-director",
+  file: {
+    sealed: "motion-director.zip.enc",
+    filename: "motion-director.zip",
+    // The engine is .mjs files, which Gmail blocks inside a zip.
+    attach: false,
+  },
+  stripeProductId: "motion-director",
+  share: {
+    description:
+      "A Claude Code skill that turns any idea into a finished 10 to 20 second video with its own original soundtrack, in about ten minutes. €5, instant download.",
+    kicker: "Skill · for Claude Code",
+    line: "Any idea, a finished video with its own soundtrack, in ten minutes.",
+    proof: "1080p MP4 · original music · yours to use",
+  },
+  contents: [
+    ["SKILL.md", "the workflow Claude follows, from your idea to the MP4"],
+    ["references/", "the craft playbook: twists, timing, sound and the four looks"],
+    ["engine/", "the animation, music and render engine, with open-licensed fonts"],
+    ["examples/", "four finished films as code, one per look, to learn from"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs it in about two minutes.",
+  ],
+  email: {
+    after: [
+      "From then on, type /motion-director in any Claude Code session, or just ask for a video, and answer a couple of quick questions: where it's going, how long, and which look.",
+      "About ten minutes later the MP4 is in the Motion Director Videos folder on your Desktop. Every video and its soundtrack is yours to use, commercially too.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. If Node is missing, Claude will tell you.",
+    next: [
+      ["Right after install", "Claude offers to make your first video. Tell it what it's about."],
+      ["Every video", "Two quick rounds of questions, then about ten minutes to a finished MP4 on your Desktop."],
+      ["Want changes?", "Say \"faster\", \"change the headline\" or \"make a square version\" and it renders again."],
+    ],
+  },
 };
 
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
+  "motion-director": MOTION_DIRECTOR,
 };
 
 export function productById(id: unknown): Product | undefined {

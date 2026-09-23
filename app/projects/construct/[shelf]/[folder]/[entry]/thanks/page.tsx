@@ -4,6 +4,7 @@ import { ArrowLeft, Download } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { FOLDER_BY_ID } from "@/components/superhuman/material/material-data";
 import { Specimen } from "@/components/superhuman/material/specimens";
+import { Commands } from "@/components/superhuman/material/product/commands";
 import { downloadHref, PRODUCTS, SHOP_EMAIL as EMAIL, type Product } from "@/lib/shop/products";
 import { findPurchase, type Purchase } from "@/lib/shop/stripe";
 
@@ -148,18 +149,10 @@ function Paid({
 
       <section aria-labelledby="steps-title" className="mt-20">
         <h2 id="steps-title" className={label}>
-          Three steps, about ten minutes
+          Three steps
         </h2>
         <ol className="mt-5 list-none border-b border-[var(--hairline)]">
-          {[
-            <>Unzip the folder and put it somewhere you&rsquo;ll keep, like Documents.</>,
-            <>
-              Open a terminal in the folder and type <Kbd>claude</Kbd>
-            </>,
-            <>
-              Type <Kbd>hi</Kbd>. Claude takes it from there.
-            </>,
-          ].map((step, i) => (
+          {product.steps.map((step, i) => (
             <li
               key={i}
               className="flex items-baseline gap-5 border-t border-[var(--hairline)] py-4 text-[1.08rem] leading-[1.55] text-[var(--ink)]"
@@ -167,14 +160,14 @@ function Paid({
               <span className="w-6 shrink-0 font-mono text-[0.78rem] tracking-[0.1em] text-[var(--accent-clay-text)]">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span>{step}</span>
+              <span>
+                <Commands text={step} />
+              </span>
             </li>
           ))}
         </ol>
         <p className="mt-5 text-pretty text-[0.98rem] leading-[1.6] text-[color:rgba(11,31,58,0.66)]">
-          You&rsquo;ll need Claude Code, and you&rsquo;ll create one TypeSafe
-          key when Claude asks for it. Keep the key in the <Kbd>.env</Kbd> file,
-          not in the chat.
+          {product.thanks.needs}
         </p>
       </section>
 
@@ -183,11 +176,7 @@ function Paid({
           What happens next
         </h2>
         <dl className="mt-5 border-b border-[var(--hairline)]">
-          {[
-            ["Tomorrow", "The first paper orders either fill, because real trades reached their price, or expire."],
-            ["In about a week", "The first positions settle. About 99 in 100 pay out; about 1 in 100 loses its stake."],
-            ["In 4 to 8 weeks", "The go-live checklist has enough data to judge. Type /status any time to see how close it is."],
-          ].map(([when, what]) => (
+          {product.thanks.next          .map(([when, what]) => (
             <div key={when} className="grid grid-cols-1 gap-1 border-t border-[var(--hairline)] py-4 sm:grid-cols-[9rem_1fr] sm:gap-6">
               <dt className="text-[1rem] text-[var(--ink)]">{when}</dt>
               <dd className="text-pretty text-[1rem] leading-[1.6] text-[color:rgba(11,31,58,0.7)]">{what}</dd>
@@ -204,7 +193,7 @@ function Paid({
         >
           {EMAIL}
         </a>
-        . It comes straight to me. Not financial advice.
+        . It comes straight to me.{product.thanks.footnote ? ` ${product.thanks.footnote}` : ""}
       </p>
     </>
   );
@@ -257,13 +246,5 @@ function Contact({ product }: { product: Product }) {
         {EMAIL}
       </a>
     </p>
-  );
-}
-
-function Kbd({ children }: { children: React.ReactNode }) {
-  return (
-    <code className="rounded-md border border-[var(--hairline)] bg-[rgba(11,31,58,0.045)] px-1.5 py-0.5 font-mono text-[0.92em] text-[var(--ink)]">
-      {children}
-    </code>
   );
 }

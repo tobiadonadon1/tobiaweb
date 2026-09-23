@@ -12,6 +12,13 @@ import { ShopNotConfigured, stripe, type Purchase } from "./stripe";
  * Replies go straight back to the same inbox, and every delivery sits in his
  * Sent folder.
  *
+ * WHEN THE ZIP CANNOT TRAVEL. Gmail refuses a message outright (552 5.7.0)
+ * when a zip holds a script file, and refuses one that is too big. So a
+ * product marked `attach: false` goes out with the link only, and if the
+ * server refuses an attachment anyway, the same email goes again with the
+ * link only. A refused message was never delivered, so the second send is
+ * still the buyer's only email.
+ *
  * TWO WAYS OUT, chosen by what is configured:
  *
  *   Gmail SMTP   GMAIL_APP_PASSWORD is set (a Google "App Password", not the
@@ -47,7 +54,7 @@ type Message = {
   subject: string;
   html: string;
   text: string;
-  attachment: { filename: string; content: Buffer };
+  attachment?: { filename: string; content: Buffer };
   sessionId: string;
   product: Product;
 };
@@ -79,7 +86,9 @@ async function viaGmail(msg: Message): Promise<string> {
     subject: msg.subject,
     text: msg.text,
     html: msg.html,
-    attachments: [{ filename: msg.attachment.filename, content: msg.attachment.content, contentType: "application/zip" }],
+    attachments: msg.attachment
+      ? [{ filename: msg.attachment.filename, content: msg.attachment.content, contentType: "application/zip" }]
+      : [],
   });
   if (!info.accepted?.length) {
     throw new Error(`Gmail did not accept the delivery email: ${info.response ?? "no response"}`);
@@ -93,7 +102,8 @@ async function viaResend(msg: Message): Promise<string> {
     headers: {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
-      "Idempotency-Key": `delivery/${msg.sessionId}`,
+      // A link-only resend is a different message, so it needs its own key.
+      "Idempotency-Key": `delivery/${msg.sessionId}${msg.attachment ? "" : "/link"}`,
     },
     body: JSON.stringify({
       from: `${FROM_NAME} <${sender()}>`,
@@ -102,7 +112,9 @@ async function viaResend(msg: Message): Promise<string> {
       subject: msg.subject,
       html: msg.html,
       text: msg.text,
-      attachments: [{ filename: msg.attachment.filename, content: msg.attachment.content.toString("base64") }],
+      attachments: msg.attachment
+        ? [{ filename: msg.attachment.filename, content: msg.attachment.content.toString("base64") }]
+        : undefined,
       tags: [{ name: "product", value: msg.product.id.replace(/[^\w-]/g, "_") }],
     }),
     signal: AbortSignal.timeout(20_000),
@@ -122,24 +134,41 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
   const via = emailTransport();
   if (!via) throw new ShopNotConfigured("GMAIL_APP_PASSWORD");
 
-  const { subject, html, text } = deliveryEmail(purchase, origin);
-  const msg: Message = {
-    to: purchase.email,
-    subject,
-    html,
-    text,
-    attachment: { filename: purchase.product.file.filename, content: await productFile(purchase.product) },
-    sessionId: purchase.session.id,
-    product: purchase.product,
+  const to = purchase.email;
+  const send = async (attached: boolean) => {
+    const msg: Message = {
+      to,
+      ...deliveryEmail(purchase, origin, { attached }),
+      attachment: attached
+        ? { filename: purchase.product.file.filename, content: await productFile(purchase.product) }
+        : undefined,
+      sessionId: purchase.session.id,
+      product: purchase.product,
+    };
+    return via === "gmail" ? viaGmail(msg) : viaResend(msg);
   };
 
-  const id = via === "gmail" ? await viaGmail(msg) : await viaResend(msg);
+  let file: "attached" | "link" = purchase.product.file.attach === false ? "link" : "attached";
+  let id: string;
+  try {
+    id = await send(file === "attached");
+  } catch (err) {
+    if (file === "link" || !refusedAttachment(err)) throw err;
+    console.warn("[shop] the mail server refused the attachment, sending the link instead", err);
+    file = "link";
+    id = await send(false);
+  }
 
   // The stamp is bookkeeping. If it fails, the email has still gone.
   if (purchase.paymentIntent) {
     try {
       await stripe().paymentIntents.update(purchase.paymentIntent.id, {
-        metadata: { delivered_at: new Date().toISOString(), delivery_email: id.slice(0, 200), delivery_via: via },
+        metadata: {
+          delivered_at: new Date().toISOString(),
+          delivery_email: id.slice(0, 200),
+          delivery_via: via,
+          delivery_file: file,
+        },
       });
     } catch (err) {
       console.warn("[shop] delivered but could not stamp the payment", err);
@@ -149,12 +178,19 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
   return { status: "sent", id, via };
 }
 
+/** A refusal about the message's content or size (SMTP 552), not the connection. */
+function refusedAttachment(err: unknown): boolean {
+  const e = err as { responseCode?: number; message?: string } | null;
+  return e?.responseCode === 552 || /\b552\b|attachment/i.test(e?.message ?? "");
+}
+
 /* ------------------------------------------------------------------ *
  * THE MESSAGE.
  *
  * Written like a note from a person, because it is one: it comes from Tobia's
- * address and a reply reaches him. The zip is attached; one button links to
- * the same file, then the three steps, then what to do if something breaks.
+ * address and a reply reaches him. The zip is attached (or, where it cannot
+ * be, only linked); one button links to the file, then the three steps, then
+ * what to do if something breaks.
  * Most people buy from a phone and the folder is only useful on a computer,
  * so the email says where to open it.
  * ------------------------------------------------------------------ */
@@ -177,7 +213,11 @@ export function emailBase(purchase: Purchase, origin: string): string {
   return purchase.session.livemode ? SITE : origin;
 }
 
-export function deliveryEmail(purchase: Purchase, origin: string) {
+export function deliveryEmail(
+  purchase: Purchase,
+  origin: string,
+  { attached = purchase.product.file.attach !== false }: { attached?: boolean } = {},
+) {
   const { product, session } = purchase;
   const base = emailBase(purchase, origin);
   const download = `${base}${downloadHref(session.id)}`;
@@ -185,32 +225,32 @@ export function deliveryEmail(purchase: Purchase, origin: string) {
   const first = purchase.name?.trim().split(/\s+/)[0];
   const hello = first ? `Hi ${first},` : "Hi,";
   const file = product.file.filename;
+  const { steps, email } = product;
 
   const subject = `Your copy of ${product.name}`;
 
   const text = [
     hello,
     "",
-    `Thanks for buying ${product.name}. Your copy is attached (${file}).`,
-    "If your email app hides the attachment, download it here:",
+    ...(attached
+      ? [
+          `Thanks for buying ${product.name}. Your copy is attached (${file}).`,
+          "If your email app hides the attachment, download it here:",
+        ]
+      : [`Thanks for buying ${product.name}. Download your copy (${file}) here:`]),
     download,
     "",
     "Open it on the computer you will run it on:",
-    "1. Unzip the folder and put it somewhere you'll keep, like Documents.",
-    "2. Open a terminal in the folder and type: claude",
-    "3. Type: hi",
+    ...steps.map((s, i) => `${i + 1}. ${s}`),
     "",
-    "Claude takes it from there. It installs what the bot needs, helps you create your one TypeSafe key, runs the first scan and schedules it for every day. About ten minutes.",
-    "",
-    "It starts on paper money, on real prices. It only suggests real trades after it passes its go-live checklist, and you place every one yourself.",
-    "",
+    ...email.after.flatMap((para) => [para, ""]),
     "If anything doesn't work, reply to this email. It comes straight to me.",
     "",
     "Tobia",
     "",
     "",
     `The download link is yours and keeps working. The setup steps are also here: ${guide}`,
-    "Not financial advice.",
+    ...(email.footnote ? [email.footnote] : []),
   ].join("\n");
 
   const ink = "#0b1f3a";
@@ -224,32 +264,41 @@ export function deliveryEmail(purchase: Purchase, origin: string) {
     `<tr><td style="padding:10px 14px 10px 0;vertical-align:top;font:500 13px/1.6 ${font};color:${clay};">${n}</td><td style="padding:10px 0;border-top:1px solid rgba(11,31,58,0.12);font:400 15px/1.6 ${font};color:${ink};">${s}</td></tr>`;
   const code = (s: string) =>
     `<span style="font-family:Menlo,Consolas,monospace;font-size:14px;background:#f1ede4;padding:2px 6px;border-radius:4px;">${s}</span>`;
+  // What the buyer types, set as code: the lowercase commands only, so
+  // "Claude Code" in a sentence is left alone.
+  const commands = (s: string) =>
+    escape(s).replace(/(^|\s)(claude|hi|\/[a-z-]+)(?=[\s.,]|$)/g, (_, pre, cmd) => `${pre}${code(cmd)}`);
 
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(subject)}</title></head>
 <body style="margin:0;padding:0;background:#faf8f2;">
-<div style="display:none;max-height:0;overflow:hidden;">Your copy is attached. Unzip it, open it in Claude Code, type hi.</div>
+<div style="display:none;max-height:0;overflow:hidden;">${attached ? "Your copy is attached." : "Your download is inside."} Unzip it, open it in Claude Code, type hi.</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf8f2;"><tr><td align="center" style="padding:40px 20px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
 <tr><td>
 <p style="margin:0 0 28px;font:400 12px/1 ${font};letter-spacing:0.14em;text-transform:uppercase;color:${soft};">${escape(product.name)} · ${escape(product.priceLabel)} · Paid</p>
 ${p(escape(hello))}
-${p(`Thanks for buying ${escape(product.name)}. Your copy is attached as <strong style="font-weight:500;">${escape(file)}</strong>.`)}
+${p(
+  attached
+    ? `Thanks for buying ${escape(product.name)}. Your copy is attached as <strong style="font-weight:500;">${escape(file)}</strong>.`
+    : `Thanks for buying ${escape(product.name)}. Your copy is one click away.`,
+)}
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 12px;"><tr><td style="border-radius:999px;background:${clay};">
 <a href="${escape(download)}" style="display:inline-block;padding:14px 26px;font:500 15px/1 ${font};color:#faf8f2;text-decoration:none;border-radius:999px;">Download ${escape(product.name)}</a>
 </td></tr></table>
-<p style="margin:0 0 28px;font:400 13px/1.5 ${font};color:${soft};">The same file, in case your email app hides the attachment.</p>
+<p style="margin:0 0 28px;font:400 13px/1.5 ${font};color:${soft};">${
+  attached
+    ? "The same file, in case your email app hides the attachment."
+    : `It saves as <strong style="font-weight:500;">${escape(file)}</strong>.`
+}</p>
 ${p(`<span style="color:${soft};">Open it on the computer you will run it on:</span>`)}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border-bottom:1px solid rgba(11,31,58,0.12);">
-${step(1, "Unzip the folder and put it somewhere you'll keep, like Documents.")}
-${step(2, `Open a terminal in the folder and type ${code("claude")}`)}
-${step(3, `Type ${code("hi")}`)}
+${steps.map((s, i) => step(i + 1, commands(s))).join("\n")}
 </table>
-${p("Claude takes it from there. It installs what the bot needs, helps you create your one TypeSafe key, runs the first scan and schedules it for every day. About ten minutes.")}
-${p("It starts on paper money, on real prices. It only suggests real trades after it passes its go-live checklist, and you place every one yourself.")}
+${email.after.map((para) => p(commands(para))).join("\n")}
 ${p("If anything doesn't work, reply to this email. It comes straight to me.")}
 ${p("Tobia")}
-<p style="margin:32px 0 0;padding-top:20px;border-top:1px solid rgba(11,31,58,0.12);font:400 13px/1.6 ${font};color:${soft};">The download link is yours and keeps working. The setup steps are also <a href="${escape(guide)}" style="color:${soft};">on this page</a>. Not financial advice.</p>
+<p style="margin:32px 0 0;padding-top:20px;border-top:1px solid rgba(11,31,58,0.12);font:400 13px/1.6 ${font};color:${soft};">The download link is yours and keeps working. The setup steps are also <a href="${escape(guide)}" style="color:${soft};">on this page</a>.${email.footnote ? ` ${escape(email.footnote)}` : ""}</p>
 </td></tr></table>
 </td></tr></table>
 </body></html>`;

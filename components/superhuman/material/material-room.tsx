@@ -162,10 +162,10 @@ export function MaterialRoom() {
         <h1 className="text-balance font-serif text-[clamp(1.7rem,4.2vw,2.75rem)] leading-[1.12] tracking-[-0.032em] text-[var(--ink)]">
           Everything here is something I use.
         </h1>
-        {/* Setups are paid now, so the promise names what it covers
-            rather than claiming the whole room. */}
+        {/* Some things here have a price now, and each one says so on its
+            own face, so the promise covers everything else. */}
         <p className="mt-6 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          Skills and guides are free, and stay free
+          Free unless it shows a price
         </p>
       </header>
 

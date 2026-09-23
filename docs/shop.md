@@ -1,8 +1,13 @@
 # The shop
 
-How a sale works, and the one-time setup to switch it on. The first product is
-**The 98¢ Trade**, at `/projects/construct/material/setups/the-98c-trade`
-(short link for posts: **tobiadonadon.com/98c**).
+How a sale works, and the one-time setup to switch it on. Two products, both
+€5, both defined once in `lib/shop/products.ts`:
+
+- **The 98¢ Trade**, at `/projects/construct/material/setups/the-98c-trade`
+  (short link for posts: **tobiadonadon.com/98c**). Its own sales page.
+- **Motion Director**, at `/projects/construct/material/skills/motion-director`.
+  A skill page in the same format as the free skills, with a buy button where
+  the download would be.
 
 ## How a sale works
 
@@ -11,9 +16,12 @@ How a sale works, and the one-time setup to switch it on. The first product is
 2. **Paid.** Stripe sends the buyer to `…/the-98c-trade/thanks?session_id=…`.
    The page asks Stripe whether that session is paid and shows the download.
 3. **Email.** Stripe calls `/api/stripe/webhook`; the site emails the buyer
-   **from tobia10donadon@gmail.com** through Gmail, with the zip attached and
-   a download link as backup. Replies go to that inbox, and every delivery is
-   in its Sent folder. The webhook is the only sender, so it can't go twice;
+   **from tobia10donadon@gmail.com** through Gmail. The 98¢ Trade's zip is
+   attached, with a download link as backup. Motion Director's email has the
+   download link only (`attach: false`): Gmail blocks any zip holding script
+   files, and its engine is `.mjs` files. If Gmail ever refuses an attachment
+   anyway, the same email goes again with the link only. Replies go to that
+   inbox, and every delivery is in its Sent folder. The webhook is the only sender, so it can't go twice;
    if it fails, Stripe retries for three days.
 4. **Download.** `/api/download?session_id=…` checks with Stripe again, then
    serves the zip. The link in the email keeps working.
@@ -23,8 +31,9 @@ How a sale works, and the one-time setup to switch it on. The first product is
 **There is no database.** Stripe is the record of every purchase: who, when,
 what, and whether the email went (the payment is stamped `delivered_at`).
 
-**The zip is encrypted in the repo** (`private/the-98c-trade.zip.enc`),
-because the repo is public. The key lives only in `.env.local` and in Vercel.
+**The zips are encrypted in the repo** (`private/*.zip.enc`), because the
+repo is public. Keep each under about 4 MB: Vercel's function responses stop
+at 4.5 MB and the download is served by one. The key lives only in `.env.local` and in Vercel.
 
 ## One-time setup
 
@@ -78,11 +87,12 @@ Then redeploy.
   your Gmail within a minute. Then
   refund yourself in Stripe → Payments.
 
-## Shipping a new version of the bot
+## Shipping a new version
 
 ```
 npm run seal -- ~/Desktop/JevTrader/dist/the-98c-trade.zip
-git add private && git commit -m "New version of The 98¢ Trade" && git push
+npm run seal -- ~/Desktop/motion-director.zip
+git add private && git commit -m "New version of …" && git push
 ```
 
 Use the same `SHOP_FILE_KEY` (the script reads it from `.env.local`). Every
@@ -99,6 +109,12 @@ buyer's link serves the new version.
   Logs for `[shop]`.
 - **Webhook failures** show in Stripe → Webhooks → your endpoint, with each
   attempt and its response.
+
+## Analytics
+
+Vercel Web Analytics is on for the project (`<Analytics />` in
+`app/layout.tsx`). Visitors, pages, referrers and countries are in Vercel →
+the project → Analytics. No cookies, so no consent banner. Sales are in Stripe.
 
 ## Tests
 

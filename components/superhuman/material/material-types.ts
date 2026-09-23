@@ -84,7 +84,19 @@ export type Block =
    * to make sense with the picture missing. A diagram nobody can read from its
    * caption alone is decoration.
    */
-  | { type: "figure"; id: string; caption: string };
+  | { type: "figure"; id: string; caption: string }
+  /**
+   * WORK IT ACTUALLY MADE, PLAYING.
+   *
+   * For a piece whose output is a video, the honest proof is the videos. Each
+   * one is a real render, muted until tapped, playing only while on screen.
+   * `label` names the look; the caption says what the set is.
+   */
+  | {
+      type: "reel";
+      caption: string;
+      items: { src: string; poster: string; label: string; aspect: "16/9" | "9/16" | "1/1" }[];
+    };
 
 export type MaterialEntry = {
   /** Stable, lowercase, hyphenated. It is the deep link into the folder. */
@@ -121,9 +133,11 @@ export type MaterialEntry = {
   referral?: boolean;
   /**
    * SOMETHING YOU BUY, not something you read. Names a product in
-   * lib/shop/products.ts, which owns the price; the entry route renders the
-   * product page for it instead of the reading page. A piece can only be
-   * paid by pointing here, so nothing gets a price by accident.
+   * lib/shop/products.ts, which owns the price. The entry route renders the
+   * product's bespoke sales page if it has one (The 98¢ Trade), and otherwise
+   * the piece in its folder's own format with a buy button where a download
+   * would be (Motion Director). A piece can only be paid by pointing here, so
+   * nothing gets a price by accident.
    */
   product?: ProductId;
 };
