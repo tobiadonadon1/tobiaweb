@@ -24,14 +24,11 @@ import { WhyMeMascot } from "./why-me-mascot";
  */
 
 /**
- * THE EMPLOYER, NAMED. It was left as null with a note that naming it is "the
- * single biggest credibility gain available in this section": "a company",
- * unnamed, reads as either an NDA or an exaggeration and the reader cannot
- * tell which. Tobia asked for it to hit harder. The name does that on its own,
- * set as the card's one big fact the way the neighbouring cards set "15" and
- * "2.5 yrs", with no ranking claim beside it that nobody could check.
+ * THE EMPLOYER, DESCRIBED BUT NOT NAMED. Tobia's call: the card should say
+ * what kind of company it is, strongly, without the name. So it leads with
+ * that sentence at display size, the way the neighbouring cards lead with
+ * "15" and "2.5 yrs", and claims nothing that needs a number to back it.
  */
-const EMPLOYER = "Cisco";
 
 const GLASS_BG =
   "linear-gradient(145deg, rgba(253,252,249,0.9), rgba(247,245,239,0.7))";
@@ -120,8 +117,8 @@ export function WhyMeSection() {
         >
           <WhyMeMascot scope={stage} />
 
-          {/* Tall left, on ink: the day job, named, and the standard that
-              comes with it. It used to be a paragraph claiming
+          {/* Tall left, on ink: the day job, described, and the standard
+              that comes with it. It used to be a paragraph claiming
               proximity to "the brightest minds in the room", which is
               unverifiable, immodest, and the exact thing the voice forbids. */}
           <motion.article
@@ -149,15 +146,14 @@ export function WhyMeSection() {
               </span>
               {/* The fact, at the size of a fact, like "15" and "2.5 yrs"
                   beside it. */}
-              <h3 className="mt-5 font-serif text-[clamp(3.6rem,7vw,5.6rem)] leading-[0.9] tracking-[-0.045em] text-[#faf8f2]">
-                {EMPLOYER}.
+              <h3 className="mt-5 max-w-[14ch] text-balance font-serif text-[clamp(2.1rem,3.4vw,2.9rem)] leading-[1.02] tracking-[-0.035em] text-[#faf8f2]">
+                I work at one of the{" "}
+                <span className="text-[#7dd3fc]">most important networking companies</span>{" "}
+                in the world.
               </h3>
-              <p className="mt-5 max-w-sm text-pretty text-lg leading-snug text-[#faf8f2] md:text-xl">
-                One of the largest networking companies in the world.
-              </p>
               <p className="mt-auto max-w-sm pt-8 text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
-                I work there full time, on systems real teams depend on. That
-                standard is the one I hold my own work to.
+                Full time, on systems real teams depend on. That standard is
+                the one I hold my own work to.
               </p>
             </div>
           </motion.article>
