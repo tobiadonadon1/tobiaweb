@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { SITE } from "@/lib/site";
 import { productFile } from "./file";
 import { downloadHref, SHOP_EMAIL, thanksHref, type Product } from "./products";
 import { ShopNotConfigured, stripe, type Purchase } from "./stripe";
@@ -161,10 +162,26 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
 const escape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
+/**
+ * WHERE THE EMAIL'S LINKS POINT.
+ *
+ * A real purchase always links to the public site, whatever server happened
+ * to handle the webhook: a buyer's email must never carry a localhost or
+ * preview address, because the link has to keep working for as long as they
+ * keep the email. Only a test-mode purchase links back to the copy of the
+ * site that processed it, since the public site runs on live keys and cannot
+ * see test purchases. (The first sandbox run linked to localhost for exactly
+ * this reason, and it looked like a broken download.)
+ */
+export function emailBase(purchase: Purchase, origin: string): string {
+  return purchase.session.livemode ? SITE : origin;
+}
+
 export function deliveryEmail(purchase: Purchase, origin: string) {
   const { product, session } = purchase;
-  const download = `${origin}${downloadHref(session.id)}`;
-  const guide = `${origin}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`;
+  const base = emailBase(purchase, origin);
+  const download = `${base}${downloadHref(session.id)}`;
+  const guide = `${base}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`;
   const first = purchase.name?.trim().split(/\s+/)[0];
   const hello = first ? `Hi ${first},` : "Hi,";
   const file = product.file.filename;

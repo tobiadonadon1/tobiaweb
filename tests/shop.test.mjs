@@ -169,6 +169,17 @@ test("webhook: a paid purchase gets the email from Gmail, with the zip attached,
   assert.equal(resendCalls.length, 0, "Resend is not used when Gmail is configured");
 });
 
+test("email: a live purchase always links to the public site, even from a local server", async () => {
+  const id = purchase();
+  globalThis.__stripe.sessions.get(id).livemode = true;
+  await webhook(signedEvent(id));
+  const { message } = mail()[0];
+  const link = `https://www.tobiadonadon.com/api/download?session_id=${id}`;
+  assert.ok(message.html.includes(link), "the button points at the public site");
+  assert.ok(message.text.includes(link));
+  assert.ok(!message.html.includes("localhost") && !message.text.includes("localhost"), "no localhost anywhere");
+});
+
 test("email: without a Gmail password it falls back to Resend, still with the attachment", async () => {
   const saved = process.env.GMAIL_APP_PASSWORD;
   delete process.env.GMAIL_APP_PASSWORD;
