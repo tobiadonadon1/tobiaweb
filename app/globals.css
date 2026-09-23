@@ -962,11 +962,91 @@ body[data-footer-open] .sh-compass {
   animation: material-cell-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---------------------------------------------------------------------------
+   THE 98¢ TRADE, "WHAT YOU GET": one pinned stage (value-section.tsx).
+
+   The section is a viewport tall plus its scroll travel, and the stage inside
+   it sticks. JavaScript writes each point's opacity and a small --lift as the
+   reader scrolls; CSS only lays them out. On a phone the four points share one
+   grid cell and cross over; on desktop they are a ruled list with the current
+   one lit. Reduced motion unpins everything and shows every point.
+   --------------------------------------------------------------------------- */
+.value-pin {
+  height: calc(100svh + var(--value-travel, 210svh));
+}
+
+.value-item {
+  transform: translateY(var(--lift, 0px));
+  will-change: opacity, transform;
+}
+
+@media (max-width: 1023px) {
+  .value-list {
+    display: grid;
+  }
+  .value-list > .value-item {
+    grid-area: 1 / 1;
+    opacity: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .value-list {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .value-list > .value-item {
+    cursor: pointer;
+    border-top: 1px solid var(--hairline);
+    padding: 1.15rem 0 1.3rem;
+    opacity: 0.26;
+  }
+  .value-list > .value-item[data-current] h3 {
+    color: var(--ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value-pin {
+    height: auto;
+  }
+  .value-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-bottom: 4rem;
+  }
+  .value-stage > div {
+    display: block;
+  }
+  .value-stage > div > div:first-of-type {
+    height: 320px;
+    margin: 2rem 0;
+  }
+  .value-list {
+    display: block;
+  }
+  .value-list > .value-item {
+    opacity: 1 !important;
+    transform: none !important;
+    margin-bottom: 1.5rem;
+  }
+  .value-rail {
+    display: none;
+  }
+}
+
+/* The product page's mark arrives the way the room's cells do: out of a
+   blur, a short rise. Once, on load, and frozen under reduced motion. */
+.product-hero-mark {
+  animation: material-cell-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Reduced motion freezes the entrance, it does not remove the cell: the
    grid still has to be readable with everything switched off. The locked
    cells keep their blur, because that blur is content, not decoration. */
 @media (prefers-reduced-motion: reduce) {
-  .material-cell {
+  .material-cell,
+  .product-hero-mark {
     animation: none;
   }
 }

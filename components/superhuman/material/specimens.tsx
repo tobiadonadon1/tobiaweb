@@ -27,8 +27,8 @@
  * cut shape at 200px is a poster.
  *
  * NO HOOKS. These render inside server components, so filter ids are derived
- * from the mark's own id rather than from useId. Two marks never share a
- * document-level id because no page draws the same mark twice.
+ * from the mark's own id rather than from useId. A page that draws the same
+ * mark twice passes `instance` so the two filter ids still differ.
  */
 
 /* ------------------------------------------------------------------ *
@@ -72,6 +72,27 @@ const BAR =
 /** A wedge. The only shape here that points at anything. */
 const WEDGE =
   "M5 2 L34 17 L63 31 L92 46 L120 61 L91 76 L62 90 L33 105 L2 119 L8 90 L3 60 L9 31 Z";
+
+/**
+ * THE DISC WITH A SLICE OUT OF IT, and the slice.
+ *
+ * Not a paper-coloured wedge laid over a disc: that leaves a pale ghost where
+ * it crosses the shadow. This is the disc's own outline, cut along two radii
+ * 26 degrees apart, and SLICE is exactly the piece that was removed, torn edge
+ * and all, so the two fit back together. Computed once from DISC and written
+ * out, like every other shape here.
+ */
+const DISC_CUT =
+  "M121.1 26.8 L131 34 L135 49 L131 61 L139 72 L132 86 L124 97 L125 110 L110 118 L98 126 L86 133 L71 131 L58 138 L45 130 L33 124 L22 118 L15 106 L5 97 L3 83 L1 69 L6 55 L3 43 L13 32 L20 20 L33 14 L44 6 L57 7 L69 1 L83 6 L96 4 L98.4 5.9 L69 69 Z";
+const SLICE = "M69 69 L98.4 5.9 L110 15 L120 26 L121.1 26.8 Z";
+
+/**
+ * The outlines and colours the 3D coin on the product page is built from
+ * (product/coin-stage.tsx), exported so the flat mark and the solid one are
+ * cut from the same paper and cannot drift apart.
+ */
+export const MARK_SHAPES = { DISC, DISC_CUT, SLICE } as const;
+export const MARK_PALETTE = { INK, VERMILION, ULTRAMARINE, SAFFRON, FOREST } as const;
 
 /** A small fleck, for the fragments in the reviewer's field. */
 const FLECK =
@@ -221,6 +242,55 @@ function Setups() {
       <Cut d={BAR} x={70} y={104} s={0.86} fill={INK} rotate={2} />
       <Cut d={BAR} x={56} y={54} s={0.72} fill={VERMILION} rotate={-2} />
     </>
+  );
+}
+
+/* ================================================================== *
+ * THE SETUPS.
+ * ================================================================== */
+
+/**
+ * THE 98¢ TRADE — a coin with a slice taken out.
+ *
+ * The whole strategy is the last couple of cents of a dollar: buy at 98¢,
+ * collect $1. So the mark is a coin that is nearly whole, and the missing
+ * slice lifted out and turned, in vermilion because it is the only part that
+ * matters. It is the only mark in the set made of one thing and its own
+ * missing piece.
+ *
+ * T98 is where the coin and its slice sit, shared by the component and the
+ * flat SVG below so the two cannot drift apart.
+ */
+const T98 = { s: 1.66, coin: [38, 56], slice: [74.5, 20.2], turn: -8, drop: 7 } as const;
+
+function The98cTrade() {
+  const { s, coin, slice, turn, drop } = T98;
+  return (
+    <>
+      <Cut d={DISC_CUT} x={coin[0] + drop} y={coin[1] + drop} s={s} fill={SHADE} />
+      <Cut d={DISC_CUT} x={coin[0]} y={coin[1]} s={s} fill={SAFFRON} />
+      <Cut d={SLICE} x={slice[0] + 6} y={slice[1] + 6} s={s} fill={SHADE} rotate={turn} />
+      <Cut d={SLICE} x={slice[0]} y={slice[1]} s={s} fill={VERMILION} rotate={turn} />
+    </>
+  );
+}
+
+/**
+ * The same mark as a flat SVG string, for places that cannot render the
+ * component: the share card (Satori takes no filters, so no grain) and the
+ * product image Stripe shows at checkout. Same shapes, same placement.
+ */
+export function the98cTradeSvg(shade = SHADE): string {
+  const { s, coin, slice, turn, drop } = T98;
+  const g = (d: string, x: number, y: number, fill: string, rotate = 0) =>
+    `<g transform="translate(${x} ${y}) rotate(${rotate}) scale(${s})"><path d="${d}" fill="${fill}"/></g>`;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 330" width="400" height="330">` +
+    g(DISC_CUT, coin[0] + drop, coin[1] + drop, shade) +
+    g(DISC_CUT, coin[0], coin[1], SAFFRON) +
+    g(SLICE, slice[0] + 6, slice[1] + 6, shade, turn) +
+    g(SLICE, slice[0], slice[1], VERMILION, turn) +
+    `</svg>`
   );
 }
 
@@ -533,6 +603,8 @@ const MARKS: Record<string, () => React.ReactElement> = {
   guides: Guides,
   videos: Videos,
   setups: Setups,
+  // the setups themselves
+  "the-98c-trade": The98cTrade,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,
@@ -551,10 +623,20 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "family-design": FamilyDesign,
 };
 
-export function Specimen({ id, className }: { id: string; className?: string }) {
+export function Specimen({
+  id,
+  className,
+  instance,
+}: {
+  id: string;
+  className?: string;
+  /** Only needed when one page draws the same mark twice, so the two grain
+      filters do not share a document-level id. */
+  instance?: string;
+}) {
   const Composition = MARKS[id];
   if (!Composition) return null;
-  const grainId = `grain-${id}`;
+  const grainId = `grain-${id}${instance ? `-${instance}` : ""}`;
 
   return (
     <svg

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntryPage } from "@/components/superhuman/material/entry-page";
+import { The98cTradePage } from "@/components/superhuman/material/product/the-98c-trade-page";
+import { PRODUCTS, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
   MATERIAL_FOLDERS,
@@ -21,6 +23,11 @@ import {
  * render one list component and that component links to `entryHref` for every
  * row, so generating these for the public folders only would leave the parked
  * folders pointing at 404s. Cheap insurance: all of them are static.
+ *
+ * A PIECE WITH A PRICE IS A PRODUCT PAGE. An entry that names a product
+ * (see `product` in material-types.ts) renders that product's own sales page
+ * and carries its own share card, because it is the page posts link to and the
+ * card is the first thing anybody sees of it.
  *
  * All three segments are generated here rather than split across a layout,
  * because the nesting is the point. A piece is not a thing that could belong
@@ -57,6 +64,43 @@ export async function generateMetadata({
   if (!found) return {};
 
   const { folder, entry } = found;
+
+  if (entry.product) {
+    const product = PRODUCTS[entry.product];
+    const description =
+      "A prediction-market bot that sets itself up in Claude Code. Tested on 8,318 past Polymarket trades: 99% paid out. " +
+      `${product.priceLabel}, instant download.`;
+    const card = {
+      url: `/shop/${product.id}/card`,
+      width: 1200,
+      height: 630,
+      alt: `${product.name}. A prediction-market bot for Claude Code. ${product.priceLabel}.`,
+    };
+    return {
+      // `absolute`: the layout's template would make it "The 98¢ Trade ·
+      // Tobia Donadon", which is right, but the product name should lead a
+      // browser tab on its own.
+      title: { absolute: `${product.name} · A prediction-market bot for Claude Code` },
+      description,
+      alternates: { canonical: entryHref(folder.id, entry.slug) },
+      openGraph: {
+        title: product.name,
+        description,
+        url: entryHref(folder.id, entry.slug),
+        siteName: "Tobia Donadon",
+        locale: "en_US",
+        type: "website",
+        images: [card],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: product.name,
+        description,
+        images: [card],
+      },
+    };
+  }
+
   const title = `${entry.title} · ${folder.name}`;
 
   return {
@@ -83,5 +127,15 @@ export default async function MaterialEntryRoute({
   // narrows the two segments for TypeScript.
   if (!found) notFound();
 
+  if (found.entry.product) return <ProductPage id={found.entry.product} />;
+
   return <EntryPage folder={found.folder} entry={found.entry} />;
+}
+
+/** One product today. A second one is a new page component and a new line here. */
+function ProductPage({ id }: { id: ProductId }) {
+  switch (id) {
+    case "the-98c-trade":
+      return <The98cTradePage />;
+  }
 }

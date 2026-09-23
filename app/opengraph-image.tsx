@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { CLAIM } from "@/lib/bio";
 import { SITE_LABEL } from "@/lib/site";
+import { hostGrotesk } from "@/lib/og-font";
 import {
   INNER_STAR_D,
   OUTER_STAR_D,
@@ -31,12 +32,7 @@ import {
  * turbulence displacement cannot come along. Handing it a flat two-path SVG
  * through <img> is the shape of it that survives, and it never rotates.
  *
- * THE FONT IS FETCHED, AND FAILING IS ALLOWED. next/font serves woff2, which
- * Satori cannot parse, and there is no ttf on disk. So the face is pulled from
- * Google Fonts at build time with an old User-Agent (which is what makes them
- * serve truetype) and a short timeout. If any of that fails the card still
- * renders in Satori's default face: a slightly off-brand share image beats a
- * failed build.
+ * THE FONT IS FETCHED, AND FAILING IS ALLOWED. See lib/og-font.ts.
  */
 
 export const alt =
@@ -56,28 +52,8 @@ const STAR = `data:image/svg+xml;utf8,${encodeURIComponent(
     `</svg>`,
 )}`;
 
-async function face(weight: number): Promise<ArrayBuffer | null> {
-  try {
-    const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@${weight}`,
-      {
-        // An old UA is what makes Google serve truetype rather than woff2.
-        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 6.1)" },
-        signal: AbortSignal.timeout(6000),
-      },
-    ).then((r) => r.text());
-    const url = /src:\s*url\((https:[^)]+)\)/.exec(css)?.[1];
-    if (!url) return null;
-    return await fetch(url, { signal: AbortSignal.timeout(6000) }).then((r) =>
-      r.arrayBuffer(),
-    );
-  } catch {
-    return null;
-  }
-}
-
 export default async function Image() {
-  const [regular, bold] = await Promise.all([face(400), face(700)]);
+  const [regular, bold] = await Promise.all([hostGrotesk(400), hostGrotesk(700)]);
   const fonts = [
     regular && { name: "Host", data: regular, weight: 400 as const, style: "normal" as const },
     bold && { name: "Host", data: bold, weight: 700 as const, style: "normal" as const },

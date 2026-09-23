@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { HandNote } from "@/components/ui/hand-note";
+import { PRODUCTS } from "@/lib/shop/products";
 import { MATERIAL_GRID, folderHref } from "./material-data";
 import { Specimen } from "./specimens";
 import type { MaterialFolder } from "./material-types";
@@ -23,9 +24,9 @@ import type { MaterialFolder } from "./material-types";
  * for it. Nobody has to be told how Skills and Guides differ, because the two
  * cells do not look alike.
  *
- * TWO OF THE FOUR ARE BLURRED. Not hidden, and not removed. A page showing two
- * folders looks finished at two folders. A page showing two you can open and
- * two you cannot read yet says the shelf is still being filled, which is true.
+ * ONE OF THE FOUR IS BLURRED (it was two, until Setups opened). Not hidden,
+ * and not removed. A page showing only finished folders looks finished. One
+ * you cannot read yet says the shelf is still being filled, which is true.
  * The blur is the only place on this site where something is deliberately
  * unreadable, so it is paid for immediately: every locked cell carries one
  * checkable fact about what is written and what is missing. "Six written. None
@@ -99,7 +100,15 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
   /* ------------------------------------------------------------------ *
    * OPEN. The whole cell is the target, so there is no button inside a
    * card competing with the card for the same click.
+   *
+   * A folder with something for sale says so on its face, with the lowest
+   * price in it, so nobody opens it expecting another free folder.
    * ------------------------------------------------------------------ */
+  const prices = folder.entries.flatMap((e) => (e.product ? [PRODUCTS[e.product]] : []));
+  const from = prices.length
+    ? prices.reduce((a, b) => (b.priceCents < a.priceCents ? b : a))
+    : undefined;
+
   return (
     <li
       className="material-cell bg-[var(--paper)]"
@@ -111,7 +120,14 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
       >
         <div className="flex items-start justify-between gap-4">
           {label}
-          <ArrowUpRight className="h-4 w-4 shrink-0 text-[color:rgba(11,31,58,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-clay)]" />
+          <span className="flex shrink-0 items-center gap-3">
+            {from ? (
+              <span className="inline-flex items-center rounded-full bg-[var(--accent-clay-text)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--paper)]">
+                New · {prices.length > 1 ? `from ${from.priceLabel}` : from.priceLabel}
+              </span>
+            ) : null}
+            <ArrowUpRight className="h-4 w-4 text-[color:rgba(11,31,58,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-clay)]" />
+          </span>
         </div>
 
         {specimen}
@@ -146,8 +162,10 @@ export function MaterialRoom() {
         <h1 className="text-balance font-serif text-[clamp(1.7rem,4.2vw,2.75rem)] leading-[1.12] tracking-[-0.032em] text-[var(--ink)]">
           Everything here is something I use.
         </h1>
+        {/* Setups are paid now, so the promise names what it covers
+            rather than claiming the whole room. */}
         <p className="mt-6 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          Free, and it stays free
+          Skills and guides are free, and stay free
         </p>
       </header>
 

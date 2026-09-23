@@ -5,10 +5,24 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   skipTrailingSlashRedirect: true,
 
+  // The shop's sealed product files are read at runtime by path, which the
+  // file tracer cannot see, so they are listed here or they would be missing
+  // from the deployed functions. See lib/shop/file.ts.
+  outputFileTracingIncludes: {
+    "/api/download": ["./private/**/*"],
+    "/api/shop/health": ["./private/**/*"],
+    // The webhook attaches the zip to the delivery email.
+    "/api/stripe/webhook": ["./private/**/*"],
+  },
+
   // Sole was renamed to Mynd. Keep the old path alive permanently so any
   // existing link or indexed result lands on the new page instead of a 404.
   async redirects() {
     return [
+      /* The short link for posts. Temporary on purpose: it is a campaign
+         address that may point somewhere else later, and a 301 would be
+         cached by every browser that ever followed it. */
+      { source: "/98c", destination: "/projects/construct/material/setups/the-98c-trade", permanent: false },
       { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
       { source: "/projects/superhuman", destination: "/projects/construct", statusCode: 301 },
       { source: "/projects/superhuman/", destination: "/projects/construct", statusCode: 301 },

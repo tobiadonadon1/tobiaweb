@@ -5,15 +5,16 @@ import { SKILLS } from "./content/skills";
 import { VIDEOS } from "./content/videos";
 import { TOOLS } from "./content/tools";
 import { SETUPS } from "./content/setups";
+import { CONFIGURATION } from "./content/configuration";
 
 /**
  * THE ROOM, ASSEMBLED.
  *
- * FOUR CELLS, TWO OPEN. The room is a grid of four now rather than a list of
- * two, and the two that are not ready are drawn blurred instead of being left
- * off. That is a deliberate promise about the size of the thing: a page
- * showing two folders looks finished at two folders, and a page showing two
- * plus two you cannot read yet says the shelf is still being filled.
+ * FOUR CELLS, THREE OPEN. The room is a grid of four rather than a list, and
+ * the folder that is not ready is drawn blurred instead of being left off.
+ * That is a deliberate promise about the size of the thing: a page showing
+ * only what is finished looks finished, and one cell you cannot read yet says
+ * the shelf is still being filled.
  *
  * A BLUR ON ITS OWN IS A TEASE, so every locked folder carries `soon`: one
  * checkable fact about what is written and what is missing. The copy rules ban
@@ -61,7 +62,7 @@ const GUIDES_FOLDER: MaterialFolder = {
 };
 
 /* ---------------------------------------------------------------- *
- * THE TWO THAT ARE NOT OPEN.
+ * THE ONE THAT IS NOT OPEN YET, AND THE ONE THAT JUST OPENED.
  * ---------------------------------------------------------------- */
 
 const VIDEOS_FOLDER: MaterialFolder = {
@@ -78,16 +79,21 @@ const VIDEOS_FOLDER: MaterialFolder = {
   entries: VIDEOS,
 };
 
+/**
+ * SETUPS, OPEN, AND THE ONE FOLDER THAT COSTS SOMETHING.
+ *
+ * It was drawn blurred with "Five written. Not open." over five notes about
+ * configuration. It opens now with a different job: finished folders you open
+ * in Claude Code that build themselves, starting with The 98¢ Trade. The name
+ * fits better than it did before, since "a setup" is exactly what you get. The
+ * five notes moved to CONFIGURATION, parked below with their routes intact.
+ */
 const SETUPS_FOLDER: MaterialFolder = {
   id: "setups",
   name: "Setups",
-  line: "The configuration layer. Rules that hold whether you remember them or not.",
-  lede: "The dull folder that compounds.",
-  locked: true,
-  soon: "Five written. Not open.",
-  intro: [
-    "Instruction files, hooks, subagents and housekeeping. None of it is interesting and all of it pays for itself within a week.",
-  ],
+  line: "Finished folders you open in Claude Code. They set themselves up.",
+  lede: "",
+  intro: [],
   accent: "sky",
   entries: SETUPS,
 };
@@ -106,6 +112,18 @@ const DO_THIS_FOLDER: MaterialFolder = {
   ],
   accent: "sky",
   entries: DO_THIS,
+};
+
+const CONFIGURATION_FOLDER: MaterialFolder = {
+  id: "configuration",
+  name: "Configuration",
+  line: "The configuration layer. Rules that hold whether you remember them or not.",
+  lede: "The dull folder that compounds.",
+  intro: [
+    "Instruction files, hooks, subagents and housekeeping. None of it is interesting and all of it pays for itself within a week.",
+  ],
+  accent: "sky",
+  entries: CONFIGURATION,
 };
 
 const TOOLS_FOLDER: MaterialFolder = {
@@ -128,18 +146,16 @@ const TOOLS_FOLDER: MaterialFolder = {
 export const MATERIAL_ROOM_FOLDERS: MaterialFolder[] = [
   SKILLS_FOLDER,
   GUIDES_FOLDER,
-];
-
-/** Drawn blurred in the grid. Not links, not indexed. */
-export const MATERIAL_LOCKED_FOLDERS: MaterialFolder[] = [
-  VIDEOS_FOLDER,
   SETUPS_FOLDER,
 ];
 
+/** Drawn blurred in the grid. Not links, not indexed. */
+export const MATERIAL_LOCKED_FOLDERS: MaterialFolder[] = [VIDEOS_FOLDER];
+
 /**
- * THE GRID, reading order. Two you can open, then two you cannot. The reading
- * order is the point: the eye lands on something it can use before it lands on
- * something it has to wait for.
+ * THE GRID, reading order. Three you can open, then one you cannot. The
+ * reading order is the point: the eye lands on something it can use before it
+ * lands on something it has to wait for.
  */
 export const MATERIAL_GRID: MaterialFolder[] = [
   ...MATERIAL_ROOM_FOLDERS,
@@ -151,7 +167,7 @@ export const MATERIAL_PARKED_FOLDERS: MaterialFolder[] = [
   VIDEOS_FOLDER,
   DO_THIS_FOLDER,
   TOOLS_FOLDER,
-  SETUPS_FOLDER,
+  CONFIGURATION_FOLDER,
 ];
 
 /** Room plus parked. Routes and generateStaticParams use this. */
@@ -222,9 +238,11 @@ export function folderCount(folder: MaterialFolder): {
   // The middle case is derived, not assumed. "None filmed" is only true of a
   // folder whose unfinished pieces are ALL waiting on a camera; a folder of
   // half-written drafts must not inherit the video folder's sentence.
+  // A folder of setups counts setups: "1 piece" reads wrong on a product.
+  const noun = folder.entries.every((e) => e.kind === "setup") ? "setup" : "piece";
   const label =
     ready === total
-      ? `${total} ${total === 1 ? "piece" : "pieces"}`
+      ? `${total} ${noun}${total === 1 ? "" : "s"}`
       : filming === total
         ? `${total} written, none filmed`
         : `${ready} of ${total} finished`;

@@ -1,6 +1,7 @@
 import { BackLink } from "@/components/ui/back-link";
 import { MaterialList } from "./material-list";
 import { MaterialRack } from "./material-rack";
+import { SetupList } from "./setup-list";
 import { folderCount } from "./material-data";
 import type { MaterialFolder } from "./material-types";
 
@@ -28,6 +29,8 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
   // for their entries, so they keep the list and cannot render an empty
   // picture frame.
   const isRack = folder.id === "skills" || folder.id === "guides";
+  // Setups are things with a price, and get a wide card each instead.
+  const isSetups = folder.id === "setups";
 
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
@@ -39,7 +42,7 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
           columns were too narrow to give a mark any size. */}
       <div
         className={`mx-auto w-full px-6 pb-28 pt-28 md:pb-36 md:pt-36 ${
-          isRack ? "max-w-6xl" : "max-w-4xl"
+          isRack || isSetups ? "max-w-6xl" : "max-w-4xl"
         }`}
       >
         <header>
@@ -75,7 +78,9 @@ export function FolderPage({ folder }: { folder: MaterialFolder }) {
         {/* The two open folders get the rack. The parked ones keep the list,
             because nothing has drawn marks for their entries. */}
         <div className="mt-14 md:mt-16">
-          {isRack ? (
+          {isSetups ? (
+            <SetupList folder={folder} />
+          ) : isRack ? (
             <MaterialRack folder={folder} />
           ) : (
             <MaterialList folder={folder} />

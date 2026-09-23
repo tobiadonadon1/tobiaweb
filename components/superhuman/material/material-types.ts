@@ -1,3 +1,5 @@
+import type { ProductId } from "@/lib/shop/products";
+
 /**
  * WHAT A PIECE OF MATERIAL IS.
  *
@@ -117,6 +119,13 @@ export type MaterialEntry = {
    * disclosure itself, so a piece cannot carry a paid link silently.
    */
   referral?: boolean;
+  /**
+   * SOMETHING YOU BUY, not something you read. Names a product in
+   * lib/shop/products.ts, which owns the price; the entry route renders the
+   * product page for it instead of the reading page. A piece can only be
+   * paid by pointing here, so nothing gets a price by accident.
+   */
+  product?: ProductId;
 };
 
 /**
