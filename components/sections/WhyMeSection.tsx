@@ -25,9 +25,8 @@ import { WhyMeMascot } from "./why-me-mascot";
 
 /**
  * THE EMPLOYER, DESCRIBED BUT NOT NAMED. Tobia's call: the card should say
- * what kind of company it is, strongly, without the name. So it leads with
- * that sentence at display size, the way the neighbouring cards lead with
- * "15" and "2.5 yrs", and claims nothing that needs a number to back it.
+ * what kind of company it is, without the name, in one short line under the
+ * "Day job" label. It claims nothing that needs a number to back it.
  */
 
 const GLASS_BG =
@@ -144,12 +143,13 @@ export function WhyMeSection() {
               <span className="text-[0.85rem] text-[#7dd3fc]/85">
                 Day job
               </span>
-              {/* The fact, at the size of a fact, like "15" and "2.5 yrs"
-                  beside it. */}
-              <h3 className="mt-5 max-w-[14ch] text-balance font-serif text-[clamp(2.1rem,3.4vw,2.9rem)] leading-[1.02] tracking-[-0.035em] text-[#faf8f2]">
-                I work at one of the{" "}
-                <span className="text-[#7dd3fc]">most important networking companies</span>{" "}
-                in the world.
+              {/* Under the "Day job" label, so it can drop "I work at" and
+                  stay short. Set at the size of the neighbouring card's
+                  heading, not the size of the numbers: a sentence at number
+                  size filled the whole card. */}
+              <h3 className="mt-5 max-w-[16ch] text-balance font-serif text-[clamp(1.6rem,2.4vw,2.1rem)] leading-[1.12] tracking-[-0.03em] text-[#faf8f2]">
+                One of the <span className="text-[#7dd3fc]">most important</span>{" "}
+                networking companies.
               </h3>
               <p className="mt-auto max-w-sm pt-8 text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
                 Full time, on systems real teams depend on. That standard is
