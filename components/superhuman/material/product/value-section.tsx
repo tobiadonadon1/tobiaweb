@@ -19,8 +19,10 @@ import { Specimen } from "../specimens";
  * scroll frame, so the 3D reads it without React re-rendering. The copy
  * reads the same number to set its own opacity.
  *
- * DESKTOP lists all four points and lights the current one; clicking a point
- * scrolls to it (a mouse shortcut; the list itself is plain text in order).
+ * DESKTOP lists all four titles and opens only the current one's paragraph,
+ * so the list fits a laptop-height window (with every paragraph open it ran
+ * off the bottom of the pinned frame). Clicking a point scrolls to it (a
+ * mouse shortcut; the list itself is plain text in order).
  * A PHONE has no room for four, so the points share one slot under the coin
  * and cross over, with a thin rail for where you are.
  *
@@ -83,13 +85,16 @@ export function ValueSection({
       stage.current = s;
 
       const floor = wide.matches ? 0.26 : 0;
+      // Exactly one point is current at any moment. On desktop that is the
+      // one whose paragraph is open, so it must never be none or two.
+      const current = Math.round(clamp(s, 0, last));
       items.current.forEach((li, i) => {
         if (!li) return;
         const d = Math.abs(Math.max(0, s) - i);
         const on = clamp(1 - (d - 0.24) / 0.34);
-        li.style.opacity = String(floor + (1 - floor) * on);
-        li.style.setProperty("--lift", `${(1 - on) * (i > s ? 14 : -14)}px`);
-        li.toggleAttribute("data-current", on > 0.5);
+        li.style.opacity = String(wide.matches ? (i === current ? 1 : floor) : on);
+        li.style.setProperty("--lift", wide.matches ? "0px" : `${(1 - on) * (i > s ? 14 : -14)}px`);
+        li.toggleAttribute("data-current", i === current);
       });
       rail.current.forEach((bar, i) => {
         if (bar) bar.style.transform = `scaleX(${clamp(Math.max(0, s) - i + 1)})`;
@@ -192,9 +197,15 @@ export function ValueSection({
                   <h3 className="text-[1.5rem] leading-snug tracking-[-0.02em] text-[var(--ink)] md:text-[1.75rem]">
                     {p.title}
                   </h3>
-                  <p className="mt-2.5 max-w-[42ch] text-pretty text-[1.02rem] leading-[1.6] text-[color:rgba(11,31,58,0.7)] md:text-[1.06rem]">
-                    {p.text}
-                  </p>
+                  {/* On desktop only the current point opens its paragraph,
+                      so four points always fit a laptop-height frame. */}
+                  <div className="value-body">
+                    <div>
+                      <p className="mt-2.5 max-w-[42ch] text-pretty text-[1.02rem] leading-[1.6] text-[color:rgba(11,31,58,0.7)] md:text-[1.06rem]">
+                        {p.text}
+                      </p>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ol>

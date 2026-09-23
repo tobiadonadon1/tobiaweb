@@ -24,15 +24,14 @@ import { WhyMeMascot } from "./why-me-mascot";
  */
 
 /**
- * TODO(tobia): put the employer's name here, e.g. `const EMPLOYER = "Acme";`
- *
- * Left as null the copy falls back to an unnamed but honest sentence, so the
- * page NEVER renders a visible placeholder and never has to be shipped with
- * one. Naming it is the single biggest credibility gain available in this
- * section: "a major company" twice, unnamed, reads as either an NDA or an
- * exaggeration and the reader cannot tell which.
+ * THE EMPLOYER, NAMED. It was left as null with a note that naming it is "the
+ * single biggest credibility gain available in this section": "a company",
+ * unnamed, reads as either an NDA or an exaggeration and the reader cannot
+ * tell which. Tobia asked for it to hit harder. The name does that on its own,
+ * set as the card's one big fact the way the neighbouring cards set "15" and
+ * "2.5 yrs", with no ranking claim beside it that nobody could check.
  */
-const EMPLOYER: string | null = null;
+const EMPLOYER = "Cisco";
 
 const GLASS_BG =
   "linear-gradient(145deg, rgba(253,252,249,0.9), rgba(247,245,239,0.7))";
@@ -121,8 +120,8 @@ export function WhyMeSection() {
         >
           <WhyMeMascot scope={stage} />
 
-          {/* Tall left, on ink: where he sits, and the standard that comes
-              with it. Two sentences. It used to be a paragraph claiming
+          {/* Tall left, on ink: the day job, named, and the standard that
+              comes with it. It used to be a paragraph claiming
               proximity to "the brightest minds in the room", which is
               unverifiable, immodest, and the exact thing the voice forbids. */}
           <motion.article
@@ -146,16 +145,19 @@ export function WhyMeSection() {
             />
             <div className="relative flex h-full flex-col">
               <span className="text-[0.85rem] text-[#7dd3fc]/85">
-                Where I sit
+                Day job
               </span>
-              <h3 className="mt-6 max-w-sm font-serif text-3xl leading-[1.05] tracking-tight text-[#faf8f2] md:text-4xl">
-                This is the job, not the side project.
+              {/* The fact, at the size of a fact, like "15" and "2.5 yrs"
+                  beside it. */}
+              <h3 className="mt-5 font-serif text-[clamp(3.6rem,7vw,5.6rem)] leading-[0.9] tracking-[-0.045em] text-[#faf8f2]">
+                {EMPLOYER}.
               </h3>
-              <p className="mt-6 max-w-sm text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
-                {EMPLOYER
-                  ? `I do this full time at ${EMPLOYER}.`
-                  : "I do this full time, for a company, on systems real teams depend on."}{" "}
-                That standard is the one I hold my own work to.
+              <p className="mt-5 max-w-sm text-pretty text-lg leading-snug text-[#faf8f2] md:text-xl">
+                One of the largest networking companies in the world.
+              </p>
+              <p className="mt-auto max-w-sm pt-8 text-pretty text-base leading-relaxed text-[#cfe9ee]/75 md:text-lg">
+                I work there full time, on systems real teams depend on. That
+                standard is the one I hold my own work to.
               </p>
             </div>
           </motion.article>

@@ -997,11 +997,31 @@ body[data-footer-open] .sh-compass {
   .value-list > .value-item {
     cursor: pointer;
     border-top: 1px solid var(--hairline);
-    padding: 1.15rem 0 1.3rem;
+    padding: 1.05rem 0 1.15rem;
     opacity: 0.26;
+    transition: opacity 0.35s ease-out;
   }
   .value-list > .value-item[data-current] h3 {
     color: var(--ink);
+  }
+  /* Only the current point's paragraph is open. Grid rows from 0fr to 1fr
+     is the one way to ease an element to its own height; the inner div
+     clips the paragraph and its margin while it is shut. */
+  .value-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+      opacity 0.35s ease-out;
+  }
+  .value-body > div {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .value-item[data-current] .value-body {
+    grid-template-rows: 1fr;
+    opacity: 1;
   }
 }
 
@@ -1029,6 +1049,11 @@ body[data-footer-open] .sh-compass {
     opacity: 1 !important;
     transform: none !important;
     margin-bottom: 1.5rem;
+  }
+  .value-body {
+    grid-template-rows: 1fr !important;
+    opacity: 1 !important;
+    transition: none !important;
   }
   .value-rail {
     display: none;
