@@ -4,7 +4,7 @@ import { abs } from "@/lib/site";
 import { THE_98C_TRADE as PRODUCT } from "@/lib/shop/products";
 import { Specimen } from "../specimens";
 import { folderHref } from "../material-data";
-import { BacktestChart } from "./backtest-chart";
+import { BeforeAfter } from "./before-after";
 import { BACKTEST_TOTAL } from "./backtest-data";
 import { BuyForm } from "./buy-form";
 import { StickyBuy } from "./sticky-buy";
@@ -152,32 +152,33 @@ export function The98cTradePage() {
         productId={PRODUCT.id}
       />
 
-      {/* 3. DOES IT WORK. Every backtested trade, the losses drawn in. */}
+      {/* 3. DOES IT WORK. The first bot's trades, then the backtest's. */}
       <section
         aria-labelledby="evidence-title"
         className="border-y border-[var(--hairline)] bg-[rgba(255,255,255,0.35)]"
       >
         <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
           <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[1fr_1fr] lg:gap-16">
-            <h2 id="evidence-title" className={`${h2} max-w-[16ch]`}>
-              Every trade from the backtest
+            <h2 id="evidence-title" className={`${h2} max-w-[17ch]`}>
+              From losing 5 trades in 7 to losing 1 in 104
             </h2>
-            <p className="max-w-[44ch] text-pretty text-[1.05rem] leading-[1.65] text-[color:rgba(11,31,58,0.72)]">
-              Each dot is a trade the bot would have made on Polymarket
-              between January 2025 and September 2026. The {BACKTEST_TOTAL.lost} red
-              ones lost. Every quarter still finished ahead, at +
-              {BACKTEST_TOTAL.avgReturnPct}% per trade on average.
+            <p className="max-w-[46ch] text-pretty text-[1.05rem] leading-[1.65] text-[color:rgba(11,31,58,0.72)]">
+              The first bot guessed which way crypto would move in the next
+              five minutes, and most guesses lost. The 98¢ Trade stopped
+              guessing. It only buys what the market already prices at 97 to
+              99.5¢, and Jev reads each market&rsquo;s rules first.
             </p>
           </div>
 
           <div className="mt-12 md:mt-14">
-            <BacktestChart />
+            <BeforeAfter />
           </div>
 
           <p className="mt-8 max-w-[70ch] text-pretty text-[0.9rem] leading-relaxed text-[color:rgba(11,31,58,0.62)]">
-            Before real-world fill effects, and past results don&rsquo;t
-            guarantee future ones. The data and the scripts that produced it
-            are in the folder.
+            Before: seven trades from the first bot&rsquo;s dashboard. After:
+            the bot as shipped, backtested on Polymarket before real-world fill
+            effects. Past results don&rsquo;t guarantee future ones. The data
+            and the scripts are in the folder.
           </p>
         </div>
       </section>
