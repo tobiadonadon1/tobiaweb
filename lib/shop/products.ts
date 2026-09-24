@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "motion-director";
+export type ProductId = "the-98c-trade";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -51,13 +51,12 @@ export type Product = {
    * never is. Keep it under about 4 MB: Vercel caps a function's response at
    * 4.5 MB, and the download is served by one.
    *
-   * `attach: false` sends the delivery email with the download link only.
-   * Gmail refuses any message whose zip holds a script file (.js, .mjs and
-   * friends), whatever the script does, so a product whose folder carries
-   * code it runs cannot travel as an attachment. The link serves the same
-   * file and keeps working.
+   * Gmail refuses a zip that holds a script file (.js, .mjs and friends),
+   * whatever the script does. The delivery email falls back to the link when
+   * that happens (see deliver.ts), but a product that ships code will always
+   * take that path.
    */
-  file: { sealed: string; filename: string; attach?: boolean };
+  file: { sealed: string; filename: string };
   /**
    * The product in Stripe, so every sale lands on ONE product in the
    * dashboard rather than on a new inline product per checkout. The price is
@@ -127,60 +126,8 @@ export const THE_98C_TRADE: Product = {
   },
 };
 
-export const MOTION_DIRECTOR: Product = {
-  id: "motion-director",
-  name: "Motion Director",
-  description:
-    "A Claude Code skill that turns any idea into a finished 10 to 20 second video with its own original soundtrack. Instant download.",
-  priceCents: 500,
-  currency: "eur",
-  priceLabel: money(500, "eur"),
-  href: "/projects/construct/material/skills/motion-director",
-  file: {
-    sealed: "motion-director.zip.enc",
-    filename: "motion-director.zip",
-    // The engine is .mjs files, which Gmail blocks inside a zip.
-    attach: false,
-  },
-  stripeProductId: "motion-director",
-  share: {
-    description:
-      "A Claude Code skill that turns any idea into a finished 10 to 20 second video with its own original soundtrack, in about ten minutes. €5, instant download.",
-    kicker: "Skill · for Claude Code",
-    line: "Any idea, a finished video with its own soundtrack, in ten minutes.",
-    proof: "1080p MP4 · original music · yours to use",
-  },
-  contents: [
-    ["SKILL.md", "the workflow Claude follows, from your idea to the MP4"],
-    ["references/", "the craft playbook: twists, timing, sound and the four looks"],
-    ["engine/", "the animation, music and render engine, with open-licensed fonts"],
-    ["examples/", "four finished films as code, one per look, to learn from"],
-  ],
-  steps: [
-    "Unzip the folder.",
-    "Open a terminal in the folder and type claude",
-    "Type hi. Claude installs it in about two minutes.",
-  ],
-  email: {
-    after: [
-      "From then on, type /motion-director in any Claude Code session, or just ask for a video, and answer a couple of quick questions: where it's going, how long, and which look.",
-      "About ten minutes later the MP4 is in the Motion Director Videos folder on your Desktop. Every video and its soundtrack is yours to use, commercially too.",
-    ],
-  },
-  thanks: {
-    needs:
-      "You'll need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. If Node is missing, Claude will tell you.",
-    next: [
-      ["Right after install", "Claude offers to make your first video. Tell it what it's about."],
-      ["Every video", "Two quick rounds of questions, then about ten minutes to a finished MP4 on your Desktop."],
-      ["Want changes?", "Say \"faster\", \"change the headline\" or \"make a square version\" and it renders again."],
-    ],
-  },
-};
-
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
-  "motion-director": MOTION_DIRECTOR,
 };
 
 export function productById(id: unknown): Product | undefined {

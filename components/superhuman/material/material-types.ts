@@ -127,6 +127,13 @@ export type MaterialEntry = {
    */
   link?: { label: string; href: string; download?: boolean };
   /**
+   * HOW TO INSTALL IT, when it is not "unzip it into your skills folder".
+   * A skill that sets itself up (Motion Director installs its own render
+   * engine) says so in steps, and the page prints them instead of the paths.
+   * Lowercase commands (claude, hi, /name) are set as keys.
+   */
+  install?: string[];
+  /**
    * Set on anything whose link pays a commission. The reading pane prints the
    * disclosure itself, so a piece cannot carry a paid link silently.
    */
@@ -136,8 +143,8 @@ export type MaterialEntry = {
    * lib/shop/products.ts, which owns the price. The entry route renders the
    * product's bespoke sales page if it has one (The 98¢ Trade), and otherwise
    * the piece in its folder's own format with a buy button where a download
-   * would be (Motion Director). A piece can only be paid by pointing here, so
-   * nothing gets a price by accident.
+   * would be. A piece can only be paid by pointing here, so nothing gets a
+   * price by accident.
    */
   product?: ProductId;
 };

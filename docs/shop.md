@@ -1,13 +1,10 @@
 # The shop
 
-How a sale works, and the one-time setup to switch it on. Two products, both
-€5, both defined once in `lib/shop/products.ts`:
-
-- **The 98¢ Trade**, at `/projects/construct/material/setups/the-98c-trade`
-  (short link for posts: **tobiadonadon.com/98c**). Its own sales page.
-- **Motion Director**, at `/projects/construct/material/skills/motion-director`.
-  A skill page in the same format as the free skills, with a buy button where
-  the download would be.
+How a sale works, and the one-time setup to switch it on. The product is
+**The 98¢ Trade**, €5, at `/projects/construct/material/setups/the-98c-trade`
+(short link for posts: **tobiadonadon.com/98c**), defined once in
+`lib/shop/products.ts`. (Motion Director, in Skills, is free: a plain
+download like the other skills, not part of the shop.)
 
 ## How a sale works
 
@@ -16,11 +13,10 @@ How a sale works, and the one-time setup to switch it on. Two products, both
 2. **Paid.** Stripe sends the buyer to `…/the-98c-trade/thanks?session_id=…`.
    The page asks Stripe whether that session is paid and shows the download.
 3. **Email.** Stripe calls `/api/stripe/webhook`; the site emails the buyer
-   **from tobia10donadon@gmail.com** through Gmail. The 98¢ Trade's zip is
-   attached, with a download link as backup. Motion Director's email has the
-   download link only (`attach: false`): Gmail blocks any zip holding script
-   files, and its engine is `.mjs` files. If Gmail ever refuses an attachment
-   anyway, the same email goes again with the link only. Replies go to that
+   **from tobia10donadon@gmail.com** through Gmail, with the zip attached and
+   a download link as backup. Gmail blocks any zip holding script files
+   (`.js`, `.mjs`…); if it ever refuses the attachment, the same email goes
+   again with the link only. Replies go to that
    inbox, and every delivery is in its Sent folder. The webhook is the only sender, so it can't go twice;
    if it fails, Stripe retries for three days.
 4. **Download.** `/api/download?session_id=…` checks with Stripe again, then
@@ -87,12 +83,11 @@ Then redeploy.
   your Gmail within a minute. Then
   refund yourself in Stripe → Payments.
 
-## Shipping a new version
+## Shipping a new version of the bot
 
 ```
 npm run seal -- ~/Desktop/JevTrader/dist/the-98c-trade.zip
-npm run seal -- ~/Desktop/motion-director.zip
-git add private && git commit -m "New version of …" && git push
+git add private && git commit -m "New version of The 98¢ Trade" && git push
 ```
 
 Use the same `SHOP_FILE_KEY` (the script reads it from `.env.local`). Every

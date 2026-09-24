@@ -44,7 +44,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
   const product = entry.product ? PRODUCTS[entry.product] : undefined;
 
   return (
-    <li className="flex flex-col bg-[var(--paper)] p-6 md:p-8">
+    <li className="flex flex-col border-b border-r border-[var(--hairline)] bg-[var(--paper)] p-6 md:p-8">
       {/* ---- the mark and the title, as one target ---- */}
       <Link
         href={href}
@@ -116,7 +116,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         </div>
 
         <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {product ? `${product.priceLabel} · ${entry.minutes} min a video` : `${entry.minutes} min · ${entry.level}`}
+          {product ? `${product.priceLabel} · ` : ""}{entry.minutes} min · {entry.level}
         </p>
       </div>
     </li>
@@ -125,13 +125,11 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
 
 export function MaterialRack({ folder }: { folder: MaterialFolder }) {
   return (
-    <ul
-      className={`grid list-none grid-cols-1 gap-px border border-[var(--hairline)] bg-[var(--hairline)] ${
-        // Four in a row on wide screens, a 2 x 2 below that; never a 3 + 1
-        // with an empty cell. Three stay three.
-        folder.entries.length === 4 ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3"
-      }`}
-    >
+    // ROWS OF THREE, and a fourth starts the next row on its own. The rules
+    // are drawn per cell (each draws its right and bottom, the list its left
+    // and top) rather than as gaps over a ruled ground, so a short last row
+    // ends at its last cell instead of leaving grey blocks where cells are not.
+    <ul className="grid list-none grid-cols-1 border-l border-t border-[var(--hairline)] md:grid-cols-3">
       {folder.entries.map((entry) => (
         <Column key={entry.slug} folder={folder} entry={entry} />
       ))}

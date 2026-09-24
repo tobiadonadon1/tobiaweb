@@ -13,11 +13,10 @@ import { ShopNotConfigured, stripe, type Purchase } from "./stripe";
  * Sent folder.
  *
  * WHEN THE ZIP CANNOT TRAVEL. Gmail refuses a message outright (552 5.7.0)
- * when a zip holds a script file, and refuses one that is too big. So a
- * product marked `attach: false` goes out with the link only, and if the
- * server refuses an attachment anyway, the same email goes again with the
- * link only. A refused message was never delivered, so the second send is
- * still the buyer's only email.
+ * when a zip holds a script file, and refuses one that is too big. When the
+ * server refuses the attachment, the same email goes again with the link
+ * only. A refused message was never delivered, so the second send is still
+ * the buyer's only email.
  *
  * TWO WAYS OUT, chosen by what is configured:
  *
@@ -148,12 +147,12 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
     return via === "gmail" ? viaGmail(msg) : viaResend(msg);
   };
 
-  let file: "attached" | "link" = purchase.product.file.attach === false ? "link" : "attached";
+  let file: "attached" | "link" = "attached";
   let id: string;
   try {
     id = await send(file === "attached");
   } catch (err) {
-    if (file === "link" || !refusedAttachment(err)) throw err;
+    if (!refusedAttachment(err)) throw err;
     console.warn("[shop] the mail server refused the attachment, sending the link instead", err);
     file = "link";
     id = await send(false);
@@ -188,9 +187,9 @@ function refusedAttachment(err: unknown): boolean {
  * THE MESSAGE.
  *
  * Written like a note from a person, because it is one: it comes from Tobia's
- * address and a reply reaches him. The zip is attached (or, where it cannot
- * be, only linked); one button links to the file, then the three steps, then
- * what to do if something breaks.
+ * address and a reply reaches him. The zip is attached (or, where the mail
+ * server refuses it, only linked); one button links to the file, then the
+ * three steps, then what to do if something breaks.
  * Most people buy from a phone and the folder is only useful on a computer,
  * so the email says where to open it.
  * ------------------------------------------------------------------ */
@@ -216,7 +215,7 @@ export function emailBase(purchase: Purchase, origin: string): string {
 export function deliveryEmail(
   purchase: Purchase,
   origin: string,
-  { attached = purchase.product.file.attach !== false }: { attached?: boolean } = {},
+  { attached = true }: { attached?: boolean } = {},
 ) {
   const { product, session } = purchase;
   const base = emailBase(purchase, origin);

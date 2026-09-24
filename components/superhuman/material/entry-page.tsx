@@ -129,6 +129,7 @@ export function EntryPage({
             slug={entry.slug}
             title={entry.title}
             href={entry.link.href}
+            install={entry.install}
           />
         ) : null}
 

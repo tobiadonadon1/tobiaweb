@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { DownloadGate } from "./download-gate";
+import { Commands } from "./product/commands";
 
 /**
  * WHAT IS ACTUALLY IN THE FOLDER.
@@ -24,7 +25,11 @@ const SKILLS_DIR = path.join(process.cwd(), "public", "construct", "skills");
 
 type SkillFile = { name: string; lines: number };
 
-/** The folder's files, SKILL.md first, then the rest alphabetically. */
+/**
+ * The folder's files, SKILL.md first, then the rest alphabetically. Nested
+ * ones keep their folder in the name (references/craft.md), because a skill
+ * that files its reference in a subfolder is telling you how to read it.
+ */
 export function readSkillFiles(slug: string): SkillFile[] {
   const dir = path.join(SKILLS_DIR, slug);
   let files: SkillFile[];
@@ -36,16 +41,17 @@ export function readSkillFiles(slug: string): SkillFile[] {
   // the readFileSync sat outside the guard.
   try {
     files = fs
-      .readdirSync(dir, { withFileTypes: true })
-      .filter((e) => e.isFile() && e.name.endsWith(".md"))
-      .map((e) => ({
-        name: e.name,
+      .readdirSync(dir, { recursive: true, encoding: "utf8" })
+      .map((name) => name.split(path.sep).join("/"))
+      .filter((name) => name.endsWith(".md") && fs.statSync(path.join(dir, name)).isFile())
+      .map((name) => ({
+        name,
         // COUNT NEWLINES, do not split on them. Every one of these files ends
         // with a newline, so `split` yields a phantom empty last line and the
         // page printed one more than `wc -l` for every file. The number is
         // advertised as checkable the second after you download it, so it has
         // to agree with the tool somebody will check it with.
-        lines: (fs.readFileSync(path.join(dir, e.name), "utf8").match(/\n/g) ?? []).length,
+        lines: (fs.readFileSync(path.join(dir, name), "utf8").match(/\n/g) ?? []).length,
       }));
   } catch {
     // A skill listed without a folder yet is not a build error: the page
@@ -65,10 +71,13 @@ export function SkillContents({
   slug,
   title,
   href,
+  install,
 }: {
   slug: string;
   title: string;
   href: string;
+  /** Steps for a skill that installs itself, printed instead of the paths. */
+  install?: string[];
 }) {
   const files = readSkillFiles(slug);
   if (files.length === 0) return null;
@@ -115,16 +124,36 @@ export function SkillContents({
         Installing it
       </h3>
 
-      <p className="mt-4 max-w-[58ch] text-pretty text-[1.02rem] leading-[1.7] text-[color:rgba(11,31,58,0.68)]">
-        Unzip it into your skills folder. Use the first path to have it in every
-        project on your machine, or the second to keep it inside one project and
-        commit it with the code.
-      </p>
+      {install ? (
+        <ol className="mt-5 list-none border-b border-[var(--hairline)]">
+          {install.map((step, i) => (
+            <li
+              key={i}
+              className="flex items-baseline gap-5 border-t border-[var(--hairline)] py-4 text-[1.04rem] leading-[1.55] text-[var(--ink)]"
+            >
+              <span className="w-6 shrink-0 font-mono text-[0.78rem] tracking-[0.1em] text-[var(--accent-clay-text)]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span>
+                <Commands text={step} />
+              </span>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <>
+          <p className="mt-4 max-w-[58ch] text-pretty text-[1.02rem] leading-[1.7] text-[color:rgba(11,31,58,0.68)]">
+            Unzip it into your skills folder. Use the first path to have it in every
+            project on your machine, or the second to keep it inside one project and
+            commit it with the code.
+          </p>
 
-      <pre className="mt-5 overflow-x-auto border border-[var(--hairline)] bg-[rgba(11,31,58,0.035)] p-5 text-[0.86rem] leading-[1.7] text-[color:rgba(11,31,58,0.82)] md:p-6">
-        <code className="font-mono">{`~/.claude/skills/${slug}/SKILL.md      everywhere
+          <pre className="mt-5 overflow-x-auto border border-[var(--hairline)] bg-[rgba(11,31,58,0.035)] p-5 text-[0.86rem] leading-[1.7] text-[color:rgba(11,31,58,0.82)] md:p-6">
+            <code className="font-mono">{`~/.claude/skills/${slug}/SKILL.md      everywhere
 .claude/skills/${slug}/SKILL.md       this project only`}</code>
-      </pre>
+          </pre>
+        </>
+      )}
 
       <p className="mt-5 max-w-[58ch] text-pretty text-[1.02rem] leading-[1.7] text-[color:rgba(11,31,58,0.68)]">
         Then type <span className="text-[var(--accent-clay-text)]">/{slug}</span> in

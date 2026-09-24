@@ -1,7 +1,7 @@
 import type { MaterialEntry } from "../material-types";
 
 /**
- * FOUR SKILLS, NAMED AS ROLES. THE FOURTH HAS A PRICE.
+ * FOUR SKILLS, NAMED AS ROLES.
  *
  * They were called Atelier, The Spec and The Sweep, which are codenames: you
  * had to already know what they did before the name told you anything. A skill
@@ -23,8 +23,9 @@ import type { MaterialEntry } from "../material-types";
  * The `body` here is the skill's own page. It is the argument for the skill
  * plus how to install it, and it never repeats the summary that got you here.
  *
- * Motion Director is sold, not downloaded: it names a product, and the page
- * shows its price and a buy button where the others have a download.
+ * Motion Director is the one that brings its own machinery: a render engine
+ * it installs on first run. So its folder is bigger, its page shows what it
+ * makes, and it carries its own install steps instead of the skills path.
  */
 
 /** Where a skill's bundle and its raw instructions live. One place. */
@@ -162,7 +163,7 @@ export const SKILLS: MaterialEntry[] = [
     link: { label: "Download Code Reviewer", href: bundle("code-reviewer"), download: true },
   },
   /* ---------------------------------------------------------------- *
-   * 04 · the first one with a price
+   * 04
    * ---------------------------------------------------------------- */
   {
     slug: "motion-director",
@@ -174,7 +175,6 @@ export const SKILLS: MaterialEntry[] = [
     status: "ready",
     when: "You need a video for a launch, a post or an idea, and you have ten minutes, not a video team.",
     level: "Anyone",
-    product: "motion-director",
     body: [
       {
         type: "p",
@@ -184,10 +184,10 @@ export const SKILLS: MaterialEntry[] = [
         type: "reel",
         caption: "Four videos Motion Director made, one in each look. Tap one for sound.",
         items: [
-          { src: "/shop/motion-director/explainer.mp4", poster: "/shop/motion-director/explainer.jpg", label: "Motion-graphics explainer", aspect: "16/9" },
-          { src: "/shop/motion-director/kinetic.mp4", poster: "/shop/motion-director/kinetic.jpg", label: "Kinetic typography", aspect: "9/16" },
-          { src: "/shop/motion-director/neon.mp4", poster: "/shop/motion-director/neon.jpg", label: "Neon, cinematic", aspect: "9/16" },
-          { src: "/shop/motion-director/ink.mp4", poster: "/shop/motion-director/ink.jpg", label: "Hand-drawn ink", aspect: "1/1" },
+          { src: "/construct/reel/motion-director/explainer.mp4", poster: "/construct/reel/motion-director/explainer.jpg", label: "Motion-graphics explainer", aspect: "16/9" },
+          { src: "/construct/reel/motion-director/kinetic.mp4", poster: "/construct/reel/motion-director/kinetic.jpg", label: "Kinetic typography", aspect: "9/16" },
+          { src: "/construct/reel/motion-director/neon.mp4", poster: "/construct/reel/motion-director/neon.jpg", label: "Neon, cinematic", aspect: "9/16" },
+          { src: "/construct/reel/motion-director/ink.mp4", poster: "/construct/reel/motion-director/ink.jpg", label: "Hand-drawn ink", aspect: "1/1" },
         ],
       },
       { type: "h", text: "What you get" },
@@ -205,7 +205,7 @@ export const SKILLS: MaterialEntry[] = [
       {
         type: "steps",
         items: [
-          "Unzip the folder, open it in Claude Code and type hi. It installs itself in about two minutes.",
+          "Download it, unzip it, open it in Claude Code and type hi. It installs itself in about two minutes.",
           "Tell Claude what the video is about, then pick where it's going, how long, and a look.",
           "Claude writes it, animates it, scores it and checks it. The MP4 lands in a folder on your Desktop.",
         ],
@@ -219,5 +219,11 @@ export const SKILLS: MaterialEntry[] = [
         text: "You need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. Windows and Linux should work but haven't been tested yet. Everything renders on your own computer and nothing is uploaded.",
       },
     ],
+    install: [
+      "Unzip the folder.",
+      "Open a terminal in the folder and type claude",
+      "Type hi. Claude installs it and checks it works, in about two minutes.",
+    ],
+    link: { label: "Download Motion Director", href: bundle("motion-director"), download: true },
   },
 ];
