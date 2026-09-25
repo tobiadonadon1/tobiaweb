@@ -187,7 +187,7 @@ export function LaunchrStage() {
       {/* One copy of everything, placed by the grid: on a phone the title,
           the reel, then the value and the button; on a wide screen the title
           over the value and the button on the left, the reel on the right. */}
-      <div className="relative mx-auto grid min-h-[100svh] w-full max-w-7xl grid-cols-1 content-center gap-4 px-5 pb-28 pt-[4.6rem] [@media(max-height:700px)]:gap-3 [@media(max-height:700px)]:pt-[4.2rem] sm:gap-6 sm:px-6 sm:pt-24 lg:grid-cols-[0.72fr_1.28fr] lg:grid-rows-[1fr_1fr] lg:gap-x-4 lg:gap-y-7 lg:pb-16">
+      <div className="relative mx-auto grid min-h-[100svh] w-full max-w-7xl grid-cols-1 content-center gap-4 px-5 pb-12 pt-[4.6rem] [@media(max-height:700px)]:gap-3 [@media(max-height:700px)]:pt-[4.2rem] sm:gap-6 sm:px-6 sm:pt-24 lg:grid-cols-[0.72fr_1.28fr] lg:grid-rows-[1fr_1fr] lg:gap-x-4 lg:gap-y-7 lg:pb-16">
         <div className="lg:col-start-1 lg:row-start-1 lg:self-end">{pitch}</div>
 
         {/* ---- the reel ---- */}

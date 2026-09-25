@@ -44,6 +44,38 @@ export function NavBar({ items, className }: NavBarProps) {
       : undefined;
 
   const [spyTab, setSpyTab] = useState<string | null>(null);
+
+  /**
+   * ON A PHONE THE NAV LIVES AT THE TOP AND GETS OUT OF THE WAY.
+   *
+   * It used to sit at the bottom, mid-screen, right where a thumb scrolls,
+   * so a swipe could land on it and take the reader off the page. Now it sits
+   * top right (the back link has the top left), tucks up while you scroll
+   * down, and comes back the moment you scroll up, or near the top.
+   * Desktop keeps it pinned and visible, as it always was.
+   */
+  const [tucked, setTucked] = useState(false);
+  useEffect(() => {
+    let last = window.scrollY;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const y = window.scrollY;
+        const dy = y - last;
+        if (y < 80) setTucked(false);
+        else if (dy > 6) setTucked(true);
+        else if (dy < -6) setTucked(false);
+        if (Math.abs(dy) > 6 || y < 80) last = y;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
   const activeTab = routeTab ?? spyTab ?? items[0].name;
 
   // Scrollspy, homepage only. A tall, thin band across the middle of the
@@ -99,11 +131,11 @@ export function NavBar({ items, className }: NavBarProps) {
   return (
     <div
       className={cn(
-        // `sm:bottom-auto` is load-bearing: with bottom-0 AND sm:top-0 both
-        // set, this fixed wrapper stretched the FULL viewport height — an
-        // invisible z-50 column down the screen's center that swallowed all
-        // mouse events over the hero CTA (hover never fired).
-        "fixed bottom-0 sm:bottom-auto sm:top-0 left-1/2 -translate-x-1/2 z-50 mb-6 sm:pt-6",
+        // Top only, never top AND bottom: a fixed wrapper with both set
+        // stretches the full viewport height, an invisible z-50 column that
+        // once swallowed every click over the hero CTA. On a phone it sits
+        // top right, clear of the back link; from `sm` up, top centre.
+        "fixed top-0 right-3 z-50 pt-[max(0.9rem,env(safe-area-inset-top))] sm:right-auto sm:left-1/2 sm:-translate-x-1/2 sm:pt-6",
         className,
       )}
       // Stable hooks for ground-aware theming. A page on an ink ground sets
@@ -120,7 +152,11 @@ export function NavBar({ items, className }: NavBarProps) {
           frosted surface instead of near-transparent glass. */}
       <div
         data-nav-pill=""
-        className="flex items-center gap-1.5 bg-background/72 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg"
+        className={cn(
+          "flex items-center gap-1.5 bg-background/72 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg",
+          "transition-[transform,opacity] duration-300 ease-out",
+          tucked && "max-sm:pointer-events-none max-sm:-translate-y-[160%] max-sm:opacity-0",
+        )}
       >
         {items.map((item) => {
           const Icon = item.icon;

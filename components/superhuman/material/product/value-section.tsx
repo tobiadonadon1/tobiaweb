@@ -136,7 +136,7 @@ export function ValueSection({
       style={{ ["--value-travel" as string]: `${TRAVEL_SVH}svh` }}
     >
       <div className="value-stage sticky top-0 flex h-[100svh] flex-col overflow-hidden">
-        <div className="mx-auto grid h-full w-full max-w-6xl grid-rows-[auto_1fr_auto] px-6 pb-[max(10.5rem,calc(env(safe-area-inset-bottom)+10rem))] pt-24 sm:pb-12 lg:grid-cols-[1.1fr_0.9fr] lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:pb-16 lg:pt-28">
+        <div className="mx-auto grid h-full w-full max-w-6xl grid-rows-[auto_1fr_auto] px-6 pb-[max(6rem,calc(env(safe-area-inset-bottom)+5.5rem))] pt-24 sm:pb-12 lg:grid-cols-[1.1fr_0.9fr] lg:grid-rows-[auto_1fr] lg:gap-x-14 lg:pb-16 lg:pt-28">
           <h2
             id="value-title"
             className="text-balance font-serif text-[clamp(2rem,4.6vw,3.2rem)] leading-[1.02] tracking-[-0.035em] text-[var(--ink)] lg:col-span-2"

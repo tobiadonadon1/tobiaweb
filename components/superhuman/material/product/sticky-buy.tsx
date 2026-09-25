@@ -52,15 +52,14 @@ export function StickyBuy({
 
   const shown = heroGone && !closeReached;
 
-  /* A floating card, not a full-width bar. Below `sm` the site's own nav is a
-     pill pinned to the bottom of the screen (SiteNav: bottom-0, mb-6, about
-     48px tall), so the card rides just above it; from `sm` up the nav moves
-     to the top and the card drops to the bottom edge. */
+  /* A floating card, not a full-width bar, at the bottom edge. The site's
+     nav lives at the top on every screen size now, so nothing down here
+     competes with it. */
   return (
     <div
       aria-hidden={!shown}
       inert={!shown}
-      className={`fixed inset-x-3 z-40 mx-auto max-w-[26rem] transition-[transform,opacity] duration-500 ease-out bottom-[calc(env(safe-area-inset-bottom)+5.4rem)] sm:bottom-5 md:hidden ${
+      className={`fixed inset-x-3 z-40 mx-auto max-w-[26rem] transition-[transform,opacity] duration-500 ease-out bottom-[calc(env(safe-area-inset-bottom)+0.9rem)] sm:bottom-5 md:hidden ${
         shown ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
       }`}
     >
