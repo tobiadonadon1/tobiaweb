@@ -13,9 +13,11 @@ import type { DeviceKind, Pose } from "./device-stage";
  * Tobia: a film should be playing the moment you land, and the films should
  * be their best ten seconds, not a slow build. So the hero is a reel of three
  * ten-second cuts (public/shop/launchr/*.mp4, each starting on a strong frame)
- * playing back to back on a 3D device: MYYND and Ledgerly's web app on a
- * MacBook, Ledgerly's mobile app on a phone. When a cut ends, the next one
- * starts, and the laptop turns into the phone and back.
+ * playing on a 3D device: MYYND and Ledgerly's web app on a MacBook,
+ * Ledgerly's mobile app on a phone. Tobia then asked for faster changes, at
+ * most three seconds, so each film plays for SLOT seconds and hands over. A
+ * film resumes where it stopped when its turn comes back, so each pass shows
+ * a different part of its ten seconds, and it wraps at its end.
  *
  * The pitch beside it is his: what it saves, and that it runs inside your own
  * Claude subscription. The price is on the page, just not the headline.
@@ -38,6 +40,8 @@ const FILMS: Film[] = [
 ];
 
 const mono = "font-mono uppercase tracking-[0.16em]";
+/** Seconds each film holds the screen before the next one takes over. */
+const SLOT = 3;
 
 export function LaunchrStage() {
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
@@ -69,8 +73,6 @@ export function LaunchrStage() {
 
   const go = useCallback((i: number) => {
     const next = (i + FILMS.length) % FILMS.length;
-    const v = videos.current[next];
-    if (v) v.currentTime = 0;
     pose.current = { look: next };
     setLook(next);
   }, []);
@@ -93,22 +95,35 @@ export function LaunchrStage() {
     });
   }, [look, seen, sound, motion]);
 
-  /* ---- the ticks fill with the cut, like stories ---- */
+  /* ---- each film holds the screen for SLOT seconds of play ----
+     Measured in the film's own time, so a stall or a hidden tab does not
+     eat the slot. The ticks fill with it, like stories. */
   useEffect(() => {
     if (!motion) return;
+    const v = videos.current[look];
+    let from = v ? v.currentTime : 0;
+    let played = 0;
     let raf = 0;
     const tick = () => {
+      if (v) {
+        const t = v.currentTime;
+        // A wrap at the film's end counts the rest of the loop too.
+        played += t >= from ? t - from : t + (v.duration || 10) - from;
+        from = t;
+      }
+      const p = Math.min(1, played / SLOT);
       fills.current.forEach((f, i) => {
-        if (!f) return;
-        const v = videos.current[i];
-        const p = i < look ? 1 : i > look || !v || !v.duration ? 0 : v.currentTime / v.duration;
-        f.style.transform = `scaleX(${p})`;
+        if (f) f.style.transform = `scaleX(${i < look ? 1 : i === look ? p : 0})`;
       });
+      if (played >= SLOT) {
+        go(look + 1);
+        return;
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [look, motion]);
+  }, [look, motion, go]);
 
   const pitch = (
     <>
@@ -133,8 +148,8 @@ export function LaunchrStage() {
 
   const pitchValue = (
     <p className="lx-fade mx-auto max-w-[34ch] text-balance text-center text-[1rem] leading-[1.45] sm:text-[1.08rem] text-[rgba(244,242,236,0.78)] md:text-[1.25rem] lg:mx-0 lg:text-left">
-      Skip the <span className="text-[#f4f2ec]">$50+ Higgsfield plan</span> and the{" "}
-      <span className="text-[#f4f2ec]">$5,000+ video team</span>. Make every launch
+      Skip the <span className="text-[#f4f2ec]">€50+ Higgsfield plan</span> and the{" "}
+      <span className="text-[#f4f2ec]">€5,000+ video team</span>. Make every launch
       video inside your own Claude subscription.
     </p>
   );
@@ -195,10 +210,10 @@ export function LaunchrStage() {
                   poster={f.poster}
                   muted
                   autoPlay={i === 0}
+                  loop
                   playsInline
                   preload="auto"
                   crossOrigin="anonymous"
-                  onEnded={() => i === look && go(i + 1)}
                   aria-label="A launch video made with Launchr"
                   className={
                     mode === "flat"

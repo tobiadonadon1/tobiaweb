@@ -15,7 +15,8 @@ import { StickyBuy } from "./sticky-buy";
  * couple of big titles", and it should be about what you can make, not about
  * each example. Then: lead with the savings, not the price ("Save more than
  * $50 on Higgsfield and more than $5,000 on a team creating your video. Just
- * do it inside your own Claude subscription"). Those figures are his. So:
+ * do it inside your own Claude subscription"). Those figures are his, shown
+ * in euros at his request. So:
  *
  *   1. The hero: a reel already playing, and the savings.
  *   2. What it does, in three lines.
@@ -85,10 +86,10 @@ export function LaunchrPage() {
       {/* 3. THE PRICE, AND THE BUTTON. It holds. */}
       <section id={CLOSE_ID} aria-labelledby="close-title" className="scroll-mt-28 border-t border-[rgba(244,242,236,0.1)] px-6 py-28 text-center md:py-40">
         <h2 id="close-title" className={`${big} mx-auto max-w-[13ch] text-[clamp(2.8rem,8vw,6.5rem)]`}>
-          Skip the <span className="text-[#f07a5f]">$5,000</span> video team.
+          Skip the <span className="text-[#f07a5f]">€5,000</span> video team.
         </h2>
         <p className="mx-auto mt-6 max-w-[34ch] text-balance text-[1.1rem] leading-[1.5] text-[rgba(244,242,236,0.72)] md:text-[1.3rem]">
-          And the $50+ Higgsfield plan. Make every launch video inside your own
+          And the €50+ Higgsfield plan. Make every launch video inside your own
           Claude subscription.
         </p>
         <div className="mt-10 flex justify-center">
