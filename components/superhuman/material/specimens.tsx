@@ -277,6 +277,29 @@ function The98cTrade() {
   );
 }
 
+/**
+ * LAUNCHR — a screen with a play wedge on it, taking off.
+ *
+ * A launch video is a thing on a screen that leaves: so an ink card stood on
+ * end as a phone, the vermilion wedge that means "play" on its face, a
+ * saffron trail sweeping up from under it, and three flecks thrown off ahead
+ * of it. The only mark in the set that moves out of its own frame.
+ */
+function Launchr() {
+  return (
+    <>
+      <Cut d={BAR} x={14} y={262} s={1.0} sy={1.1} fill={SHADE} rotate={-24} />
+      <Cut d={BAR} x={8} y={254} s={1.0} sy={1.1} fill={SAFFRON} rotate={-24} />
+      <Cut d={CARD} x={176} y={36} s={0.74} sy={1.46} fill={SHADE} rotate={8} />
+      <Cut d={CARD} x={168} y={28} s={0.74} sy={1.46} fill={INK} rotate={8} />
+      <Cut d={WEDGE} x={214} y={112} s={0.52} fill={VERMILION} rotate={8} />
+      <Cut d={FLECK} x={330} y={34} s={0.9} fill={ULTRAMARINE} rotate={-8} />
+      <Cut d={FLECK} x={352} y={96} s={0.62} fill={FOREST} rotate={12} />
+      <Cut d={FLECK} x={318} y={132} s={0.5} fill={SAFFRON} rotate={4} />
+    </>
+  );
+}
+
 /* ================================================================== *
  * THE THREE SKILL MARKS.
  *
@@ -636,6 +659,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   setups: Setups,
   // the setups themselves
   "the-98c-trade": The98cTrade,
+  launchr: Launchr,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,

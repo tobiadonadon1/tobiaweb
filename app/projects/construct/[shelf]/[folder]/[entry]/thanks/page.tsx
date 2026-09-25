@@ -142,7 +142,7 @@ function Paid({
         ) : (
           <p className="mx-auto mt-5 max-w-[36ch] text-[0.95rem] leading-[1.5] text-[color:rgba(11,31,58,0.62)]">
             On your phone? Open the email on your computer. That&rsquo;s where
-            the bot runs.
+            it runs.
           </p>
         )}
       </header>

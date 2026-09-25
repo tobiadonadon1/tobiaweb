@@ -28,4 +28,18 @@ export const SETUPS: MaterialEntry[] = [
     body: [],
     product: "the-98c-trade",
   },
+  {
+    slug: "launchr",
+    title: "Launchr",
+    kind: "setup",
+    summary:
+      "Your logo, product photos or screenshots in, a finished launch video with its own soundtrack out, in about ten minutes.",
+    // Minutes to a finished video.
+    minutes: 10,
+    status: "ready",
+    when: "You're launching a product, a feature or an update and it needs a video today, not next week.",
+    level: "Anyone",
+    body: [],
+    product: "launchr",
+  },
 ];

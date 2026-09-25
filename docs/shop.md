@@ -1,10 +1,17 @@
 # The shop
 
-How a sale works, and the one-time setup to switch it on. The product is
-**The 98¢ Trade**, €5, at `/projects/construct/material/setups/the-98c-trade`
-(short link for posts: **tobiadonadon.com/98c**), defined once in
-`lib/shop/products.ts`. (Motion Director, in Skills, is free: a plain
-download like the other skills, not part of the shop.)
+How a sale works, and the one-time setup to switch it on. Two products, both
+in Setups and both defined once in `lib/shop/products.ts`:
+
+- **The 98¢ Trade**, €5, at `/projects/construct/material/setups/the-98c-trade`
+  (short link for posts: **tobiadonadon.com/98c**).
+- **Launchr**, €12, at `/projects/construct/material/setups/launchr`, on
+  Stripe product `prod_VKL1qwlByvTm4z`. Its page is the 3D device stage
+  (`launchr-stage.tsx`, `device-stage.tsx`), playing the four example films in
+  `public/shop/launchr/`.
+
+(Motion Director, in Skills, is free: a plain download like the other skills,
+not part of the shop.)
 
 ## How a sale works
 
@@ -13,10 +20,11 @@ download like the other skills, not part of the shop.)
 2. **Paid.** Stripe sends the buyer to `…/the-98c-trade/thanks?session_id=…`.
    The page asks Stripe whether that session is paid and shows the download.
 3. **Email.** Stripe calls `/api/stripe/webhook`; the site emails the buyer
-   **from tobia10donadon@gmail.com** through Gmail, with the zip attached and
-   a download link as backup. Gmail blocks any zip holding script files
-   (`.js`, `.mjs`…); if it ever refuses the attachment, the same email goes
-   again with the link only. Replies go to that
+   **from tobia10donadon@gmail.com** through Gmail. The 98¢ Trade's zip is
+   attached, with a download link as backup. Launchr's email carries the link
+   only (`attach: false`): Gmail blocks any zip holding script files, and its
+   engine is `.mjs`. If Gmail ever refuses an attachment anyway, the same
+   email goes again with the link only. Replies go to that
    inbox, and every delivery is in its Sent folder. The webhook is the only sender, so it can't go twice;
    if it fails, Stripe retries for three days.
 4. **Download.** `/api/download?session_id=…` checks with Stripe again, then
@@ -83,11 +91,16 @@ Then redeploy.
   your Gmail within a minute. Then
   refund yourself in Stripe → Payments.
 
-## Shipping a new version of the bot
+## Shipping a new version
+
+Launchr ships WITHOUT the four example MP4s (34 MB, far over the 4 MB limit);
+they are on the product page instead. Rebuild its zip from the folder with
+`examples/` removed.
 
 ```
 npm run seal -- ~/Desktop/JevTrader/dist/the-98c-trade.zip
-git add private && git commit -m "New version of The 98¢ Trade" && git push
+npm run seal -- ~/Desktop/launchr-shipped.zip   # rename to launchr.zip first
+git add private && git commit -m "New version of …" && git push
 ```
 
 Use the same `SHOP_FILE_KEY` (the script reads it from `.env.local`). Every

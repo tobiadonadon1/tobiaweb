@@ -32,6 +32,8 @@ const ZIP = Buffer.from("PK\u0003\u0004 not really a zip, but the bytes have to 
 const cwd = mkdtempSync(path.join(tmpdir(), "shop-test-"));
 mkdirSync(path.join(cwd, "private"));
 writeFileSync(path.join(cwd, "private", "the-98c-trade.zip.enc"), seal(ZIP, parseKey(fileKey)));
+const LAUNCHR_ZIP = Buffer.from("PK\u0003\u0004 the launch-video skill, a different file " + "z".repeat(3000));
+writeFileSync(path.join(cwd, "private", "launchr.zip.enc"), seal(LAUNCHR_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -51,7 +53,7 @@ const { POST: webhook } = await import("../app/api/stripe/webhook/route.ts");
 const { GET: download } = await import("../app/api/download/route.ts");
 const { POST: checkout } = await import("../app/api/checkout/route.ts");
 const { GET: health } = await import("../app/api/shop/health/route.ts");
-const { THE_98C_TRADE, productById } = await import("../lib/shop/products.ts");
+const { THE_98C_TRADE, LAUNCHR, productById } = await import("../lib/shop/products.ts");
 
 const ORIGIN = "http://localhost:3000";
 const signer = new Stripe("sk_test_mock").webhooks;
@@ -131,6 +133,13 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(md?.product, undefined);
   assert.equal(md?.link?.download, true);
   assert.equal(productById("motion-director"), undefined);
+  // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
+  assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["the-98c-trade", "launchr"], "Launchr sits below the 98¢ Trade");
+  assert.equal(LAUNCHR.priceCents, 1200);
+  assert.equal(LAUNCHR.priceLabel, "€12");
+  assert.equal(LAUNCHR.stripeProductId, "prod_VKL1qwlByvTm4z");
   assert.equal(productById("__proto__"), undefined);
   assert.equal(productById("nope"), undefined);
 });
@@ -219,6 +228,41 @@ test("email: a refused attachment goes again as a link, and the buyer gets one e
   const meta = globalThis.__stripe.paymentIntents.get(`pi_${id}`).metadata;
   assert.ok(meta.delivered_at);
   assert.equal(meta.delivery_file, "link");
+});
+
+test("webhook: Launchr ships its own file as a link, never as an attachment Gmail would refuse", async () => {
+  const id = purchase({ product: "launchr", name: "Grace Hopper" });
+  const res = await webhook(signedEvent(id));
+  assert.equal((await res.json()).delivery, "sent");
+  assert.equal(mail().length, 1, "one send, no refused attempt first");
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Launchr");
+  assert.equal(m.attachments.length, 0);
+  const link = `${ORIGIN}/api/download?session_id=${id}`;
+  assert.ok(m.text.includes(link) && m.html.includes(link));
+  assert.ok(!/attached/i.test(m.text + m.html), "never promises an attachment");
+  assert.ok(m.html.includes(">/launchr<"), "the command is set as code");
+  assert.ok(m.html.includes("€12"));
+  assert.ok(!/TypeSafe|financial advice/i.test(m.text), "none of the bot's copy");
+  assert.equal(globalThis.__stripe.paymentIntents.get(`pi_${id}`).metadata.delivery_file, "link");
+
+  const dl = await download(new Request(link));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-disposition"), /filename="launchr.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), LAUNCHR_ZIP, "the video skill, not the bot");
+});
+
+test("checkout: Launchr charges €12 on its own Stripe product and comes back to its own page", async () => {
+  globalThis.__stripe.products.add("prod_VKL1qwlByvTm4z");
+  const res = await buy("launchr");
+  assert.equal(res.status, 303);
+  const params = globalThis.__stripe.createdSessions[0];
+  assert.equal(params.line_items[0].price_data.product, "prod_VKL1qwlByvTm4z");
+  assert.equal(params.line_items[0].price_data.unit_amount, 1200);
+  assert.equal(params.line_items[0].price_data.currency, "eur");
+  assert.equal(params.metadata.product, "launchr");
+  assert.equal(params.success_url, `${ORIGIN}${LAUNCHR.href}/thanks?session_id={CHECKOUT_SESSION_ID}`);
+  assert.equal(params.cancel_url, `${ORIGIN}${LAUNCHR.href}`);
 });
 
 test("webhook: the same event twice sends one email", async () => {
@@ -362,6 +406,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.stripeMode, "test");
   assert.equal(body.emailVia, "gmail");
   assert.equal(body.files["the-98c-trade"].bytes, ZIP.length);
+  assert.equal(body.files.launchr.bytes, LAUNCHR_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

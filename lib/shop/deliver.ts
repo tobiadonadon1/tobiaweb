@@ -147,12 +147,12 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
     return via === "gmail" ? viaGmail(msg) : viaResend(msg);
   };
 
-  let file: "attached" | "link" = "attached";
+  let file: "attached" | "link" = purchase.product.file.attach === false ? "link" : "attached";
   let id: string;
   try {
     id = await send(file === "attached");
   } catch (err) {
-    if (!refusedAttachment(err)) throw err;
+    if (file === "link" || !refusedAttachment(err)) throw err;
     console.warn("[shop] the mail server refused the attachment, sending the link instead", err);
     file = "link";
     id = await send(false);
@@ -215,7 +215,7 @@ export function emailBase(purchase: Purchase, origin: string): string {
 export function deliveryEmail(
   purchase: Purchase,
   origin: string,
-  { attached = true }: { attached?: boolean } = {},
+  { attached = purchase.product.file.attach !== false }: { attached?: boolean } = {},
 ) {
   const { product, session } = purchase;
   const base = emailBase(purchase, origin);

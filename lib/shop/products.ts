@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade";
+export type ProductId = "the-98c-trade" | "launchr";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -52,11 +52,12 @@ export type Product = {
    * 4.5 MB, and the download is served by one.
    *
    * Gmail refuses a zip that holds a script file (.js, .mjs and friends),
-   * whatever the script does. The delivery email falls back to the link when
-   * that happens (see deliver.ts), but a product that ships code will always
-   * take that path.
+   * whatever the script does. `attach: false` sends the email with the
+   * download link only, for a product that ships code, so Gmail is never
+   * handed a message it will refuse. (If it refuses one anyway, deliver.ts
+   * sends the link instead.)
    */
-  file: { sealed: string; filename: string };
+  file: { sealed: string; filename: string; attach?: boolean };
   /**
    * The product in Stripe, so every sale lands on ONE product in the
    * dashboard rather than on a new inline product per checkout. The price is
@@ -126,8 +127,60 @@ export const THE_98C_TRADE: Product = {
   },
 };
 
+export const LAUNCHR: Product = {
+  id: "launchr",
+  name: "Launchr",
+  description:
+    "A Claude Code skill that turns your logo, product photos or app screenshots into a finished 15 to 30 second launch video with its own soundtrack. Instant download.",
+  priceCents: 1200,
+  currency: "eur",
+  priceLabel: money(1200, "eur"),
+  href: "/projects/construct/material/setups/launchr",
+  file: {
+    sealed: "launchr.zip.enc",
+    filename: "launchr.zip",
+    // The render engine is .mjs files, which Gmail refuses inside a zip.
+    attach: false,
+  },
+  stripeProductId: "prod_VKL1qwlByvTm4z",
+  share: {
+    description:
+      "Launchr puts a motion-graphics studio inside Claude Code. Drop in your logo, product photos or screenshots and get a finished launch video with its own soundtrack in about ten minutes. €12 once, unlimited videos.",
+    kicker: "Skill · for Claude Code",
+    line: "Your launch video, with its own soundtrack, in ten minutes.",
+    proof: "Unlimited videos · commercial use",
+  },
+  contents: [
+    ["launchr/SKILL.md", "the workflow Claude follows, from your assets to the MP4"],
+    ["references/", "the launch playbook: structure, the four looks, sound"],
+    ["engine/", "the cut-out, device, animation, music and render engine"],
+    ["examples/", "four finished launch films as code, one per look"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs Launchr in about two minutes.",
+  ],
+  email: {
+    after: [
+      "From then on, type /launchr in any Claude Code session, or just ask for a launch video. Tell it what you're launching and drag in your logo, product photos or screenshots.",
+      "About ten minutes later the MP4 is in the Launchr Videos folder on your Desktop. Every video and its soundtrack is yours to use, commercially too, and you can make as many as you want.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. If Node is missing, Claude will tell you.",
+    next: [
+      ["Right after install", "Claude offers to make your first launch video. Have your logo and a product photo or a screenshot ready."],
+      ["Every video", "A few quick questions, your files dragged in, then about ten minutes to a finished MP4."],
+      ["Want changes?", "Say \"shorter headline\", \"try dark premium\" or \"now a vertical version\" and it renders again."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
+  launchr: LAUNCHR,
 };
 
 export function productById(id: unknown): Product | undefined {
