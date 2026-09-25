@@ -221,8 +221,10 @@ export function deliveryEmail(
   const base = emailBase(purchase, origin);
   const download = `${base}${downloadHref(session.id)}`;
   const guide = `${base}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`;
-  const first = purchase.name?.trim().split(/\s+/)[0];
-  const hello = first ? `Hi ${first},` : "Hi,";
+  // Plain "Hi," for everyone. The name typed at checkout is often a card
+  // name, a company or a test fixture ("Jenny"), and a wrong name reads worse
+  // than none.
+  const hello = "Hi,";
   const file = product.file.filename;
   const { steps, email } = product;
 

@@ -178,7 +178,8 @@ test("webhook: a paid purchase gets the email from Gmail, with the zip attached,
   const link = `${ORIGIN}/api/download?session_id=${id}`;
   assert.ok(message.html.includes(link), "the html carries the download link");
   assert.ok(message.text.includes(link), "so does the plain-text part");
-  assert.ok(message.text.startsWith("Hi Ada,"));
+  assert.ok(message.text.startsWith("Hi,\n"), "a plain hello, no name");
+  assert.ok(!message.text.includes("Ada") && !message.html.includes("Ada"), "the buyer's name is not used");
   assert.ok(message.html.includes("€5"));
   assert.ok(stamp(id), "the payment is marked delivered");
   assert.equal(resendCalls.length, 0, "Resend is not used when Gmail is configured");
