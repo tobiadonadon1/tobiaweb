@@ -31,6 +31,7 @@ export function BuyForm({
   tone = "paper",
   reportErrors = false,
   compact = false,
+  label,
   className = "",
 }: {
   productId: string;
@@ -40,6 +41,8 @@ export function BuyForm({
   reportErrors?: boolean;
   /** The sticky card's size: shorter button, shorter words. */
   compact?: boolean;
+  /** The button's words, when the price is said elsewhere. */
+  label?: string;
   className?: string;
 }) {
   const [pending, setPending] = useState(false);
@@ -93,7 +96,7 @@ export function BuyForm({
           </>
         ) : (
           <>
-            {compact ? `Buy · ${price}` : `Buy it for ${price}`}
+            {label ?? (compact ? `Buy · ${price}` : `Buy it for ${price}`)}
             <ArrowRight
               aria-hidden
               className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"

@@ -13,14 +13,13 @@ import { StickyBuy } from "./sticky-buy";
  * Tobia on the first version: shorter, more techy, "straight to the point: a
  * couple of phrases so people know what to buy, max three or four lines", "a
  * couple of big titles", and it should be about what you can make, not about
- * each example. So three parts:
+ * each example. Then: lead with the savings, not the price ("Save more than
+ * $50 on Higgsfield and more than $5,000 on a team creating your video. Just
+ * do it inside your own Claude subscription"). Those figures are his. So:
  *
- *   1. The stage: the laptop opens into a real Launchr film, then two more.
+ *   1. The hero: a reel already playing, and the savings.
  *   2. What it does, in three lines.
- *   3. The price, and the button.
- *
- * No competitor names or prices. The spec lines are facts from the product
- * itself (formats, resolution, what it needs).
+ *   3. The savings again, big, and the button. The price stays in small type.
  */
 
 const CLOSE_ID = "buy-close";
@@ -85,15 +84,18 @@ export function LaunchrPage() {
 
       {/* 3. THE PRICE, AND THE BUTTON. It holds. */}
       <section id={CLOSE_ID} aria-labelledby="close-title" className="scroll-mt-28 border-t border-[rgba(244,242,236,0.1)] px-6 py-28 text-center md:py-40">
-        <p className={`${big} text-[clamp(4.5rem,14vw,10rem)]`}>{PRODUCT.priceLabel}</p>
-        <h2 id="close-title" className={`${big} mx-auto mt-4 max-w-[18ch] text-[clamp(1.6rem,3.4vw,2.6rem)] text-[rgba(244,242,236,0.7)]`}>
-          One payment. Unlimited launch videos.
+        <h2 id="close-title" className={`${big} mx-auto max-w-[13ch] text-[clamp(2.8rem,8vw,6.5rem)]`}>
+          Skip the <span className="text-[#f07a5f]">$5,000</span> video team.
         </h2>
+        <p className="mx-auto mt-6 max-w-[34ch] text-balance text-[1.1rem] leading-[1.5] text-[rgba(244,242,236,0.72)] md:text-[1.3rem]">
+          And the $50+ Higgsfield plan. Make every launch video inside your own
+          Claude subscription.
+        </p>
         <div className="mt-10 flex justify-center">
-          <BuyForm productId={PRODUCT.id} price={PRODUCT.priceLabel} tone="ink" />
+          <BuyForm productId={PRODUCT.id} price={PRODUCT.priceLabel} label="Get Launchr" tone="ink" />
         </div>
-        <p className={`${mono} mx-auto mt-6 max-w-[48ch] text-[0.6rem] leading-[2] text-[rgba(244,242,236,0.45)] md:text-[0.66rem]`}>
-          Instant download · Mac · Claude Code with a paid plan · Node.js 18+
+        <p className={`${mono} mx-auto mt-6 max-w-[52ch] text-[0.6rem] leading-[2] text-[rgba(244,242,236,0.45)] md:text-[0.66rem]`}>
+          One time {PRODUCT.priceLabel} · instant download · Mac · Claude Code with a paid plan · Node.js 18+
         </p>
       </section>
 

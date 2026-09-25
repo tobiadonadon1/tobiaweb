@@ -12,9 +12,9 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
  * the vertical one. Each screen is the film itself, a video texture, unlit so
  * its colours are the colours Launchr rendered.
  *
- * THE OPENING IS THE PEAK. The laptop rises out of the dark closed, the lid
- * swings open, and the screen powers on into the first film while the camera
- * settles in. It plays once, the first time the stage is drawn.
+ * THE OPENING. The laptop rises out of the dark closed, the lid swings open
+ * and the screen powers on into the film that is already playing, in about a
+ * second. It plays once, the first time the stage is drawn.
  *
  * ONE POSE DRIVES THE REST. The section writes `pose.current` on every scroll
  * frame (which film is current). A new film on the same device gives it a
@@ -335,7 +335,7 @@ export default function DeviceStage({
     let introDone = looks[pose.current?.look ?? 0]?.device !== "laptop";
     if (introDone) lid.rotation.x = LID_OPEN;
     let introStart = -1;
-    let camDist = fitDistance("laptop") * (introDone ? 1 : 1.55);
+    let camDist = fitDistance("laptop") * (introDone ? 1 : 1.3);
     let lastLook = -1;
     let ready = false;
     const start = performance.now();
@@ -350,16 +350,17 @@ export default function DeviceStage({
       const kind = looks[look].device;
       const k = 1 - Math.pow(0.0009, dt);
 
-      // The opening: rise, open, power on. About 2.6 s, once.
+      // The opening: rise, open, power on. Quick (about 1.1 s), because the
+      // film is already playing and the point is to see it.
       let rise = 1;
       let power = 1;
       if (!introDone) {
         if (introStart < 0) introStart = now;
         const it = (now - introStart) / 1000;
-        rise = ease(it / 1.1);
-        lid.rotation.x = LID_SHUT + (LID_OPEN - LID_SHUT) * smooth((it - 0.5) / 1.3);
-        power = smooth((it - 1.5) / 0.7);
-        if (it > 2.6 || kind !== "laptop") {
+        rise = ease(it / 0.7);
+        lid.rotation.x = LID_SHUT + (LID_OPEN - LID_SHUT) * smooth((it - 0.1) / 0.75);
+        power = smooth((it - 0.45) / 0.35);
+        if (it > 1.1 || kind !== "laptop") {
           introDone = true;
           lid.rotation.x = LID_OPEN;
           power = 1;
