@@ -6,38 +6,35 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 
 /**
- * THE DEVICE, IN THREE DIMENSIONS, PLAYING THE REAL FILMS.
+ * THE DEVICES, IN THREE DIMENSIONS, PLAYING THE REAL FILMS. On black.
  *
- * Launchr's films are made for three kinds of screen, so the stage has three
- * devices: a phone (vertical films), a laptop (landscape) and a feed post
- * (square). Each screen is the film itself, as a video texture, unlit so its
- * colours are the colours Launchr rendered.
+ * Two devices: a MacBook-style laptop for the landscape films and a phone for
+ * the vertical one. Each screen is the film itself, a video texture, unlit so
+ * its colours are the colours Launchr rendered.
  *
- * ONE POSE DRIVES IT. The section writes `pose.current` on every scroll frame:
- * which look is current and how far the camera has pushed in. When the look
- * changes device, the old one spins out as the new one spins in, so the phone
- * seems to turn round and come back as a laptop. That is the page's peak.
+ * THE OPENING IS THE PEAK. The laptop rises out of the dark closed, the lid
+ * swings open, and the screen powers on into the first film while the camera
+ * settles in. It plays once, the first time the stage is drawn.
  *
- * YOUR HAND DRIVES IT TOO. Drag sideways and it turns with you, with a little
- * throw; let go and it drifts back to face you, because the film is the point.
- * The canvas keeps `touch-action: pan-y`, so on a phone a vertical swipe still
- * scrolls the page and only a sideways one turns the device.
+ * ONE POSE DRIVES THE REST. The section writes `pose.current` on every scroll
+ * frame (which film is current). A new film on the same device gives it a
+ * turn; a new device spins the old one out as the new one spins in.
+ *
+ * YOUR HAND DRIVES IT TOO. Drag sideways and it turns with you and drifts
+ * back to face you. `touch-action: pan-y` keeps a vertical swipe scrolling.
  *
  * COST. One scene, drawn only while on screen and while the tab is visible,
- * pixel ratio capped at 2. The films are <video> elements owned by the
- * section (which decides which one plays); this only reads their frames. A
- * poster stands in until a film has a frame. If WebGL is unavailable,
- * `onError` and the section shows the film in a flat frame instead.
+ * pixel ratio capped at 2. The <video> elements belong to the section, which
+ * decides what plays. A poster stands in until a film has a frame. Without
+ * WebGL, `onError`, and the section shows the film flat.
  */
 
-export type DeviceKind = "phone" | "laptop" | "post";
+export type DeviceKind = "phone" | "laptop";
 export type StageLook = { device: DeviceKind; poster: string };
-export type Pose = { look: number; push: number };
-
-const PAPER_CARD = "#fbfaf7";
+export type Pose = { look: number };
 
 /** A flat rounded rectangle whose UVs span it exactly, for screens. */
-function screenGeometry(w: number, h: number, r: number) {
+function roundedRect(w: number, h: number, r: number) {
   const s = new THREE.Shape();
   const x = -w / 2;
   const y = -h / 2;
@@ -61,15 +58,15 @@ function screenGeometry(w: number, h: number, r: number) {
   return g;
 }
 
-/** A soft round shadow for the device to stand over. */
-function shadowTexture() {
+/** A soft pool of light for the device to stand in, on a black page. */
+function poolTexture() {
   const c = document.createElement("canvas");
   c.width = c.height = 128;
   const g = c.getContext("2d")!;
-  const grad = g.createRadialGradient(64, 64, 4, 64, 64, 64);
-  grad.addColorStop(0, "rgba(11,31,58,0.42)");
-  grad.addColorStop(0.55, "rgba(11,31,58,0.12)");
-  grad.addColorStop(1, "rgba(11,31,58,0)");
+  const grad = g.createRadialGradient(64, 64, 2, 64, 64, 64);
+  grad.addColorStop(0, "rgba(255,255,255,0.16)");
+  grad.addColorStop(0.5, "rgba(255,255,255,0.05)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
   g.fillStyle = grad;
   g.fillRect(0, 0, 128, 128);
   const t = new THREE.CanvasTexture(c);
@@ -79,16 +76,19 @@ function shadowTexture() {
 
 /** How much of the scene each device needs to show, for the camera fit. */
 const FIT: Record<DeviceKind, { w: number; h: number; y: number }> = {
-  phone: { w: 1.45, h: 2.0, y: 0 },
-  laptop: { w: 3.0, h: 2.05, y: 0.05 },
-  post: { w: 2.05, h: 2.45, y: 0 },
+  phone: { w: 1.4, h: 1.95, y: 0 },
+  laptop: { w: 3.45, h: 2.45, y: 0.12 },
 };
 
-type Device = {
-  group: THREE.Group;
-  screen: THREE.MeshBasicMaterial;
-  presence: number;
+const LID_OPEN = -0.12;
+const LID_SHUT = 1.5;
+const ease = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+const smooth = (t: number) => {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
 };
+
+type Device = { group: THREE.Group; screen: THREE.MeshBasicMaterial; presence: number };
 
 export default function DeviceStage({
   looks,
@@ -132,18 +132,21 @@ export default function DeviceStage({
     const pmrem = new THREE.PMREMGenerator(renderer);
     const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = env;
-    scene.environmentIntensity = 0.75;
+    scene.environmentIntensity = 0.55;
 
     const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 50);
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    const key = new THREE.DirectionalLight(0xffffff, 1.4);
     key.position.set(-3, 4, 5);
     scene.add(key);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xd9d4ca, 0.9));
+    const rim = new THREE.DirectionalLight(0xbfd4ff, 1.1);
+    rim.position.set(4, 2, -4);
+    scene.add(rim);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x101014, 0.5));
 
     const root = new THREE.Group();
     scene.add(root);
 
-    /* ---- textures: a poster per look, a video texture per look ---- */
+    /* ---- textures ---- */
     const loader = new THREE.TextureLoader();
     const posters = looks.map((l) => {
       const t = loader.load(l.poster);
@@ -164,37 +167,78 @@ export default function DeviceStage({
       disposables.push(m);
       return m;
     };
+    const basic = (color: number) => {
+      const m = new THREE.MeshBasicMaterial({ color, toneMapped: false });
+      disposables.push(m);
+      return m;
+    };
     const geo = <G extends THREE.BufferGeometry>(g: G) => {
       disposables.push(g);
       return g;
     };
-    const screenMat = () => {
-      const m = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
-      disposables.push(m);
-      return m;
-    };
 
     const byKind: Partial<Record<DeviceKind, Device>> = {};
+    const register = (kind: DeviceKind, group: THREE.Group, screen: THREE.MeshBasicMaterial) => {
+      group.scale.setScalar(0.001);
+      group.visible = false;
+      root.add(group);
+      byKind[kind] = { group, screen, presence: 0 };
+    };
+
+    /* ---- the laptop ---- */
+    const laptop = new THREE.Group();
+    const lid = new THREE.Group();
+    const laptopScreen = basic(0x000000);
+    {
+      const alu = std("#b9bcc3", 0.85, 0.3);
+      const shell = new THREE.Mesh(geo(new RoundedBoxGeometry(2.62, 1.66, 0.045, 4, 0.05)), alu);
+      shell.position.set(0, 0.83, -0.024);
+      lid.add(shell);
+      const bezel = new THREE.Mesh(geo(roundedRect(2.58, 1.62, 0.06)), basic(0x050506));
+      bezel.position.set(0, 0.83, 0.001);
+      lid.add(bezel);
+      const scr = new THREE.Mesh(geo(roundedRect(2.46, 1.38375, 0.03)), laptopScreen);
+      scr.position.set(0, 0.86, 0.003);
+      lid.add(scr);
+      const notch = new THREE.Mesh(geo(roundedRect(0.26, 0.06, 0.025)), basic(0x050506));
+      notch.position.set(0, 1.532, 0.004);
+      lid.add(notch);
+      // The lid hinges on the deck's back edge.
+      lid.position.set(0, -0.8, -0.78);
+      lid.rotation.x = LID_SHUT;
+      laptop.add(lid);
+
+      const deck = new THREE.Mesh(geo(new RoundedBoxGeometry(2.62, 0.055, 1.62, 4, 0.027)), alu);
+      deck.position.set(0, -0.83, 0.02);
+      laptop.add(deck);
+      const keys = new THREE.Mesh(geo(roundedRect(2.24, 0.78, 0.03)), std("#1c1e23", 0.3, 0.6));
+      keys.rotation.x = -Math.PI / 2;
+      keys.position.set(0, -0.801, -0.24);
+      laptop.add(keys);
+      const pad = new THREE.Mesh(geo(roundedRect(0.92, 0.5, 0.04)), std("#a9adb4", 0.8, 0.28));
+      pad.rotation.x = -Math.PI / 2;
+      pad.position.set(0, -0.801, 0.45);
+      laptop.add(pad);
+      laptop.rotation.x = 0.14;
+      register("laptop", laptop, laptopScreen);
+    }
 
     /* ---- the phone ---- */
     const phone = new THREE.Group();
     {
-      const body = new THREE.Mesh(geo(new RoundedBoxGeometry(0.99, 1.73, 0.1, 6, 0.13)), std("#1b1e25", 0.55, 0.32));
+      const body = new THREE.Mesh(geo(new RoundedBoxGeometry(0.99, 1.73, 0.1, 6, 0.13)), std("#2a2d34", 0.7, 0.28));
       phone.add(body);
-      const mat = screenMat();
-      const scr = new THREE.Mesh(geo(screenGeometry(0.94, 1.671, 0.1)), mat);
+      const mat = basic(0xffffff);
+      const scr = new THREE.Mesh(geo(roundedRect(0.94, 1.671, 0.1)), mat);
       scr.position.z = 0.0505;
       phone.add(scr);
-      const islandMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-      disposables.push(islandMat);
-      const island = new THREE.Mesh(geo(screenGeometry(0.24, 0.06, 0.03)), islandMat);
+      const island = new THREE.Mesh(geo(roundedRect(0.24, 0.06, 0.03)), basic(0x000000));
       island.position.set(0, 0.765, 0.052);
       phone.add(island);
-      const btn = new THREE.Mesh(geo(new RoundedBoxGeometry(0.02, 0.22, 0.04, 2, 0.01)), std("#2a2e37", 0.6, 0.3));
+      const btn = new THREE.Mesh(geo(new RoundedBoxGeometry(0.02, 0.22, 0.04, 2, 0.01)), std("#3a3e47", 0.7, 0.3));
       btn.position.set(0.5, 0.32, 0);
       phone.add(btn);
-      // The back, for whoever turns it round: a camera module, two lenses.
-      const bump = new THREE.Mesh(geo(new RoundedBoxGeometry(0.36, 0.36, 0.04, 3, 0.07)), std("#23272f", 0.5, 0.28));
+      const bump = new THREE.Mesh(geo(new RoundedBoxGeometry(0.36, 0.36, 0.04, 3, 0.07)), std("#30343c", 0.6, 0.28));
       bump.position.set(-0.24, 0.6, -0.06);
       phone.add(bump);
       const glass = std("#07080b", 0.2, 0.08);
@@ -204,83 +248,14 @@ export default function DeviceStage({
         lens.position.set(x, y, -0.085);
         phone.add(lens);
       });
-      devices("phone", phone, mat);
+      register("phone", phone, mat);
     }
 
-    /* ---- the laptop ---- */
-    const laptop = new THREE.Group();
-    {
-      const alu = std("#c7cad0", 0.75, 0.34);
-      const lid = new THREE.Group();
-      const shell = new THREE.Mesh(geo(new RoundedBoxGeometry(2.62, 1.66, 0.05, 4, 0.05)), alu);
-      shell.position.y = 0.83;
-      lid.add(shell);
-      const bezel = new THREE.Mesh(geo(screenGeometry(2.56, 1.6, 0.05)), std("#0b0c0f", 0.2, 0.5));
-      bezel.position.set(0, 0.83, 0.026);
-      lid.add(bezel);
-      const mat = screenMat();
-      const scr = new THREE.Mesh(geo(screenGeometry(2.44, 1.3725, 0.02)), mat);
-      scr.position.set(0, 0.86, 0.028);
-      lid.add(scr);
-      lid.rotation.x = -0.1;
-      lid.position.set(0, -0.8, -0.78);
-      laptop.add(lid);
-      const deck = new THREE.Mesh(geo(new RoundedBoxGeometry(2.62, 0.06, 1.62, 4, 0.03)), alu);
-      deck.position.set(0, -0.83, 0.02);
-      laptop.add(deck);
-      const keys = new THREE.Mesh(geo(new THREE.PlaneGeometry(2.2, 0.8)), std("#26292f", 0.3, 0.7));
-      keys.rotation.x = -Math.PI / 2;
-      keys.position.set(0, -0.798, -0.25);
-      laptop.add(keys);
-      const pad = new THREE.Mesh(geo(new THREE.PlaneGeometry(0.9, 0.46)), std("#b8bcc3", 0.7, 0.3));
-      pad.rotation.x = -Math.PI / 2;
-      pad.position.set(0, -0.798, 0.45);
-      laptop.add(pad);
-      laptop.rotation.x = 0.16;
-      devices("laptop", laptop, mat);
-    }
-
-    /* ---- the feed post ---- */
-    const post = new THREE.Group();
-    {
-      const card = new THREE.Mesh(geo(new RoundedBoxGeometry(1.8, 2.24, 0.04, 4, 0.08)), std(PAPER_CARD, 0, 0.85));
-      post.add(card);
-      const mat = screenMat();
-      const scr = new THREE.Mesh(geo(new THREE.PlaneGeometry(1.8, 1.8)), mat);
-      scr.position.set(0, -0.04, 0.021);
-      post.add(scr);
-      const avatar = new THREE.Mesh(geo(new THREE.CircleGeometry(0.075, 24)), std("#ce4631", 0, 0.8));
-      avatar.position.set(-0.76, 0.99, 0.021);
-      post.add(avatar);
-      const line = (w: number, x: number, y: number, c = "#d7d3cb") => {
-        const m = new THREE.Mesh(geo(screenGeometry(w, 0.045, 0.02)), std(c, 0, 0.9));
-        m.position.set(x, y, 0.021);
-        post.add(m);
-      };
-      line(0.5, -0.4, 1.01, "#b9b4aa");
-      line(0.32, -0.49, 0.95);
-      [-0.8, -0.64, -0.48].forEach((x) => {
-        const d = new THREE.Mesh(geo(new THREE.CircleGeometry(0.04, 16)), std("#8f8a80", 0, 0.9));
-        d.position.set(x + 0.04, -1.03, 0.021);
-        post.add(d);
-      });
-      devices("post", post, mat);
-    }
-
-    const shadow = new THREE.Mesh(
-      geo(new THREE.PlaneGeometry(1, 1)),
-      new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false }),
-    );
-    // Faces the camera and sits just behind the device's foot: at eye level a
-    // plane lying on the floor would be edge on and invisible.
-    shadow.position.set(0, -1.18, -0.4);
-    scene.add(shadow);
-
-    function devices(kind: DeviceKind, group: THREE.Group, screen: THREE.MeshBasicMaterial) {
-      group.scale.setScalar(0.001);
-      root.add(group);
-      byKind[kind] = { group, screen, presence: 0 };
-    }
+    const poolMat = new THREE.MeshBasicMaterial({ map: poolTexture(), transparent: true, depthWrite: false });
+    disposables.push(poolMat);
+    const pool = new THREE.Mesh(geo(new THREE.PlaneGeometry(1, 1)), poolMat);
+    pool.position.set(0, -1.0, -0.4);
+    scene.add(pool);
 
     /* ---- your hand ---- */
     let yaw = 0;
@@ -298,8 +273,8 @@ export default function DeviceStage({
     const onMove = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
       if (e.pointerType === "mouse") {
-        tiltX = ((e.clientY - r.top) / r.height - 0.5) * 0.16;
-        tiltY = ((e.clientX - r.left) / r.width - 0.5) * 0.22;
+        tiltX = ((e.clientY - r.top) / r.height - 0.5) * 0.14;
+        tiltY = ((e.clientX - r.left) / r.width - 0.5) * 0.2;
       }
       if (!dragging) return;
       const dx = e.clientX - lastX;
@@ -311,35 +286,35 @@ export default function DeviceStage({
       dragging = false;
       canvas.style.cursor = "grab";
     };
+    const onLeave = () => {
+      tiltX = 0;
+      tiltY = 0;
+    };
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerup", onUp);
     canvas.addEventListener("pointercancel", onUp);
-    canvas.addEventListener("pointerleave", () => {
-      tiltX = 0;
-      tiltY = 0;
-    });
+    canvas.addEventListener("pointerleave", onLeave);
 
-    /* ---- size and camera fit ---- */
-    let width = 1;
-    let height = 1;
+    /* ---- size and fit ---- */
     const resize = () => {
-      width = Math.max(1, el.clientWidth);
-      height = Math.max(1, el.clientHeight);
-      renderer.setSize(width, height, false);
+      const w = Math.max(1, el.clientWidth);
+      const h = Math.max(1, el.clientHeight);
+      renderer.setSize(w, h, false);
       canvas.style.width = "100%";
       canvas.style.height = "100%";
-      camera.aspect = width / height;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize);
     ro.observe(el);
     resize();
-
     const fitDistance = (kind: DeviceKind) => {
       const f = FIT[kind];
       const t = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-      return Math.max(f.h / 2 / t, f.w / 2 / (t * camera.aspect)) * 1.08;
+      // On a narrow screen the width is the limit, so allow a tighter margin.
+      const w = camera.aspect < 1 ? f.w * 0.9 : f.w;
+      return Math.max(f.h / 2 / t, w / 2 / (t * camera.aspect)) * 1.06;
     };
 
     /* ---- the loop, only while seen ---- */
@@ -356,8 +331,11 @@ export default function DeviceStage({
 
     let raf = 0;
     let last = performance.now();
-    let camDist = fitDistance(looks[pose.current?.look ?? 0]?.device ?? "phone");
-    let push = 0;
+    // The opening only makes sense if the laptop is what is on screen.
+    let introDone = looks[pose.current?.look ?? 0]?.device !== "laptop";
+    if (introDone) lid.rotation.x = LID_OPEN;
+    let introStart = -1;
+    let camDist = fitDistance("laptop") * (introDone ? 1 : 1.55);
     let lastLook = -1;
     let ready = false;
     const start = performance.now();
@@ -367,63 +345,73 @@ export default function DeviceStage({
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const t = (now - start) / 1000;
-      const p = pose.current ?? { look: 0, push: 0 };
+      const p = pose.current ?? { look: 0 };
       const look = Math.max(0, Math.min(looks.length - 1, p.look));
       const kind = looks[look].device;
+      const k = 1 - Math.pow(0.0009, dt);
 
-      // A change of look gives the device a turn, even when the device stays.
+      // The opening: rise, open, power on. About 2.6 s, once.
+      let rise = 1;
+      let power = 1;
+      if (!introDone) {
+        if (introStart < 0) introStart = now;
+        const it = (now - introStart) / 1000;
+        rise = ease(it / 1.1);
+        lid.rotation.x = LID_SHUT + (LID_OPEN - LID_SHUT) * smooth((it - 0.5) / 1.3);
+        power = smooth((it - 1.5) / 0.7);
+        if (it > 2.6 || kind !== "laptop") {
+          introDone = true;
+          lid.rotation.x = LID_OPEN;
+          power = 1;
+        }
+      }
+
       if (look !== lastLook) {
-        if (lastLook !== -1 && looks[lastLook].device === kind) yawVel += 0.28;
+        if (lastLook !== -1 && looks[lastLook].device === kind) yawVel += 0.3;
         lastLook = look;
       }
 
-      // Presence: the current device spins in, the others spin out.
-      const k = 1 - Math.pow(0.0009, dt);
       (Object.keys(byKind) as DeviceKind[]).forEach((dk) => {
         const d = byKind[dk]!;
         const target = dk === kind ? 1 : 0;
+        // In the opening the laptop is simply there; it enters by rising.
+        if (!introDone && dk === "laptop") d.presence = 1;
         d.presence += (target - d.presence) * k;
-        const pr = d.presence;
-        const e = pr * pr * (3 - 2 * pr);
-        d.group.visible = pr > 0.004;
+        const e = smooth(d.presence);
+        d.group.visible = d.presence > 0.004;
         d.group.scale.setScalar(Math.max(0.001, e));
         d.group.rotation.y = (1 - e) * (target ? -1.9 : 1.9);
-        d.group.position.y = FIT[dk].y - (1 - e) * 0.25;
+        d.group.position.y = FIT[dk].y - (1 - e) * 0.25 - (dk === "laptop" ? (1 - rise) * 0.9 : 0);
       });
 
-      // Each device screen shows its current film: the look that is current
-      // if it is this device's, otherwise the last one it showed.
-      looks.forEach((l, i) => {
-        if (i !== look) return;
-        const d = byKind[l.device]!;
-        const v = videos.current?.[i];
-        const film = films[i];
-        const map = v && film && v.readyState >= 2 ? film : posters[i];
-        if (d.screen.map !== map) {
-          d.screen.map = map;
-          d.screen.needsUpdate = true;
-        }
-      });
+      // Screens: the current film once it has a frame, the poster before.
+      const d = byKind[kind]!;
+      const v = videos.current?.[look];
+      const film = films[look];
+      const map = v && film && v.readyState >= 2 ? film : posters[look];
+      if (d.screen.map !== map) {
+        d.screen.map = map;
+        d.screen.needsUpdate = true;
+      }
+      laptopScreen.color.setScalar(power);
 
-      // Throw, then drift home.
       if (!dragging) {
         yaw += yawVel;
         yawVel *= Math.pow(0.02, dt);
         yaw += (0 - yaw) * (1 - Math.pow(0.25, dt));
       }
-      root.rotation.y = yaw + Math.sin(t * 0.45) * 0.2 + tiltY;
-      root.rotation.x = Math.sin(t * 0.37) * 0.035 + tiltX;
+      const sway = introDone ? Math.sin(t * 0.45) * 0.14 : 0;
+      root.rotation.y = yaw + sway + tiltY;
+      root.rotation.x = (introDone ? Math.sin(t * 0.37) * 0.03 : 0) + tiltX;
 
-      // Camera: fit the current device, then push in on request.
-      push += (p.push - push) * k;
       const fit = fitDistance(kind);
-      camDist += (fit * (1 - push * 0.17) - camDist) * k;
-      camera.position.set(0, 0.08 + push * 0.06, camDist);
-      camera.lookAt(0, push * 0.04, 0);
+      camDist += (fit - camDist) * (introDone ? k : 1 - Math.pow(0.2, dt));
+      camera.position.set(0, 0.1 + (1 - rise) * 0.35, camDist);
+      camera.lookAt(0, 0, 0);
 
-      const sw = kind === "laptop" ? 3.2 : kind === "post" ? 2.2 : 1.5;
-      shadow.scale.set(sw, sw * 0.16, 1);
-      shadow.position.y = kind === "laptop" ? -0.9 : kind === "post" ? -1.2 : -1.02;
+      const sw = kind === "laptop" ? 3.4 : 1.7;
+      pool.scale.set(sw, sw * 0.22, 1);
+      pool.position.y = kind === "laptop" ? -0.92 : -1.02;
 
       renderer.render(scene, camera);
       if (!ready) {
@@ -449,9 +437,11 @@ export default function DeviceStage({
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerup", onUp);
       canvas.removeEventListener("pointercancel", onUp);
-      disposables.forEach((d) => d.dispose());
-      posters.forEach((p) => p.dispose());
-      films.forEach((f) => f?.dispose());
+      canvas.removeEventListener("pointerleave", onLeave);
+      disposables.forEach((x) => x.dispose());
+      poolMat.map?.dispose();
+      posters.forEach((x) => x.dispose());
+      films.forEach((x) => x?.dispose());
       env.dispose();
       pmrem.dispose();
       renderer.dispose();

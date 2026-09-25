@@ -1245,3 +1245,55 @@ body[data-footer-open] .sh-compass {
     transition: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   LAUNCHR, on black (launchr-stage.tsx). The title arrives word by word while
+   the laptop opens; a faint grid sits behind the device; one clay dot pulses
+   beside the product line. Transform, opacity and filter only.
+   --------------------------------------------------------------------------- */
+.lx-word {
+  animation: lx-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes lx-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.lx-fade {
+  animation: lx-fade 1.2s ease both;
+}
+@keyframes lx-fade {
+  from {
+    opacity: 0;
+  }
+}
+.lx-pulse {
+  animation: lx-pulse 2.4s ease-in-out infinite;
+}
+@keyframes lx-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+.lx-grid {
+  background-image:
+    linear-gradient(rgba(244, 242, 236, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 242, 236, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center;
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 55%, black 20%, transparent 75%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lx-word,
+  .lx-fade,
+  .lx-pulse {
+    animation: none;
+  }
+}
