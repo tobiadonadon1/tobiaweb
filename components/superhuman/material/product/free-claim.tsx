@@ -99,7 +99,7 @@ export function FreeClaim({
             setEmail(e.target.value);
             if (state !== "idle" && state !== "sending") setState("idle");
           }}
-          className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[1rem] text-[#f4f2ec] outline-none placeholder:text-[rgba(244,242,236,0.35)]"
+          className="lx-input min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-[1rem] text-[#f4f2ec] outline-none placeholder:text-[rgba(244,242,236,0.35)]"
         />
         <button
           type="submit"

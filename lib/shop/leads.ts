@@ -19,21 +19,49 @@
 export type Lead = { email: string; product: string; page: string };
 export type LeadResult = "sheet" | "supabase" | "none" | "failed";
 
+/**
+ * Google's script can take well over ten seconds to answer when it has not
+ * run for a while (a cold start): the first real signup timed out at 10 s
+ * and never reached the sheet. So the wait is long, and the route calls this
+ * AFTER answering the visitor (next/server `after`), so nobody waits on it.
+ * A refusal or a network error is tried once more; a timeout is not, because
+ * the script may still have written the row, and a double row beats none.
+ */
+const SHEET_WAIT_MS = 45_000;
+
+async function toSheet(url: string, body: string): Promise<"ok" | "timeout" | "failed"> {
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body,
+      redirect: "follow",
+      signal: AbortSignal.timeout(SHEET_WAIT_MS),
+    });
+    const text = (await res.text()).trim();
+    if (res.ok && text === "ok") return "ok";
+    console.error("[leads] the sheet refused the row", res.status, text.slice(0, 120));
+    return "failed";
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      console.error("[leads] the sheet did not answer in time");
+      return "timeout";
+    }
+    console.error("[leads] could not reach the sheet", err);
+    return "failed";
+  }
+}
+
 export async function recordLead(lead: Lead): Promise<LeadResult> {
   const at = new Date().toISOString();
   try {
     const sheet = process.env.LEADS_WEBHOOK_URL;
     if (sheet) {
-      const res = await fetch(sheet, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token: process.env.LEADS_TOKEN ?? "", ...lead, at }),
-        redirect: "follow",
-        signal: AbortSignal.timeout(10_000),
-      });
-      const text = (await res.text()).trim();
-      if (res.ok && text === "ok") return "sheet";
-      console.error("[leads] the sheet refused the row", res.status, text.slice(0, 120));
+      const body = JSON.stringify({ token: process.env.LEADS_TOKEN ?? "", ...lead, at });
+      let r = await toSheet(sheet, body);
+      if (r === "failed") r = await toSheet(sheet, body);
+      if (r === "ok") return "sheet";
+      console.error("[leads] LOST ROW (still in Gmail Sent):", JSON.stringify({ ...lead, at }));
       return "failed";
     }
 

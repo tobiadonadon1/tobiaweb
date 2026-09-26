@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { sendFree } from "@/lib/shop/deliver";
 import { recordLead } from "@/lib/shop/leads";
 import { productById } from "@/lib/shop/products";
@@ -20,6 +21,20 @@ import { originFor } from "@/lib/shop/stripe";
  */
 
 export const dynamic = "force-dynamic";
+// Room for the sheet's slow first answer, which runs after the response.
+export const maxDuration = 60;
+
+/**
+ * Run `task` after the response has gone. Outside a request (the tests call
+ * the handler directly) there is nothing to run after, so run it now.
+ */
+async function later(task: () => Promise<unknown>) {
+  try {
+    after(task);
+  } catch {
+    await task();
+  }
+}
 
 const EMAIL = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']{2,}$/;
 const WINDOW_MS = 10 * 60_000;
@@ -63,13 +78,16 @@ export async function POST(request: Request) {
   const origin = originFor(request);
   try {
     const sent = await sendFree(product, email, origin);
-    const stored = await recordLead({ email, product: product.id, page: product.href });
-    console.info("[free] sent", product.id, sent.via, "lead:", stored);
+    console.info("[free] sent", product.id, sent.via);
+    await later(async () => {
+      const stored = await recordLead({ email, product: product.id, page: product.href });
+      console.info("[free] lead", product.id, stored);
+    });
     return Response.json({ ok: true });
   } catch (err) {
     console.error("[free] could not send", product.id, err);
     // Keep the address even if the send failed, so Tobia can follow up.
-    await recordLead({ email, product: product.id, page: `${product.href} (send failed)` });
+    await later(() => recordLead({ email, product: product.id, page: `${product.href} (send failed)` }));
     return Response.json({ ok: false, error: "send-failed" }, { status: 502 });
   }
 }

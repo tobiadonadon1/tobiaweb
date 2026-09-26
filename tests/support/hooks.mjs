@@ -36,6 +36,10 @@ export function resolve(specifier, context, next) {
   if (specifier === "nodemailer") {
     return { url: mailMock, shortCircuit: true };
   }
+  // Next's bundler resolves "next/server" by itself; plain Node needs the file.
+  if (specifier === "next/server") {
+    return next("next/server.js", context);
+  }
   if (specifier.startsWith("@/")) {
     const file = withExtension(path.join(root, specifier.slice(2)));
     if (file) return { url: pathToFileURL(file).href, shortCircuit: true };

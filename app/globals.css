@@ -1297,3 +1297,18 @@ body[data-footer-open] .sh-compass {
     animation: none;
   }
 }
+
+/* The free form's field on black (free-claim.tsx). Chrome and Safari paint
+   an autofilled field pale blue with dark text, whatever the page says, which
+   left a light box inside the dark pill. An inset shadow in the pill's own
+   colour covers it, and the text stays light. */
+.lx-input:-webkit-autofill,
+.lx-input:-webkit-autofill:hover,
+.lx-input:-webkit-autofill:focus,
+.lx-input:autofill {
+  -webkit-text-fill-color: #f4f2ec;
+  caret-color: #f4f2ec;
+  -webkit-box-shadow: 0 0 0 1000px #141416 inset;
+  box-shadow: 0 0 0 1000px #141416 inset;
+  transition: background-color 99999s ease-out 0s;
+}
