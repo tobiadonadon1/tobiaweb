@@ -22,12 +22,17 @@ export function StickyBuy({
   price,
   heroId,
   closeId,
+  href,
+  label,
 }: {
   productId: string;
   name: string;
   price: string;
   heroId: string;
   closeId: string;
+  /** For something given away: a link to the page's own form instead of a checkout. */
+  href?: string;
+  label?: string;
 }) {
   const [heroGone, setHeroGone] = useState(false);
   const [closeReached, setCloseReached] = useState(false);
@@ -67,15 +72,19 @@ export function StickyBuy({
         <div className="min-w-0">
           <p className="truncate text-[0.95rem] leading-tight text-[var(--ink)]">{name}</p>
           <p className="mt-0.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-            Instant download
+            {href ? "Free · sent by email" : "Instant download"}
           </p>
         </div>
-        <BuyForm
-          productId={productId}
-          price={price}
-          compact
-          className="shrink-0"
-        />
+        {href ? (
+          <a
+            href={href}
+            className="inline-flex min-h-[2.9rem] shrink-0 items-center gap-2 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)]"
+          >
+            {label ?? "Get it"}
+          </a>
+        ) : (
+          <BuyForm productId={productId} price={price} compact className="shrink-0" />
+        )}
       </div>
     </div>
   );

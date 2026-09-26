@@ -104,7 +104,8 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
    * A folder with something for sale says so on its face, with the lowest
    * price in it, so nobody opens it expecting another free folder.
    * ------------------------------------------------------------------ */
-  const prices = folder.entries.flatMap((e) => (e.product ? [PRODUCTS[e.product]] : []));
+  // Only things with a price count; a free product is not a "from" price.
+  const prices = folder.entries.flatMap((e) => (e.product && !PRODUCTS[e.product].free ? [PRODUCTS[e.product]] : []));
   const from = prices.length
     ? prices.reduce((a, b) => (b.priceCents < a.priceCents ? b : a))
     : undefined;

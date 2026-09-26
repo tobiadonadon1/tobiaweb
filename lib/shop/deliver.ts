@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { SITE } from "@/lib/site";
 import { productFile } from "./file";
+import { freeLink } from "./free";
 import { downloadHref, SHOP_EMAIL, thanksHref, type Product } from "./products";
 import { ShopNotConfigured, stripe, type Purchase } from "./stripe";
 
@@ -219,8 +220,59 @@ export function deliveryEmail(
 ) {
   const { product, session } = purchase;
   const base = emailBase(purchase, origin);
-  const download = `${base}${downloadHref(session.id)}`;
-  const guide = `${base}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`;
+  return renderEmail({
+    product,
+    download: `${base}${downloadHref(session.id)}`,
+    guide: `${base}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`,
+    attached,
+    free: false,
+  });
+}
+
+/**
+ * THE SAME EMAIL, FOR SOMETHING GIVEN AWAY. Same template, same steps, same
+ * sign-off; it says "here it is" instead of "thanks for buying", and its link
+ * is signed for the address rather than tied to a payment (see free.ts).
+ * `base` is the public site for real requests, so the link keeps working.
+ */
+export function freeEmail(product: Product, to: string, base: string) {
+  return renderEmail({
+    product,
+    download: freeLink(base, product, to),
+    guide: `${base}${product.href}`,
+    attached: false,
+    free: true,
+  });
+}
+
+/** Send a free product to an address. Throws if the mail server refuses. */
+export async function sendFree(product: Product, to: string, base: string) {
+  const via = emailTransport();
+  if (!via) throw new ShopNotConfigured("GMAIL_APP_PASSWORD");
+  const msg: Message = {
+    to,
+    ...freeEmail(product, to, base),
+    // Resend's idempotency key: a double click within the minute sends once.
+    sessionId: `free/${product.id}/${to.toLowerCase()}/${Math.floor(Date.now() / 60_000)}`,
+    product,
+  };
+  const id = via === "gmail" ? await viaGmail(msg) : await viaResend(msg);
+  return { id, via };
+}
+
+function renderEmail({
+  product,
+  download,
+  guide,
+  attached,
+  free,
+}: {
+  product: Product;
+  download: string;
+  guide: string;
+  attached: boolean;
+  free: boolean;
+}) {
   // Plain "Hi," for everyone. The name typed at checkout is often a card
   // name, a company or a test fixture ("Jenny"), and a wrong name reads worse
   // than none.
@@ -238,7 +290,11 @@ export function deliveryEmail(
           `Thanks for buying ${product.name}. Your copy is attached (${file}).`,
           "If your email app hides the attachment, download it here:",
         ]
-      : [`Thanks for buying ${product.name}. Download your copy (${file}) here:`]),
+      : [
+          free
+            ? `Here's ${product.name}, as promised. Download your copy (${file}) here:`
+            : `Thanks for buying ${product.name}. Download your copy (${file}) here:`,
+        ]),
     download,
     "",
     "Open it on the computer you will run it on:",
@@ -277,12 +333,14 @@ export function deliveryEmail(
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf8f2;"><tr><td align="center" style="padding:40px 20px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
 <tr><td>
-<p style="margin:0 0 28px;font:400 12px/1 ${font};letter-spacing:0.14em;text-transform:uppercase;color:${soft};">${escape(product.name)} · ${escape(product.priceLabel)} · Paid</p>
+<p style="margin:0 0 28px;font:400 12px/1 ${font};letter-spacing:0.14em;text-transform:uppercase;color:${soft};">${escape(product.name)} · ${free ? "Free" : `${escape(product.priceLabel)} · Paid`}</p>
 ${p(escape(hello))}
 ${p(
   attached
     ? `Thanks for buying ${escape(product.name)}. Your copy is attached as <strong style="font-weight:500;">${escape(file)}</strong>.`
-    : `Thanks for buying ${escape(product.name)}. Your copy is one click away.`,
+    : free
+      ? `Here's ${escape(product.name)}, as promised. Your copy is one click away.`
+      : `Thanks for buying ${escape(product.name)}. Your copy is one click away.`,
 )}
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 12px;"><tr><td style="border-radius:999px;background:${clay};">
 <a href="${escape(download)}" style="display:inline-block;padding:14px 26px;font:500 15px/1 ${font};color:#faf8f2;text-decoration:none;border-radius:999px;">Download ${escape(product.name)}</a>

@@ -5,8 +5,14 @@ in Setups and both defined once in `lib/shop/products.ts`:
 
 - **The 98¢ Trade**, €5, at `/projects/construct/material/setups/the-98c-trade`
   (short link for posts: **tobiadonadon.com/98c**).
-- **Launchr**, €12, at `/projects/construct/material/setups/launchr`, on
-  Stripe product `prod_VKL1qwlByvTm4z`. Its page is the 3D device stage
+- **Launchr**, FREE since 2026-09-25, at `/projects/construct/material/setups/launchr`.
+  No paywall: the page asks where to send it (`free-claim.tsx` → `/api/free`),
+  emails the same delivery email with a signed download link
+  (`lib/shop/free.ts`, keyed off SHOP_FILE_KEY), and adds a row to the
+  "Launchr leads" Google Sheet in tobia10donadon@gmail.com's Drive
+  (`lib/shop/leads.ts`; env LEADS_WEBHOOK_URL = the sheet's Apps Script web
+  app, LEADS_TOKEN = the secret the script checks). Checkout refuses it. The
+  Stripe product `prod_VKL1qwlByvTm4z` still exists but nothing sells it. Its page is the 3D device stage
   (`launchr-stage.tsx`, `device-stage.tsx`), playing the four example films in
   `public/shop/launchr/`.
 

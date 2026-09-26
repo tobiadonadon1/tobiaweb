@@ -40,7 +40,14 @@ process.chdir(cwd);
         fallback, by this stub ---- */
 const resendCalls = [];
 const realFetch = globalThis.fetch;
+const sheetRows = [];
+globalThis.__sheetDown = false;
 globalThis.fetch = async (url, init) => {
+  if (String(url) === "https://sheet.example/exec") {
+    if (globalThis.__sheetDown) return new Response("boom", { status: 500 });
+    sheetRows.push(JSON.parse(init.body));
+    return new Response("ok");
+  }
   if (String(url) === "https://api.resend.com/emails") {
     resendCalls.push({ body: JSON.parse(init.body), headers: init.headers });
     return Response.json({ id: `email_${resendCalls.length}` });
@@ -53,6 +60,7 @@ const { POST: webhook } = await import("../app/api/stripe/webhook/route.ts");
 const { GET: download } = await import("../app/api/download/route.ts");
 const { POST: checkout } = await import("../app/api/checkout/route.ts");
 const { GET: health } = await import("../app/api/shop/health/route.ts");
+const { POST: claim } = await import("../app/api/free/route.ts");
 const { THE_98C_TRADE, LAUNCHR, productById } = await import("../lib/shop/products.ts");
 
 const ORIGIN = "http://localhost:3000";
@@ -253,17 +261,113 @@ test("webhook: Launchr ships its own file as a link, never as an attachment Gmai
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), LAUNCHR_ZIP, "the video skill, not the bot");
 });
 
-test("checkout: Launchr charges €12 on its own Stripe product and comes back to its own page", async () => {
+test("checkout: Launchr is free now, so it never opens a checkout", async () => {
   globalThis.__stripe.products.add("prod_VKL1qwlByvTm4z");
   const res = await buy("launchr");
   assert.equal(res.status, 303);
-  const params = globalThis.__stripe.createdSessions[0];
-  assert.equal(params.line_items[0].price_data.product, "prod_VKL1qwlByvTm4z");
-  assert.equal(params.line_items[0].price_data.unit_amount, 1200);
-  assert.equal(params.line_items[0].price_data.currency, "eur");
-  assert.equal(params.metadata.product, "launchr");
-  assert.equal(params.success_url, `${ORIGIN}${LAUNCHR.href}/thanks?session_id={CHECKOUT_SESSION_ID}`);
-  assert.equal(params.cancel_url, `${ORIGIN}${LAUNCHR.href}`);
+  assert.equal(res.headers.get("location"), `${ORIGIN}${LAUNCHR.href}`);
+  assert.equal(globalThis.__stripe.createdSessions.length, 0, "no Stripe session");
+});
+
+/* ================================================================== *
+ * Free: "let me know where you want me to send the product"
+ * ================================================================== */
+
+const ask = (body, ip = "203.0.113.1") =>
+  claim(
+    new Request(`${ORIGIN}/api/free`, {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "content-type": "application/json", "x-forwarded-for": ip },
+    }),
+  );
+
+test("free: an address gets the Launchr email with a link that downloads the file, and lands in the sheet", async () => {
+  process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
+  process.env.LEADS_TOKEN = "sheet-secret";
+  sheetRows.length = 0;
+  try {
+    const res = await ask({ product: "launchr", email: "Grace@Example.com" }, "203.0.113.10");
+    assert.equal(res.status, 200);
+    assert.deepEqual(await res.json(), { ok: true });
+
+    assert.equal(mail().length, 1);
+    const m = mail()[0].message;
+    assert.equal(m.to, "Grace@Example.com");
+    assert.equal(m.subject, "Your copy of Launchr");
+    assert.equal(m.attachments.length, 0);
+    assert.ok(m.text.startsWith("Hi,\n"));
+    assert.ok(m.text.includes("Here's Launchr, as promised."));
+    assert.ok(!/buying|Paid|€12/.test(m.text + m.html), "nothing about a purchase or a price");
+    assert.ok(m.html.includes("Launchr · Free"));
+
+    const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)?.[0];
+    assert.ok(link, "a download link on this site");
+    const dl = await download(new Request(link));
+    assert.equal(dl.status, 200);
+    assert.match(dl.headers.get("content-disposition"), /filename="launchr.zip"/);
+    assert.deepEqual(Buffer.from(await dl.arrayBuffer()), LAUNCHR_ZIP);
+
+    assert.equal(sheetRows.length, 1);
+    assert.equal(sheetRows[0].token, "sheet-secret");
+    assert.equal(sheetRows[0].email, "Grace@Example.com");
+    assert.equal(sheetRows[0].product, "launchr");
+  } finally {
+    delete process.env.LEADS_WEBHOOK_URL;
+    delete process.env.LEADS_TOKEN;
+  }
+});
+
+test("free: a link that was tampered with, borrowed or made up never downloads", async () => {
+  await ask({ product: "launchr", email: "ada@example.com" }, "203.0.113.11");
+  const link = new URL(mail()[0].message.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0]);
+  const tries = [
+    (u) => u.searchParams.set("t", "A".repeat(32)),
+    (u) => u.searchParams.set("e", "someone-else@example.com"),
+    (u) => u.searchParams.delete("t"),
+    (u) => u.searchParams.set("product", "the-98c-trade"),
+  ];
+  for (const change of tries) {
+    const u = new URL(link);
+    change(u);
+    const res = await download(new Request(u));
+    assert.equal(res.status, 303, u.search);
+    assert.notEqual(res.headers.get("content-type"), "application/zip");
+  }
+});
+
+test("free: bots, bad addresses and paid products get nothing sent", async () => {
+  const bot = await ask({ product: "launchr", email: "bot@example.com", website: "http://spam" }, "203.0.113.12");
+  assert.deepEqual(await bot.json(), { ok: true }, "a bot is told yes and learns nothing");
+  const bad = await ask({ product: "launchr", email: "not-an-address" }, "203.0.113.12");
+  assert.equal(bad.status, 400);
+  const paid = await ask({ product: "the-98c-trade", email: "free-bot@example.com" }, "203.0.113.12");
+  assert.equal(paid.status, 404, "the bot is not free");
+  assert.equal(mail().length, 0);
+});
+
+test("free: the same address a third time in ten minutes is held back", async () => {
+  for (let i = 0; i < 2; i++) {
+    const ok = await ask({ product: "launchr", email: "twice@example.com" }, `203.0.113.2${i}`);
+    assert.equal(ok.status, 200);
+  }
+  const third = await ask({ product: "launchr", email: "twice@example.com" }, "203.0.113.29");
+  assert.equal(third.status, 429);
+  assert.equal(mail().length, 2);
+});
+
+test("free: if Gmail fails the visitor is told, and the address is still kept", async () => {
+  process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
+  sheetRows.length = 0;
+  globalThis.__mailDown = true;
+  try {
+    const res = await ask({ product: "launchr", email: "unlucky@example.com" }, "203.0.113.30");
+    assert.equal(res.status, 502);
+    assert.equal(sheetRows.length, 1);
+    assert.match(sheetRows[0].page, /send failed/);
+  } finally {
+    delete process.env.LEADS_WEBHOOK_URL;
+  }
 });
 
 test("webhook: the same event twice sends one email", async () => {

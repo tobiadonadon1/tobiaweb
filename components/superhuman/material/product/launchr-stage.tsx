@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { LAUNCHR as PRODUCT } from "@/lib/shop/products";
-import { BuyForm } from "./buy-form";
+import { FreeClaim } from "./free-claim";
 import type { DeviceKind, Pose } from "./device-stage";
 
 /**
@@ -20,7 +20,8 @@ import type { DeviceKind, Pose } from "./device-stage";
  * a different part of its ten seconds, and it wraps at its end.
  *
  * The pitch beside it is his: what it saves, and that it runs inside your own
- * Claude subscription. The price is on the page, just not the headline.
+ * Claude subscription. It is free: the form asks where to send it
+ * (free-claim.tsx), and the product arrives by email.
  *
  * The first film starts on mount, muted (browsers allow that), before the 3D
  * is even ready. The story-style ticks show where the reel is and jump to a
@@ -155,10 +156,10 @@ export function LaunchrStage() {
   );
 
   const buy = (
-    <div id="buy" className="flex scroll-mt-28 flex-col items-center lg:items-start">
-      <BuyForm productId={PRODUCT.id} price={PRODUCT.priceLabel} label="Get Launchr" tone="ink" reportErrors />
-      <p className={`${mono} mt-3 text-[0.6rem] text-[rgba(244,242,236,0.45)] sm:text-[0.64rem]`}>
-        One time · {PRODUCT.priceLabel} · unlimited videos
+    <div id="claim" className="flex w-full scroll-mt-28 flex-col items-center lg:items-start">
+      <FreeClaim productId={PRODUCT.id} className="lg:items-start lg:text-left" />
+      <p className={`${mono} mt-1 text-[0.6rem] text-[rgba(244,242,236,0.45)] sm:text-[0.64rem]`}>
+        Free · unlimited videos · sent to your inbox
       </p>
     </div>
   );

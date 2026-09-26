@@ -102,6 +102,10 @@ export async function POST(request: Request) {
   if (!product) {
     return Response.redirect(`${origin}/projects/construct/material/setups`, 303);
   }
+  // Given away, not sold: never open a checkout for it.
+  if (product.free) {
+    return Response.redirect(`${origin}${product.href}`, 303);
+  }
 
   try {
     const session = await createSession(product, origin);

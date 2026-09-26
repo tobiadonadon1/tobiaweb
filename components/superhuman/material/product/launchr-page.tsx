@@ -3,7 +3,7 @@ import { Reveal } from "@/components/superhuman/reveal";
 import { abs } from "@/lib/site";
 import { LAUNCHR as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
-import { BuyForm } from "./buy-form";
+import { FreeClaim } from "./free-claim";
 import { LaunchrStage } from "./launchr-stage";
 import { StickyBuy } from "./sticky-buy";
 
@@ -20,7 +20,9 @@ import { StickyBuy } from "./sticky-buy";
  *
  *   1. The hero: a reel already playing, and the savings.
  *   2. What it does, in three lines.
- *   3. The savings again, big, and the button. The price stays in small type.
+ *   3. The savings again, big, and the form.
+ *
+ * Then free: no paywall, the form asks where to send it (free-claim.tsx).
  */
 
 const CLOSE_ID = "buy-close";
@@ -43,7 +45,7 @@ const JSON_LD = {
   brand: { "@type": "Person", name: "Tobia Donadon" },
   offers: {
     "@type": "Offer",
-    price: (PRODUCT.priceCents / 100).toFixed(2),
+    price: "0.00",
     priceCurrency: PRODUCT.currency.toUpperCase(),
     availability: "https://schema.org/InStock",
     url: abs(PRODUCT.href),
@@ -93,14 +95,14 @@ export function LaunchrPage() {
           Claude subscription.
         </p>
         <div className="mt-10 flex justify-center">
-          <BuyForm productId={PRODUCT.id} price={PRODUCT.priceLabel} label="Get Launchr" tone="ink" />
+          <FreeClaim productId={PRODUCT.id} />
         </div>
-        <p className={`${mono} mx-auto mt-6 max-w-[52ch] text-[0.6rem] leading-[2] text-[rgba(244,242,236,0.45)] md:text-[0.66rem]`}>
-          One time {PRODUCT.priceLabel} · instant download · Mac · Claude Code with a paid plan · Node.js 18+
+        <p className={`${mono} mx-auto mt-4 max-w-[52ch] text-[0.6rem] leading-[2] text-[rgba(244,242,236,0.45)] md:text-[0.66rem]`}>
+          Free · Mac · Claude Code with a paid plan · Node.js 18+
         </p>
       </section>
 
-      <StickyBuy productId={PRODUCT.id} name={PRODUCT.name} price={PRODUCT.priceLabel} heroId="launchr-top" closeId={CLOSE_ID} />
+      <StickyBuy productId={PRODUCT.id} name={PRODUCT.name} price={PRODUCT.priceLabel} heroId="launchr-top" closeId={CLOSE_ID} href="#claim" label="Get it free" />
     </main>
   );
 }

@@ -76,6 +76,13 @@ export type Product = {
   steps: [string, string, string];
   /** What is in the zip, for pages that list it: [name, what it is]. */
   contents?: [string, string][];
+  /**
+   * GIVEN AWAY FOR AN EMAIL ADDRESS, not sold. The checkout refuses it, the
+   * page asks where to send it instead of taking a payment, and the email
+   * carries a signed download link (lib/shop/free.ts) rather than a receipt.
+   * `priceLabel` stays as the record of what it used to cost; pages say Free.
+   */
+  free?: boolean;
 };
 
 const SYMBOL = { eur: "€", usd: "$" } as const;
@@ -142,13 +149,15 @@ export const LAUNCHR: Product = {
     // The render engine is .mjs files, which Gmail refuses inside a zip.
     attach: false,
   },
+  // Free since 2026-09-25: Tobia swapped the paywall for an email field.
+  free: true,
   stripeProductId: "prod_VKL1qwlByvTm4z",
   share: {
     description:
-      "Launchr puts a motion-graphics studio inside Claude Code. Drop in your logo, product photos or screenshots and get a finished launch video with its own soundtrack in about ten minutes. €12 once, unlimited videos.",
+      "Launchr puts a motion-graphics studio inside Claude Code. Drop in your logo, product photos or screenshots and get a finished launch video with its own soundtrack in about ten minutes. Free, unlimited videos.",
     kicker: "Skill · for Claude Code",
     line: "Your launch video, with its own soundtrack, in ten minutes.",
-    proof: "Unlimited videos · commercial use",
+    proof: "Free · unlimited videos",
   },
   contents: [
     ["launchr/SKILL.md", "the workflow Claude follows, from your assets to the MP4"],
@@ -190,6 +199,9 @@ export function productById(id: unknown): Product | undefined {
 }
 
 export const thanksHref = (product: Product) => `${product.href}/thanks`;
+
+/** What a page prints where a price would go. */
+export const priceText = (product: Product) => (product.free ? "Free" : product.priceLabel);
 
 /** Where the buyer's copy of the file is fetched from. */
 export const downloadHref = (sessionId: string) =>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { PRODUCTS } from "@/lib/shop/products";
+import { PRODUCTS, priceText } from "@/lib/shop/products";
 import { Specimen } from "./specimens";
 import { entryHref } from "./material-data";
 import type { MaterialFolder } from "./material-types";
@@ -35,7 +35,7 @@ export function SetupList({ folder }: { folder: MaterialFolder }) {
               <div>
                 <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
                   Setup · {entry.minutes} min to set up
-                  {product ? ` · ${product.priceLabel}` : ""}
+                  {product ? ` · ${priceText(product)}` : ""}
                 </p>
                 <h2 className="mt-4 font-serif text-[clamp(2rem,4.4vw,3.1rem)] leading-[1] tracking-[-0.035em] text-[var(--ink)] transition-colors duration-[600ms] ease-out group-hover:text-[var(--accent-clay)]">
                   {entry.title}
@@ -49,7 +49,7 @@ export function SetupList({ folder }: { folder: MaterialFolder }) {
                 </p>
 
                 <span className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-6 py-3 text-[0.95rem] text-[var(--paper)] transition-transform duration-300 group-hover:-translate-y-0.5">
-                  {product ? `See it · ${product.priceLabel}` : "See it"}
+                  {product ? `See it · ${priceText(product)}` : "See it"}
                   <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                 </span>
               </div>

@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { flatSpecimenSvg } from "@/components/superhuman/material/specimen-svg";
 import { hostGrotesk } from "@/lib/og-font";
-import { PRODUCTS, productById } from "@/lib/shop/products";
+import { PRODUCTS, priceText, productById } from "@/lib/shop/products";
 import { SITE_LABEL } from "@/lib/site";
 
 /**
@@ -113,7 +113,7 @@ export async function GET(
                 fontWeight: 500,
               }}
             >
-              {product.priceLabel}
+              {priceText(product)}
             </div>
             <div
               style={{
