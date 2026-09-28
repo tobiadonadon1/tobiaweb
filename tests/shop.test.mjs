@@ -48,7 +48,14 @@ globalThis.fetch = async (url, init) => {
   if (String(url) === "https://sheet.example/exec") {
     if (globalThis.__sheetDown) return new Response("boom", { status: 500 });
     sheetRows.push(JSON.parse(init.body));
+    // Like Google: the script runs, then the reply lives at a second URL.
+    if (globalThis.__sheetEcho) {
+      return new Response(null, { status: 302, headers: { location: "https://sheet.example/echo" } });
+    }
     return new Response("ok");
+  }
+  if (String(url) === "https://sheet.example/echo") {
+    return globalThis.__sheetEcho === "404" ? new Response("<html>Not Found</html>", { status: 404 }) : new Response("ok");
   }
   if (String(url) === "https://api.resend.com/emails") {
     resendCalls.push({ body: JSON.parse(init.body), headers: init.headers });
@@ -379,6 +386,22 @@ test("free: the same address a third time in ten minutes is held back", async ()
   const third = await ask({ product: "launchr", email: "twice@example.com" }, "203.0.113.29");
   assert.equal(third.status, 429);
   assert.equal(mail().length, 2);
+});
+
+test("free: Google's reply page failing after the row went in never writes the row twice", async () => {
+  process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
+  for (const mode of ["ok", "404"]) {
+    sheetRows.length = 0;
+    globalThis.__sheetEcho = mode;
+    try {
+      const res = await ask({ product: "jev-crypto-analyst", email: `echo-${mode}@example.com` }, `203.0.113.5${mode.length}`);
+      assert.equal(res.status, 200);
+      assert.equal(sheetRows.length, 1, `one row when the reply is ${mode}`);
+    } finally {
+      globalThis.__sheetEcho = undefined;
+    }
+  }
+  delete process.env.LEADS_WEBHOOK_URL;
 });
 
 test("free: if Gmail fails the visitor is told, and the address is still kept", async () => {

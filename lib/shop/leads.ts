@@ -24,32 +24,53 @@ export type LeadResult = "sheet" | "supabase" | "none" | "failed";
  * run for a while (a cold start): the first real signup timed out at 10 s
  * and never reached the sheet. So the wait is long, and the route calls this
  * AFTER answering the visitor (next/server `after`), so nobody waits on it.
- * A refusal or a network error is tried once more; a timeout is not, because
- * the script may still have written the row, and a double row beats none.
+ * Only a request that never reached Google is tried again (see toSheet).
  */
 const SHEET_WAIT_MS = 45_000;
 
-async function toSheet(url: string, body: string): Promise<"ok" | "timeout" | "failed"> {
+/**
+ * HOW GOOGLE ANSWERS. The POST to the script runs doPost (the row is written)
+ * and answers 302; the script's reply ("ok"/"no") is then served from a
+ * second URL, which Google sometimes fails to serve (404) even though the row
+ * went in. Retrying after that wrote the first real Jev signup twice. So:
+ * only a request Google never accepted is retried; once it has answered 302
+ * the row counts as written, confirmed by "ok" when the reply is readable.
+ */
+async function toSheet(url: string, body: string): Promise<"ok" | "unconfirmed" | "refused" | "unsent"> {
+  let res: Response;
   try {
-    const res = await fetch(url, {
+    res = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body,
-      redirect: "follow",
+      redirect: "manual",
       signal: AbortSignal.timeout(SHEET_WAIT_MS),
     });
-    const text = (await res.text()).trim();
-    if (res.ok && text === "ok") return "ok";
-    console.error("[leads] the sheet refused the row", res.status, text.slice(0, 120));
-    return "failed";
   } catch (err) {
-    if (err instanceof Error && err.name === "TimeoutError") {
-      console.error("[leads] the sheet did not answer in time");
-      return "timeout";
-    }
     console.error("[leads] could not reach the sheet", err);
-    return "failed";
+    return "unsent";
   }
+  const reply = async (r: Response) => (await r.text().catch(() => "")).trim();
+  const location = res.headers.get("location");
+  if (res.status >= 300 && res.status < 400 && location) {
+    try {
+      const echo = await fetch(location, { signal: AbortSignal.timeout(SHEET_WAIT_MS) });
+      const text = await reply(echo);
+      if (text === "ok") return "ok";
+      if (text === "no") {
+        console.error("[leads] the sheet refused the token");
+        return "refused";
+      }
+      console.warn("[leads] row sent, Google's reply unreadable", echo.status);
+    } catch {
+      console.warn("[leads] row sent, Google's reply timed out");
+    }
+    return "unconfirmed";
+  }
+  const text = await reply(res);
+  if (res.ok && text === "ok") return "ok";
+  console.error("[leads] the sheet did not take the row", res.status, text.slice(0, 120));
+  return res.status >= 500 ? "unsent" : "refused";
 }
 
 export async function recordLead(lead: Lead): Promise<LeadResult> {
@@ -59,8 +80,9 @@ export async function recordLead(lead: Lead): Promise<LeadResult> {
     if (sheet) {
       const body = JSON.stringify({ token: process.env.LEADS_TOKEN ?? "", ...lead, at });
       let r = await toSheet(sheet, body);
-      if (r === "failed") r = await toSheet(sheet, body);
-      if (r === "ok") return "sheet";
+      // Only a request Google never took is sent again, so a row is never doubled.
+      if (r === "unsent") r = await toSheet(sheet, body);
+      if (r === "ok" || r === "unconfirmed") return "sheet";
       console.error("[leads] LOST ROW (still in Gmail Sent):", JSON.stringify({ ...lead, at }));
       return "failed";
     }
