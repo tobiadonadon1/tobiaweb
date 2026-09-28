@@ -12,7 +12,11 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
  * the vertical one. Each screen is the film itself, a video texture, unlit so
  * its colours are the colours Launchr rendered.
  *
- * THE OPENING. The laptop rises out of the dark closed, the lid swings open
+ * NO TURNS. The device is open and on from the first frame and the canvas
+ * fades in; a new film only changes the screen, and a change of device (the
+ * laptop to the phone) shrinks one and grows the other in place. (It used to
+ * spin; Tobia found it annoying.) The old opening, below, is kept but off:
+ * the laptop rises out of the dark closed, the lid swings open
  * and the screen powers on into the film that is already playing, in about a
  * second. It plays once, the first time the stage is drawn.
  *
@@ -332,19 +336,20 @@ export default function DeviceStage({
     let raf = 0;
     let last = performance.now();
     // The opening only makes sense if the laptop is what is on screen.
-    let introDone = looks[pose.current?.look ?? 0]?.device !== "laptop";
-    if (introDone) lid.rotation.x = LID_OPEN;
+    // No opening move any more (Tobia: the turning was annoying). The laptop
+    // is open and on from the first frame; the canvas simply fades in.
+    let introDone = true;
+    lid.rotation.x = LID_OPEN;
     let introStart = -1;
     let camDist = fitDistance("laptop") * (introDone ? 1 : 1.3);
     let lastLook = -1;
+    let framed = false;
     let ready = false;
-    const start = performance.now();
 
     const frame = (now: number) => {
       raf = 0;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      const t = (now - start) / 1000;
       const p = pose.current ?? { look: 0 };
       const look = Math.max(0, Math.min(looks.length - 1, p.look));
       const kind = looks[look].device;
@@ -368,8 +373,19 @@ export default function DeviceStage({
       }
 
       if (look !== lastLook) {
-        if (lastLook !== -1 && looks[lastLook].device === kind) yawVel += 0.3;
+        // A new film on the same device just changes the screen: no turn.
+        // Its texture is not trusted until the video has painted a frame
+        // while playing; until then the screen holds the poster, never black.
         lastLook = look;
+        framed = false;
+        const nv = videos.current?.[look];
+        const cb = nv as (HTMLVideoElement & { requestVideoFrameCallback?: (f: () => void) => number }) | null | undefined;
+        if (cb?.requestVideoFrameCallback) {
+          const want = look;
+          cb.requestVideoFrameCallback(() => {
+            if (lastLook === want) framed = true;
+          });
+        }
       }
 
       (Object.keys(byKind) as DeviceKind[]).forEach((dk) => {
@@ -381,7 +397,7 @@ export default function DeviceStage({
         const e = smooth(d.presence);
         d.group.visible = d.presence > 0.004;
         d.group.scale.setScalar(Math.max(0.001, e));
-        d.group.rotation.y = (1 - e) * (target ? -1.9 : 1.9);
+        d.group.rotation.y = 0;
         d.group.position.y = FIT[dk].y - (1 - e) * 0.25 - (dk === "laptop" ? (1 - rise) * 0.9 : 0);
       });
 
@@ -389,7 +405,8 @@ export default function DeviceStage({
       const d = byKind[kind]!;
       const v = videos.current?.[look];
       const film = films[look];
-      const map = v && film && v.readyState >= 2 ? film : posters[look];
+      const painting = framed || (!!v && !v.paused && v.currentTime > 0.25 && !("requestVideoFrameCallback" in v));
+      const map = v && film && v.readyState >= 2 && painting ? film : posters[look];
       if (d.screen.map !== map) {
         d.screen.map = map;
         d.screen.needsUpdate = true;
@@ -401,9 +418,9 @@ export default function DeviceStage({
         yawVel *= Math.pow(0.02, dt);
         yaw += (0 - yaw) * (1 - Math.pow(0.25, dt));
       }
-      const sway = introDone ? Math.sin(t * 0.45) * 0.14 : 0;
+      const sway = 0;
       root.rotation.y = yaw + sway + tiltY;
-      root.rotation.x = (introDone ? Math.sin(t * 0.37) * 0.03 : 0) + tiltX;
+      root.rotation.x = tiltX;
 
       const fit = fitDistance(kind);
       camDist += (fit - camDist) * (introDone ? k : 1 - Math.pow(0.2, dt));
