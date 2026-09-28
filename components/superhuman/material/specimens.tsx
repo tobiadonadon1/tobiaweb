@@ -300,6 +300,36 @@ function Launchr() {
   );
 }
 
+/**
+ * JEV CRYPTO ANALYST — a chart read, with its range.
+ *
+ * Four cut candles climbing, the last one vermilion because it is now, and a
+ * saffron wedge fanning out ahead of it: the likely range the app draws. The
+ * forest bar under it is the support it names.
+ */
+function JevCryptoAnalyst() {
+  const candles: [number, number, number, string][] = [
+    [40, 186, 0.62, INK],
+    [104, 150, 0.8, ULTRAMARINE],
+    [168, 170, 0.66, INK],
+    [232, 112, 0.92, VERMILION],
+  ];
+  return (
+    <>
+      <Cut d={BAR} x={34} y={262} s={1.08} sy={0.9} fill={SHADE} rotate={-1} />
+      <Cut d={BAR} x={28} y={256} s={1.08} sy={0.9} fill={FOREST} rotate={-1} />
+      {candles.map(([x, y, h, fill]) => (
+        <g key={x}>
+          <Cut d={CARD} x={x + 6} y={y + 6} s={0.22} sy={h} fill={SHADE} />
+          <Cut d={CARD} x={x} y={y} s={0.22} sy={h} fill={fill} />
+        </g>
+      ))}
+      <Cut d={WEDGE} x={292} y={70} s={0.78} sy={1.1} fill={SHADE} rotate={-6} />
+      <Cut d={WEDGE} x={286} y={64} s={0.78} sy={1.1} fill={SAFFRON} rotate={-6} />
+    </>
+  );
+}
+
 /* ================================================================== *
  * THE THREE SKILL MARKS.
  *
@@ -660,6 +690,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   // the setups themselves
   "the-98c-trade": The98cTrade,
   launchr: Launchr,
+  "jev-crypto-analyst": JevCryptoAnalyst,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,

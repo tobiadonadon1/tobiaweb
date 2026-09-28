@@ -42,4 +42,18 @@ export const SETUPS: MaterialEntry[] = [
     body: [],
     product: "launchr",
   },
+  {
+    slug: "jev-crypto-analyst",
+    title: "Jev Crypto Analyst",
+    kind: "setup",
+    summary:
+      "Type a coin and Jev reads the chart: the likely price range, the levels that matter, and why.",
+    // Seconds per read, rounded up to a minute; setup is about two.
+    minutes: 2,
+    status: "ready",
+    when: "You want a second opinion on a crypto chart in seconds, with the odds said out loud.",
+    level: "Anyone",
+    body: [],
+    product: "jev-crypto-analyst",
+  },
 ];

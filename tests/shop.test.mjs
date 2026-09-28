@@ -34,6 +34,8 @@ mkdirSync(path.join(cwd, "private"));
 writeFileSync(path.join(cwd, "private", "the-98c-trade.zip.enc"), seal(ZIP, parseKey(fileKey)));
 const LAUNCHR_ZIP = Buffer.from("PK\u0003\u0004 the launch-video skill, a different file " + "z".repeat(3000));
 writeFileSync(path.join(cwd, "private", "launchr.zip.enc"), seal(LAUNCHR_ZIP, parseKey(fileKey)));
+const JEV_ZIP = Buffer.from("PK\u0003\u0004 the chart analyst app " + "j".repeat(2500));
+writeFileSync(path.join(cwd, "private", "jev-crypto-analyst.zip.enc"), seal(JEV_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -144,7 +146,7 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["the-98c-trade", "launchr"], "Launchr sits below the 98¢ Trade");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["the-98c-trade", "launchr", "jev-crypto-analyst"], "Launchr below the 98¢ Trade, then Jev");
   assert.equal(LAUNCHR.priceCents, 1200);
   assert.equal(LAUNCHR.priceLabel, "€12");
   assert.equal(LAUNCHR.stripeProductId, "prod_VKL1qwlByvTm4z");
@@ -316,6 +318,29 @@ test("free: an address gets the Launchr email with a link that downloads the fil
     delete process.env.LEADS_WEBHOOK_URL;
     delete process.env.LEADS_TOKEN;
   }
+});
+
+test("free: Jev Crypto Analyst sends its own file, and its link never opens Launchr", async () => {
+  const { JEV_CRYPTO_ANALYST } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(JEV_CRYPTO_ANALYST.href, entryHref("setups", "jev-crypto-analyst"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "jev-crypto-analyst")?.product, "jev-crypto-analyst");
+
+  const res = await ask({ product: "jev-crypto-analyst", email: "trader@example.com" }, "203.0.113.40");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Jev Crypto Analyst");
+  assert.equal(m.attachments.length, 0);
+  assert.ok(m.text.includes("Not financial advice."));
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.match(dl.headers.get("content-disposition"), /filename="jev-crypto-analyst.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), JEV_ZIP);
+
+  const swapped = new URL(link);
+  swapped.searchParams.set("product", "launchr");
+  const other = await download(new Request(swapped));
+  assert.equal(other.status, 303, "a Jev link is not a Launchr link");
 });
 
 test("free: a link that was tampered with, borrowed or made up never downloads", async () => {

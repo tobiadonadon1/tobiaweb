@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
-import { LAUNCHR as PRODUCT } from "@/lib/shop/products";
 import { FreeClaim } from "./free-claim";
 import type { DeviceKind, Pose } from "./device-stage";
 
@@ -28,23 +27,82 @@ import type { DeviceKind, Pose } from "./device-stage";
  * cut. Sound is one tap. Only the current film plays, only while on screen.
  *
  * REDUCED MOTION: no reel and no WebGL; the three cuts as plain players.
+ *
+ * SHARED. Launchr and Jev Crypto Analyst both open on this stage; each page
+ * passes its own films, words and form (see LaunchrStage below and
+ * jev-analyst-page.tsx). With `slot` unset a film plays to its end before
+ * the next one, which suits screen recordings that need their whole run.
  */
 
 const DeviceStage = dynamic(() => import("./device-stage"), { ssr: false });
 
-type Film = { id: string; device: DeviceKind; aspect: string; src: string; poster: string };
+export type Film = { id: string; device: DeviceKind; aspect: string; src: string; poster: string };
 
-const FILMS: Film[] = [
+const LAUNCHR_FILMS: Film[] = [
   { id: "myynd", device: "laptop", aspect: "16/9", src: "/shop/launchr/myynd.mp4", poster: "/shop/launchr/myynd.jpg" },
   { id: "tech", device: "laptop", aspect: "16/9", src: "/shop/launchr/tech.mp4", poster: "/shop/launchr/tech.jpg" },
   { id: "bold", device: "phone", aspect: "9/16", src: "/shop/launchr/bold.mp4", poster: "/shop/launchr/bold.jpg" },
 ];
 
 const mono = "font-mono uppercase tracking-[0.16em]";
-/** Seconds each film holds the screen before the next one takes over. */
-const SLOT = 3;
+export type FilmStageProps = {
+  productId: string;
+  name: string;
+  /** The small line above the title. */
+  kicker: string;
+  /** The title, word by word; words from `dimFrom` on are dimmed. */
+  title: string[];
+  dimFrom: number;
+  /** The one paragraph under the title. */
+  value: React.ReactNode;
+  /** The small print under the form. */
+  meta: string;
+  films: Film[];
+  /** Seconds each film holds the screen; unset plays each film to its end. */
+  slot?: number;
+  /** Films with a soundtrack get a sound button. */
+  hasSound?: boolean;
+  /** What each film is, for screen readers. */
+  filmLabel: string;
+};
 
 export function LaunchrStage() {
+  return (
+    <FilmStage
+      productId="launchr"
+      name="Launchr"
+      kicker="Launchr · a skill for Claude Code"
+      title={["Launch", "videos,", "made", "by", "Claude."]}
+      dimFrom={2}
+      value={
+        <>
+          Skip the <span className="text-[#f4f2ec]">€50+ Higgsfield plan</span> and the{" "}
+          <span className="text-[#f4f2ec]">€5,000+ video team</span>. Make every launch
+          video inside your own Claude subscription.
+        </>
+      }
+      meta="Free · unlimited videos · sent to your inbox"
+      films={LAUNCHR_FILMS}
+      slot={3}
+      hasSound
+      filmLabel="A launch video made with Launchr"
+    />
+  );
+}
+
+export function FilmStage({
+  productId,
+  name,
+  kicker,
+  title,
+  dimFrom,
+  value,
+  meta,
+  films: FILMS,
+  slot,
+  hasSound = false,
+  filmLabel,
+}: FilmStageProps) {
   const videos = useRef<(HTMLVideoElement | null)[]>([]);
   const fills = useRef<(HTMLSpanElement | null)[]>([]);
   const hero = useRef<HTMLElement>(null);
@@ -72,11 +130,12 @@ export function LaunchrStage() {
     return () => io.disconnect();
   }, [motion]);
 
+  const count = FILMS.length;
   const go = useCallback((i: number) => {
-    const next = (i + FILMS.length) % FILMS.length;
+    const next = (i + count) % count;
     pose.current = { look: next };
     setLook(next);
-  }, []);
+  }, [count]);
 
   /* ---- the current cut plays; the others wait at their start ---- */
   useEffect(() => {
@@ -112,11 +171,12 @@ export function LaunchrStage() {
         played += t >= from ? t - from : t + (v.duration || 10) - from;
         from = t;
       }
-      const p = Math.min(1, played / SLOT);
+      const limit = slot ?? Math.max(1, (v?.duration || 10) - 0.15);
+      const p = Math.min(1, played / limit);
       fills.current.forEach((f, i) => {
         if (f) f.style.transform = `scaleX(${i < look ? 1 : i === look ? p : 0})`;
       });
-      if (played >= SLOT) {
+      if (played >= limit) {
         go(look + 1);
         return;
       }
@@ -124,23 +184,23 @@ export function LaunchrStage() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [look, motion, go]);
+  }, [look, motion, go, slot]);
 
   const pitch = (
     <>
       <p className={`${mono} lx-fade flex items-center gap-2 text-[0.62rem] text-[rgba(244,242,236,0.55)] sm:text-[0.68rem] lg:justify-start justify-center`}>
         <span aria-hidden className="lx-pulse inline-block h-1.5 w-1.5 rounded-full bg-[#f07a5f]" />
-        Launchr · a skill for Claude Code
+        {kicker}
       </p>
       <h1 className="mt-3 text-balance text-center font-serif text-[clamp(2.2rem,5.6vw,4.9rem)] leading-[0.95] tracking-[-0.045em] text-[#f4f2ec] lg:text-left">
-        {["Launch", "videos,", "made", "by", "Claude."].map((w, i) => (
+        {title.map((w, i) => (
           <span
             key={i}
-            className={`inline-block ${motion ? "lx-word" : ""} ${i >= 2 ? "text-[rgba(244,242,236,0.5)]" : ""}`}
+            className={`inline-block ${motion ? "lx-word" : ""} ${i >= dimFrom ? "text-[rgba(244,242,236,0.5)]" : ""}`}
             style={motion ? { animationDelay: `${120 + i * 90}ms` } : undefined}
           >
             {w}
-            {i < 4 ? " " : ""}
+            {i < title.length - 1 ? " " : ""}
           </span>
         ))}
       </h1>
@@ -149,17 +209,15 @@ export function LaunchrStage() {
 
   const pitchValue = (
     <p className="lx-fade mx-auto max-w-[34ch] text-balance text-center text-[1rem] leading-[1.45] sm:text-[1.08rem] text-[rgba(244,242,236,0.78)] md:text-[1.25rem] lg:mx-0 lg:text-left">
-      Skip the <span className="text-[#f4f2ec]">€50+ Higgsfield plan</span> and the{" "}
-      <span className="text-[#f4f2ec]">€5,000+ video team</span>. Make every launch
-      video inside your own Claude subscription.
+      {value}
     </p>
   );
 
   const buy = (
     <div id="claim" className="flex w-full scroll-mt-28 flex-col items-center lg:items-start">
-      <FreeClaim productId={PRODUCT.id} className="lg:items-start lg:text-left" />
+      <FreeClaim productId={productId} className="lg:items-start lg:text-left" />
       <p className={`${mono} mt-1 text-[0.6rem] text-[rgba(244,242,236,0.45)] sm:text-[0.64rem]`}>
-        Free · unlimited videos · sent to your inbox
+        {meta}
       </p>
     </div>
   );
@@ -167,14 +225,14 @@ export function LaunchrStage() {
   /* ---- reduced motion ---- */
   if (motion === false) {
     return (
-      <section aria-label="Launchr" className="mx-auto max-w-6xl px-6 pb-20 pt-28">
+      <section aria-label={name} className="mx-auto max-w-6xl px-6 pb-20 pt-28">
         {pitch}
         <div className="mt-6">{pitchValue}</div>
         <div className="mt-8">{buy}</div>
         <ul className="mt-14 grid list-none grid-cols-1 gap-6 md:grid-cols-[1fr_1fr_0.45fr] md:items-end">
           {FILMS.map((f) => (
             <li key={f.id}>
-              <video src={f.src} poster={f.poster} controls playsInline preload="none" aria-label="A launch video made with Launchr" className="w-full rounded-xl bg-black" style={{ aspectRatio: f.aspect }} />
+              <video src={f.src} poster={f.poster} controls playsInline preload="none" aria-label={filmLabel} className="w-full rounded-xl bg-black" style={{ aspectRatio: f.aspect }} />
             </li>
           ))}
         </ul>
@@ -183,7 +241,7 @@ export function LaunchrStage() {
   }
 
   return (
-    <section ref={hero} aria-label="Launchr" className="relative">
+    <section ref={hero} aria-label={name} className="relative">
       <div aria-hidden className="lx-grid pointer-events-none absolute inset-0" />
       {/* One copy of everything, placed by the grid: on a phone the title,
           the reel, then the value and the button; on a wide screen the title
@@ -215,7 +273,7 @@ export function LaunchrStage() {
                   playsInline
                   preload="auto"
                   crossOrigin="anonymous"
-                  aria-label="A launch video made with Launchr"
+                  aria-label={filmLabel}
                   className={
                     mode === "flat"
                       ? `max-h-full max-w-full rounded-2xl bg-black ${i === look ? "" : "hidden"}`
@@ -245,7 +303,7 @@ export function LaunchrStage() {
                   key={f.id}
                   type="button"
                   onClick={() => go(i)}
-                  aria-label={`Play launch video ${i + 1} of ${FILMS.length}`}
+                  aria-label={`Play video ${i + 1} of ${FILMS.length}`}
                   aria-pressed={i === look}
                   className="group flex-1 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f07a5f]"
                 >
@@ -261,6 +319,7 @@ export function LaunchrStage() {
                 </button>
               ))}
             </div>
+            {hasSound ? (
             <button
               type="button"
               onClick={() => setSound((s) => !s)}
@@ -270,6 +329,7 @@ export function LaunchrStage() {
               {sound ? <Volume2 aria-hidden className="h-3.5 w-3.5" /> : <VolumeX aria-hidden className="h-3.5 w-3.5" />}
               {sound ? "Sound on" : "Sound"}
             </button>
+            ) : null}
           </div>
         </div>
 

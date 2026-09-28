@@ -4,7 +4,7 @@ import { abs } from "@/lib/site";
 import { LAUNCHR as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
-import { LaunchrStage } from "./launchr-stage";
+import { LaunchrStage } from "./film-stage";
 import { StickyBuy } from "./sticky-buy";
 
 /**

@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -187,9 +187,66 @@ export const LAUNCHR: Product = {
   },
 };
 
+export const JEV_CRYPTO_ANALYST: Product = {
+  id: "jev-crypto-analyst",
+  name: "Jev Crypto Analyst",
+  description:
+    "A small app for Claude Code that reads any crypto chart in seconds with Jev, TypeSafe's AI: the likely price range, the levels that matter, and why.",
+  // Never sold, so never priced; kept at zero so nothing can charge for it.
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/jev-crypto-analyst",
+  file: {
+    sealed: "jev-crypto-analyst.zip.enc",
+    filename: "jev-crypto-analyst.zip",
+    // The app is .mjs and node_modules, which Gmail refuses inside a zip.
+    attach: false,
+  },
+  free: true,
+  // Free from the start: there is no Stripe product, and checkout refuses it.
+  stripeProductId: "none",
+  share: {
+    description:
+      "Type a coin or drop a chart. Jev, TypeSafe's AI, reads real exchange data and tells you where the price is likely to be, which levels matter, and why. Tested on 540 charts it had never seen. Free.",
+    kicker: "App · for Claude Code",
+    line: "Any crypto chart, read in seconds: the likely range, the key levels, and why.",
+    proof: "Free · tested on 540 unseen charts",
+  },
+  contents: [
+    ["app/", "the chart reader: live exchange data, the measurements, and Jev's read"],
+    ["app/backtest/", "the honest test on 540 past charts, and the calibration it uses"],
+    ["CLAUDE.md", "what Claude follows to install it and open it for you"],
+    ["README.md", "how it works, how accurate it is, and what it costs to run"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs it, asks for your TypeSafe key and opens the app.",
+  ],
+  email: {
+    after: [
+      "Then type a coin (BTC, ETH, SOL, even a memecoin), pick a timeframe and press Read the chart. You get the likely price range for the window, the support and resistance that matter, whether the market is trending or ranging, and why, in plain words.",
+      "It runs on your computer. Each read is one Jev request on your own TypeSafe key.",
+    ],
+    footnote: "Probabilities, not certainties. Not financial advice.",
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code, Node.js 18.17 or newer, and a TypeSafe API key for Jev (typesafe.ai). Claude asks for the key during setup.",
+    next: [
+      ["Right after setup", "The app opens in your browser. Type a coin and read your first chart."],
+      ["Every read", "About ten seconds from ticker to range, levels and reasons."],
+      ["Want proof?", "The accuracy panel shows the measured track record for each timeframe."],
+    ],
+    footnote: "Not financial advice.",
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
+  "jev-crypto-analyst": JEV_CRYPTO_ANALYST,
 };
 
 export function productById(id: unknown): Product | undefined {
