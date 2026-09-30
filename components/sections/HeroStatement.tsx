@@ -17,8 +17,9 @@ import { CLAIM, CONTEXT } from "@/lib/bio";
  *
  * A soft circular spotlight follows the pointer and RECOLOURS the type to
  * clay as it passes — same words underneath, only the colour changes. It's
- * a second, identical copy of the block masked to a circle; it arms
- * only for real pointers. The text itself is always visible.
+ * a second, identical copy of the block masked to a circle. On a touch
+ * screen scrolling sweeps it across the block, and a finger pulls it along.
+ * The text itself is always visible.
  */
 const UNDERSTATEMENT =
   "I'm figuring this out. Maybe we can figure it out together.";
@@ -99,10 +100,74 @@ export function HeroStatement() {
     const spot = spotlight.current;
     if (!stageEl || !spot) return;
 
-    // Pointer-driven and purely decorative: skip it for touch and for
-    // anyone who asked for less motion.
-    if (!window.matchMedia("(pointer: fine)").matches) return;
+    // Purely decorative: skip it for anyone who asked for less motion.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // ON A TOUCH SCREEN there is no pointer to follow, so the light moves on
+    // its own: scrolling the block through the screen sweeps it across the
+    // lines, top to bottom, and a finger on the block pulls it to the finger.
+    if (!window.matchMedia("(pointer: fine)").matches) {
+      const TOUCH_SIZE = 230;
+      let raf = 0;
+      let heldUntil = 0;
+      const sweep = () => {
+        raf = 0;
+        if (performance.now() < heldUntil) return;
+        const r = stageEl.getBoundingClientRect();
+        const vh = window.innerHeight;
+        // 0 as the block's top enters the lower third, 1 as its bottom
+        // leaves the upper third.
+        const t = Math.min(1, Math.max(0, (vh * 0.78 - r.top) / (r.height + vh * 0.5)));
+        const d = TOUCH_SIZE * Math.pow(Math.sin(t * Math.PI), 0.6);
+        const x = r.width * (0.12 + 0.76 * t) + Math.sin(t * Math.PI * 2) * r.width * 0.1;
+        const y = r.height * (t * 1.1 - 0.05);
+        gsap.set(spot, {
+          webkitMaskSize: `${d}px`,
+          maskSize: `${d}px`,
+          webkitMaskPosition: `${x - d / 2}px ${y - d / 2}px`,
+          maskPosition: `${x - d / 2}px ${y - d / 2}px`,
+        });
+      };
+      const onScroll = () => {
+        if (!raf) raf = requestAnimationFrame(sweep);
+      };
+      const onTouch = (e: TouchEvent) => {
+        const touch = e.touches[0];
+        if (!touch) return;
+        const r = stageEl.getBoundingClientRect();
+        heldUntil = performance.now() + 900;
+        const x = touch.clientX - r.left - TOUCH_SIZE / 2;
+        const y = touch.clientY - r.top - TOUCH_SIZE / 2;
+        gsap.to(spot, {
+          webkitMaskSize: `${TOUCH_SIZE}px`,
+          maskSize: `${TOUCH_SIZE}px`,
+          webkitMaskPosition: `${x}px ${y}px`,
+          maskPosition: `${x}px ${y}px`,
+          duration: 0.3,
+          ease: "power3.out",
+          overwrite: "auto",
+        });
+      };
+      const onRelease = () => {
+        heldUntil = performance.now() + 300;
+        setTimeout(onScroll, 320);
+      };
+      sweep();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      stageEl.addEventListener("touchstart", onTouch, { passive: true });
+      stageEl.addEventListener("touchmove", onTouch, { passive: true });
+      stageEl.addEventListener("touchend", onRelease, { passive: true });
+      return () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+        stageEl.removeEventListener("touchstart", onTouch);
+        stageEl.removeEventListener("touchmove", onTouch);
+        stageEl.removeEventListener("touchend", onRelease);
+        gsap.killTweensOf(spot);
+      };
+    }
 
     // The mask is positioned inside the stage's own box, so the pointer has
     // to be converted out of viewport space. Cached — recomputing the rect

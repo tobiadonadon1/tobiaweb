@@ -81,17 +81,27 @@ export function PlainStatement() {
         const target = el.querySelector<HTMLElement>("[data-statement]");
         if (!target) return;
 
-        split = SplitText.create(target, { type: "words" });
+        // reduceWhiteSpace off, or SplitText folds the no-break spaces in
+        // the copy back into ordinary ones and the orphans come back.
+        const narrow = window.matchMedia("(max-width: 639px)").matches;
+        split = SplitText.create(target, {
+          type: "words",
+          reduceWhiteSpace: false,
+        });
 
         const tween = gsap.from(split.words, {
           opacity: 0.14,
           duration: 1,
           stagger: 0.3,
           ease: "none",
+          // On a phone the sentence sits under the shell rather than beside
+          // it, so it has to be finished while it is still low on the screen,
+          // with the whole shell above it. The shell's break is measured off
+          // this same line (NARROW_INK_END in particle-sphere.tsx).
           scrollTrigger: {
             trigger: target,
-            start: "top 82%",
-            end: "bottom 46%",
+            start: narrow ? "top 94%" : "top 82%",
+            end: narrow ? "bottom 74%" : "bottom 46%",
             scrub: 0.5,
           },
         });
@@ -119,23 +129,33 @@ export function PlainStatement() {
           <span
             data-sphere-dock
             aria-hidden
-            className="mx-auto mb-10 block aspect-square w-[58vw] max-w-[280px] motion-reduce:hidden sm:w-[42vw] lg:absolute lg:right-0 lg:top-1/2 lg:mx-0 lg:mb-0 lg:w-[clamp(250px,25vw,340px)] lg:-translate-y-1/2"
+            className="mx-auto mb-8 block aspect-square w-[70vw] max-w-[300px] motion-reduce:hidden sm:mb-10 sm:w-[42vw] lg:absolute lg:right-0 lg:top-1/2 lg:mx-0 lg:mb-0 lg:w-[clamp(250px,25vw,340px)] lg:-translate-y-1/2"
           />
           <h2
             id="myynd-what"
             data-statement
-            className="font-helvetica max-w-[20ch] text-[clamp(1.9rem,5vw,3.9rem)] font-medium leading-[1.06] tracking-[-0.035em]"
+            className="font-helvetica max-w-[20ch] text-[clamp(1.7rem,7.6vw,1.9rem)] sm:text-[clamp(1.9rem,5vw,3.9rem)] font-medium leading-[1.06] tracking-[-0.035em]"
             style={{ color: "var(--ink)" }}
           >
-            Twenty years of know-how, out of a few heads.{" "}
+            {/* NBSPs, not luck: on a phone "heads." and "money." were each
+                stranded alone on the last line of their beat. SplitText keeps
+                a word joined by a no-break space as one unit, so the pair
+                wraps together at every width. */}
+            {"Twenty years of know-how, out of a few\u00a0heads."}{" "}
             {/* The promise starts its own line. Two claims running into each
                 other mid-line is what made the old version read as one long
                 feature description instead of a setup and a payoff. */}
+            {/* And the payoff is two lines of its own. Left to wrap, it broke
+                as "…on / top. Save money, / make money." at 375px: the second
+                claim split across the first's last word. */}
             <span
               className="block"
               style={{ color: "var(--myynd-terracotta)" }}
             >
-              Then automations on top. Save money, make money.
+              <span className="block">
+                {"Then automations on\u00a0top."}
+              </span>
+              <span className="block">{"Save money, make\u00a0money."}</span>
             </span>
           </h2>
         </div>

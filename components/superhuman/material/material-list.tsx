@@ -94,7 +94,7 @@ function Row({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntry }
 
             <Link
               href={href}
-              className="group/read inline-flex items-center gap-2 border-b border-[var(--hairline-strong)] pb-1 text-[0.92rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
+              className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-2 border-b border-[var(--hairline-strong)] pb-1 text-[0.92rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
             >
               {entry.kind === "skill" ? "What it does" : "Read it"}
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/read:translate-x-0.5" />

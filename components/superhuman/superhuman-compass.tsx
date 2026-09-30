@@ -55,6 +55,14 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
   const [onInk, setOnInk] = useState(false);
   /** True once the close has arrived. The instrument is done at that point. */
   const [retired, setRetired] = useState(false);
+  /**
+   * PHONE ONLY: the label is up for a moment after the section changes, then
+   * goes, leaving the dial. On a wide screen it sits in the margin and is
+   * simply always there (the class that hides it is `max-md:` only).
+   */
+  const [flash, setFlash] = useState(false);
+  const lastIndex = useRef(0);
+  const flashTimer = useRef<number | undefined>(undefined);
 
   /**
    * NOTHING SPINS AND NOTHING STRETCHES ANY MORE.
@@ -89,7 +97,15 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
           if (entry.isIntersecting) seen.add(i);
           else seen.delete(i);
         }
-        if (seen.size) setIndex(Math.max(...seen));
+        if (!seen.size) return;
+        const next = Math.max(...seen);
+        setIndex(next);
+        if (next !== lastIndex.current) {
+          lastIndex.current = next;
+          setFlash(true);
+          window.clearTimeout(flashTimer.current);
+          flashTimer.current = window.setTimeout(() => setFlash(false), 1800);
+        }
       },
       // A thin band across the middle of the viewport: whatever crosses it
       // is what you are reading.
@@ -124,6 +140,7 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
     if (close && endObserver) endObserver.observe(close);
 
     return () => {
+      window.clearTimeout(flashTimer.current);
       sectionObserver.disconnect();
       inkObserver.disconnect();
       endObserver?.disconnect();
@@ -138,16 +155,27 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
     <div
       ref={rootRef}
       aria-hidden="true"
-      className={`sh-compass pointer-events-none fixed bottom-6 left-6 z-40 hidden flex-col items-start gap-2 transition-opacity duration-700 md:flex ${
+      // ON A PHONE TOO. It was `hidden` below md, which dropped the page's one
+      // instrument from the screen most people read it on. On a phone it
+      // moves to the bottom RIGHT: every block on this page is set left with
+      // a measure, so the right edge is the emptiest strip of the column,
+      // and the bottom left put it straight over the one to one's button.
+      // The dial sits in a small frosted chip so it reads as an instrument
+      // over the text rather than a smudge on it, and the label only shows
+      // for a moment when you cross into a new section (see `flash`).
+      className={`sh-compass pointer-events-none fixed bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] right-3 z-40 flex items-center transition-opacity duration-700 md:bottom-6 md:left-6 md:right-auto md:flex-col md:items-start md:gap-2 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
+      <span
+        className={`rounded-full p-1 backdrop-blur-md transition-colors duration-700 md:rounded-none md:bg-transparent md:p-0 md:backdrop-blur-none ${
+          onInk ? "bg-[rgba(5,13,26,0.55)]" : "bg-[rgba(250,248,242,0.72)]"
+        }`}
+      >
       <svg
         data-dial
-        width={62}
-        height={62}
         viewBox="-40 -40 80 80"
-        className="text-[var(--accent-clay)]"
+        className="block h-10 w-10 text-[var(--accent-clay)] md:h-[62px] md:w-[62px]"
       >
         <circle r={DIAL_R} fill="none" stroke={line} strokeWidth={1} />
         {labels.map((label, i) => {
@@ -178,9 +206,12 @@ export function SuperhumanCompass({ labels }: { labels: string[] }) {
           <path d={INNER_STAR_D} fill={STAR_RED} />
         </g>
       </svg>
+      </span>
 
       <span
-        className="font-mono text-[9px] uppercase leading-none tracking-[0.14em] whitespace-nowrap transition-colors duration-500"
+        className={`whitespace-nowrap font-mono text-[9px] uppercase leading-none tracking-[0.14em] transition-[opacity,color,background-color] duration-500 max-md:absolute max-md:right-full max-md:top-1/2 max-md:mr-2 max-md:-translate-y-1/2 max-md:rounded-full max-md:px-2.5 max-md:py-1.5 max-md:backdrop-blur-md md:bg-transparent ${
+          onInk ? "max-md:bg-[rgba(5,13,26,0.55)]" : "max-md:bg-[rgba(250,248,242,0.72)]"
+        } ${flash ? "" : "max-md:opacity-0"}`}
         style={{ color: onInk ? "rgba(207,233,238,0.6)" : "rgba(11,31,58,0.42)" }}
       >
         {labels[index] ?? ""}

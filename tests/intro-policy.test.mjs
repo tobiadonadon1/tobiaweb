@@ -2,21 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveIntroVisit } from '../lib/intro-policy.ts';
 
-const first = { navigationType: 'navigate', navigationPath: '/', firstMount: true, hash: '', played: false, savedScrollY: 0 };
-for (const [name, changes, skip, scroll] of [
-  ['fresh homepage plays the intro', {}, false, 0],
-  ['refresh at the top keeps the full animation', { navigationType: 'reload', played: true }, false, 0],
-  ['refresh inside a section skips the intro', { navigationType: 'reload', hash: '#projects', played: true }, true, 0],
-  ['refresh at a reading position without a hash skips and restores', { navigationType: 'reload', savedScrollY: 2800 }, true, 2800],
-  ['direct section link skips even on first visit', { hash: '#thoughts' }, true, 0],
-  ['return from project after a homepage reload does not replay', { navigationType: 'reload', firstMount: false, played: true, savedScrollY: 2800 }, true, 0],
-  ['reload of a subpage is not a homepage restart', { navigationType: 'reload', navigationPath: '/projects/book', played: true }, true, 0],
-  ['new navigation ignores a stale saved position', { savedScrollY: 2800 }, false, 0],
-  ['invalid saved position is ignored', { navigationType: 'reload', savedScrollY: NaN }, false, 0],
+const first = { navigationType: 'navigate', navigationPath: '/', firstMount: true, hash: '', played: false };
+for (const [name, changes, skip] of [
+  ['fresh homepage plays the intro', {}, false],
+  ['refresh plays the intro again, even after it played', { navigationType: 'reload', played: true }, false],
+  ['refresh with a leftover section hash still plays from the top', { navigationType: 'reload', hash: '#projects', played: true }, false],
+  ['coming back to the homepage in the same tab does not replay', { played: true }, true],
+  ['back/forward to the homepage does not replay', { navigationType: 'back_forward', played: true }, true],
+  ['direct section link skips even on first visit', { hash: '#thoughts' }, true],
+  ['return from a project after a homepage refresh does not replay', { navigationType: 'reload', firstMount: false, played: true }, true],
+  ['refresh of a subpage, then going home, does not replay', { navigationType: 'reload', navigationPath: '/projects/book', played: true }, true],
 ]) {
   test(name, () => {
-    const actual = resolveIntroVisit({ ...first, ...changes });
-    assert.equal(actual.skip, skip);
-    assert.equal(actual.restoreScrollY, scroll);
+    assert.equal(resolveIntroVisit({ ...first, ...changes }).skip, skip);
   });
 }
+
+test('a refresh ignores the hash, so nothing scrolls to a section', () => {
+  assert.equal(resolveIntroVisit({ ...first, navigationType: 'reload', hash: '#thoughts' }).hash, '');
+});

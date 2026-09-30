@@ -144,3 +144,35 @@ the single melt back to paper. Measured ground sequence: paper 0-3376, melt,
 ink 3508-7576, melt, paper to the end. Two changes, not four.
 
 Visible word count 220, deliberately under the 350-500 budget.
+
+---
+
+## Revision 5 (2026-09-28): iPhone parity and copy pass
+
+The route is `/projects/construct` now; component names still say Superhuman.
+Measured in Playwright WebKit on iPhone 15 (393x659 visible), iPhone 8
+(375x553) and iPhone SE 1st gen (320x568), plus 1440x900 desktop.
+
+Landing:
+- Hero hand ("free material, down here") moved into the flow under the lede.
+  It sat in the bottom strip its own observer ignores, so it never drew on
+  first load, on any screen.
+- Premise: phones get the sweep without the pin. Words ink in and each refusal
+  is struck through as it crosses the lower third, scrubbed, nothing held.
+  Reduced motion still lands on the finished state.
+- Shelf: the hand shows on phones too, and says "free to open" (one setup costs
+  €5). Marks are capped at 17rem on a phone so a whole card fits one screen.
+  Material line: "Four skills, three guides, and three setups that build
+  themselves." (was "... and the first setup.", now wrong).
+- One to one: touch screens get the clay spotlight too, driven by scroll: it
+  travels across the headline as the section rises.
+- Compass: on phones now, bottom right in a frosted chip; the label flashes for
+  1.8s on each section change. Desktop unchanged.
+- Close: "Start with one thing." now hands over the one thing: a sub line and
+  a primary "Open the free material" button, email underneath.
+- Meta description no longer lists locked families as available.
+
+Products: Jev's form moved above the app reel on phones (it was below the
+fold on every phone). 98¢ phone crossfade no longer prints two points over
+each other mid-handoff. 44px touch areas on the reel ticks and sound switch
+via pseudo elements, so no hero moved. No form, API call, id or price changed.

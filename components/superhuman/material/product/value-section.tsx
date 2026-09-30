@@ -91,7 +91,12 @@ export function ValueSection({
       items.current.forEach((li, i) => {
         if (!li) return;
         const d = Math.abs(Math.max(0, s) - i);
-        const on = clamp(1 - (d - 0.24) / 0.34);
+        // Phone: the outgoing point is gone before the incoming one shows
+        // (both are 0 at d >= 0.45). The old ramp (0 only past 0.58) left
+        // both at about a quarter opacity for the middle of every handoff,
+        // two paragraphs printed over each other in the one slot, which on
+        // a short phone is most of what you see while the thumb is moving.
+        const on = clamp(1 - (d - 0.2) / 0.25);
         li.style.opacity = String(wide.matches ? (i === current ? 1 : floor) : on);
         li.style.setProperty("--lift", wide.matches ? "0px" : `${(1 - on) * (i > s ? 14 : -14)}px`);
         li.toggleAttribute("data-current", i === current);

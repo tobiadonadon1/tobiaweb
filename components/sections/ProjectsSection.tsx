@@ -20,16 +20,16 @@ export function ProjectsSection() {
             Better tools.<br />Deeper questions.
           </h2>
           <p className="mt-7 max-w-[48ch] text-lg leading-relaxed text-[#cfe9ee]">
-            I build to learn, share what works, and write about what I still don’t understand. These are the places that work lives.
+            I build to learn, share what works, and write about what I still don’t understand. Three projects, one thread.
           </p>
         </header>
 
         <div className="project-stack mx-auto max-w-6xl">
           <article className="project-layer project-layer-construct" aria-labelledby="construct-title">
             <div className="project-layer-copy">
-              <p className="project-purpose">Put it into practice</p>
+              <p className="project-purpose">Start here</p>
               <h3 id="construct-title">Construct</h3>
-              <p>Use AI to build something of your own. The tools, skills, and playbooks I use, with enough detail to try them yourself.</p>
+              <p>The AI skills and setups I actually run, packaged so you can run them too. Most of them are free.</p>
               <div className="project-actions">
                 <Link className="project-cta" href="/projects/construct/material">Explore free material <ArrowUpRight aria-hidden size={18} /></Link>
                 <Link className="project-secondary" href="/projects/construct">Inside Construct <ArrowUpRight aria-hidden size={16} /></Link>
@@ -45,7 +45,7 @@ export function ProjectsSection() {
             <div className="project-layer-copy">
               <p className="project-purpose">A digital brain for a business</p>
               <h3 id="myynd-title">Myynd</h3>
-              <p>A company’s knowledge is scattered across people, files, and tools. I’m building a brain that brings it together, with automations that put it to work.</p>
+              <p>A company’s know-how lives in people’s heads, in files, and in a dozen tools. I’m building one brain that holds all of it, and automations that put it to work.</p>
               <div className="project-actions">
                 <Link className="project-cta" href="/projects/mynd">Explore Myynd <ArrowUpRight aria-hidden size={18} /></Link>
                 <span className="project-stage">In development</span>
@@ -68,7 +68,7 @@ export function ProjectsSection() {
             <div className="project-layer-copy">
               <p className="project-purpose">The inner world</p>
               <h3 id="book-title">The Book</h3>
-              <p>What does it mean to be conscious? A book about attention, creativity, and the experience of being human. Still being written, one question at a time.</p>
+              <p>What does it mean to be conscious? A book about attention, creativity, and what it feels like to be human. I’m writing it now, one question at a time.</p>
               <div className="project-actions">
                 <Link className="project-cta" href="/projects/book">Meet the book <ArrowUpRight aria-hidden size={18} /></Link>
                 <span className="project-stage">In progress</span>
@@ -81,7 +81,7 @@ export function ProjectsSection() {
           </article>
         </div>
         <p className="mx-auto mt-16 max-w-6xl text-base leading-relaxed text-[#cfe9ee]">
-          Also taking shape: digital twins and Everwave. More here as the work develops.
+          Also taking shape: digital twins and Everwave. They land here when they’re real.
         </p>
       </div>
     </section>

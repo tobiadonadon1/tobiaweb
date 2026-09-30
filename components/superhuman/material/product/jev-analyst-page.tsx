@@ -59,9 +59,13 @@ export function JevAnalystPage() {
       {/* 1. THE PROMISE, THE APP, THE FORM. All on the first screen. */}
       <section aria-labelledby="jev-title" className="relative">
         <div aria-hidden className="lx-grid pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto grid min-h-[100svh] max-w-7xl grid-cols-1 content-center gap-7 px-5 pb-16 pt-24 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14">
-          {/* On a phone: promise, the app, then the form. On a wide screen the
-              words and the form sit left of the app. */}
+        <div className="relative mx-auto grid min-h-[100svh] max-w-7xl grid-cols-1 content-center gap-6 px-5 pb-16 pt-20 sm:px-6 sm:pt-24 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14">
+          {/* On a phone: promise, the form, then the app. It was promise, app,
+              form, which put the field at 707px on an iPhone 15 whose Safari
+              shows 659: the page promised the form on the first screen and
+              the phone never got it. The app follows straight after, playing,
+              and its top edge is on the first screen as well. On a wide screen
+              the words and the form sit left of the app. */}
           <div className="contents text-center lg:col-start-1 lg:row-start-1 lg:block lg:text-left">
             <div className="order-1 text-center lg:text-left">
             <p className={`${mono} lx-fade flex items-center justify-center gap-2 text-[0.62rem] text-[rgba(244,242,236,0.55)] sm:text-[0.68rem] lg:justify-start`}>
@@ -75,7 +79,7 @@ export function JevAnalystPage() {
               Type a coin. See where the price is likely to be, the levels that matter, and why.
             </p>
             </div>
-            <div id="claim" className="order-3 flex lg:mt-8 scroll-mt-28 flex-col items-center lg:items-start">
+            <div id="claim" className="order-2 flex scroll-mt-28 flex-col items-center lg:mt-8 lg:items-start">
               <FreeClaim productId={PRODUCT.id} className="lg:items-start lg:text-left" />
               <p className={`${mono} mt-1 text-[0.6rem] text-[rgba(244,242,236,0.45)] sm:text-[0.64rem]`}>
                 Free · set up in 2 minutes · runs on your computer
@@ -83,7 +87,7 @@ export function JevAnalystPage() {
             </div>
           </div>
 
-          <div className="lx-fade order-2 lg:col-start-2 lg:row-start-1">
+          <div className="lx-fade order-3 lg:col-start-2 lg:row-start-1">
             <AppReel clips={CLIPS} address="Jev Crypto Analyst" />
           </div>
         </div>

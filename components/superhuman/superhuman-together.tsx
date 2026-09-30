@@ -326,8 +326,52 @@ export function SuperhumanTogether() {
     const spot = spotlight.current;
     if (!stageEl || !spot) return;
 
-    if (!window.matchMedia("(pointer: fine)").matches) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    /* NO CURSOR, SO THE SCROLL CARRIES THE LIGHT.
+     *
+     * A phone has no pointer to hover with, and a finger dragging across the
+     * headline is a scroll, not a hover. So on a touch screen the same clay
+     * circle is driven by position instead: it opens over the first word and
+     * travels down and across the headline as the section moves up the
+     * screen, recolouring each word as it passes and leaving it ink again
+     * behind it. Same layer, same mask, same colour. It is scrubbed, so it
+     * holds still when the thumb does. */
+    if (!window.matchMedia("(pointer: fine)").matches) {
+      const touchSize = Math.round(Math.min(260, stageEl.offsetWidth * 0.62));
+      gsap.set(spot, {
+        webkitMaskSize: `${touchSize}px`,
+        maskSize: `${touchSize}px`,
+      });
+      const sweep = (p: number) => {
+        const w = stageEl.offsetWidth;
+        const h = stageEl.offsetHeight;
+        // Left to right, and top to bottom, so it reads the words in order.
+        const x = -touchSize * 0.5 + p * (w + touchSize * 0.1) - touchSize * 0.1;
+        const y = h * 0.18 + p * h * 0.62 - touchSize / 2;
+        const at = `${Math.round(x)}px ${Math.round(y)}px`;
+        spot.style.setProperty("-webkit-mask-position", at);
+        spot.style.setProperty("mask-position", at);
+      };
+      const state = { p: 0 };
+      sweep(0);
+      const tw = gsap.to(state, {
+        p: 1,
+        ease: "none",
+        onUpdate: () => sweep(state.p),
+        scrollTrigger: {
+          trigger: stageEl,
+          start: "top 72%",
+          end: "bottom 22%",
+          scrub: 0.6,
+        },
+      });
+      return () => {
+        tw.scrollTrigger?.kill();
+        tw.kill();
+        gsap.set(spot, { webkitMaskSize: "0px", maskSize: "0px" });
+      };
+    }
 
     // The mask lives in the stage's own box, so the pointer has to be taken
     // out of viewport space. Cached: re-measuring on every move forces a
@@ -462,7 +506,7 @@ export function SuperhumanTogether() {
                   style={{ background: CLAY, opacity: 0.85 }}
                 />
                 <div data-t2-way className="pt-6">
-                  <Specimen id={way.mark} className="h-auto w-full max-w-[16rem]" />
+                  <Specimen id={way.mark} className="h-auto w-full max-w-[12rem] sm:max-w-[16rem]" />
                   <h3
                     className="mt-5 font-serif text-[1.5rem] leading-none tracking-tight md:text-[1.8rem]"
                     style={{ color: "var(--ink)" }}

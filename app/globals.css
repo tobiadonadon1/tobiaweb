@@ -195,7 +195,12 @@ body {
   overscroll-behavior-y: none;
 }
 
-html {
+/* Smooth scrolling is ARMED per click, not always on. Left on, it also
+   animated every scroll the browser makes by itself (restoring a position on
+   a refresh or on Back, jumping to a #hash), which raced the reader through
+   the whole site. SiteNav sets `data-smooth-scroll` only for the length of an
+   in-page link click, so everything else is a cut. */
+html[data-smooth-scroll] {
   scroll-behavior: smooth;
 }
 
@@ -354,6 +359,18 @@ canvas {
 }
 .editorial-index--on-ink > *:last-child {
   border-bottom-color: var(--hairline-on-ink);
+}
+
+/* The intro loader's starting state, in the server HTML itself. Without it
+   the photos arrive stacked and fully visible, and each one pops on top of
+   the last as it finishes downloading: a fast flip-through of every photo
+   before the JS lands and plays the real, slow reveal. HeroSequence takes
+   over with inline GSAP styles and drops this class in the same frame. */
+.intro-pending .js-intro-image {
+  clip-path: inset(0% 0% 100% 0%);
+}
+.intro-pending .js-name {
+  opacity: 0;
 }
 
 /* Images spawned by the pointer trail on the intro loader */
@@ -762,7 +779,8 @@ body {
    `data-footer-open` is raised on <body> by footer-reveal.tsx the moment any
    of the footer is uncovered. Two class selectors deep, so it beats the
    component's own `opacity-100` utility without an !important. */
-body[data-footer-open] .sh-compass {
+body[data-footer-open] .sh-compass,
+body[data-footer-open] .back-link {
   opacity: 0;
   pointer-events: none;
 }

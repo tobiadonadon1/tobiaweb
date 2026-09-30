@@ -19,8 +19,11 @@ if (typeof window !== "undefined") {
  * the handover reads as one continuous motion rather than a crossfade.
  * A photo marquee runs along the bottom, quickening with scroll velocity.
  *
- * Below 1000px — and for anyone who asked for less motion — the pin is
- * dropped entirely and all three beats are simply stacked and readable.
+ * Below 1000px the three columns become ONE: the beats sit on top of each
+ * other in the same spot, and the same word handover swaps them in place, on
+ * a shorter track (a phone swipe covers more of the page than a trackpad).
+ * Only for anyone who asked for less motion is the pin dropped entirely, with
+ * all three beats simply stacked and readable.
  */
 type Beat = { eyebrow: string; title: string; description: string };
 
@@ -101,23 +104,25 @@ export function IdentityScroll() {
   const root = useRef<HTMLElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLDivElement>(null);
-  // Rendered animated by default; the effect drops to the stacked layout on
-  // narrow screens or under reduced motion.
+  // Rendered animated by default; the effect drops to the stacked layout
+  // under reduced motion, and to the single-column pin on narrow screens.
   const [stacked, setStacked] = useState(false);
   const [reduced, setReduced] = useState(false);
+  const [narrow, setNarrow] = useState(false);
 
   useEffect(() => {
-    const narrow = window.matchMedia("(max-width: 999px)");
+    const small = window.matchMedia("(max-width: 999px)");
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => {
       setReduced(motion.matches);
-      setStacked(narrow.matches || motion.matches);
+      setNarrow(small.matches);
+      setStacked(motion.matches);
     };
     sync();
-    narrow.addEventListener("change", sync);
+    small.addEventListener("change", sync);
     motion.addEventListener("change", sync);
     return () => {
-      narrow.removeEventListener("change", sync);
+      small.removeEventListener("change", sync);
       motion.removeEventListener("change", sync);
     };
   }, []);
@@ -189,7 +194,9 @@ export function IdentityScroll() {
     }, root);
 
     return () => ctx.revert();
-  }, [stacked]);
+    // `narrow` re-splits the words: the columns and the single stack wrap
+    // their lines differently.
+  }, [stacked, narrow]);
 
   // The marquee: a constant drift that scroll velocity briefly accelerates.
   useEffect(() => {
@@ -233,7 +240,7 @@ export function IdentityScroll() {
       </p>
       <p
         data-words
-        className="mt-5 max-w-[28rem] font-helvetica text-[1.15rem] font-medium leading-[1.3] tracking-[-0.02em] text-[#0a0a0a] lg:text-[1.6rem]"
+        className="mt-5 max-w-[28rem] font-helvetica text-[1.3rem] font-medium leading-[1.3] tracking-[-0.02em] text-[#0a0a0a] lg:text-[1.6rem]"
       >
         {b.description}
       </p>
@@ -285,25 +292,40 @@ export function IdentityScroll() {
     <section
       ref={root}
       id="phrases"
-      className="paper-bg relative w-full"
       // The track length IS the scroll speed: the sticky panel below is one
       // screen, so every extra viewport here buys the three beats more room to
       // hand over in. 500vh read as slightly hurried on a trackpad. This is the
       // one number to turn if it ever needs retuning.
-      style={{ height: "620vh" }}
+      // On a phone the same three handovers get 420svh: a thumb swipe
+      // travels much further down the page than a trackpad flick. Set in CSS,
+      // not from `narrow`, so the height is right in the server HTML: a height
+      // that changed after hydration threw /#thoughts links past their target.
+      className="paper-bg relative h-[420svh] w-full min-[1000px]:h-[620vh]"
     >
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
-        {/* Progress through the sequence — the only chrome in the panel. */}
-        <div className="absolute right-8 top-12 h-px w-40 bg-black/12">
+        {/* Progress through the sequence — the only chrome in the panel. On a
+            phone it moves to the left: the nav owns the top right there. */}
+        <div
+          className={`absolute h-px bg-black/12 ${
+            narrow ? "left-6 top-[max(1.75rem,env(safe-area-inset-top))] w-24" : "right-8 top-12 w-40"
+          }`}
+        >
           <div
             ref={bar}
             className="h-full w-full origin-left scale-x-0 bg-[#0a0a0a]"
           />
         </div>
 
-        <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 gap-16 px-8 lg:px-12">
+        <div
+          className={`absolute inset-x-0 -translate-y-1/2 ${
+            narrow ? "top-[44%] grid px-6" : "top-1/2 flex gap-16 px-8 lg:px-12"
+          }`}
+        >
           {BEATS.map((b) => (
-            <div key={b.eyebrow} className="js-beat flex-1">
+            <div
+              key={b.eyebrow}
+              className={`js-beat ${narrow ? "[grid-area:1/1]" : "flex-1"}`}
+            >
               {beatBody(b)}
             </div>
           ))}

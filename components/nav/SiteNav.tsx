@@ -43,6 +43,69 @@ export function SiteNav() {
     };
   }, [isHome]);
 
+  /**
+   * SMOOTH SCROLLING IS ONLY FOR THE READER'S OWN IN-PAGE CLICKS: the nav's
+   * Home / Projects / Thoughts and the footer's "Back to the top" while on
+   * the homepage. It is switched on (`data-smooth-scroll`, globals.css) for
+   * the length of that one scroll and off again after. Left on all the time,
+   * every scroll the BROWSER made also glided: a refresh or the Back button
+   * raced the reader through the whole site before landing. Now those are
+   * cuts, and only a click glides.
+   */
+  useEffect(() => {
+    const root = document.documentElement;
+    let timer = 0;
+    const disarm = () => {
+      clearTimeout(timer);
+      root.removeAttribute("data-smooth-scroll");
+    };
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = (e.target as Element | null)?.closest?.("a[href]");
+      const href = link?.getAttribute("href") ?? "";
+      const inPage =
+        href.startsWith("#") ||
+        (href.startsWith("/#") && window.location.pathname === "/");
+      if (!inPage) return;
+      root.setAttribute("data-smooth-scroll", "");
+      clearTimeout(timer);
+      // Browsers finish a smooth scroll well inside this; turning the
+      // property off afterwards does not interrupt one already running.
+      timer = window.setTimeout(disarm, 2000);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      disarm();
+    };
+  }, []);
+
+  /**
+   * A SECTION HASH IS SPENT ONCE THE PAGE HAS ARRIVED AT IT. After a nav click
+   * the URL kept "#projects" while the reader scrolled on, so a reload made
+   * the browser jump to Projects before the page could put them back where
+   * they were: a flash of the wrong section on every Cmd-R. Once scrolling
+   * settles, the hash comes off the address bar (Next's own history state is
+   * kept), so a reload simply returns to the reading position.
+   */
+  useEffect(() => {
+    if (!isHome) return;
+    let timer = 0;
+    const settle = () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (!window.location.hash) return;
+        const { pathname, search } = window.location;
+        window.history.replaceState(window.history.state, "", pathname + search);
+      }, 250);
+    };
+    window.addEventListener("scroll", settle, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", settle);
+    };
+  }, [isHome]);
+
   return (
     <NavBar
       items={navItems}

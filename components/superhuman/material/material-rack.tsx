@@ -81,7 +81,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
               <BuyForm productId={product.id} price={product.priceLabel} compact />
               <Link
                 href={href}
-                className="group/read inline-flex items-center gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
+                className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
               >
                 What it does
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/read:translate-x-0.5" />
@@ -98,7 +98,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
 
               <Link
                 href={href}
-                className="group/read inline-flex items-center gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
+                className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
               >
                 What it does
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/read:translate-x-0.5" />
@@ -107,7 +107,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
           ) : (
             <Link
               href={href}
-              className="group/read inline-flex items-center gap-2.5 rounded-full border border-[var(--hairline-strong)] px-5 py-2.5 text-[0.9rem] text-[var(--ink)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:bg-[rgba(206,70,49,0.06)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
+              className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-2.5 rounded-full border border-[var(--hairline-strong)] px-5 py-2.5 text-[0.9rem] text-[var(--ink)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:bg-[rgba(206,70,49,0.06)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
             >
               Read it
               <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover/read:translate-x-0.5" />

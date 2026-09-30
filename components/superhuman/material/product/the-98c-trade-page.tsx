@@ -139,8 +139,11 @@ export function The98cTradePage() {
 
         <div id={HERO_ID} className="mt-9 flex scroll-mt-28 flex-col items-center">
           <BuyForm productId={PRODUCT.id} price={PRODUCT.priceLabel} reportErrors />
-          <p className="mt-5 text-[0.95rem] text-[color:rgba(11,31,58,0.62)]">
-            Backtested on {BACKTEST_TOTAL.trades.toLocaleString("en-US")} Polymarket trades. 99% paid out.
+          {/* Balanced, and the proof kept whole: "99%" alone at the end of a
+              line and "paid out." alone under it read as two facts. */}
+          <p className="mt-5 text-balance text-[0.95rem] text-[color:rgba(11,31,58,0.62)]">
+            Backtested on {BACKTEST_TOTAL.trades.toLocaleString("en-US")} Polymarket trades.{" "}
+            <span className="whitespace-nowrap">99% paid out.</span>
           </p>
         </div>
       </header>

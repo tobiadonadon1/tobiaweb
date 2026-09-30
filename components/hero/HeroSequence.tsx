@@ -1,8 +1,9 @@
 "use client";
 
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { resolveIntroVisit } from "@/lib/intro-policy";
+import { HeroConstructCard } from "@/components/hero/HeroConstructCard";
 
 /**
  * Tobia's own photos, web-optimized from assets/trail-originals/. They stack
@@ -92,16 +93,16 @@ export default function HeroSequence() {
   const scope = useRef<HTMLElement>(null);
   const visit = useRef<ReturnType<typeof resolveIntroVisit> | null>(null);
 
-  useEffect(() => {
+  // A layout effect, so a client-side return to the homepage never paints
+  // the pending (hidden) state for a frame before landing on the open frame.
+  useLayoutEffect(() => {
     if (!visit.current) {
       const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
       let navigationPath = "";
       let played = false;
-      let savedScrollY = 0;
       try { navigationPath = nav ? new URL(nav.name).pathname : ""; } catch { /* Ignore malformed timing entries. */ }
       try {
         played = sessionStorage.getItem("intro:played") === "1";
-        savedScrollY = Number(sessionStorage.getItem("intro:scroll-y") ?? 0);
       } catch { /* The intro also works with storage disabled. */ }
       visit.current = resolveIntroVisit({
         navigationType: nav?.type ?? "navigate",
@@ -109,17 +110,12 @@ export default function HeroSequence() {
         firstMount: !reloadSpent,
         hash: window.location.hash,
         played,
-        savedScrollY,
       });
       reloadSpent = true;
     }
     // Capture once, before the effect is replayed in Strict Mode. Otherwise
     // the first run consumes reloadSpent and the second skips mid-intro.
-    const { skip: returning, hash, restoreScrollY } = visit.current;
-    const rememberScroll = () => {
-      try { sessionStorage.setItem("intro:scroll-y", String(window.scrollY)); } catch { /* Optional storage. */ }
-    };
-    window.addEventListener("pagehide", rememberScroll);
+    const { skip: returning, hash } = visit.current;
     let releaseFrame = 0;
     let landingFrame = 0;
 
@@ -141,6 +137,10 @@ export default function HeroSequence() {
       if (released) return;
       released = true;
       document.body.style.overflow = prevOverflow;
+      // The head script in app/layout.tsx switched the browser's scroll
+      // restoration off for a refresh. Hand it back, so moving back and forth
+      // between pages returns the reader to where they were.
+      try { history.scrollRestoration = "auto"; } catch { /* Old browsers. */ }
       // Remembered for the rest of the tab: the loader is a first-impression
       // device, and a first impression only happens once.
       try {
@@ -168,6 +168,7 @@ export default function HeroSequence() {
       const frame = q(".js-intro-frame");
       const radial = q(".js-intro-radial");
       const nameWords = q(".js-name .js-word");
+      const card = q(".js-hero-card");
 
       // The opened frame. Percentages, not dvh: GSAP's unit converter knows
       // px/%/em/rem/vw/vh but NOT dvh, so a dvh target tweens to garbage. The
@@ -179,13 +180,11 @@ export default function HeroSequence() {
       // A return visit lands on the finished frame with no animation at all,
       // exactly like the reduced-motion path, and then gets out of the way so
       // the browser can scroll to whatever hash brought us here.
-      // Let all homepage effects establish their layout before restoring a
-      // reading position. Never run the loader on top of a section landing.
+      // Let all homepage effects establish their layout before landing on a
+      // section. Never run the loader on top of a section landing.
       if (returning) {
         landingFrame = requestAnimationFrame(() => {
-          if (restoreScrollY > 0) {
-            window.scrollTo({ top: restoreScrollY, left: 0, behavior: "instant" });
-          } else if (hash && hash !== "#home") {
+          if (hash && hash !== "#home") {
             document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "instant", block: "start" });
           }
         });
@@ -197,12 +196,18 @@ export default function HeroSequence() {
         gsap.set(frame, OPEN);
         gsap.set(radial, { opacity: 1 });
         gsap.set(nameWords, { yPercent: 0, opacity: 1 });
+        gsap.set(card, { autoAlpha: 1, y: 0 });
+        scope.current?.classList.remove("intro-pending");
         release();
         return;
       }
 
       gsap.set(images, { clipPath: "inset(0% 0% 100% 0%)" });
       gsap.set(nameWords, { yPercent: 110, opacity: 0 });
+      gsap.set(card, { autoAlpha: 0, y: 24 });
+      // GSAP now holds the starting state inline; the server-rendered
+      // placeholder (globals.css) can let go without a visible change.
+      scope.current?.classList.remove("intro-pending");
 
       const tl = gsap.timeline();
 
@@ -237,10 +242,18 @@ export default function HeroSequence() {
       );
 
       tl.call(release, undefined, NAME_AT);
+
+      // The Construct card follows the name, once the reader has a face and
+      // a name to put it with. `clearProps` hands the transform back to CSS
+      // so its hover lift works.
+      tl.to(
+        card,
+        { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", clearProps: "transform" },
+        NAME_AT + 0.7,
+      );
     }, scope);
 
     return () => {
-      window.removeEventListener("pagehide", rememberScroll);
       cancelAnimationFrame(releaseFrame);
       cancelAnimationFrame(landingFrame);
       ctx.revert();
@@ -251,7 +264,9 @@ export default function HeroSequence() {
   return (
     <section
       ref={scope}
-      className="relative h-[100dvh] w-full overflow-hidden bg-[#0a0a0a] text-white"
+      // `intro-pending` keeps every photo and the name hidden in the server
+      // HTML until the effect below takes over (see globals.css).
+      className="intro-pending relative h-[100dvh] w-full overflow-hidden bg-[#0a0a0a] text-white"
     >
       {/* The frame: a small 16/9 card that opens out to fill the viewport.
           The 16/9 comes from a calc() height rather than `aspect-ratio` so
@@ -285,11 +300,13 @@ export default function HeroSequence() {
       </div>
 
       {/* The landing: the name arrives last, once the frame is full-bleed. */}
-      <div className="js-name pointer-events-none absolute inset-x-0 bottom-32 z-20 sm:bottom-16 md:bottom-20 md:left-20 md:right-auto">
+      <div className="js-name pointer-events-none absolute inset-x-0 bottom-32 z-20 md:bottom-20 md:left-20 md:right-auto">
         <h1 className="px-5 text-center font-helvetica text-[clamp(2.25rem,7vw,4.75rem)] font-bold leading-[1.02] tracking-[-0.045em] [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] md:px-0 md:text-left">
           <MaskedWords text={NAME} />
         </h1>
       </div>
+
+      <HeroConstructCard />
     </section>
   );
 }

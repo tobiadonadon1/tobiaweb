@@ -123,6 +123,26 @@ export function ThoughtsDesktop() {
     if (e.button !== 0) return;
     const desk = deskRef.current;
     if (!desk) return;
+    // ON A PHONE A FINGER ON A FILE IS USUALLY A SCROLL. The files cover the
+    // whole pinned screen, so capturing touches here trapped the page: you
+    // could not swipe past the section. Touch gets tap-to-open only; the
+    // browser keeps the swipe (touch-action: pan-y below) and cancels the
+    // pointer when it becomes a scroll, which is exactly "not a tap".
+    if (e.pointerType === "touch") {
+      const sx = e.clientX;
+      const sy = e.clientY;
+      const cleanup = () => {
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", cleanup);
+      };
+      const onUp = (ev: PointerEvent) => {
+        cleanup();
+        if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 10) setOpenSlug(slug);
+      };
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", cleanup);
+      return;
+    }
     e.preventDefault();
     const rect = desk.getBoundingClientRect();
     const start = positions[slug];
@@ -209,7 +229,8 @@ export function ThoughtsDesktop() {
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
                 zIndex: isDragging ? 30 : 12,
-                touchAction: "none",
+                // Mouse and pen drag the file; a finger scrolls the page.
+                touchAction: "pan-y",
               }}
             >
               {/* The file icon: a clean rounded photo thumbnail (macOS-style —
@@ -251,7 +272,7 @@ export function ThoughtsDesktop() {
               role="dialog"
               aria-modal="true"
               aria-label={open.headline}
-              className="absolute left-1/2 top-1/2 z-50 flex h-[82%] w-[78%] max-w-[760px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-black/10 bg-[#faf8f2] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)]"
+              className="absolute bottom-3 left-1/2 z-50 flex h-[calc(100%-84px)] w-[calc(100%-24px)] max-w-[760px] sm:bottom-auto sm:top-1/2 sm:h-[82%] sm:w-[78%] -translate-x-1/2 sm:-translate-y-1/2 flex-col overflow-hidden rounded-xl border border-black/10 bg-[#faf8f2] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)]"
               style={{ animation: "mac-window-in 0.22s ease-out" }}
             >
               {/* Title bar */}

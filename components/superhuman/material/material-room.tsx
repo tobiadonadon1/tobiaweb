@@ -58,7 +58,7 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
    * page is built on fills every cell to its edges, and that is most of why
    * it looks certain of itself. */
   const specimen = (
-    <div className="my-7 md:my-9">
+    <div className="my-5 md:my-9">
       <Specimen
         id={folder.id}
         className={`h-auto w-full transition-transform duration-[600ms] ease-out ${

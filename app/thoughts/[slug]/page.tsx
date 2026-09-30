@@ -82,7 +82,7 @@ export default async function ThoughtPage({
   const tagHref = t.tag ? TAG_HREF[t.tag] : undefined;
 
   return (
-    <main className="paper-bg min-h-screen px-6 pb-28 pt-10 text-[#0a0a0a]">
+    <main className="paper-bg min-h-[100svh] px-5 pb-28 pt-8 text-[#0a0a0a] sm:px-6 sm:pt-10">
       {/* BlogPosting, so a post can be understood as a piece of writing with an
           author and a date rather than as an anonymous page. This is the single
           largest structured-data gap on the site: the person and the projects
@@ -111,23 +111,30 @@ export default async function ThoughtPage({
         }}
       />
 
-      <article className="page-rise mx-auto w-full max-w-3xl">
+      {/* 44rem holds the body near 70 characters a line at 18px on a laptop;
+          on a phone the 20px gutters give about 45, which is where a thumb
+          reader is comfortable. */}
+      <article className="page-rise mx-auto w-full max-w-[44rem]">
         <Link
           href="/#thoughts"
-          className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.14em] text-black/40 transition-colors hover:text-black/70"
+          // A 44px target on the phone without moving the text: the padding
+          // grows the hit area and the negative margin gives the space back.
+          className="-mx-2 -my-3 inline-flex min-h-11 w-fit items-center gap-2 px-2 py-3 font-mono text-xs uppercase tracking-[0.14em] text-black/60 transition-colors hover:text-black/85"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Thoughts
         </Link>
 
         {/* ---- Title block ---- */}
-        <header className="pt-16">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-black/40">
+        <header className="pt-12 sm:pt-16">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[11px] uppercase tracking-[0.16em] text-black/55">
             {t.tag &&
               (tagHref ? (
                 <Link
                   href={tagHref}
-                  className="rounded-full border px-2.5 py-1 transition-colors hover:text-cyan-900"
+                  // The pill stays small; an invisible pseudo-element grows
+                  // the tap area to 44px tall.
+                  className="relative rounded-full border px-2.5 py-1 transition-colors after:absolute after:-inset-x-1 after:-inset-y-2.5 after:content-[''] hover:text-cyan-900"
                   style={{ borderColor: "rgba(30,26,14,0.12)" }}
                 >
                   {t.tag}
@@ -147,7 +154,7 @@ export default async function ThoughtPage({
             {t.readTime && <span>{t.readTime}</span>}
           </div>
 
-          <h1 className="mt-6 font-serif text-4xl leading-[1.06] tracking-tight md:text-6xl">
+          <h1 className="mt-5 text-balance font-serif text-[2.4rem] leading-[1.06] tracking-tight sm:mt-6 md:text-6xl">
             {t.headline}
           </h1>
         </header>
@@ -180,7 +187,7 @@ export default async function ThoughtPage({
         )}
 
         {/* ---- The standfirst: the excerpt, set large as the piece's lede ---- */}
-        <p className="mt-12 font-serif text-2xl italic leading-snug text-black/60 md:text-3xl">
+        <p className="mt-10 text-pretty font-serif text-[1.55rem] italic leading-snug text-black/65 sm:mt-12 md:text-3xl">
           {t.excerpt}
         </p>
 
@@ -189,7 +196,7 @@ export default async function ThoughtPage({
             // Trusted, authored HTML from Tobia's own blog export (build-time
             // only) — styled via scoped child utilities (no prose plugin).
             <div
-              className="text-base leading-relaxed text-black/70 md:text-lg [&>*+*]:mt-5 [&_h2]:mt-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:leading-tight [&_h2]:tracking-tight [&_h2]:text-[#0a0a0a] [&_h3]:mt-9 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:tracking-tight [&_h3]:text-[#0a0a0a] [&_strong]:font-semibold [&_strong]:text-[#0a0a0a] [&_em]:italic [&_a]:underline [&_a]:decoration-black/30 [&_a]:underline-offset-4 [&_a:hover]:text-cyan-900"
+              className="text-pretty text-[1.0625rem] leading-[1.7] text-black/75 md:text-lg md:leading-[1.75] [&>*+*]:mt-5 [&_a]:[overflow-wrap:anywhere] [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl [&_h2]:mt-10 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:leading-tight [&_h2]:tracking-tight [&_h2]:text-[#0a0a0a] [&_h3]:mt-9 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:tracking-tight [&_h3]:text-[#0a0a0a] [&_strong]:font-semibold [&_strong]:text-[#0a0a0a] [&_em]:italic [&_a]:underline [&_a]:decoration-black/30 [&_a]:underline-offset-4 [&_a:hover]:text-cyan-900"
               dangerouslySetInnerHTML={{ __html: t.bodyHtml }}
             />
           ) : t.body && t.body.length > 0 ? (
@@ -234,19 +241,19 @@ export default async function ThoughtPage({
         </div>
 
         {/* ---- Close ---- */}
-        <div className="mt-16 flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-16 flex flex-col gap-4 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           {t.writer && (
-            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/40">
+            <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/55">
               {t.writer}
             </span>
           )}
-          <div className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.14em] text-black/40">
-            <Link href="/#thoughts" className="hover:text-black/70">
+          <div className="-my-3 flex items-center gap-5 font-mono text-[11px] uppercase tracking-[0.14em] text-black/60">
+            <Link href="/#thoughts" className="inline-flex min-h-11 items-center hover:text-black/85">
               All thoughts
             </Link>
             <a
               href="mailto:tobia@donadon.com?subject=Hi%20Tobia"
-              className="inline-flex items-center gap-1 hover:text-black/70"
+              className="inline-flex min-h-11 items-center gap-1 hover:text-black/85"
             >
               Write me <ArrowUpRight className="h-3 w-3" />
             </a>

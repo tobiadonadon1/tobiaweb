@@ -87,10 +87,14 @@ function CardText({ family }: { family: ShelfFamily }) {
 function Family({ family, index }: { family: ShelfFamily; index: number }) {
   // The drawing lifts on hover whether or not the door opens: a card that goes
   // dead to the touch reads as broken, and this one has something to say.
+  // Capped on a phone: at the full 345px a mark is 260px of drawing and the
+  // card's door lands below the fold, so the eye meets three pictures and
+  // no way in. At 17rem a whole card (mark, name, line, door) sits on one
+  // screen.
   const mark = (
     <Specimen
       id={`family-${family.id}`}
-      className="h-auto w-full transition-transform duration-[600ms] ease-out group-hover:-translate-y-1.5"
+      className="h-auto w-full max-w-[17rem] transition-transform duration-[600ms] ease-out group-hover:-translate-y-1.5 md:max-w-none"
     />
   );
 
@@ -129,7 +133,7 @@ export function SuperhumanShelf() {
           className="pointer-events-none absolute inset-x-0 bottom-[14vh] top-[14vh]"
         />
 
-        <div className="relative mx-auto w-full max-w-6xl px-6 py-36 md:py-44">
+        <div className="relative mx-auto w-full max-w-6xl px-6 pb-28 pt-32 md:py-44">
           <Reveal>
             <h2 className="max-w-[16ch] font-serif text-[clamp(2.25rem,4.2vw,3.4rem)] leading-[1.02] tracking-[-0.03em] text-[var(--paper)]">
               On the shelf.
@@ -140,16 +144,21 @@ export function SuperhumanShelf() {
               which. It sits over the first column at every width because
               Material is first in the array, not because anything is
               positioned by hand. */}
+          {/* On a phone too. It was desktop only, and a phone is where the
+              three doors are furthest apart, so it is where a reader most
+              needs telling which one opens before scrolling past two that do
+              not. "Free to open", not "free": one setup inside costs €5, and
+              the material room says so on its own face. */}
           <HandNote
             gesture="down"
-            label="this one is free"
+            label="free to open"
             color="var(--m-gold, #e8a41f)"
-            size={92}
-            className="mt-10 hidden flex-col items-start gap-0.5 md:mt-12 md:flex md:w-1/3"
+            size={84}
+            className="mt-8 flex flex-col items-start gap-0.5 md:mt-12 md:w-1/3"
             labelClassName="-rotate-2"
           />
 
-          <ul className="mt-6 grid list-none grid-cols-1 gap-x-12 gap-y-20 md:mt-4 md:grid-cols-3">
+          <ul className="mt-4 grid list-none grid-cols-1 gap-x-12 gap-y-16 md:mt-4 md:grid-cols-3 md:gap-y-20">
             {SHELF.map((family, i) => (
               <Family key={family.id} family={family} index={i} />
             ))}

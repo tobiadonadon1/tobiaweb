@@ -130,3 +130,21 @@ the close.
 6. THE CLOSE (`stay-tuned.tsx`). "Stay tuned." + one field, posting to
    /api/waitlist, which reports whether the address was actually forwarded to a
    list or only logged. The confirmation copy says which.
+
+## Revision 3 (2026-09-28) — iPhone + copy pass
+The page is three beats now (title, film, ask) at Tobia's instruction; this
+pass kept that and fixed what a stranger on a phone was missing.
+
+- THE ASK said "Pre-order." and nothing about what the book is. It now carries
+  one line under the heading: the original lede, verbatim, plus the admission
+  ("A book about minds: the ones we are building, and the ones we already are.
+  I am still writing it."). Microcopy under the field is a positive fact: "No
+  money changes hands. One email, the day it is ready." Confirmation: "You are
+  on the list. One email, the day the book is ready."
+  Heading kept as "Pre-order." (Tobia's word). If it ever reads as a purchase,
+  the researched alternative is "Read it first."
+- Hero title 60px -> ~75px on an iPhone 15 (clamp(4.5rem,19vw,9.5rem)).
+- The film steps out to a 16px gutter on phones.
+- Wave field is 100lvh, not 100svh: with iOS Safari's toolbar collapsed an svh
+  field left a flat band with a seam under the swell.
+- Field and button are at least 44px tall.

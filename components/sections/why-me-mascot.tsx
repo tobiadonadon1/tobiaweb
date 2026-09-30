@@ -40,9 +40,16 @@ import { useEffect, useRef } from "react";
  * body lies across the climb is checked for, so he never leans a ladder over
  * the face of the card in between.
  *
- * IT ONLY RUNS WHEN YOU CAN SEE IT (IntersectionObserver), only on layouts wide
- * enough to have the cards side by side, and not at all under reduced motion,
- * where he simply stands on the first card.
+ * IT ONLY RUNS WHEN YOU CAN SEE IT (IntersectionObserver), and not at all
+ * under reduced motion, where he simply stands on the first card.
+ *
+ * ON A PHONE HE COMES TOO. The stack is one column there (two small cards side
+ * by side in the middle, so he still has a gap to hop), which makes most of
+ * his moves vertical: steps off the bottom of one card onto the next, ladders
+ * back up. A phone only shows a card or two at a time, so there he leans
+ * toward whichever card the reader is looking at, and follows them down the
+ * page instead of wandering off-screen. His step-off arc is kept inside the
+ * page gutter so he never pokes past the edge of the screen.
  */
 
 /** Ground speed, px/s. */
@@ -78,9 +85,11 @@ const STRIDE = 13;
 const RUNG = 22;
 const LADDER_W = 19;
 
-/** The widest gap he will hop, and the longest fall he will take. */
+/** The widest gap he will hop, and the longest fall he will take. On a phone
+ *  the cards are stacked, so a fall is a whole card tall: he gets more reach. */
 const HOP_REACH = 190;
 const DROP_REACH = 460;
+const DROP_REACH_NARROW = 900;
 /** A ladder shorter than this is not worth the ceremony; longer is silly. */
 const CLIMB_MIN = 70;
 const CLIMB_MAX = 560;
@@ -167,6 +176,7 @@ export function WhyMeMascot({
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const wide = window.matchMedia("(min-width: 768px)");
+    const dropReach = () => (wide.matches ? DROP_REACH : DROP_REACH_NARROW);
 
     let plats: Plat[] = [];
     let raf = 0;
@@ -258,7 +268,14 @@ export function WhyMeMascot({
       const p = plats[cur];
       const [a, b] = span(p);
       const opts: Opt[] = [];
-      const bias = (i: number) => (i === prev ? 0.3 : 1);
+      // On a phone, pull him toward the card nearest the middle of the screen.
+      const narrow = !wide.matches;
+      const mid = window.innerHeight / 2 - root.getBoundingClientRect().top;
+      const dist = (q: Plat) => Math.abs((q.top + q.bottom) / 2 - mid);
+      const here = dist(p);
+      const bias = (i: number) =>
+        (i === prev ? 0.3 : 1) *
+        (narrow ? (dist(plats[i]) < here - 40 ? 5 : here < 260 ? 0.25 : 0.6) : 1);
 
       /* STROLL — somewhere else on this card. */
       opts.push({
@@ -345,7 +362,7 @@ export function WhyMeMascot({
         }
 
         /* DROP — step off one of this card's ends onto something below. */
-        if (q.top > p.bottom - 4 && q.top - p.top <= DROP_REACH) {
+        if (q.top > p.bottom - 4 && q.top - p.top <= dropReach()) {
           for (const edge of [a, b] as const) {
             if (edge < qa - 90 || edge > qb + 90) continue;
             const land = clamp(edge, qa, qb);
@@ -380,8 +397,9 @@ export function WhyMeMascot({
                   y1: q.top,
                   out: right ? 1 : -1,
                   // Enough of an arc to clear the corner he just left, so it
-                  // reads as stepping OFF rather than falling through.
-                  arcX: EDGE_PAD + 16,
+                  // reads as stepping OFF rather than falling through. On a
+                  // phone the gutter is 24px, so the arc stops just inside it.
+                  arcX: narrow ? EDGE_PAD + 6 : EDGE_PAD + 16,
                   dur: clamp(Math.sqrt((2 * fall) / GRAV), 0.34, 1.1),
                 });
                 prev = cur;
@@ -728,31 +746,32 @@ export function WhyMeMascot({
     io.observe(root);
 
     const apply = () => {
-      if (!wide.matches) {
-        host.style.opacity = "0";
-        if (ladderRef.current) ladderRef.current.style.opacity = "0";
-        plats = [];
-        return;
-      }
       host.style.opacity = "1";
       measure();
     };
 
     // A ResizeObserver catches the reflow a webfont swap or a copy change
-    // causes, which a window resize listener alone would miss.
-    const ro = new ResizeObserver(() => {
-      if (wide.matches) measure();
+    // causes, which a window resize listener alone would miss. It watches the
+    // stage's SIZE only: iOS Safari fires window resizes every time its
+    // toolbar slides in or out, and re-measuring on those would snap him out
+    // of the middle of a hop.
+    let lastW = 0;
+    let lastH = 0;
+    const ro = new ResizeObserver(([e]) => {
+      const { width, height } = e.contentRect;
+      if (Math.abs(width - lastW) < 1 && Math.abs(height - lastH) < 1) return;
+      lastW = width;
+      lastH = height;
+      measure();
     });
     ro.observe(root);
 
     apply();
     wide.addEventListener("change", apply);
-    window.addEventListener("resize", apply);
     raf = requestAnimationFrame(frame);
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", apply);
       wide.removeEventListener("change", apply);
       ro.disconnect();
       io.disconnect();

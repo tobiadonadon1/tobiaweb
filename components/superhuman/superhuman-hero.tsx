@@ -75,7 +75,7 @@ export function SuperhumanHero() {
       ref={scope}
       id="hero"
       data-sh-section={SECTION_LABELS.hero}
-      className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 pb-36 pt-28 text-center sm:pb-28 sm:pt-32"
+      className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 pb-10 pt-24 text-center sm:pb-12 sm:pt-32"
     >
       {/* The mark. One object now, not two stacked copies of a geometry:
           the outline and the fill are the two layers of the drawing itself. */}
@@ -113,13 +113,21 @@ export function SuperhumanHero() {
       {/* THE HAND, pushing you down the page. It is the only thing on this
           screen asking you to do something, and it does it in the margin
           rather than as a button, because a button here would be the page
-          selling before it has said anything. */}
+          selling before it has said anything.
+
+          IN THE FLOW, NOT PINNED TO THE BOTTOM EDGE. It used to sit absolute
+          at the foot of the screen, which is exactly the strip the hand's own
+          observer ignores (it waits until the note is 40% inside the top 85%
+          of the viewport). So on first load it never drew: a phone showed a
+          single clay dot where the note should be, and it only appeared once
+          you had already scrolled past it. Under the lede it is on screen,
+          and inside the strip, on every phone from an SE up. */}
       <HandNote
         gesture="down"
         label="free material, down here"
         color="var(--accent-clay)"
-        size={104}
-        className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-0.5 sm:bottom-6"
+        size={92}
+        className="mt-8 flex flex-col items-center gap-0.5 sm:mt-10"
         labelClassName="-rotate-2"
       />
     </section>

@@ -171,6 +171,9 @@ export function NavBar({ items, className }: NavBarProps) {
               data-nav-active={isActive ? "" : undefined}
               className={cn(
                 "relative cursor-pointer text-[13px] font-medium px-5 py-1.5 rounded-full transition-colors",
+                // An invisible 44px-tall hit area: the pill stays the size it
+                // is, and a thumb on a phone no longer has to land in 30px.
+                "after:absolute after:inset-x-0 after:-inset-y-[7px] after:content-['']",
                 "text-foreground/80 hover:text-primary",
                 isActive && "bg-muted text-primary",
               )}

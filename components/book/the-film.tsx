@@ -53,7 +53,10 @@ export function TheFilm() {
   return (
     <section ref={root} aria-label="A reading from the book" className="relative py-8 lg:py-14">
       <Sheet className="relative z-10">
-        <div data-film-frame className="mx-auto max-w-[56rem]">
+        {/* On a phone the frame steps out of the text margin to a 16px gutter:
+            the film is the one picture on the page and 28px margins either
+            side made it a thumbnail. */}
+        <div data-film-frame className="-mx-3 max-w-[56rem] sm:mx-auto">
           <VideoFrame
             bare
             tone="ink"

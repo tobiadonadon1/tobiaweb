@@ -36,9 +36,10 @@ if (typeof window !== "undefined") {
  * get the second without having read the first, which is the whole point of
  * putting a scroll stop here.
  *
- * Below 1024px, and under reduced motion, there is no pin and no sweep: the
- * claim is set and the refusals are drawn already struck through, which is a
- * perfectly good way to read either of them.
+ * Below 1024px there is no pin, but the sweep stays: the claim inks in and
+ * the refusals are struck through as you scroll past them (buildScrolled).
+ * Under reduced motion the claim is simply set and the refusals are drawn
+ * already struck through.
  */
 
 /**
@@ -138,7 +139,95 @@ export function SuperhumanPremise() {
       };
     };
 
-    /* Narrow, or reduced: nothing moves, and the refusals are already gone. */
+    /* NARROW, AND MOVING: the same two beats, without the pin.
+     *
+     * A phone used to get the finished state, which dropped the one thing
+     * this section does. The pin itself cannot come along (the claim and the
+     * margin are one tall column on a phone, taller than an SE's screen, so a
+     * sticky stage would either crop it or trap the thumb). What can come
+     * along is the scrub. The claim inks in word by word as it travels up the
+     * screen, and each refusal arrives and is struck through as it crosses
+     * the lower third, at the speed you scroll. Nothing is held, so nothing
+     * fights the thumb. */
+    const buildScrolled = () => {
+      const claim = root.querySelector<HTMLElement>("[data-premise-claim]");
+      if (!claim) return;
+
+      const rows = gsap.utils.toArray<HTMLElement>("[data-refusal]", root);
+      const label = root.querySelector<HTMLElement>("[data-refusal-label]");
+      const verdict = root.querySelector<HTMLElement>("[data-verdict]");
+
+      split = SplitText.create(claim, { type: "words" });
+
+      const words = gsap.from(split.words, {
+        opacity: 0.11,
+        stagger: 0.34,
+        ease: "none",
+        scrollTrigger: {
+          trigger: claim,
+          start: "top 82%",
+          end: "bottom 48%",
+          scrub: 0.5,
+        },
+      });
+
+      const tweens: gsap.core.Animation[] = [words];
+
+      if (label) {
+        tweens.push(
+          gsap.from(label, {
+            opacity: 0,
+            y: 12,
+            ease: "power2.out",
+            scrollTrigger: { trigger: label, start: "top 90%", end: "top 72%", scrub: 0.5 },
+          }),
+        );
+      }
+
+      rows.forEach((row) => {
+        const strike = row.querySelector<HTMLElement>("[data-strike]");
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: row, start: "top 88%", end: "top 58%", scrub: 0.5 },
+        });
+        tl.from(row, { opacity: 0, y: 16, duration: 0.45, ease: "power2.out" }, 0);
+        // The line is read, and then it is taken away.
+        if (strike) {
+          tl.fromTo(
+            strike,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.5, ease: "power2.inOut" },
+            0.4,
+          );
+        }
+        tweens.push(tl);
+      });
+
+      if (verdict) {
+        tweens.push(
+          gsap.from(verdict, {
+            opacity: 0,
+            y: 12,
+            ease: "power2.out",
+            scrollTrigger: { trigger: verdict, start: "top 90%", end: "top 70%", scrub: 0.5 },
+          }),
+        );
+      }
+
+      return () => {
+        tweens.forEach((t) => {
+          t.scrollTrigger?.kill();
+          t.kill();
+        });
+        split?.revert();
+        split = null;
+        gsap.set([...rows, label, verdict].filter(Boolean), {
+          clearProps: "opacity,transform",
+        });
+        gsap.set(root.querySelectorAll("[data-strike]"), { clearProps: "transform" });
+      };
+    };
+
+    /* Reduced: nothing moves, and the refusals are already gone. */
     const buildStatic = () => {
       gsap.set(root.querySelectorAll("[data-strike]"), { scaleX: 1 });
       gsap.set(
@@ -153,7 +242,10 @@ export function SuperhumanPremise() {
         "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
         buildPinned,
       );
-      mm.add("(max-width: 1023px)", buildStatic);
+      mm.add(
+        "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+        buildScrolled,
+      );
       mm.add("(prefers-reduced-motion: reduce)", buildStatic);
       ScrollTrigger.refresh();
     });

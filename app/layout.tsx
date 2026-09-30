@@ -114,7 +114,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      // globals.css sets `scroll-behavior: smooth` on <html>. Without this
+      // globals.css sets `scroll-behavior: smooth` on <html> during an
+      // in-page link click (SiteNav). Without this
       // attribute the router's scroll-to-top on a route change becomes a
       // SMOOTH scroll that is cancelled the moment the new page renders, so
       // every project page opened from a scrolled homepage landed near its
@@ -123,6 +124,23 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${hostGrotesk.variable} ${caveat.variable} h-full antialiased`}
     >
+      <head>
+        {/* A HOMEPAGE REFRESH STARTS AT THE TOP. On a reload the browser puts
+            the page back where the reader was, and a leftover #section makes
+            it jump there; the loader then pulled everything back up to the
+            top, so a refresh raced through the whole site before the intro.
+            This runs before the first paint, only on a homepage reload: it
+            turns the browser's restoration off for this load and drops the
+            hash, so the page never leaves the top and the loader plays whole
+            (lib/intro-policy.ts). Chrome restores before any script on the
+            new page runs, so the homepage also marks itself "manual" as it
+            unloads. Moving between pages inside the site is untouched. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.pathname==="/"){history.scrollRestoration="manual";if(location.hash)history.replaceState(history.state,"",location.pathname+location.search);window.scrollTo(0,0)}addEventListener("pagehide",function(){if(location.pathname==="/")history.scrollRestoration="manual"})}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full">
         <SiteNav />
         {/* Opaque, above the footer, and reserving exactly the footer's height

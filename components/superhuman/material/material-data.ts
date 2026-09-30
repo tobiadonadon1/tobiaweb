@@ -44,7 +44,7 @@ import { CONFIGURATION } from "./content/configuration";
 const SKILLS_FOLDER: MaterialFolder = {
   id: "skills",
   name: "Skills",
-  line: "Three roles you put into the agent for the length of a job.",
+  line: "Four roles you put into the agent for the length of a job.",
   lede: "",
   intro: [],
   accent: "clay",

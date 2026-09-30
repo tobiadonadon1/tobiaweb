@@ -52,7 +52,14 @@ if (typeof window !== "undefined") {
  * settled frame is drawn in the middle of the hero.
  */
 
-const COUNT = 700;
+/**
+ * HOW MANY POINTS. 700 on a wide screen. A phone gets 480: the shell there is
+ * about half the radius, so 480 points still make a denser mesh than 700 do on
+ * a desktop, and every point dropped is three fewer wires to stroke as curves
+ * on every frame, which is where a phone actually spends its time here.
+ */
+const COUNT_WIDE = 700;
+const COUNT_NARROW = 480;
 const NEIGHBOURS = 3;
 /**
  * Camera distance in sphere radii. Sets how much perspective the shell has.
@@ -221,6 +228,19 @@ const TRAVEL_OUT = 0.32;
  */
 const BREAK_IN = 0.4;
 const BREAK_OUT = 1;
+/**
+ * ON A PHONE THE BREAK IS MEASURED, NOT SET.
+ *
+ * 0.40 was tuned on a desktop, where the stage is a short screen and the
+ * sentence sits beside the dock. On a phone the sentence sits UNDER the dock,
+ * the stage is proportionally much taller, and 0.40 came round while the
+ * sentence's bottom line was still at 92% of the screen: the shell blew apart
+ * before anyone had read what it was about. So on a narrow screen the break
+ * starts at the scroll position where the sentence finishes inking, computed
+ * from the real layout on every refresh. Keep in step with NARROW_INK_END in
+ * plain-statement.tsx.
+ */
+const NARROW_INK_END = 0.74;
 
 /**
  * THE RETURN, on the steps section's own scroll (`mode="reform"`).
@@ -257,7 +277,7 @@ type Geo = {
   eb: Int32Array;
 };
 
-let GEO: Geo | null = null;
+const GEO = new Map<number, Geo>();
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -274,7 +294,7 @@ const softFloor = (v: number, floor: number, k: number) => {
 };
 
 /** Fibonacci shell, then every point reaches for its three nearest. */
-function buildGeo(): Geo {
+function buildGeo(COUNT: number): Geo {
   const bx = new Float32Array(COUNT);
   const by = new Float32Array(COUNT);
   const bz = new Float32Array(COUNT);
@@ -347,9 +367,13 @@ function buildGeo(): Geo {
   return { bx, by, bz, phase, jx, jy, jz, jr, ea, eb };
 }
 
-function geometry(): Geo {
-  if (!GEO) GEO = buildGeo();
-  return GEO;
+function geometry(count: number): Geo {
+  let g = GEO.get(count);
+  if (!g) {
+    g = buildGeo(count);
+    GEO.set(count, g);
+  }
+  return g;
 }
 
 /** One soft terracotta disc, rendered once, blitted under every lit point. */
@@ -413,7 +437,10 @@ export function ParticleSphere({
     if (!ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const geo = geometry();
+    // Decided once, at mount. A phone does not change into a desktop.
+    const narrow = window.matchMedia("(max-width: 639px)").matches;
+    const COUNT = narrow ? COUNT_NARROW : COUNT_WIDE;
+    const geo = geometry(COUNT);
     const { bx, by, bz, phase, jx, jy, jz, jr, ea, eb } = geo;
     const edgeCount = ea.length;
 
@@ -431,6 +458,11 @@ export function ParticleSphere({
 
     /** The one number the whole journey is a function of. */
     const journey = { p: 0 };
+    /** Where the break begins. Measured on a phone; see NARROW_INK_END. */
+    let breakIn = BREAK_IN;
+    const statement = reform
+      ? null
+      : (stage?.querySelector<HTMLElement>("[data-statement]") ?? null);
 
     /* ---------------- preallocated scratch ---------------- */
     const sx = new Float32Array(COUNT);
@@ -551,7 +583,7 @@ export function ParticleSphere({
       } else {
         // Eased so the shell leaves and lands slowly and crosses quickly.
         const trav = smooth(ramp(p, TRAVEL_IN, TRAVEL_OUT));
-        brk = ramp(p, BREAK_IN, BREAK_OUT);
+        brk = ramp(p, breakIn, BREAK_OUT);
 
         // Home: the middle of the hero. Under `sm:` the title is lifted clear
         // of the bottom nav, so the shell's home is lifted with it.
@@ -584,7 +616,7 @@ export function ParticleSphere({
           // above the sentence rather than beside it, so holding it at the
           // middle of the viewport would put the whole break on top of the
           // type.
-          const floor = h * (w < 640 ? 0.2 : 0.36);
+          const floor = h * (w < 640 ? 0.17 : 0.36);
           cy += (softFloor(cy, floor, h * 0.09) - cy) * trav;
         }
       }
@@ -851,11 +883,17 @@ export function ParticleSphere({
     /* ---------------- sizing ---------------- */
     if (reduced) journey.p = reform ? 1 : 0;
 
+    // A PHONE IS CAPPED AT 1.5, not 2. The canvas is the full screen for the
+    // whole stage, so its pixel count is what a phone pays for on every frame,
+    // not the particle maths (under 2ms even on a throttled CPU). At 1.5 an
+    // iPhone rasterises 44% fewer pixels than at 2, measured as the difference
+    // between 20 and 34 frames a second under 6x CPU throttling, and a mesh of
+    // soft wires sitting in a haze loses nothing a reader can see.
     let dpr = 1;
     const resize = () => {
       const rect = wrap.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, narrow ? 1.5 : 2);
       w = rect.width;
       h = rect.height;
       canvas.width = Math.round(w * dpr);
@@ -910,6 +948,14 @@ export function ParticleSphere({
               end: reform ? "bottom bottom" : "bottom top",
               scrub: 0.5,
               invalidateOnRefresh: true,
+              onRefresh: (self) => {
+                if (!narrow || !statement || self.end <= self.start) return;
+                const bottom =
+                  statement.getBoundingClientRect().bottom + window.scrollY;
+                const at = bottom - window.innerHeight * NARROW_INK_END;
+                const p = (at - self.start) / (self.end - self.start);
+                breakIn = Math.min(0.8, Math.max(TRAVEL_OUT + 0.06, p));
+              },
             },
           },
         )

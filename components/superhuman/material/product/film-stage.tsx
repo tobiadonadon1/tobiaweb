@@ -296,6 +296,9 @@ export function FilmStage({
             ) : null}
           </div>
 
+          {/* The ticks and the sound switch take a 44px touch area from a
+              pseudo element rather than from padding, so the hero's height,
+              and with it where the form lands on a phone, does not move. */}
           <div className="mt-1 flex items-center justify-center gap-4">
             <div role="group" aria-label="Launch videos" className="flex w-40 gap-1.5">
               {FILMS.map((f, i) => (
@@ -305,7 +308,7 @@ export function FilmStage({
                   onClick={() => go(i)}
                   aria-label={`Play video ${i + 1} of ${FILMS.length}`}
                   aria-pressed={i === look}
-                  className="group flex-1 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f07a5f]"
+                  className="group relative flex-1 py-2 after:absolute after:inset-x-0 after:-inset-y-3.5 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#f07a5f]"
                 >
                   <span className="block h-[2px] overflow-hidden rounded-full bg-[rgba(244,242,236,0.16)] group-hover:bg-[rgba(244,242,236,0.3)]">
                     <span
@@ -324,7 +327,7 @@ export function FilmStage({
               type="button"
               onClick={() => setSound((s) => !s)}
               aria-pressed={sound}
-              className={`${mono} inline-flex items-center gap-2 rounded-full border border-[rgba(244,242,236,0.18)] bg-[rgba(10,10,12,0.7)] px-3.5 py-2 text-[0.6rem] text-[rgba(244,242,236,0.85)] transition-colors hover:border-[rgba(244,242,236,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f07a5f]`}
+              className={`${mono} relative inline-flex items-center gap-2 rounded-full after:absolute after:-inset-1.5 after:content-[''] border border-[rgba(244,242,236,0.18)] bg-[rgba(10,10,12,0.7)] px-3.5 py-2 text-[0.6rem] text-[rgba(244,242,236,0.85)] transition-colors hover:border-[rgba(244,242,236,0.45)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f07a5f]`}
             >
               {sound ? <Volume2 aria-hidden className="h-3.5 w-3.5" /> : <VolumeX aria-hidden className="h-3.5 w-3.5" />}
               {sound ? "Sound on" : "Sound"}

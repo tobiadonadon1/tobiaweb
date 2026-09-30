@@ -5,7 +5,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import { ConstructStar } from "./construct-star";
-import { EMAIL, mailto } from "./shelf-data";
+import Link from "next/link";
+import { EMAIL, mailto, shelfHref } from "./shelf-data";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -76,7 +77,7 @@ export function SuperhumanClose() {
 
       <h2
         data-close-rise
-        className="mt-12 font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1] tracking-[-0.025em] text-[var(--ink)]"
+        className="mt-10 text-balance font-serif text-[clamp(2.5rem,6vw,4.5rem)] leading-[1] tracking-[-0.025em] text-[var(--ink)] md:mt-12"
       >
         Start with one thing.
       </h2>
@@ -86,14 +87,38 @@ export function SuperhumanClose() {
           the shelf under the shelf was the page saying the same thing a
           third time. What is left is the one thing the page cannot do for
           you: write. */}
-      <a
+      {/* THE ONE THING, NAMED. "Start with one thing" used to be followed
+          only by an address, so the page told a ready reader to start and
+          then gave them nowhere to start except their inbox. The one thing
+          is the free shelf, so the close hands it over, and the address
+          stays underneath for anyone the shelf did not answer. */}
+      <p
         data-close-rise
-        href={mailto("Construct")}
-        className="group mt-11 inline-flex items-center gap-2 border-b border-[rgba(11,31,58,0.2)] pb-1 text-sm text-[var(--ink)] transition-colors hover:border-[var(--accent-clay)]"
+        className="mt-6 max-w-[30ch] text-pretty text-[1.05rem] leading-[1.55] text-[color:rgba(11,31,58,0.66)] md:text-[1.15rem]"
       >
-        {EMAIL}
-        <ArrowUpRight className="h-4 w-4 text-[var(--accent-clay-text)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </a>
+        Pick the piece nearest to what you are stuck on. If nothing fits, write to me.
+      </p>
+
+      <div
+        data-close-rise
+        className="mt-10 flex flex-col items-center gap-5"
+      >
+        <Link
+          href={shelfHref("material")}
+          className="group inline-flex min-h-[3.25rem] items-center gap-2.5 bg-[var(--ink)] px-7 py-4 text-[0.98rem] text-[var(--paper)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]"
+        >
+          Open the free material
+          <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </Link>
+
+        <a
+          href={mailto("Construct")}
+          className="group inline-flex min-h-11 items-center gap-2 border-b border-[rgba(11,31,58,0.2)] text-sm text-[color:rgba(11,31,58,0.72)] transition-colors hover:border-[var(--accent-clay)] hover:text-[var(--ink)]"
+        >
+          {EMAIL}
+          <ArrowUpRight className="h-4 w-4 text-[var(--accent-clay-text)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </a>
+      </div>
 
     </section>
   );

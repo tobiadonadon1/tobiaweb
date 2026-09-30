@@ -165,3 +165,42 @@ exposed a worse orphan ("from." alone on a line at every width from 430 to
 target. That is a direct consequence of the deletions Tobia asked for, not an
 oversight. Putting it back in budget is a copy decision, and nothing may be
 invented to do it.
+
+---
+
+## Revision 4 (2026-09-28): iPhone and copy pass
+
+**soleagency.co is a parked GoDaddy page** (checked 2026-09-28, redirects to
+/lander, "is parked free"). The close's only button sent people there. It now
+opens an email to Tobia ("Book my 30 minutes", subject prefilled), with the
+address stated under it. The JSON-LD no longer carries the soleagency URL.
+If myynd gets a live site again, put the link back as a second, quieter door.
+
+Copy, before -> after:
+- Hero gains the line a stranger needs: "I am building myynd. It learns how
+  your business runs, then takes the repetitive work off your team." plus a
+  mono "In development".
+- Problem body no longer repeats the statement's "twenty years" and "a few
+  heads": "Pricing logic, client history, why that one client gets a discount.
+  It lives in people, not in files, and half of it goes home every night."
+- "How it works." over the boat photo (which promised a film that is not
+  there) -> the honest beat: "It works. / No customers yet." + "I am building
+  it in the open, so there are no logos on this page and no case study with a
+  percentage in it. Here is what it does instead, in the order it does it."
+- Steps: "Four steps, in this order." -> "How it works, in four steps."
+- Close: "It has its own home. / Go and use it." (untrue while in development)
+  -> "Start with one conversation. / Thirty minutes."
+
+Phone:
+- Sphere: 480 points under 640px (700 wide), canvas DPR capped at 1.5 there.
+  Measured 20 -> 34 fps under 6x CPU throttle; the JS side is under 2ms, the
+  cost is raster.
+- Break start is measured on phones from where the statement finishes inking
+  (NARROW_INK_END 0.74), because the desktop constant 0.40 blew the shell apart
+  while the sentence was still at the bottom of the screen. Dock is 70vw.
+- Statement: NBSPs + SplitText reduceWhiteSpace:false; payoff split into two
+  fixed lines. No orphans from 375 to 430.
+- Steps: the thread that was `hidden lg:block` now has a phone version: a
+  scroll-drawn line down the left gutter through a knot per step. Cards go
+  compact (mark beside words).
+- Marquee runs full bleed on phones; scatter card held to a strip.

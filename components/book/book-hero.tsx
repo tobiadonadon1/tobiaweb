@@ -23,6 +23,11 @@ const useIsomorphicLayoutEffect =
  * rather than floating in black. The only thing this section adds is a scrim
  * that keeps the top of the screen deep, so the swell reads as light rising.
  *
+ * On a phone the title is set at about a fifth of the screen width (75px on
+ * an iPhone 15), not the 60px floor it used to sit on: two words have to hold
+ * a whole screen, and on a 393px screen they can afford to be bigger, not
+ * smaller, than their share of a laptop.
+ *
  * The markup renders FINISHED. Motion only ever subtracts from it, and only
  * after we know the reader wants motion, so reduced motion needs no branch.
  */
@@ -86,7 +91,7 @@ export function BookHero() {
       <Sheet className="relative z-10">
         <div className="mx-auto max-w-[46rem] text-center">
           <div data-hero-mask className="overflow-hidden pb-[0.12em]">
-            <h1 className="font-serif text-[clamp(3.75rem,12vw,9.5rem)] leading-[1.02] tracking-[-0.03em] text-paper">
+            <h1 className="font-serif text-[clamp(4.5rem,19vw,9.5rem)] leading-[1.02] tracking-[-0.03em] text-paper">
               The Book
             </h1>
           </div>

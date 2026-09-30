@@ -155,7 +155,8 @@ export const SHELF: ShelfFamily[] = [
     tier: "free",
     open: true,
     tag: "Free",
-    line: "Four skills, three guides, and the first setup.",
+    // Counted, not rounded: skills.ts, guides.ts and setups.ts.
+    line: "Four skills, three guides, and three setups that set themselves up.",
     // Two things here have a price, so the promise names what it covers.
     status: "Free unless it shows a price.",
     cta: "Open the material",

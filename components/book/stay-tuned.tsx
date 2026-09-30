@@ -32,9 +32,12 @@ const MAILTO =
  *
  *   1. THE BUTTON says what actually happens. "Put my name down" cannot be
  *      read as a purchase; "Reserve my copy" could.
- *   2. ONE SHORT LINE under the field, eight words, states the two facts a
- *      reader could otherwise get wrong: nothing is charged, and there is no
- *      finished book. It sits OUTSIDE the form/confirmation switch, so it is
+ *   2. ONE LINE under the heading says what the book is and that it is
+ *      still being written, and ONE SHORT LINE under the field says what the
+ *      reader gets: no charge, one email when it is ready. (2026-09-28: the
+ *      page had no sentence anywhere saying what the book was about, which a
+ *      stranger arriving from a phone link needs before they give an address.)
+ *      The field line sits OUTSIDE the form/confirmation switch, so it is
  *      still on screen after a successful submit.
  *   3. THE CONFIRMATION says it again in plain words. Nobody reaches the end
  *      of this interaction without having been told twice.
@@ -92,12 +95,22 @@ export function StayTuned() {
         <div className="mx-auto max-w-[34rem] text-center">
           <h2
             id="stay-heading"
-            className="font-serif text-[clamp(1.9rem,4.4vw,2.8rem)] leading-[1.1] tracking-[-0.02em] text-paper"
+            className="font-serif text-[clamp(2.25rem,4vw+1rem,3rem)] leading-[1.1] tracking-[-0.02em] text-paper"
           >
             Pre-order.
           </h2>
 
-          <div className="mt-10">
+          {/* The one sentence the page owes a stranger. Someone arriving from
+              a link on their phone has seen a title and a picture; this is
+              where they learn what the book is and where it stands. The first
+              line is the page's original lede, kept word for word. The second
+              is the admission, said plainly, right before the ask. */}
+          <p className="mx-auto mt-5 max-w-[26rem] text-pretty font-serif text-[1.3rem] leading-[1.4] text-paper/90 sm:text-[1.45rem]">
+            A book about minds: the ones we are building, and the ones we
+            already&nbsp;are. I&nbsp;am still writing&nbsp;it.
+          </p>
+
+          <div className="mt-9">
             {state.kind === "done" ? (
               <p
                 role="status"
@@ -105,7 +118,7 @@ export function StayTuned() {
                 className="text-[1.05rem] leading-[1.7] text-paper/85"
               >
                 {state.durable ? (
-                  "Your name is down. Nothing was charged. I write to you when the book is finished."
+                  "You are on the list. One email, the day the book is ready."
                 ) : (
                   <>
                     It reached me, but the list is not wired up yet. Send{" "}
@@ -138,12 +151,12 @@ export function StayTuned() {
                   placeholder="you@somewhere.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full flex-1 border-b border-paper/25 bg-transparent pb-3 text-[1.05rem] text-paper caret-[#f0743a] transition-colors duration-300 placeholder:text-paper/70 hover:border-paper/45 focus:border-[#f0743a] focus:outline-none"
+                  className="min-h-11 w-full flex-1 border-b border-paper/25 bg-transparent pb-3 text-[1.05rem] text-paper caret-[#f0743a] transition-colors duration-300 placeholder:text-paper/70 hover:border-paper/45 focus:border-[#f0743a] focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={state.kind === "sending"}
-                  className="group inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.95rem] text-paper transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0743a] disabled:opacity-60"
+                  className="group inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.95rem] text-paper transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f0743a] disabled:opacity-60"
                   // The one place the orange goes solid instead of staying
                   // light. It is the same hue as the flare in the water
                   // behind it, one step hotter so it separates.
@@ -165,8 +178,8 @@ export function StayTuned() {
                 reader could take as a promise the book will be free, and not
                 "nothing to pay yet", which implies they will owe something.
                 This describes the one thing that is actually happening. */}
-            <p className="mt-6 text-[0.9rem] leading-[1.6] text-paper/80">
-              No money changes hands. The book is unfinished.
+            <p className="mt-6 text-balance text-[0.9rem] leading-[1.6] text-paper/80">
+              No money changes hands. One email, the day it is&nbsp;ready.
             </p>
 
             {state.kind === "failed" ? (

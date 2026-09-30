@@ -81,7 +81,9 @@ export function AppReel({ clips, address }: { clips: Clip[]; address: string }) 
           ))}
         </div>
       </div>
-      <div className="mt-4 flex justify-center gap-1.5">
+      {/* Each dash is a 44px target, not a 19px one: they are how a thumb
+          picks the coin, and a 3px line with 8px of padding is a miss. */}
+      <div className="mt-1.5 flex justify-center gap-0.5">
         {clips.map((c, i) => (
           <button
             key={c.id}
@@ -89,7 +91,7 @@ export function AppReel({ clips, address }: { clips: Clip[]; address: string }) 
             onClick={() => setCur(i)}
             aria-label={`Show ${c.label}`}
             aria-pressed={i === cur}
-            className="py-2"
+            className="flex h-11 min-w-11 items-center justify-center"
           >
             <span className={`block h-[3px] w-10 rounded-full transition-colors ${i === cur ? "bg-[#36e0a2]" : "bg-[rgba(244,242,236,0.16)]"}`} />
           </button>

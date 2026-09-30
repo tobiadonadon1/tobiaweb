@@ -496,7 +496,12 @@ export function WaveField() {
         ref={host}
         className="sticky top-0 w-full overflow-hidden"
         style={{
-          height: "100svh",
+          // lvh, not svh: when iOS Safari collapses its toolbar the visible
+          // viewport grows to the LARGE height, and an svh field left a band
+          // of flat ground under it with a visible seam where the swell
+          // stopped. At lvh the field always reaches the bottom edge; with
+          // the toolbar showing, its last few rows sit under the toolbar.
+          height: "100lvh",
           // The still ground under the canvas: what a reader sees for the one
           // frame before the field paints, and if canvas never arrives.
           background: `linear-gradient(to bottom, #04091a 0%, #071429 46%, #050f20 100%)`,
