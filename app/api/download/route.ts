@@ -1,6 +1,6 @@
 import { productFile } from "@/lib/shop/file";
 import { verifyFree } from "@/lib/shop/free";
-import { productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
+import { fileType, productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
 import { findPurchase, originFor } from "@/lib/shop/stripe";
 
 /**
@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 function serve(bytes: Buffer, product: Product) {
   return new Response(new Uint8Array(bytes), {
     headers: {
-      "Content-Type": "application/zip",
+      "Content-Type": fileType(product),
       "Content-Length": String(bytes.length),
       "Content-Disposition": `attachment; filename="${product.file.filename}"`,
       // Somebody's copy, not a public asset: no shared caches.

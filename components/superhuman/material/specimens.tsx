@@ -330,6 +330,44 @@ function JevCryptoAnalyst() {
   );
 }
 
+/**
+ * JEV REVIEW MINER — many small reviews, sifted into one ranked brief.
+ *
+ * A loose drift of little cards on the left (the reviews), three bars of
+ * falling length on the right (the themes, counted), and one saffron fleck
+ * lifted out between them: the verbatim quote that survives.
+ */
+function JevReviewMiner() {
+  const reviews: [number, number, number, string][] = [
+    [30, 70, -8, INK],
+    [70, 124, 6, ULTRAMARINE],
+    [22, 178, -3, INK],
+    [78, 232, 9, VERMILION],
+  ];
+  const bars: [number, number, string][] = [
+    [100, 0.68, FOREST],
+    [160, 0.5, INK],
+    [220, 0.32, INK],
+  ];
+  return (
+    <>
+      {reviews.map(([x, y, r, fill]) => (
+        <g key={y}>
+          <Cut d={CARD} x={x + 5} y={y + 5} s={0.3} sy={0.34} fill={SHADE} rotate={r} />
+          <Cut d={CARD} x={x} y={y} s={0.3} sy={0.34} fill={fill} rotate={r} />
+        </g>
+      ))}
+      <Cut d={FLECK} x={146} y={146} s={1.5} fill={SAFFRON} rotate={-12} />
+      {bars.map(([y, w, fill]) => (
+        <g key={y}>
+          <Cut d={BAR} x={206} y={y + 5} s={w} sy={0.7} fill={SHADE} />
+          <Cut d={BAR} x={200} y={y} s={w} sy={0.7} fill={fill} />
+        </g>
+      ))}
+    </>
+  );
+}
+
 /* ================================================================== *
  * THE THREE SKILL MARKS.
  *
@@ -697,6 +735,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "code-reviewer": CodeReviewer,
   "motion-director": MotionDirector,
   // the guides
+  "jev-review-miner": JevReviewMiner,
   "set-up-the-tools": SetUpTheTools,
   "pick-the-model": PickTheModel,
   "find-the-idea": FindTheIdea,

@@ -1316,6 +1316,33 @@ body[data-footer-open] .back-link {
   }
 }
 
+/* Jev Review Miner (review-stream.tsx): the reviews drift up in a seamless
+   loop (the list is drawn twice, so -50% lands on the copy), and the brief's
+   bars fill once. */
+.rm-stream {
+  animation: rm-stream 32s linear infinite;
+}
+@keyframes rm-stream {
+  to {
+    transform: translateY(-50%);
+  }
+}
+.rm-bar {
+  transform-origin: left;
+  animation: rm-bar 1.3s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes rm-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rm-stream,
+  .rm-bar {
+    animation: none;
+  }
+}
+
 /* The free form's field on black (free-claim.tsx). Chrome and Safari paint
    an autofilled field pale blue with dark text, whatever the page says, which
    left a light box inside the dark pill. An inset shadow in the pill's own

@@ -4,6 +4,7 @@ import { EntryPage } from "@/components/superhuman/material/entry-page";
 import { The98cTradePage } from "@/components/superhuman/material/product/the-98c-trade-page";
 import { LaunchrPage } from "@/components/superhuman/material/product/launchr-page";
 import { JevAnalystPage } from "@/components/superhuman/material/product/jev-analyst-page";
+import { ReviewMinerPage } from "@/components/superhuman/material/product/review-miner-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -140,4 +141,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "the-98c-trade": The98cTradePage,
   launchr: LaunchrPage,
   "jev-crypto-analyst": JevAnalystPage,
+  "jev-review-miner": ReviewMinerPage,
 };

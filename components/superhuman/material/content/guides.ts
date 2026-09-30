@@ -26,6 +26,28 @@ import type { MaterialEntry } from "../material-types";
 
 export const GUIDES: MaterialEntry[] = [
   /* ================================================================== *
+   * JEV REVIEW MINER — the one guide you take away as a file.
+   *
+   * A build guide, given away for an email like the free setups. It names a
+   * product, so the entry route renders its own page (review-miner-page.tsx)
+   * and the PDF arrives attached. First in the folder: it is the newest thing
+   * on the shelf and the one posts point at.
+   * ================================================================== */
+  {
+    slug: "jev-review-miner",
+    title: "Jev Review Miner",
+    kind: "guide",
+    summary:
+      "Thousands of customer reviews in, a product and marketing brief out. Every claim backed by a count and a real quote.",
+    // Ten pages.
+    minutes: 15,
+    status: "ready",
+    when: "You want to know why customers buy, leave and what they wish existed, without reading the reviews yourself.",
+    level: "Some code",
+    body: [],
+    product: "jev-review-miner",
+  },
+  /* ================================================================== *
    * 01 — SET UP THE TOOLS
    * ================================================================== */
   {

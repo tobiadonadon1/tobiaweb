@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     "/api/shop/health": ["./private/**/*"],
     // The webhook attaches the zip to the delivery email.
     "/api/stripe/webhook": ["./private/**/*"],
+    // A free product that is a PDF goes out attached, read from here.
+    "/api/free": ["./private/**/*"],
   },
 
   // Sole was renamed to Mynd. Keep the old path alive permanently so any

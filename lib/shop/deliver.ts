@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { SITE } from "@/lib/site";
 import { productFile } from "./file";
 import { freeLink } from "./free";
-import { downloadHref, SHOP_EMAIL, thanksHref, type Product } from "./products";
+import { downloadHref, fileType, SHOP_EMAIL, thanksHref, type Product } from "./products";
 import { ShopNotConfigured, stripe, type Purchase } from "./stripe";
 
 /**
@@ -87,7 +87,7 @@ async function viaGmail(msg: Message): Promise<string> {
     text: msg.text,
     html: msg.html,
     attachments: msg.attachment
-      ? [{ filename: msg.attachment.filename, content: msg.attachment.content, contentType: "application/zip" }]
+      ? [{ filename: msg.attachment.filename, content: msg.attachment.content, contentType: fileType(msg.product) }]
       : [],
   });
   if (!info.accepted?.length) {
@@ -235,12 +235,12 @@ export function deliveryEmail(
  * is signed for the address rather than tied to a payment (see free.ts).
  * `base` is the public site for real requests, so the link keeps working.
  */
-export function freeEmail(product: Product, to: string, base: string) {
+export function freeEmail(product: Product, to: string, base: string, attached = false) {
   return renderEmail({
     product,
     download: freeLink(base, product, to),
     guide: `${base}${product.href}`,
-    attached: false,
+    attached,
     free: true,
   });
 }
@@ -249,15 +249,28 @@ export function freeEmail(product: Product, to: string, base: string) {
 export async function sendFree(product: Product, to: string, base: string) {
   const via = emailTransport();
   if (!via) throw new ShopNotConfigured("GMAIL_APP_PASSWORD");
-  const msg: Message = {
-    to,
-    ...freeEmail(product, to, base),
-    // Resend's idempotency key: a double click within the minute sends once.
-    sessionId: `free/${product.id}/${to.toLowerCase()}/${Math.floor(Date.now() / 60_000)}`,
-    product,
+  // Attached where the product allows it (the PDF guide), linked otherwise
+  // (the zips of code, which Gmail refuses). A refused attachment falls back
+  // to the link, the same way a paid delivery does.
+  const send = async (attached: boolean) => {
+    const msg: Message = {
+      to,
+      ...freeEmail(product, to, base, attached),
+      attachment: attached ? { filename: product.file.filename, content: await productFile(product) } : undefined,
+      // Resend's idempotency key: a double click within the minute sends once.
+      sessionId: `free/${product.id}/${to.toLowerCase()}/${Math.floor(Date.now() / 60_000)}${attached ? "" : "/link"}`,
+      product,
+    };
+    return via === "gmail" ? viaGmail(msg) : viaResend(msg);
   };
-  const id = via === "gmail" ? await viaGmail(msg) : await viaResend(msg);
-  return { id, via };
+  const attach = product.file.attach === true;
+  try {
+    return { id: await send(attach), via };
+  } catch (err) {
+    if (!attach || !refusedAttachment(err)) throw err;
+    console.warn("[free] the mail server refused the attachment, sending the link instead", err);
+    return { id: await send(false), via };
+  }
 }
 
 function renderEmail({
@@ -287,7 +300,9 @@ function renderEmail({
     "",
     ...(attached
       ? [
-          `Thanks for buying ${product.name}. Your copy is attached (${file}).`,
+          free
+            ? `Here's ${product.name}, as promised. Your copy is attached (${file}).`
+            : `Thanks for buying ${product.name}. Your copy is attached (${file}).`,
           "If your email app hides the attachment, download it here:",
         ]
       : [
@@ -297,7 +312,7 @@ function renderEmail({
         ]),
     download,
     "",
-    "Open it on the computer you will run it on:",
+    email.stepsIntro ?? "Open it on the computer you will run it on:",
     ...steps.map((s, i) => `${i + 1}. ${s}`),
     "",
     ...email.after.flatMap((para) => [para, ""]),
@@ -329,7 +344,7 @@ function renderEmail({
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(subject)}</title></head>
 <body style="margin:0;padding:0;background:#faf8f2;">
-<div style="display:none;max-height:0;overflow:hidden;">${attached ? "Your copy is attached." : "Your download is inside."} Unzip it, open it in Claude Code, type hi.</div>
+<div style="display:none;max-height:0;overflow:hidden;">${escape(email.preheader ?? `${attached ? "Your copy is attached." : "Your download is inside."} Unzip it, open it in Claude Code, type hi.`)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#faf8f2;"><tr><td align="center" style="padding:40px 20px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
 <tr><td>
@@ -337,7 +352,7 @@ function renderEmail({
 ${p(escape(hello))}
 ${p(
   attached
-    ? `Thanks for buying ${escape(product.name)}. Your copy is attached as <strong style="font-weight:500;">${escape(file)}</strong>.`
+    ? `${free ? `Here's ${escape(product.name)}, as promised.` : `Thanks for buying ${escape(product.name)}.`} Your copy is attached as <strong style="font-weight:500;">${escape(file)}</strong>.`
     : free
       ? `Here's ${escape(product.name)}, as promised. Your copy is one click away.`
       : `Thanks for buying ${escape(product.name)}. Your copy is one click away.`,
@@ -350,7 +365,7 @@ ${p(
     ? "The same file, in case your email app hides the attachment."
     : `It saves as <strong style="font-weight:500;">${escape(file)}</strong>.`
 }</p>
-${p(`<span style="color:${soft};">Open it on the computer you will run it on:</span>`)}
+${p(`<span style="color:${soft};">${escape(email.stepsIntro ?? "Open it on the computer you will run it on:")}</span>`)}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border-bottom:1px solid rgba(11,31,58,0.12);">
 ${steps.map((s, i) => step(i + 1, commands(s))).join("\n")}
 </table>

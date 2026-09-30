@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -68,8 +68,12 @@ export type Product = {
   stripeProductId: string;
   /** Meta and share descriptions, and the share card's lines. */
   share: { description: string; kicker: string; line: string; proof: string };
-  /** The delivery email, after the three setup steps. */
-  email: { after: string[]; footnote?: string };
+  /**
+   * The delivery email, after the three setup steps. `preheader` is the
+   * inbox preview line and `stepsIntro` the line above the steps; both default
+   * to the Claude Code folder wording ("Unzip it, open it in Claude Code").
+   */
+  email: { after: string[]; footnote?: string; preheader?: string; stepsIntro?: string };
   /** The thank-you page: what they need, and what happens next. */
   thanks: { needs: string; next: [string, string][]; footnote?: string };
   /** The three steps, in the email and on the thank-you page. */
@@ -243,10 +247,65 @@ export const JEV_CRYPTO_ANALYST: Product = {
   },
 };
 
+export const JEV_REVIEW_MINER: Product = {
+  id: "jev-review-miner",
+  name: "Jev Review Miner",
+  description:
+    "The build guide for a system that reads thousands of customer reviews and writes a product and marketing brief, every claim backed by a count and a real quote.",
+  // Never sold, so never priced; kept at zero so nothing can charge for it.
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/guides/jev-review-miner",
+  file: {
+    sealed: "jev-review-miner.pdf.enc",
+    filename: "jev-review-miner-build-guide.pdf",
+    // A PDF, which Gmail is happy to carry: it arrives attached.
+    attach: true,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Jev Review Miner reads thousands of reviews from the App Store, Amazon and G2, finds why people buy, why they leave and what they wish existed, and writes the brief. Every claim backed by real numbers and real quotes. The full build guide, free.",
+    kicker: "Guide · for builders",
+    line: "What your customers want, in their own words, without reading a single review.",
+    proof: "Free · the full 10-page build guide",
+  },
+  contents: [
+    ["The pipeline", "five stages from raw reviews to a cited brief"],
+    ["The schema", "the Postgres tables for reviews, extractions and themes"],
+    ["The prompts", "the extraction prompt and the brief prompt, ready to paste"],
+    ["Stack, cost and rollout", "what to build it on, what it costs, and the first month"],
+  ],
+  steps: [
+    "Open the PDF.",
+    "Read the five stages on page 2. They are the whole system on one page.",
+    "Start with a CSV of reviews you already have. The MVP needs nothing else.",
+  ],
+  email: {
+    preheader: "The build guide is attached. Start with the five stages on page 2.",
+    stepsIntro: "Where to start:",
+    after: [
+      "The guide has the whole thing: the pipeline, the database schema, the two prompts, the scoring, the stack and what it costs to run.",
+      "The one idea to hold on to: never ask a model to read ten thousand reviews at once. Extract per review, count with code, and let the strong model see only the evidence.",
+    ],
+  },
+  thanks: {
+    needs: "Nothing to install. It is a PDF: read it, then build it with Claude Code or any stack you like.",
+    next: [
+      ["First", "Read the five stages on page 2. They are the whole system on one page."],
+      ["Week one", "Build the MVP from a CSV export: normalise, extract, count, write the brief."],
+      ["Then", "Point it at your competitors' 1 to 3 star reviews. That is where the openings are."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
   "jev-crypto-analyst": JEV_CRYPTO_ANALYST,
+  "jev-review-miner": JEV_REVIEW_MINER,
 };
 
 export function productById(id: unknown): Product | undefined {
@@ -254,6 +313,10 @@ export function productById(id: unknown): Product | undefined {
     ? PRODUCTS[id as ProductId]
     : undefined;
 }
+
+/** The file's media type, from its name: the zips and the one PDF. */
+export const fileType = (product: Product) =>
+  product.file.filename.endsWith(".pdf") ? "application/pdf" : "application/zip";
 
 export const thanksHref = (product: Product) => `${product.href}/thanks`;
 

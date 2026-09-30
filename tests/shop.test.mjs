@@ -36,6 +36,8 @@ const LAUNCHR_ZIP = Buffer.from("PK\u0003\u0004 the launch-video skill, a differ
 writeFileSync(path.join(cwd, "private", "launchr.zip.enc"), seal(LAUNCHR_ZIP, parseKey(fileKey)));
 const JEV_ZIP = Buffer.from("PK\u0003\u0004 the chart analyst app " + "j".repeat(2500));
 writeFileSync(path.join(cwd, "private", "jev-crypto-analyst.zip.enc"), seal(JEV_ZIP, parseKey(fileKey)));
+const MINER_PDF = Buffer.from("%PDF-1.7 the review miner build guide " + "m".repeat(2000));
+writeFileSync(path.join(cwd, "private", "jev-review-miner.pdf.enc"), seal(MINER_PDF, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -348,6 +350,31 @@ test("free: Jev Crypto Analyst sends its own file, and its link never opens Laun
   swapped.searchParams.set("product", "launchr");
   const other = await download(new Request(swapped));
   assert.equal(other.status, 303, "a Jev link is not a Launchr link");
+});
+
+test("free: Jev Review Miner arrives as an attached PDF, and its link serves the PDF", async () => {
+  const { JEV_REVIEW_MINER } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(JEV_REVIEW_MINER.href, entryHref("guides", "jev-review-miner"));
+  assert.equal(FOLDER_BY_ID.guides.entries.find((e) => e.slug === "jev-review-miner")?.product, "jev-review-miner");
+
+  const res = await ask({ product: "jev-review-miner", email: "maker@example.com" }, "203.0.113.41");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.to, "maker@example.com");
+  assert.equal(m.subject, "Your copy of Jev Review Miner");
+  assert.equal(m.attachments.length, 1);
+  assert.equal(m.attachments[0].filename, "jev-review-miner-build-guide.pdf");
+  assert.equal(m.attachments[0].contentType, "application/pdf");
+  assert.deepEqual(Buffer.from(m.attachments[0].content), MINER_PDF);
+  assert.ok(m.text.includes("Here's Jev Review Miner, as promised. Your copy is attached"));
+  assert.ok(!/buying|Unzip|type hi/.test(m.text + m.html), "no purchase or zip wording for a PDF");
+
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.equal(dl.headers.get("content-type"), "application/pdf");
+  assert.match(dl.headers.get("content-disposition"), /filename="jev-review-miner-build-guide.pdf"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), MINER_PDF);
 });
 
 test("free: a link that was tampered with, borrowed or made up never downloads", async () => {
