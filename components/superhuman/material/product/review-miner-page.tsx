@@ -50,9 +50,20 @@ const JSON_LD = {
   offers: { "@type": "Offer", price: "0.00", priceCurrency: "EUR" },
 };
 
+/**
+ * A MARKER STROKE, NOT A BOX. The words turn highlighter yellow and a soft
+ * band sits behind their lower half only, so it can never reach the line
+ * above or below, however the heading wraps.
+ */
 function Highlight({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-[0.12em] px-[0.08em] text-[#0b0b0d] [box-decoration-break:clone]" style={{ background: HL }}>
+    <span
+      className="[box-decoration-break:clone] [-webkit-box-decoration-break:clone]"
+      style={{
+        color: HL,
+        backgroundImage: "linear-gradient(transparent 58%, rgba(255,216,77,0.22) 58%, rgba(255,216,77,0.22) 88%, transparent 88%)",
+      }}
+    >
       {children}
     </span>
   );

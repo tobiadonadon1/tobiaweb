@@ -78,7 +78,20 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           {product ? (
             <>
-              <BuyForm productId={product.id} price={product.priceLabel} compact />
+              {product.free ? (
+                // Given away for an email: straight to the product page's form.
+                // A checkout button here would say "Buy · Free", and Stripe
+                // refuses a free product anyway.
+                <Link
+                  href={`${href}#claim`}
+                  className="group/get inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
+                >
+                  Get it free
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/get:translate-x-0.5" />
+                </Link>
+              ) : (
+                <BuyForm productId={product.id} price={product.priceLabel} compact />
+              )}
               <Link
                 href={href}
                 className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
@@ -116,7 +129,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         </div>
 
         <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {product ? `${product.priceLabel} · ` : ""}{entry.minutes} min · {entry.level}
+          {product ? `${product.priceLabel} · ` : ""}{entry.kind === "guide" && product ? "PDF" : `${entry.minutes} min`} · {entry.level}
         </p>
       </div>
     </li>
