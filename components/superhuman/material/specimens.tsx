@@ -719,6 +719,35 @@ function WayHandOver() {
   );
 }
 
+/**
+ * WHITEHAT — a shield, cut from paper, with a check struck through it.
+ *
+ * The one mark here that is an emblem rather than a sample of its contents,
+ * because the thing it stands for is a stance, not an artefact. Ultramarine
+ * for trust, the clay check for the work done and signed off, the saffron
+ * fleck for the one condition the whole guide turns on: permission. Its colour
+ * signature — blue shield, red check — is unlike anything else on the shelf.
+ */
+function Whitehat() {
+  const SHIELD =
+    "M118 58 L160 50 L200 57 L242 49 L284 58 L288 110 L282 160 L270 205 L240 248 L202 286 L164 247 L133 204 L120 159 L114 110 Z";
+  return (
+    <>
+      <Cut d={SHIELD} x={8} y={9} fill={SHADE} />
+      <Cut d={SHIELD} x={0} y={0} fill={ULTRAMARINE} />
+      <path
+        d="M158 150 L190 187 L256 103"
+        fill="none"
+        stroke={VERMILION}
+        strokeWidth={26}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Cut d={FLECK} x={262} y={56} s={1.2} fill={SAFFRON} rotate={-10} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -735,6 +764,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "code-reviewer": CodeReviewer,
   "motion-director": MotionDirector,
   // the guides
+  whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,
   "set-up-the-tools": SetUpTheTools,
   "pick-the-model": PickTheModel,

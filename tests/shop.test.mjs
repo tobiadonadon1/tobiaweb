@@ -38,6 +38,8 @@ const JEV_ZIP = Buffer.from("PK\u0003\u0004 the chart analyst app " + "j".repeat
 writeFileSync(path.join(cwd, "private", "jev-crypto-analyst.zip.enc"), seal(JEV_ZIP, parseKey(fileKey)));
 const MINER_PDF = Buffer.from("%PDF-1.7 the review miner build guide " + "m".repeat(2000));
 writeFileSync(path.join(cwd, "private", "jev-review-miner.pdf.enc"), seal(MINER_PDF, parseKey(fileKey)));
+const WHITEHAT_PDF = Buffer.from("%PDF-1.7 the whitehat build guide " + "w".repeat(2000));
+writeFileSync(path.join(cwd, "private", "whitehat-playbook.pdf.enc"), seal(WHITEHAT_PDF, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the

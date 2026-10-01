@@ -26,6 +26,29 @@ import type { MaterialEntry } from "../material-types";
 
 export const GUIDES: MaterialEntry[] = [
   /* ================================================================== *
+   * WHITEHAT: the playbook you take away as a file.
+   *
+   * A build guide given away for an email like the free setups. It names a
+   * product, so the entry route renders its own page (whitehat-page.tsx) and
+   * the PDF arrives attached. First in the folder: it is the newest thing on
+   * the shelf and the one the posts point at. Its spine is authorization:
+   * the guide teaches consent-based, signed-scope work only.
+   * ================================================================== */
+  {
+    slug: "whitehat",
+    title: "Whitehat",
+    kind: "guide",
+    summary:
+      "Turn Gemini 4 Argon into a paid, authorized web-security practice. Offer a review, test only with permission, get paid to fix what you find.",
+    // Twenty-one pages.
+    minutes: 25,
+    status: "ready",
+    when: "You want to earn from web-security work the legitimate way, testing only what you are hired and signed to test.",
+    level: "Some code",
+    body: [],
+    product: "whitehat",
+  },
+  /* ================================================================== *
    * JEV REVIEW MINER — the one guide you take away as a file.
    *
    * A build guide, given away for an email like the free setups. It names a

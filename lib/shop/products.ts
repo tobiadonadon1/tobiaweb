@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -301,11 +301,67 @@ export const JEV_REVIEW_MINER: Product = {
   },
 };
 
+export const WHITEHAT: Product = {
+  id: "whitehat",
+  name: "Whitehat",
+  description:
+    "The build guide for a paid, authorized web-security practice, powered by Gemini 4 Argon: find weak points with permission, report them, fix them, get paid.",
+  // Never sold, so never priced; kept at zero so nothing can charge for it.
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/guides/whitehat",
+  file: {
+    sealed: "whitehat-playbook.pdf.enc",
+    filename: "whitehat-playbook.pdf",
+    // A PDF, which Gmail is happy to carry: it arrives attached.
+    attach: true,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Whitehat is the build guide for a paid, authorized web-security practice with Gemini 4 Argon, the model Google built for defenders. Offer a security review, test only with signed permission, report what you find and get paid to fix it. The full 21-page playbook, free.",
+    kicker: "Guide · for builders",
+    line: "Turn Gemini 4 Argon into a paid, authorized web-security practice.",
+    proof: "Free · the full 21-page playbook",
+  },
+  contents: [
+    ["Authorization", "the law, and the signed scope that keeps the work legal"],
+    ["The offer", "what you sell, who it is for, and what it is worth"],
+    ["The engagement", "five phases from scope to retest, and where Argon fits each"],
+    ["The appendix", "the scope template, and the four Argon prompts you reuse on every job"],
+  ],
+  steps: [
+    "Open the PDF.",
+    "Read section 02 first. Authorization is the whole business; everything else assumes it.",
+    "Build your practice lab (section 04) before you go near a real site.",
+  ],
+  email: {
+    preheader: "The playbook is attached. Start with section 02: authorization is the whole business.",
+    stepsIntro: "Where to start:",
+    after: [
+      "The guide has the whole thing: the authorization and scope that keep you legal, the offer, the five-phase engagement, the report that gets you paid, responsible disclosure, pricing and the 90-day path. The appendix has the scope template and the four Argon prompts you reuse on every job.",
+      "The one idea to hold on to: offer first, test only with signed permission, fix what you find. That single discipline is the difference between a whitehat and a headline.",
+    ],
+  },
+  thanks: {
+    needs:
+      "Nothing to install. It is a PDF: read it, then build your practice with Gemini 4 Argon (or the strongest model you can access) and any stack you like.",
+    next: [
+      ["First", "Read section 02. Everything else in the guide assumes it."],
+      ["Week one", "Build the practice lab and work the OWASP Top 10 on targets made to be broken."],
+      ["Then", "Use the outreach in section 05 to offer your first authorized review."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
   "jev-crypto-analyst": JEV_CRYPTO_ANALYST,
   "jev-review-miner": JEV_REVIEW_MINER,
+  whitehat: WHITEHAT,
 };
 
 export function productById(id: unknown): Product | undefined {
