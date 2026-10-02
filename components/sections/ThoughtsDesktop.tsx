@@ -17,7 +17,7 @@ import { THOUGHTS, getThought, TAG_HREF } from "@/lib/thoughts";
  *
  * PLACEHOLDERS to swap once Tobia sends them:
  *  - WALLPAPER: a stand-in (a trail photo) until his portrait.
- *  - SOCIALS: Instagram + X links are placeholders; LinkedIn + email are real.
+ *  - SOCIALS: the Instagram link is a placeholder; X, LinkedIn + email are real.
  */
 const WALLPAPER = "/trail/trail-02.jpg"; // ← replace with Tobia's portrait
 
@@ -64,9 +64,8 @@ const SOCIALS: Social[] = [
   },
   {
     label: "X",
-    href: "https://x.com/",
+    href: "https://x.com/tobiadonadon_",
     tile: "bg-black",
-    placeholder: true,
     glyph: (
       <svg viewBox="0 0 24 24" className="h-4 w-4" fill="white">
         <path d="M18.9 2H22l-7.6 8.7L23 22h-6.8l-5.3-6.9L4.8 22H1.7l8.1-9.3L1 2h7l4.8 6.4L18.9 2Zm-2.4 18h1.9L7.6 3.9H5.6L16.5 20Z" />

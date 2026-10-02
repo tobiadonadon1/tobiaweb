@@ -101,9 +101,8 @@ const MESSAGE =
  * THE LINKS, in three columns, in the order a reader actually needs them: the
  * page they are on, the work, then how to reach him.
  *
- * Instagram and X are NOT here. Both are placeholder hrefs elsewhere in the
- * codebase (see ThoughtsDesktop) and a dead link in a footer is worse than a
- * missing one. When those accounts are real, they are two lines in COLUMN 3.
+ * Instagram is NOT here: it is still a placeholder href (see ThoughtsDesktop)
+ * and a dead link in a footer is worse than a missing one.
  */
 type FooterLink = { href: string; label: string; external?: boolean };
 
@@ -126,6 +125,7 @@ const COLUMNS: FooterLink[][] = [
       label: "LinkedIn",
       external: true,
     },
+    { href: "https://x.com/tobiadonadon_", label: "X · @tobiadonadon_", external: true },
   ],
 ];
 
@@ -138,7 +138,7 @@ const COLUMNS: FooterLink[][] = [
  * link colour would have walked into.
  */
 const LABEL =
-  "footer-link relative inline-block py-[0.26rem] text-[0.78rem] font-medium uppercase tracking-[0.11em] text-[var(--ink)] md:text-[0.82rem]";
+  "footer-link relative inline-block whitespace-nowrap py-[0.26rem] text-[0.78rem] font-medium uppercase tracking-[0.11em] text-[var(--ink)] md:text-[0.82rem]";
 
 export function SiteFooter() {
   return (
