@@ -92,6 +92,8 @@ export async function GET(
                 fontSize: 36,
                 lineHeight: 1.3,
                 color: "rgba(11,31,58,0.7)",
+                // No single word left alone on the second line.
+                textWrap: "balance",
               }}
             >
               {product.share.line}

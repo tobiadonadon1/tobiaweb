@@ -167,21 +167,27 @@ function Cut({
 /**
  * SKILLS — cut cards, fanned, one per skill.
  *
- * The count is the meaning: four cards, four skills. They overlap because a
+ * The count is the meaning: five cards, five skills. They overlap because a
  * skill sits on top of how the agent already behaves rather than beside it.
- * The fourth, forest, arrived with Motion Director.
+ * The fourth, forest, arrived with Motion Director; the fifth, ink, with App
+ * Designer.
  */
 function Skills() {
+  const cards: [number, number, number, string][] = [
+    [6, 152, -14, ULTRAMARINE],
+    [80, 128, -7, SAFFRON],
+    [154, 104, 0, VERMILION],
+    [228, 82, 7, FOREST],
+    [298, 62, 13, INK],
+  ];
   return (
     <>
-      <Cut d={CARD} x={16} y={140} s={0.6} fill={SHADE} rotate={-12} />
-      <Cut d={CARD} x={9} y={133} s={0.6} fill={ULTRAMARINE} rotate={-12} />
-      <Cut d={CARD} x={104} y={112} s={0.62} fill={SHADE} rotate={-4} />
-      <Cut d={CARD} x={97} y={105} s={0.62} fill={SAFFRON} rotate={-4} />
-      <Cut d={CARD} x={192} y={88} s={0.64} fill={SHADE} rotate={4} />
-      <Cut d={CARD} x={185} y={81} s={0.64} fill={VERMILION} rotate={4} />
-      <Cut d={CARD} x={280} y={62} s={0.6} fill={SHADE} rotate={11} />
-      <Cut d={CARD} x={273} y={55} s={0.6} fill={FOREST} rotate={11} />
+      {cards.map(([x, y, r, fill]) => (
+        <g key={x}>
+          <Cut d={CARD} x={x + 7} y={y + 7} s={0.5} fill={SHADE} rotate={r} />
+          <Cut d={CARD} x={x} y={y} s={0.5} fill={fill} rotate={r} />
+        </g>
+      ))}
     </>
   );
 }
@@ -728,6 +734,34 @@ function WayHandOver() {
  * fleck for the one condition the whole guide turns on: permission. Its colour
  * signature — blue shield, red check — is unlike anything else on the shelf.
  */
+/**
+ * APP DESIGNER — a phone, cut from paper, holding one decision.
+ *
+ * The screen carries one big vermilion disc (the hero every screen needs)
+ * and two quiet bars under it. To its left, the defaults it threw out: a
+ * scatter of small, faded flecks, swept off the page.
+ */
+function AppDesigner() {
+  return (
+    <>
+      <Cut d={CARD} x={150} y={30} s={0.74} sy={1.8} fill={SHADE} rotate={-5} />
+      <Cut d={CARD} x={142} y={22} s={0.74} sy={1.8} fill={ULTRAMARINE} rotate={-5} />
+      <Cut d={DISC} x={170} y={66} s={0.66} fill={VERMILION} rotate={-5} />
+      <Cut d={BAR} x={176} y={186} s={0.34} fill={SAFFRON} rotate={-5} />
+      <Cut d={BAR} x={180} y={210} s={0.22} fill="#faf8f2" opacity={0.85} rotate={-5} />
+      {[
+        [40, 92, 0.7, -12],
+        [78, 140, 0.5, 18],
+        [30, 176, 0.55, 6],
+        [86, 214, 0.42, -20],
+        [44, 250, 0.6, 10],
+      ].map(([x, y, sc, r], i) => (
+        <Cut key={i} d={FLECK} x={x} y={y} s={sc} rotate={r} fill={INK} opacity={0.22 + i * 0.03} />
+      ))}
+    </>
+  );
+}
+
 function Whitehat() {
   const SHIELD =
     "M118 58 L160 50 L200 57 L242 49 L284 58 L288 110 L282 160 L270 205 L240 248 L202 286 L164 247 L133 204 L120 159 L114 110 Z";
@@ -763,6 +797,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "product-manager": ProductManager,
   "code-reviewer": CodeReviewer,
   "motion-director": MotionDirector,
+  "app-designer": AppDesigner,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

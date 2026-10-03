@@ -40,6 +40,8 @@ const MINER_PDF = Buffer.from("%PDF-1.7 the review miner build guide " + "m".rep
 writeFileSync(path.join(cwd, "private", "jev-review-miner.pdf.enc"), seal(MINER_PDF, parseKey(fileKey)));
 const WHITEHAT_PDF = Buffer.from("%PDF-1.7 the whitehat build guide " + "w".repeat(2000));
 writeFileSync(path.join(cwd, "private", "whitehat-playbook.pdf.enc"), seal(WHITEHAT_PDF, parseKey(fileKey)));
+const APP_DESIGNER_ZIP = Buffer.from("PK\u0003\u0004 the iphone design skill " + "a".repeat(2800));
+writeFileSync(path.join(cwd, "private", "app-designer.zip.enc"), seal(APP_DESIGNER_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -352,6 +354,30 @@ test("free: Jev Crypto Analyst sends its own file, and its link never opens Laun
   swapped.searchParams.set("product", "launchr");
   const other = await download(new Request(swapped));
   assert.equal(other.status, 303, "a Jev link is not a Launchr link");
+});
+
+test("free: App Designer is a skill on the Skills shelf, sent as a link, never attached", async () => {
+  const { APP_DESIGNER } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(APP_DESIGNER.href, entryHref("skills", "app-designer"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "app-designer")?.product, "app-designer");
+  // It ships scripts, and Gmail refuses a zip that holds them.
+  assert.equal(APP_DESIGNER.file.attach, false);
+
+  const res = await ask({ product: "app-designer", email: "designer@example.com" }, "203.0.113.61");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of App Designer");
+  assert.equal(m.attachments.length, 0);
+  assert.ok(m.html.includes(">/app-designer<"), "the command is set as code");
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.match(dl.headers.get("content-disposition"), /filename="app-designer.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), APP_DESIGNER_ZIP);
+
+  const swapped = new URL(link);
+  swapped.searchParams.set("product", "launchr");
+  assert.equal((await download(new Request(swapped))).status, 303, "an App Designer link is not a Launchr link");
 });
 
 test("free: Jev Review Miner arrives as an attached PDF, and its link serves the PDF", async () => {

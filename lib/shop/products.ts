@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -356,12 +356,65 @@ export const WHITEHAT: Product = {
   },
 };
 
+export const APP_DESIGNER: Product = {
+  id: "app-designer",
+  name: "App Designer",
+  description:
+    "A Claude Code skill that designs iPhone apps like an award-winning studio, not like AI: a real concept, three directions explored, every screen rendered and checked for slop.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/app-designer",
+  file: {
+    sealed: "app-designer.zip.enc",
+    filename: "app-designer.zip",
+    // The skill ships scripts (.mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "App Designer is a skill for Claude Code that designs iPhone apps that don't look like AI made them. It finds a concept, explores three directions, renders every screen with real iPhone fonts, scans for AI slop and has a critic score the result. Free.",
+    kicker: "Skill · for Claude Code",
+    line: "iPhone apps that don't look like AI made them.",
+    proof: "Every screen checked for AI slop",
+  },
+  contents: [
+    ["app-designer/SKILL.md", "the process Claude follows, from the brief to the scored screens"],
+    ["references/", "the slop catalogue, directions, type, colour, layout, motion, critique"],
+    ["assets/", "the iPhone device kit: status bar, Dynamic Island, Apple's fonts, Liquid Glass"],
+    ["scripts/shoot.mjs", "renders every screen at 3x and scans it for slop"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs App Designer in about a minute.",
+  ],
+  email: {
+    after: [
+      "From then on, type /app-designer in any Claude Code session, or just ask Claude to design your app. Tell it what the app does and who it is for.",
+      "It finds a concept, renders three directions so you can pick, designs every screen with Apple's own fonts, scans them for AI slop and has a critic score them before you see anything.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need a Mac with Google Chrome, Claude Code with a paid Claude plan, and Node.js 18 or newer. If Node is missing, Claude will tell you.",
+    next: [
+      ["Right after install", "Claude offers to design your first app. Have one sentence ready: what it does, and who it's for."],
+      ["Every app", "Three directions to choose from, then every screen rendered, scanned and scored."],
+      ["Want changes?", "Say \"warmer\", \"try it dark\" or \"now the App Store screenshots\" and it designs again."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
   "jev-crypto-analyst": JEV_CRYPTO_ANALYST,
   "jev-review-miner": JEV_REVIEW_MINER,
   whitehat: WHITEHAT,
+  "app-designer": APP_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

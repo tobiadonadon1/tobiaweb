@@ -6,6 +6,7 @@ import { LaunchrPage } from "@/components/superhuman/material/product/launchr-pa
 import { JevAnalystPage } from "@/components/superhuman/material/product/jev-analyst-page";
 import { ReviewMinerPage } from "@/components/superhuman/material/product/review-miner-page";
 import { WhitehatPage } from "@/components/superhuman/material/product/whitehat-page";
+import { AppDesignerPage } from "@/components/superhuman/material/product/app-designer-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -144,4 +145,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "jev-crypto-analyst": JevAnalystPage,
   "jev-review-miner": ReviewMinerPage,
   whitehat: WhitehatPage,
+  "app-designer": AppDesignerPage,
 };

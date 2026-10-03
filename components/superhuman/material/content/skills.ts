@@ -226,4 +226,23 @@ export const SKILLS: MaterialEntry[] = [
     ],
     link: { label: "Download Motion Director", href: bundle("motion-director"), download: true },
   },
+  /* ---------------------------------------------------------------- *
+   * 05
+   *
+   * Given away for an email, like the setups: the entry names a product, so
+   * the route renders its own page (app-designer-page.tsx) and the rack's
+   * pill goes to that page's form instead of saving a file.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "app-designer",
+    title: "App Designer",
+    kind: "skill",
+    summary: "Designs iPhone apps like an award-winning studio, not like AI.",
+    minutes: 30,
+    status: "ready",
+    when: "Your app works, and it looks like every other app an AI has made.",
+    level: "Anyone",
+    body: [],
+    product: "app-designer",
+  },
 ];

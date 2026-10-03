@@ -1357,3 +1357,55 @@ body[data-footer-open] .back-link {
   box-shadow: 0 0 0 1000px #141416 inset;
   transition: background-color 99999s ease-out 0s;
 }
+/* The same field on paper (App Designer's page). */
+.lx-input--light:-webkit-autofill,
+.lx-input--light:-webkit-autofill:hover,
+.lx-input--light:-webkit-autofill:focus,
+.lx-input--light:autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+}
+
+
+/* ------------------------------------------------------------------ *
+ * APP DESIGNER: THE BANNER GRADIENTS.
+ *
+ * Soft fields of the colours the skill's own apps were made of (track
+ * blue, chartreuse, lamplight, tartan red), drifting slowly behind the
+ * screens. Transform only, one long ease, so it reads as light moving rather
+ * than as an animation. The band melts into the paper at both edges, and it
+ * stands still for anyone who asked for less motion.
+ * ------------------------------------------------------------------ */
+.ad-band {
+  position: relative;
+  isolation: isolate;
+}
+/* The light lives on its own layer, so the fade at its edges never touches
+   the screens standing in front of it. */
+.ad-band__field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+}
+.ad-band__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(64px);
+  will-change: transform;
+  animation: ad-drift var(--ad-dur, 26s) ease-in-out infinite alternate;
+  animation-delay: var(--ad-delay, 0s);
+}
+@keyframes ad-drift {
+  0% { transform: translate3d(-8%, 4%, 0) scale(1); }
+  50% { transform: translate3d(6%, -6%, 0) scale(1.1); }
+  100% { transform: translate3d(10%, 6%, 0) scale(0.94); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-band__blob { animation: none; }
+}

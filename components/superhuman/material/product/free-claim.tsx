@@ -20,10 +20,13 @@ export function FreeClaim({
   productId,
   align = "center",
   prompt = true,
+  tone = "dark",
   className = "",
 }: {
   productId: string;
   align?: "center" | "start";
+  /** "light" for a page on paper (App Designer); "dark" for the black pages. */
+  tone?: "dark" | "light";
   /** Show the one-line ask above the field. */
   prompt?: boolean;
   className?: string;
@@ -54,18 +57,41 @@ export function FreeClaim({
   };
 
   const center = align === "center";
+  const light = tone === "light";
+  const t = light
+    ? {
+        ink: "text-[var(--ink)]",
+        soft: "text-[color:rgba(11,31,58,0.62)]",
+        ask: "text-[color:rgba(11,31,58,0.78)]",
+        field:
+          "border-[var(--hairline-strong)] bg-white shadow-[0_1px_0_rgba(11,31,58,0.04),0_12px_32px_-18px_rgba(11,31,58,0.28)] focus-within:border-[color:rgba(11,31,58,0.5)]",
+        input: "text-[var(--ink)] placeholder:text-[color:rgba(11,31,58,0.38)]",
+        ring: "focus-visible:outline-[var(--ink)]",
+        check: "bg-[var(--accent-clay-text)] text-[var(--paper)]",
+        error: "text-[var(--accent-clay-text)]",
+      }
+    : {
+        ink: "text-[#f4f2ec]",
+        soft: "text-[rgba(244,242,236,0.6)]",
+        ask: "text-[rgba(244,242,236,0.85)]",
+        field: "border-[rgba(244,242,236,0.18)] bg-[rgba(244,242,236,0.06)] focus-within:border-[rgba(244,242,236,0.5)]",
+        input: "text-[#f4f2ec] placeholder:text-[rgba(244,242,236,0.35)]",
+        ring: "focus-visible:outline-[#f4f2ec]",
+        check: "bg-[#f07a5f] text-[#050507]",
+        error: "text-[#f07a5f]",
+      };
 
   if (state === "sent") {
     return (
       <div role="status" className={`flex flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
-        <p className="inline-flex items-center gap-2.5 text-[1.15rem] text-[#f4f2ec]">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#f07a5f] text-[#050507]">
+        <p className={`inline-flex items-center gap-2.5 text-[1.15rem] ${t.ink}`}>
+          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${t.check}`}>
             <Check aria-hidden className="h-4 w-4" />
           </span>
           Sent. Check your inbox.
         </p>
-        <p className="mt-2 max-w-[36ch] text-[0.95rem] leading-[1.5] text-[rgba(244,242,236,0.6)]">
-          It&rsquo;s on its way to <span className="text-[#f4f2ec]">{email}</span>. If it&rsquo;s
+        <p className={`mt-2 max-w-[36ch] text-[0.95rem] leading-[1.5] ${t.soft}`}>
+          It&rsquo;s on its way to <span className={t.ink}>{email}</span>. If it&rsquo;s
           not there in a minute, look in Promotions or Spam.
         </p>
       </div>
@@ -78,7 +104,7 @@ export function FreeClaim({
       className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}
     >
       {prompt ? (
-        <label htmlFor={id} className="mb-3 text-[1rem] leading-[1.45] text-[rgba(244,242,236,0.85)] md:text-[1.05rem]">
+        <label htmlFor={id} className={`mb-3 text-[1rem] leading-[1.45] md:text-[1.05rem] ${light ? "text-balance" : ""} ${t.ask}`}>
           Let me know where you want me to send the product.
         </label>
       ) : (
@@ -86,7 +112,7 @@ export function FreeClaim({
           Your email
         </label>
       )}
-      <div className="flex w-full items-center gap-1.5 rounded-full border border-[rgba(244,242,236,0.18)] bg-[rgba(244,242,236,0.06)] p-1.5 focus-within:border-[rgba(244,242,236,0.5)]">
+      <div className={`flex w-full items-center gap-1.5 rounded-full border p-1.5 ${t.field}`}>
         <input
           id={id}
           type="email"
@@ -99,12 +125,12 @@ export function FreeClaim({
             setEmail(e.target.value);
             if (state !== "idle" && state !== "sending") setState("idle");
           }}
-          className="lx-input min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-[1rem] text-[#f4f2ec] outline-none placeholder:text-[rgba(244,242,236,0.35)]"
+          className={`lx-input ${light ? "lx-input--light" : ""} min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-[1rem] outline-none ${t.input}`}
         />
         <button
           type="submit"
           disabled={state === "sending"}
-          className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.98rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f4f2ec]"
+          className={`group inline-flex shrink-0 items-center gap-2 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.98rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring}`}
         >
           {state === "sending" ? (
             <>
@@ -130,7 +156,7 @@ export function FreeClaim({
         onChange={(e) => setTrap(e.target.value)}
         className="absolute -left-[9999px] h-px w-px opacity-0"
       />
-      <p role="alert" className="mt-3 min-h-[1.2em] text-[0.88rem] text-[#f07a5f]">
+      <p role="alert" className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.error}`}>
         {state === "bad-email"
           ? "That address doesn't look right. Mind checking it?"
           : state === "too-many"
