@@ -238,7 +238,7 @@ export function SiteFooter() {
             className="footer-rise mt-9 flex items-end justify-between gap-6 md:mt-11"
             style={{ "--i": 0 } as React.CSSProperties}
           >
-            <span className="text-[0.68rem] uppercase tracking-[0.13em] text-[var(--ink)] md:text-[0.72rem]">
+            <span className="text-[0.7rem] uppercase tracking-[0.13em] text-[var(--ink)] md:text-[0.72rem]">
               © 2026 Tobia Donadon
             </span>
 

@@ -7,6 +7,7 @@ import { JevAnalystPage } from "@/components/superhuman/material/product/jev-ana
 import { ReviewMinerPage } from "@/components/superhuman/material/product/review-miner-page";
 import { WhitehatPage } from "@/components/superhuman/material/product/whitehat-page";
 import { AppDesignerPage } from "@/components/superhuman/material/product/app-designer-page";
+import { WebDesignerPage } from "@/components/superhuman/material/product/web-designer-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -146,4 +147,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "jev-review-miner": ReviewMinerPage,
   whitehat: WhitehatPage,
   "app-designer": AppDesignerPage,
+  "web-designer": WebDesignerPage,
 };

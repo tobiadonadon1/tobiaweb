@@ -24,6 +24,8 @@ export function StickyBuy({
   closeId,
   href,
   label,
+  note,
+  buttonClassName,
 }: {
   productId: string;
   name: string;
@@ -33,6 +35,10 @@ export function StickyBuy({
   /** For something given away: a link to the page's own form instead of a checkout. */
   href?: string;
   label?: string;
+  /** The small line under the name; a page may set its own, in sentence case. */
+  note?: string;
+  /** The button's colours, for a page whose action is not clay. */
+  buttonClassName?: string;
 }) {
   const [heroGone, setHeroGone] = useState(false);
   const [closeReached, setCloseReached] = useState(false);
@@ -71,14 +77,18 @@ export function StickyBuy({
       <div className="flex items-center justify-between gap-3 rounded-full border border-[rgba(11,31,58,0.1)] bg-[rgba(250,248,242,0.92)] py-1.5 pl-5 pr-1.5 shadow-[0_18px_44px_-18px_rgba(11,31,58,0.45)] backdrop-blur-xl">
         <div className="min-w-0">
           <p className="truncate text-[0.95rem] leading-tight text-[var(--ink)]">{name}</p>
-          <p className="mt-0.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-            {href ? "Free · sent by email" : "Instant download"}
-          </p>
+          {note ? (
+            <p className="mt-0.5 text-[0.86rem] text-[color:rgba(11,31,58,0.7)]">{note}</p>
+          ) : (
+            <p className="mt-0.5 font-mono text-[0.72rem] uppercase tracking-[0.12em] text-[color:rgba(11,31,58,0.68)]">
+              {href ? "Free · sent by email" : "Instant download"}
+            </p>
+          )}
         </div>
         {href ? (
           <a
             href={href}
-            className="inline-flex min-h-[2.9rem] shrink-0 items-center gap-2 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)]"
+            className={`inline-flex min-h-[2.9rem] shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-[0.95rem] font-medium ${buttonClassName ?? "bg-[var(--accent-clay-text)] text-[var(--paper)]"}`}
           >
             {label ?? "Get it"}
           </a>

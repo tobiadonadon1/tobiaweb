@@ -64,14 +64,24 @@ export function FooterReveal() {
       frame = requestAnimationFrame(measure);
     };
 
+    // A keyboard user tabbing into the footer has not scrolled to it: its top
+    // row is still under the page. Uncover it fully so the focused link is
+    // on screen (focusin bubbles; focus does not).
+    const onFocusIn = () => {
+      const end = document.scrollingElement?.scrollHeight ?? 0;
+      if (window.scrollY + window.innerHeight < end - 2) window.scrollTo({ top: end, behavior: "instant" });
+    };
+
     measure();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
+    footer.addEventListener("focusin", onFocusIn);
 
     return () => {
       if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      footer.removeEventListener("focusin", onFocusIn);
       delete document.body.dataset.footerOpen;
     };
   }, []);

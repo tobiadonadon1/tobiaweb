@@ -833,6 +833,13 @@ body[data-footer-open] .back-link {
   transform: translateY(calc((1 - var(--p)) * 20px));
   opacity: var(--p);
 }
+/* Keyboard focus inside the footer shows all of it. Tabbing in only scrolls
+   part of the way into the reveal, which left a focused link at 30% opacity:
+   there, but not visibly. */
+.site-footer:focus-within .footer-rise {
+  opacity: 1;
+  transform: none;
+}
 
 /* The rule, drawing itself left to right under the sentence. A scale rather
    than a stroke: it is a one pixel box, and a box has nothing to dash. */
@@ -1409,3 +1416,102 @@ body[data-footer-open] .back-link {
 @media (prefers-reduced-motion: reduce) {
   .ad-band__blob { animation: none; }
 }
+
+/* ------------------------------------------------------------------ *
+ * WEB DESIGNER (web-designer-page.tsx).
+ *
+ * Grey is the default, saffron is decided, night is other people's
+ * computers. Saffron is the Web Designer mark's window on the Skills rack.
+ * Ink on saffron is 7.9:1, the warm secondary 6.6:1.
+ * ------------------------------------------------------------------ */
+.wd-page {
+  --wd-saffron: #e39a2d;
+  --wd-ink-warm: #3a2c14;
+  --wd-wall: #e6e8ea;
+  --wd-night: #0b1f3a;
+  color-scheme: light;
+}
+/* The lineup wall: a faint height chart behind Claude's identical sites. */
+.wd-wall {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 63px, rgba(11, 31, 58, 0.09) 63px 64px);
+}
+
+/* THE FAN. A grey stack of the same site lies there first; four decided
+   sites fan open over it from one pivot (the bottom-left corner), each with
+   a paint-chip label strip. The open fan is the resting state, so with
+   reduced motion (or no animation at all) it is simply open. */
+.wd-grey,
+.wd-chip {
+  width: 72%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.07), 0 26px 44px -28px rgba(11, 31, 58, 0.7);
+}
+.wd-grey {
+  width: 58%;
+  background: var(--wd-wall);
+  border: 6px solid var(--wd-wall);
+}
+.wd-grey img {
+  filter: grayscale(1) contrast(0.9);
+  border-radius: 4px;
+}
+/* The grey pile sits up and to the left, where the fan leaves room, so its
+   grey "Send the invoice. Get paid." headline shows behind the chips. */
+.wd-grey-0 { left: -3%; top: -2%; rotate: -9deg; }
+.wd-grey-1 { left: 1%; top: 1%; rotate: -5deg; }
+.wd-chip {
+  left: 9%;
+  bottom: 7%;
+  background: #fdfaf3;
+  transform-origin: 0% 100%;
+}
+/* The label strip runs along the top edge, name at the far corner: the part
+   of each chip that stays visible when the fan is open, like a swatch name. */
+.wd-chip figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #0b1f3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wd-chip-0 { rotate: -27deg; }
+.wd-chip-1 { rotate: -18deg; }
+.wd-chip-2 { rotate: -9deg; }
+.wd-chip-3 { rotate: 0deg; }
+@media (prefers-reduced-motion: no-preference) {
+  .wd-chip {
+    animation: wd-fan 1s cubic-bezier(0.2, 1.1, 0.35, 1) both;
+  }
+  .wd-chip-0 { animation-delay: 0.35s; }
+  .wd-chip-1 { animation-delay: 0.27s; }
+  .wd-chip-2 { animation-delay: 0.19s; }
+  .wd-chip-3 { animation-delay: 0.1s; }
+}
+/* Closed, the chips sit square on the stack, then swing open on the pivot. */
+@keyframes wd-fan {
+  from {
+    rotate: 0deg;
+    translate: 0 6%;
+  }
+}
+/* Web apps: the grey half and the saffron half, level with each other. */
+.wd-split > div:first-child {
+  background: var(--wd-wall);
+}
+@media (min-width: 768px) {
+  .wd-split {
+    background: linear-gradient(90deg, var(--wd-wall) 50%, transparent 50%);
+  }
+  .wd-split > div:first-child {
+    background: transparent;
+  }
+}
+

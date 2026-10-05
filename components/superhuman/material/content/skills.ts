@@ -245,4 +245,22 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "app-designer",
   },
+  /* ---------------------------------------------------------------- *
+   * 06
+   *
+   * App Designer's sibling for the web, given away the same way. It sits
+   * in the cell beside App Designer, so on a phone it is the very next card.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "web-designer",
+    title: "Web Designer",
+    kind: "skill",
+    summary: "Designs and builds websites like a top studio, not like AI.",
+    minutes: 30,
+    status: "ready",
+    when: "Every site an AI builds for you comes out as the same site.",
+    level: "Anyone",
+    body: [],
+    product: "web-designer",
+  },
 ];

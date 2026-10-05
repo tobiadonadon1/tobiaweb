@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -408,6 +408,58 @@ export const APP_DESIGNER: Product = {
   },
 };
 
+export const WEB_DESIGNER: Product = {
+  id: "web-designer",
+  name: "Web Designer",
+  description:
+    "A Claude Code skill that designs and builds websites and web apps like a top studio, not like AI: three directions explored, real code in your stack, every page scanned for slop and checked on Windows, Linux, Firefox and Safari.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/web-designer",
+  file: {
+    sealed: "web-designer.zip.enc",
+    filename: "web-designer.zip",
+    // The skill ships scripts (.mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Web Designer is a skill for Claude Code that designs and builds websites and web apps that don't look like AI made them. Three directions, real code in your stack, every page scanned for AI slop and checked on Windows, Linux, Firefox and Safari. Free.",
+    kicker: "Skill · for Claude Code",
+    line: "Websites that don't look like AI made them.",
+    proof: "Checked on every screen and every computer",
+  },
+  contents: [
+    ["web-designer/SKILL.md", "the process Claude follows, from the brief to the scored, cross-checked site"],
+    ["references/", "the slop catalogue, directions, type, colour, layout, apps, motion, platforms, stacks, critique"],
+    ["scripts/shoot.mjs", "renders every page at four widths and scans it for slop and defects"],
+    ["scripts/matrix.mjs", "the same page on Windows, Linux, Android, Firefox, Safari, High Contrast"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs Web Designer in about a minute.",
+  ],
+  email: {
+    after: [
+      "From then on, type /web-designer in any Claude Code session, or just ask Claude to design or redesign your site or app. Tell it what it's for.",
+      "It renders three directions so you can pick, builds the real thing in your project, then scans every page for AI slop, checks it on Windows, Linux, Firefox and Safari, and has a critic score it before you see anything.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code with a paid Claude plan and Node.js 18 or newer, on a Mac, Windows or Linux. If Node is missing, Claude will tell you.",
+    next: [
+      ["Right after install", "Claude offers to design your first page. Have one sentence ready: what it's for, or the URL to redesign."],
+      ["Every project", "Three directions to choose from, then real code, rendered at every size and checked on every computer."],
+      ["Want changes?", "Say \"bolder\", \"try it dark\" or \"now the pricing page\" and it designs again."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -415,6 +467,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "jev-review-miner": JEV_REVIEW_MINER,
   whitehat: WHITEHAT,
   "app-designer": APP_DESIGNER,
+  "web-designer": WEB_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

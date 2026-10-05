@@ -167,18 +167,19 @@ function Cut({
 /**
  * SKILLS — cut cards, fanned, one per skill.
  *
- * The count is the meaning: five cards, five skills. They overlap because a
+ * The count is the meaning: six cards, six skills. They overlap because a
  * skill sits on top of how the agent already behaves rather than beside it.
  * The fourth, forest, arrived with Motion Director; the fifth, ink, with App
- * Designer.
+ * Designer; the sixth, saffron again, with Web Designer.
  */
 function Skills() {
   const cards: [number, number, number, string][] = [
-    [6, 152, -14, ULTRAMARINE],
-    [80, 128, -7, SAFFRON],
-    [154, 104, 0, VERMILION],
-    [228, 82, 7, FOREST],
-    [298, 62, 13, INK],
+    [4, 158, -15, ULTRAMARINE],
+    [66, 138, -9, SAFFRON],
+    [128, 118, -3, VERMILION],
+    [190, 98, 3, FOREST],
+    [250, 80, 9, INK],
+    [306, 62, 15, SAFFRON],
   ];
   return (
     <>
@@ -762,6 +763,34 @@ function AppDesigner() {
   );
 }
 
+/**
+ * WEB DESIGNER — one page stepping out of a stack of identical ones.
+ *
+ * Behind: three faded cards, the same card three times (the page every AI
+ * builds). In front, a saffron browser window, cut from paper, with three
+ * ink dots for its title bar and its own decided hero: one vermilion disc
+ * and an ultramarine bar. Saffron is the colour no other skill on the shelf
+ * leads with.
+ */
+function WebDesigner() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <Cut key={i} d={CARD} x={34 + i * 26} y={34 + i * 20} s={0.92} sy={0.72} fill={INK} rotate={-6} opacity={0.1 + i * 0.04} />
+      ))}
+      <Cut d={CARD} x={128} y={118} s={1.18} sy={0.98} fill={SHADE} rotate={3} />
+      <Cut d={CARD} x={120} y={110} s={1.18} sy={0.98} fill={SAFFRON} rotate={3} />
+      {[0, 1, 2].map((i) => (
+        <Cut key={i} d={DISC} x={142 + i * 16} y={124 + i * 0.8} s={0.075} fill={INK} rotate={3} />
+      ))}
+      <Cut d={DISC} x={150} y={150} s={0.6} fill={VERMILION} rotate={3} />
+      <Cut d={BAR} x={246} y={176} s={0.32} fill={ULTRAMARINE} rotate={3} />
+      <Cut d={BAR} x={244} y={200} s={0.24} fill="#faf8f2" opacity={0.9} rotate={3} />
+      <Cut d={BAR} x={243} y={220} s={0.18} fill="#faf8f2" opacity={0.75} rotate={3} />
+    </>
+  );
+}
+
 function Whitehat() {
   const SHIELD =
     "M118 58 L160 50 L200 57 L242 49 L284 58 L288 110 L282 160 L270 205 L240 248 L202 286 L164 247 L133 204 L120 159 L114 110 Z";
@@ -798,6 +827,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "code-reviewer": CodeReviewer,
   "motion-director": MotionDirector,
   "app-designer": AppDesigner,
+  "web-designer": WebDesigner,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,
