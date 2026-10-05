@@ -51,9 +51,9 @@ const BRIEFS: { key: string; brief: string; name: string; as: string }[] = [
 
 /** The fan: grey stack under, four chips fanning from one pivot. */
 const FAN: { img: string; label: string; video?: string }[] = [
-  { img: "after-halden", label: "Halden & Moss · model on the table" },
-  { img: "after-forager", label: "Forager · crate label" },
-  { img: "after-ledgerline", label: "Ledgerline · departure board" },
+  { img: "object", label: "Pebble · glass speaker in 3D" },
+  { img: "ascii", label: "Tally · an agent in ASCII" },
+  { img: "cards", label: "Harbor · line art that draws itself" },
   { img: "", label: "Relay · a knot drawn in dots, moving", video: "core" },
 ];
 
@@ -181,7 +181,7 @@ export function WebDesignerPage() {
                 {c.video ? (
                   <LoopVideo src={M(c.video, "mp4")} poster={M(c.video, "jpg")} label="" />
                 ) : (
-                  <Shot src={S(c.img)} alt="" preload sizes="(min-width: 1024px) 26rem, 60vw" />
+                  <Shot src={M(c.img, "jpg")} alt="" preload sizes="(min-width: 1024px) 26rem, 60vw" />
                 )}
               </figure>
             ))}
@@ -189,40 +189,12 @@ export function WebDesignerPage() {
         </div>
       </section>
 
-      {/* 2. DOES IT WORK. Claude on its own, on the grey wall. */}
-      <section aria-labelledby="wd-parade" className="wd-wall bg-[var(--wd-wall)]">
-        <div className="mx-auto max-w-[86rem] px-5 py-24 sm:px-8 md:py-32">
-          <Reveal>
-            <h2 id="wd-parade" className={`${h2} max-w-[12ch]`}>
-              Four briefs. One website.
-            </h2>
-            <p className={`${lead} mt-5 max-w-[46ch] text-[#44546a]`}>
-              An invoicing app, an AI note-taker, an architecture studio, a coffee roaster. This is what Claude builds
-              for each, on its own.
-            </p>
-          </Reveal>
-          <Four kind="before" />
-        </div>
-      </section>
-
-      {/* ...and the same four with the skill, in the same grid, on saffron. */}
-      <section aria-labelledby="wd-after">
-        <div className="mx-auto max-w-[86rem] px-5 pb-20 pt-24 sm:px-8 md:pb-28 md:pt-32">
-          <Reveal>
-            <h2 id="wd-after" className={`${h2} max-w-[14ch]`}>
-              Same four briefs, with Web Designer.
-            </h2>
-          </Reveal>
-          <Four kind="after" />
-        </div>
-      </section>
-
-      {/* ...and pieces that move, still on saffron: the skill's motion recipes. */}
+      {/* 2. PIECES THAT MOVE, right after the hero, on saffron: the skill's motion recipes. */}
       <section aria-labelledby="wd-motion">
-        <div className="mx-auto max-w-[86rem] px-5 pb-24 sm:px-8 md:pb-32">
+        <div className="mx-auto max-w-[86rem] px-5 pb-24 pt-10 sm:px-8 md:pb-32 md:pt-16">
           <Reveal>
             <h2 id="wd-motion" className={`${h2} max-w-[13ch]`}>
-              And it designs in motion.
+              It designs in motion.
             </h2>
             <p className={`${lead} mt-5 max-w-[44ch] text-[var(--wd-ink-warm)]`}>
               Not just pages. Pieces that move, for any product: heroes, cards, menus, modals.
@@ -244,6 +216,34 @@ export function WebDesignerPage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* 2. DOES IT WORK. Claude on its own, on the grey wall. */}
+      <section aria-labelledby="wd-parade" className="wd-wall bg-[var(--wd-wall)]">
+        <div className="mx-auto max-w-[86rem] px-5 py-24 sm:px-8 md:py-32">
+          <Reveal>
+            <h2 id="wd-parade" className={`${h2} max-w-[12ch]`}>
+              Four briefs. One website.
+            </h2>
+            <p className={`${lead} mt-5 max-w-[46ch] text-[#44546a]`}>
+              An invoicing app, an AI note-taker, an architecture studio, a coffee roaster. This is what Claude builds
+              for each, on its own.
+            </p>
+          </Reveal>
+          <Four kind="before" />
+        </div>
+      </section>
+
+      {/* ...and the same four with the skill, in the same grid, on saffron. */}
+      <section aria-labelledby="wd-after">
+        <div className="mx-auto max-w-[86rem] px-5 py-24 sm:px-8 md:py-32">
+          <Reveal>
+            <h2 id="wd-after" className={`${h2} max-w-[14ch]`}>
+              Same four briefs, with Web Designer.
+            </h2>
+          </Reveal>
+          <Four kind="after" />
         </div>
       </section>
 
