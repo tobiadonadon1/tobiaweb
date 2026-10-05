@@ -412,7 +412,7 @@ export const WEB_DESIGNER: Product = {
   id: "web-designer",
   name: "Web Designer",
   description:
-    "A Claude Code skill that designs and builds websites and web apps like a top studio, not like AI: three directions explored, real code in your stack, every page scanned for slop and checked on Windows, Linux, Firefox and Safari.",
+    "A Claude Code skill that designs and builds websites, web apps and components like a top studio, not like AI: three directions explored, motion that moves like award-winning work, real code in your stack, every page scanned for slop and checked on Windows, Linux, Firefox and Safari.",
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
@@ -427,16 +427,17 @@ export const WEB_DESIGNER: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Web Designer is a skill for Claude Code that designs and builds websites and web apps that don't look like AI made them. Three directions, real code in your stack, every page scanned for AI slop and checked on Windows, Linux, Firefox and Safari. Free.",
+      "Web Designer is a skill for Claude Code that designs and builds websites, web apps and components that don't look like AI made them, and that move: dot matrices, 3D objects, ASCII, line art that draws itself. Real code in your stack, every page scanned for AI slop and checked on Windows, Linux, Firefox and Safari. Free.",
     kicker: "Skill · for Claude Code",
     line: "Websites that don't look like AI made them.",
     proof: "Checked on every screen and every computer",
   },
   contents: [
     ["web-designer/SKILL.md", "the process Claude follows, from the brief to the scored, cross-checked site"],
-    ["references/", "the slop catalogue, directions, type, colour, layout, apps, motion, platforms, stacks, critique"],
+    ["references/", "the slop catalogue, directions, type, colour, layout, apps, motion craft, platforms, stacks, critique"],
     ["scripts/shoot.mjs", "renders every page at four widths and scans it for slop and defects"],
     ["scripts/matrix.mjs", "the same page on Windows, Linux, Android, Firefox, Safari, High Contrast"],
+    ["scripts/record.mjs", "records any page or component in motion as an MP4 loop"],
   ],
   steps: [
     "Unzip the folder.",
@@ -446,7 +447,7 @@ export const WEB_DESIGNER: Product = {
   email: {
     after: [
       "From then on, type /web-designer in any Claude Code session, or just ask Claude to design or redesign your site or app. Tell it what it's for.",
-      "It renders three directions so you can pick, builds the real thing in your project, then scans every page for AI slop, checks it on Windows, Linux, Firefox and Safari, and has a critic score it before you see anything.",
+      "It renders three directions so you can pick, builds the real thing in your project, with motion that moves like award-winning work (dot matrices, 3D objects, ASCII, line art), then scans every page for AI slop, checks it on Windows, Linux, Firefox and Safari, and has a critic score it before you see anything.",
     ],
   },
   thanks: {

@@ -5,6 +5,7 @@ import { abs } from "@/lib/site";
 import { WEB_DESIGNER as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
+import { LoopVideo } from "./loop-video";
 import { StickyBuy } from "./sticky-buy";
 
 /**
@@ -49,11 +50,11 @@ const BRIEFS: { key: string; brief: string; name: string; as: string }[] = [
 ];
 
 /** The fan: grey stack under, four chips fanning from one pivot. */
-const FAN: { img: string; label: string }[] = [
+const FAN: { img: string; label: string; video?: string }[] = [
   { img: "after-halden", label: "Halden & Moss · model on the table" },
-  { img: "after-northline", label: "Northline · T-card board" },
   { img: "after-forager", label: "Forager · crate label" },
   { img: "after-ledgerline", label: "Ledgerline · departure board" },
+  { img: "", label: "Relay · a knot drawn in dots, moving", video: "core" },
 ];
 
 /** One site on six computers (the matrix the skill runs on everything it makes). */
@@ -69,9 +70,19 @@ const PHONES: [string, string, number, number][] = [
   ["wall-l10n-phone", "German-length text", 780, 1688],
 ];
 
+/** Pieces that move, made with the skill's motion recipes (record.mjs loops). */
+const MOTION: { key: string; name: string; what: string }[] = [
+  { key: "core", name: "Relay", what: "an object drawn in dots, turning under your pointer" },
+  { key: "cards", name: "Harbor", what: "feature cards whose line drawings draw themselves" },
+  { key: "object", name: "Pebble", what: "a glass speaker, lit and turning in 3D" },
+  { key: "ascii", name: "Tally", what: "an agent rendered live in characters" },
+];
+const M = (key: string, ext: "mp4" | "jpg") => `/shop/web-designer/motion-${key}-v1.${ext === "mp4" ? "mp4" : "jpg"}`;
+
 const GET: [string, string][] = [
   ["Three directions, then one.", "Your first screen, designed three different ways before it commits."],
   ["Real code, in your project.", "React, Next.js, Tailwind, shadcn, Vue, Svelte or plain HTML."],
+  ["Pieces that move.", "Dot matrices, 3D objects, ASCII, line art that draws itself. Heroes, cards, menus, modals."],
   ["Checked before you see it.", "Scanned for AI slop, tested on every computer, scored by a critic."],
 ];
 
@@ -167,7 +178,11 @@ export function WebDesignerPage() {
             {FAN.map((c, i) => (
               <figure key={c.img} className={`wd-chip wd-chip-${i} absolute m-0`} aria-hidden>
                 <figcaption>{c.label}</figcaption>
-                <Shot src={S(c.img)} alt="" preload sizes="(min-width: 1024px) 26rem, 60vw" />
+                {c.video ? (
+                  <LoopVideo src={M(c.video, "mp4")} poster={M(c.video, "jpg")} label="" />
+                ) : (
+                  <Shot src={S(c.img)} alt="" preload sizes="(min-width: 1024px) 26rem, 60vw" />
+                )}
               </figure>
             ))}
           </div>
@@ -192,13 +207,43 @@ export function WebDesignerPage() {
 
       {/* ...and the same four with the skill, in the same grid, on saffron. */}
       <section aria-labelledby="wd-after">
-        <div className="mx-auto max-w-[86rem] px-5 py-24 sm:px-8 md:py-32">
+        <div className="mx-auto max-w-[86rem] px-5 pb-20 pt-24 sm:px-8 md:pb-28 md:pt-32">
           <Reveal>
             <h2 id="wd-after" className={`${h2} max-w-[14ch]`}>
               Same four briefs, with Web Designer.
             </h2>
           </Reveal>
           <Four kind="after" />
+        </div>
+      </section>
+
+      {/* ...and pieces that move, still on saffron: the skill's motion recipes. */}
+      <section aria-labelledby="wd-motion">
+        <div className="mx-auto max-w-[86rem] px-5 pb-24 sm:px-8 md:pb-32">
+          <Reveal>
+            <h2 id="wd-motion" className={`${h2} max-w-[13ch]`}>
+              And it designs in motion.
+            </h2>
+            <p className={`${lead} mt-5 max-w-[44ch] text-[var(--wd-ink-warm)]`}>
+              Not just pages. Pieces that move, for any product: heroes, cards, menus, modals.
+            </p>
+          </Reveal>
+          <ul className="mt-12 grid list-none grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:mt-16">
+            {MOTION.map((m) => (
+              <li key={m.key}>
+                <LoopVideo
+                  src={M(m.key, "mp4")}
+                  poster={M(m.key, "jpg")}
+                  label={`${m.name}: ${m.what}. Made with Web Designer.`}
+                  className="rounded-[10px] shadow-[0_2px_0_rgba(0,0,0,0.06),0_30px_50px_-30px_rgba(11,31,58,0.7)]"
+                />
+                <p className="mt-4 text-[1.02rem] leading-[1.4]">
+                  <span className="font-semibold">{m.name}</span>
+                  <span className="text-[var(--wd-ink-warm)]">, {m.what}</span>
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
