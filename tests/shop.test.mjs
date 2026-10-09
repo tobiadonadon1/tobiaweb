@@ -428,6 +428,7 @@ test("free: App Launcher opens a new row on the rack, sent as a link, its comman
   assert.ok(m.html.includes(">run app-launcher<"), "the first command is set as code");
   assert.ok(m.html.includes(">run<"), "the everyday command is set as code");
   assert.ok(m.html.includes(">$app-launcher<") && m.html.includes(">/app-launcher<"), "both agents' commands are set as code");
+  assert.ok(!m.html.includes("type hi"), "no other product's setup line in the preview text");
   const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
   const dl = await download(new Request(link));
   assert.match(dl.headers.get("content-disposition"), /filename="app-launcher.zip"/);

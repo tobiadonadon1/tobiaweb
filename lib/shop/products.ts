@@ -499,6 +499,7 @@ export const APP_LAUNCHER: Product = {
     "Type run app-launcher. It installs itself in about a minute and starts.",
   ],
   email: {
+    preheader: "Your download is inside. Put it in your app's project, then type run app-launcher in Claude Code or Codex.",
     after: [
       "After that, in the same project, just type run (or /app-launcher in Claude Code, $app-launcher in Codex).",
       "It checks your code for what App Review would reject and fixes it, studies the apps you'll sit next to in search, writes your listing and keywords, renders your screenshots and preview from your real app, and builds the launch kit. Everything lands in a launch/ folder in your project.",
