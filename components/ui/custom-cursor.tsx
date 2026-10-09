@@ -62,8 +62,12 @@ export function CustomCursor() {
 
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
-  const springX = useSpring(x, { damping: 22, stiffness: 150, mass: 0.8 });
-  const springY = useSpring(y, { damping: 22, stiffness: 150, mass: 0.8 });
+  // Tight and light: it keeps up with the hand (within a few pixels in a
+  // tenth of a second) and still glides rather than snaps. The old spring
+  // (150 / 22 / 0.8) was still 90px behind a quarter of a second later.
+  const SPRING = { stiffness: 1100, damping: 52, mass: 0.3 };
+  const springX = useSpring(x, SPRING);
+  const springY = useSpring(y, SPRING);
 
   /* ---- is there a real pointer, and does the reader want motion ---- */
   useEffect(() => {
@@ -145,7 +149,9 @@ export function CustomCursor() {
         translateY: "-50%",
         borderWidth: 1,
       }}
-      transition={{ duration: 0.375, ease: [0.625, 0.05, 0, 1] }}
+      // The ring opens and closes in under a fifth of a second, easing out:
+      // it answers the hover instead of arriving after it.
+      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
     />
   );
 }
