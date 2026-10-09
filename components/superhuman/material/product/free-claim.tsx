@@ -34,7 +34,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages. */
-  tone?: "dark" | "light" | "saffron" | "forest";
+  tone?: "dark" | "light" | "saffron" | "forest" | "cobalt";
   /** Show the one-line ask above the field. */
   prompt?: boolean;
   className?: string;
@@ -84,8 +84,20 @@ export function FreeClaim({
 
   const center = align === "center";
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "saffron" || tone === "forest";
-  const t = tone === "forest"
+  const light = tone === "light" || tone === "saffron" || tone === "forest" || tone === "cobalt";
+  const t = tone === "cobalt"
+    ? {
+        ink: "text-white",
+        soft: "text-[rgba(255,255,255,0.78)]",
+        ask: "text-[rgba(255,255,255,0.9)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(0,0,40,0.6)] focus-within:border-white",
+        input: "text-[#0b1a6b] placeholder:text-[rgba(11,26,107,0.45)]",
+        ring: "focus-visible:outline-white",
+        check: "bg-white text-[#1636e6]",
+        error: "text-[#ffd9cf]",
+        button: "bg-[#d4361a] text-white",
+      }
+    : tone === "forest"
     ? {
         ink: "text-[#f6f1e4]",
         soft: "text-[rgba(246,241,228,0.72)]",
