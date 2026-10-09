@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -461,6 +461,60 @@ export const WEB_DESIGNER: Product = {
   },
 };
 
+export const APP_LAUNCHER: Product = {
+  id: "app-launcher",
+  name: "App Launcher",
+  description:
+    "A skill for Claude Code and Codex that takes an iOS app from its repo to the App Store: finds and fixes what App Review would reject, then writes the listing and keywords, renders the screenshots and preview, and builds the launch kit. After launch, it reads your ads and rewrites onboarding.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/app-launcher",
+  file: {
+    sealed: "app-launcher.zip.enc",
+    filename: "app-launcher.zip",
+    // The skill ships scripts (.mjs), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "App Launcher is a free skill for Claude Code and Codex. Put it in your iOS app's repo and type run: it checks the code the way App Review will and fixes what would get rejected, studies the real competition, writes the listing and keywords, renders the App Store screenshots and preview from your real app, and builds the launch kit. After launch it reads your ads and rewrites onboarding.",
+    kicker: "Skill · for Claude Code and Codex",
+    line: "From your repo to the App Store.",
+    proof: "Checks your code the way App Review will",
+  },
+  contents: [
+    ["skill/SKILL.md", "the process the agent follows, from the review check to launch day and after"],
+    ["scripts/audit.mjs", "reads your code the way App Review will: 30+ checks with file and line"],
+    ["scripts/store.mjs", "the real App Store: who ranks, their subtitles, screenshots and reviews"],
+    ["scripts/screens.mjs", "renders App Store screenshots at Apple's exact sizes from your real screens"],
+    ["scripts/preview.mjs, ads.mjs, meta.mjs", "the app preview video, the ads report, the listing checker"],
+    ["references/", "review, positioning, ASO, screenshots, preview, launch, ads, onboarding, specs"],
+  ],
+  steps: [
+    "Unzip it and move the app-launcher folder into your app's project folder.",
+    "Open Claude Code or Codex in that folder.",
+    "Type run app-launcher. It installs itself in about a minute and starts.",
+  ],
+  email: {
+    after: [
+      "After that, in the same project, just type run (or /app-launcher in Claude Code, $app-launcher in Codex).",
+      "It checks your code for what App Review would reject and fixes it, studies the apps you'll sit next to in search, writes your listing and keywords, renders your screenshots and preview from your real app, and builds the launch kit. Everything lands in a launch/ folder in your project.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code or Codex, Node.js 18 or newer, and your app's code (Swift, Expo, React Native, Flutter or Capacitor). On a Mac with Xcode it captures real screens from the Simulator; on Linux it uses screenshots from your phone.",
+    next: [
+      ["Right after install", "It runs the review check on your code and tells you what it found."],
+      ["Then", "Positioning, listing, screenshots, preview and launch kit, one step at a time. Type run again any time to continue."],
+      ["Once you're live", "Type run again: it reads your ads and onboarding and tells you what to change."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -469,6 +523,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   whitehat: WHITEHAT,
   "app-designer": APP_DESIGNER,
   "web-designer": WEB_DESIGNER,
+  "app-launcher": APP_LAUNCHER,
 };
 
 export function productById(id: unknown): Product | undefined {

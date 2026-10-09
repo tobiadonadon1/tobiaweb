@@ -1515,3 +1515,188 @@ body[data-footer-open] .back-link {
   }
 }
 
+
+/* ------------------------------------------------------------------ *
+ * APP LAUNCHER (app-launcher-page.tsx).
+ *
+ * Forest is the launch (green for go, the skill's card on the Skills rack),
+ * paper is the evidence. Cream on forest is 11.6:1, the soft cream 7.4:1;
+ * forest ink on paper 13.9:1, its soft tone 6.9:1. The vermilion is only the
+ * action and the stamp.
+ * ------------------------------------------------------------------ */
+.al-page {
+  --al-forest: #133d2e;
+  --al-forest-deep: #0d2c21;
+  --al-paper: #f3eee1;
+  --al-ink: #0e2a20;
+  --al-ink-soft: #3f5a4f;
+  --al-cream: #f6f1e4;
+  --al-cream-soft: #c6d8cd;
+  --al-mint: #9fd7ba;
+  --al-stamp: #c43d27;
+  --al-go: #1f6b4f;
+  --al-rule: rgba(14, 42, 32, 0.16);
+  --al-rule-dark: rgba(246, 241, 228, 0.18);
+  color-scheme: dark;
+}
+
+/* The review sheet. Cream paper, the problems as lines; each line's mark
+   turns from a vermilion dot into a green tick in turn, then the stamp lands. */
+.al-sheet {
+  max-width: 36rem;
+  width: 100%;
+  margin-inline: auto;
+}
+.al-sheet-paper {
+  position: relative;
+  padding: 1.5rem 1.6rem 1.4rem;
+  border-radius: 12px;
+  background: var(--al-paper);
+  color: var(--al-ink);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 40px 70px -34px rgba(0, 0, 0, 0.7);
+  rotate: 0.8deg;
+}
+.al-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid var(--al-rule);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+.al-mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  translate: 0 0.05rem;
+  background: var(--al-go);
+}
+.al-mark::after {
+  content: "";
+  position: absolute;
+  left: 0.22rem;
+  top: 0.08rem;
+  width: 0.22rem;
+  height: 0.42rem;
+  border: solid var(--al-paper);
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
+}
+/* The finished sheet is the default (no JavaScript, reduced motion). Armed,
+   it rewinds to the problems and waits; in view, it plays: each mark goes
+   from vermilion to a green tick in turn, the total swaps, the stamp lands. */
+[data-armed] .al-mark { background: var(--al-stamp); animation: al-fixed 0.35s ease-out both paused; animation-delay: calc(0.5s + var(--i) * 0.3s); }
+[data-armed] .al-mark::after { opacity: 0; animation: al-tick-in 0.35s ease-out both paused; animation-delay: calc(0.5s + var(--i) * 0.3s); }
+[data-armed] .al-sum-before { animation: al-out 0.3s ease-out 3s both paused; }
+[data-armed] .al-sum-after { animation: al-in 0.3s ease-out 3.1s both paused; }
+[data-armed] .al-stamp { animation: al-stamp 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) 3.35s both paused; }
+[data-play] .al-mark, [data-play] .al-mark::after, [data-play] .al-sum-before, [data-play] .al-sum-after, [data-play] .al-stamp { animation-play-state: running; }
+@keyframes al-fixed {
+  from { background: var(--al-stamp); }
+  to { background: var(--al-go); }
+}
+@keyframes al-tick-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.al-sum { position: relative; }
+.al-sum-before, .al-sum-after { display: block; }
+.al-sum-before { color: var(--al-stamp); opacity: 0; }
+.al-sum-after { position: absolute; left: 0; top: 1rem; color: var(--al-go); }
+@keyframes al-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes al-in { from { opacity: 0; } to { opacity: 1; } }
+.al-stamp {
+  position: absolute;
+  right: -0.4rem;
+  bottom: -1.6rem;
+  padding: 0.55rem 1.1rem 0.6rem;
+  border: 5px solid var(--al-stamp);
+  border-radius: 14px;
+  color: var(--al-stamp);
+  background: color-mix(in srgb, var(--al-paper) 88%, transparent);
+  font-size: clamp(1.6rem, 4.6vw, 2.3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  rotate: -9deg;
+  box-shadow: 0 18px 30px -18px rgba(0, 0, 0, 0.6);
+}
+@keyframes al-stamp {
+  from { opacity: 0; scale: 1.9; }
+  to { opacity: 1; scale: 1; }
+}
+
+
+/* A small green tick for lists on paper. */
+.al-tick {
+  position: relative;
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: var(--al-go);
+  translate: 0 0.08rem;
+}
+.al-tick::after {
+  content: "";
+  position: absolute;
+  left: 0.29rem;
+  top: 0.13rem;
+  width: 0.24rem;
+  height: 0.46rem;
+  border: solid var(--al-paper);
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
+}
+
+/* The screenshot strip scrolls sideways on phones and sits in a row on desktop. */
+.al-strip {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.al-strip::-webkit-scrollbar { display: none; }
+.al-strip > li { scroll-snap-align: start; }
+
+/* Listing fill bars. */
+.al-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(14, 42, 32, 0.1);
+  overflow: hidden;
+}
+.al-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--al-go);
+}
+
+/* The ads verdicts. */
+.al-ads th {
+  padding: 0 1rem 0.8rem 0;
+  border-bottom: 1px solid var(--al-rule);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--al-ink-soft);
+}
+.al-ads td {
+  padding: 1.1rem 1rem 1.1rem 0;
+  border-bottom: 1px solid var(--al-rule);
+  vertical-align: top;
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+.al-verdict {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.al-verdict--promote { background: var(--al-go); color: var(--al-paper); }
+.al-verdict--refresh { background: #e6d6a8; color: #4a3708; }
+.al-verdict--cut, .al-verdict--negative { background: #f1d3cb; color: #7a2312; }

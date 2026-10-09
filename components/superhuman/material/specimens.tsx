@@ -791,6 +791,30 @@ function WebDesigner() {
   );
 }
 
+/**
+ * APP LAUNCHER — a phone lifting off the shelf.
+ *
+ * Below, three faded ink strips: the row of look-alike apps in search. Above
+ * them a tall forest card, the phone, tilted as it rises, with a paper
+ * screen and a vermilion disc in its corner: the approval. A saffron wedge
+ * under it points the way it's going. Forest is the colour of "go",
+ * and no other skill on the shelf leads with it.
+ */
+function AppLauncher() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <Cut key={i} d={BAR} x={40 + i * 6} y={250 + i * 18} s={0.95} sy={0.62} fill={INK} opacity={0.1 + i * 0.04} rotate={-2} />
+      ))}
+      <Cut d={WEDGE} x={150} y={300} s={0.62} sy={0.72} fill={SAFFRON} rotate={-90} />
+      <Cut d={CARD} x={132} y={28} s={0.64} sy={1.3} fill={SHADE} rotate={7} />
+      <Cut d={CARD} x={124} y={20} s={0.64} sy={1.3} fill={FOREST} rotate={7} />
+      <Cut d={CARD} x={138} y={42} s={0.5} sy={1.02} fill="#faf8f2" opacity={0.92} rotate={7} />
+      <Cut d={DISC} x={212} y={6} s={0.34} fill={VERMILION} rotate={7} />
+    </>
+  );
+}
+
 function Whitehat() {
   const SHIELD =
     "M118 58 L160 50 L200 57 L242 49 L284 58 L288 110 L282 160 L270 205 L240 248 L202 286 L164 247 L133 204 L120 159 L114 110 Z";
@@ -828,6 +852,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "motion-director": MotionDirector,
   "app-designer": AppDesigner,
   "web-designer": WebDesigner,
+  "app-launcher": AppLauncher,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

@@ -44,6 +44,8 @@ const APP_DESIGNER_ZIP = Buffer.from("PK\u0003\u0004 the iphone design skill " +
 writeFileSync(path.join(cwd, "private", "app-designer.zip.enc"), seal(APP_DESIGNER_ZIP, parseKey(fileKey)));
 const WEB_DESIGNER_ZIP = Buffer.from("PK\u0003\u0004 the web design skill " + "w".repeat(3100));
 writeFileSync(path.join(cwd, "private", "web-designer.zip.enc"), seal(WEB_DESIGNER_ZIP, parseKey(fileKey)));
+const APP_LAUNCHER_ZIP = Buffer.from("PK\u0003\u0004 the app launch skill " + "l".repeat(3300));
+writeFileSync(path.join(cwd, "private", "app-launcher.zip.enc"), seal(APP_LAUNCHER_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -407,6 +409,41 @@ test("free: Web Designer is a skill beside App Designer, sent as a link, never a
   const swapped = new URL(link);
   swapped.searchParams.set("product", "app-designer");
   assert.equal((await download(new Request(swapped))).status, 303, "a Web Designer link is not an App Designer link");
+});
+
+test("free: App Launcher opens a new row on the rack, sent as a link, its commands set as code", async () => {
+  const { APP_LAUNCHER } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(APP_LAUNCHER.href, entryHref("skills", "app-launcher"));
+  const skills = FOLDER_BY_ID.skills.entries;
+  assert.equal(skills.find((e) => e.slug === "app-launcher")?.product, "app-launcher");
+  assert.equal(skills.findIndex((e) => e.slug === "app-launcher"), skills.findIndex((e) => e.slug === "web-designer") + 1);
+  assert.equal(APP_LAUNCHER.file.attach, false);
+
+  const res = await ask({ product: "app-launcher", email: "launch@example.com" }, "203.0.113.71");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of App Launcher");
+  assert.equal(m.attachments.length, 0);
+  assert.ok(m.html.includes(">run app-launcher<"), "the first command is set as code");
+  assert.ok(m.html.includes(">run<"), "the everyday command is set as code");
+  assert.ok(m.html.includes(">$app-launcher<") && m.html.includes(">/app-launcher<"), "both agents' commands are set as code");
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.match(dl.headers.get("content-disposition"), /filename="app-launcher.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), APP_LAUNCHER_ZIP);
+
+  const swapped = new URL(link);
+  swapped.searchParams.set("product", "web-designer");
+  assert.equal((await download(new Request(swapped))).status, 303, "an App Launcher link is not a Web Designer link");
+});
+
+test("email: \"costs to run\" in prose is not set as code", async () => {
+  const { JEV_REVIEW_MINER } = await import("../lib/shop/products.ts");
+  assert.ok(JEV_REVIEW_MINER.email.after.some((p) => /costs to run/.test(p)), "the prose this guards is still there");
+  const res = await ask({ product: "jev-review-miner", email: "prose@example.com" }, "203.0.113.72");
+  assert.equal(res.status, 200);
+  assert.ok(!mail()[0].message.html.includes(">run<"));
 });
 
 test("free: Jev Review Miner arrives as an attached PDF, and its link serves the PDF", async () => {

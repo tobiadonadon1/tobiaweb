@@ -8,6 +8,7 @@ import { ReviewMinerPage } from "@/components/superhuman/material/product/review
 import { WhitehatPage } from "@/components/superhuman/material/product/whitehat-page";
 import { AppDesignerPage } from "@/components/superhuman/material/product/app-designer-page";
 import { WebDesignerPage } from "@/components/superhuman/material/product/web-designer-page";
+import { AppLauncherPage } from "@/components/superhuman/material/product/app-launcher-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -148,4 +149,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   whitehat: WhitehatPage,
   "app-designer": AppDesignerPage,
   "web-designer": WebDesignerPage,
+  "app-launcher": AppLauncherPage,
 };

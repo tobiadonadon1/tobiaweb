@@ -338,8 +338,11 @@ function renderEmail({
     `<span style="font-family:Menlo,Consolas,monospace;font-size:14px;background:#f1ede4;padding:2px 6px;border-radius:4px;">${s}</span>`;
   // What the buyer types, set as code: the lowercase commands only, so
   // "Claude Code" in a sentence is left alone.
+  // "run" alone only after "type", since "costs to run" is prose.
   const commands = (s: string) =>
-    escape(s).replace(/(^|\s)(claude|hi|\/[a-z-]+)(?=[\s.,]|$)/g, (_, pre, cmd) => `${pre}${code(cmd)}`);
+    escape(s)
+      .replace(/(^|\s)(claude|codex|hi|run app-launcher|\/[a-z-]+|\$[a-z-]+)(?=[\s.,]|$)/g, (_, pre, cmd) => `${pre}${code(cmd)}`)
+      .replace(/(\btype )(run)(?=[\s.,]|$)/g, (_, pre, cmd) => `${pre}${code(cmd)}`);
 
   const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(subject)}</title></head>

@@ -263,4 +263,23 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "web-designer",
   },
+  /* ---------------------------------------------------------------- *
+   * 07
+   *
+   * The skill that ships what the other two design: put it in the app's
+   * repo and type run. Given away for an email, like the designers. The
+   * rack is three wide, so it opens a new row.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "app-launcher",
+    title: "App Launcher",
+    kind: "skill",
+    summary: "Takes your iOS app from its repo to the App Store, then helps it grow.",
+    minutes: 60,
+    status: "ready",
+    when: "Your app works. Now it has to get approved, get found and get downloaded.",
+    level: "Anyone",
+    body: [],
+    product: "app-launcher",
+  },
 ];
