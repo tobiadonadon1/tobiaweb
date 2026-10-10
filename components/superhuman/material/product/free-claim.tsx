@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { ArrowRight, Check, LoaderCircle } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ArrowRight, Check, Download, LoaderCircle } from "lucide-react";
 import { SHOP_EMAIL } from "@/lib/shop/products";
+import { ACCOUNT_HREF } from "@/components/account/links";
+import { startDownload, useMember } from "@/components/account/use-member";
 
 /**
  * "LET ME KNOW WHERE YOU WANT ME TO SEND THE PRODUCT."
@@ -15,6 +19,11 @@ import { SHOP_EMAIL } from "@/lib/shop/products";
  * It says plainly what happened: sent (and where to look), a typo in the
  * address, too many tries, or a failure with a way to reach Tobia. The
  * hidden `website` field is a honeypot for bots; people never see it.
+ *
+ * SIGNED IN, IT IS ONE CLICK. A Construct member (components/account) sees
+ * the same button, and pressing it downloads the product there and then:
+ * no field, no email to wait for. Everyone else, once it's sent, is told
+ * they can skip the form next time with an account.
  */
 export function FreeClaim({
   productId,
@@ -42,7 +51,11 @@ export function FreeClaim({
   const id = useId();
   const [email, setEmail] = useState("");
   const [trap, setTrap] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "sent" | "bad-email" | "too-many" | "failed">("idle");
+  const [state, setState] = useState<
+    "idle" | "sending" | "sent" | "downloaded" | "bad-email" | "too-many" | "failed"
+  >("idle");
+  const member = useMember();
+  const pathname = usePathname();
   const [open, setOpen] = useState(!reveal);
   const input = useRef<HTMLInputElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
@@ -82,7 +95,31 @@ export function FreeClaim({
     }
   };
 
+  const take = async () => {
+    if (state === "sending") return;
+    setState("sending");
+    try {
+      const res = await fetch("/api/free", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ product: productId }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; download?: string };
+      if (body.ok && body.download) {
+        startDownload(body.download);
+        setState("downloaded");
+      } else setState("failed");
+    } catch {
+      setState("failed");
+    }
+  };
+
   const center = align === "center";
+  const signIn = (cls: string) => (
+    <Link href={`${ACCOUNT_HREF}?next=${encodeURIComponent(pathname ?? "/projects/construct")}`} className={`underline underline-offset-4 ${cls}`}>
+      sign in
+    </Link>
+  );
   // "light" decides the input's autofill colours: the field is pale on all three.
   const light = tone === "light" || tone === "saffron" || tone === "forest" || tone === "cobalt";
   const t = tone === "cobalt"
@@ -161,6 +198,54 @@ export function FreeClaim({
           It&rsquo;s on its way to <span className={t.ink}>{email}</span>. If it&rsquo;s
           not there in a minute, look in Promotions or Spam.
         </p>
+        <p className={`mt-3 max-w-[36ch] text-[0.95rem] leading-[1.5] ${t.soft}`}>
+          Next time, skip the email:{" "}
+          <Link href={`${ACCOUNT_HREF}?mode=signup&email=${encodeURIComponent(email)}`} className={`underline underline-offset-4 ${t.ink}`}>
+            create an account
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
+
+  if (state === "downloaded") {
+    return (
+      <div role="status" className={`flex flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
+        <p className={`inline-flex items-center gap-2.5 text-[1.15rem] ${t.ink}`}>
+          <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full ${t.check}`}>
+            <Check aria-hidden className="h-4 w-4" />
+          </span>
+          Downloading now.
+        </p>
+        <p className={`mt-2 max-w-[36ch] text-[0.95rem] leading-[1.5] ${t.soft}`}>
+          Check your Downloads folder. You can come back and get it again any time.
+        </p>
+      </div>
+    );
+  }
+
+  if (member) {
+    return (
+      <div ref={wrap} className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
+        <button
+          type="button"
+          onClick={take}
+          disabled={state === "sending"}
+          className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring}`}
+        >
+          {state === "sending" ? (
+            <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+          ) : (
+            <Download aria-hidden className="h-4 w-4" />
+          )}
+          {reveal ?? "Download"}
+        </button>
+        <p role={state === "failed" ? "alert" : undefined} className={`mt-3 min-h-[1.2em] text-[0.88rem] ${state === "failed" ? t.error : t.soft}`}>
+          {state === "failed"
+            ? `That didn't work. Try again, or write to ${SHOP_EMAIL}.`
+            : <>Downloads now. Signed in as <span className={t.ink}>{member.email}</span>.</>}
+        </p>
       </div>
     );
   }
@@ -180,7 +265,9 @@ export function FreeClaim({
           {reveal}
           <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </button>
-        <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>Free. It arrives by email.</p>
+        <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
+          Free. It arrives by email, or {signIn(t.ink)} to download it now.
+        </p>
       </div>
     );
   }
@@ -253,6 +340,7 @@ export function FreeClaim({
               ? `That didn't go through. Try again, or write to ${SHOP_EMAIL}.`
               : ""}
       </p>
+      <p className={`mt-1 text-[0.88rem] ${t.soft}`}>Have an account? {signIn(t.ink)} and skip this.</p>
     </form>
   );
 }

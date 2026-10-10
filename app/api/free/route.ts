@@ -1,5 +1,7 @@
 import { after } from "next/server";
+import { currentMember, noteDownload } from "@/lib/account";
 import { sendFree } from "@/lib/shop/deliver";
+import { freeLink } from "@/lib/shop/free";
 import { recordLead } from "@/lib/shop/leads";
 import { productById } from "@/lib/shop/products";
 import { originFor } from "@/lib/shop/stripe";
@@ -18,6 +20,11 @@ import { originFor } from "@/lib/shop/stripe";
  * check, and a per-address and per-IP limit. The limits live in memory, so
  * they reset with the function; they stop a burst, which is the realistic
  * threat, and Gmail's own daily cap is the backstop.
+ *
+ * A SIGNED-IN MEMBER (lib/account.ts) skips all of that: no address to type,
+ * no email to wait for. The answer carries the signed download link for their
+ * own address and the page starts the download at once. The lead is still
+ * recorded, so the sheet keeps counting who took what.
  */
 
 export const dynamic = "force-dynamic";
@@ -63,8 +70,22 @@ export async function POST(request: Request) {
   }
 
   const product = productById(body.product);
-  const email = typeof body.email === "string" ? body.email.trim().slice(0, 254) : "";
   if (!product || !product.free) return Response.json({ ok: false, error: "not-free" }, { status: 404 });
+
+  const { member, cookies } = await currentMember(request);
+  if (member) {
+    const download = freeLink(originFor(request), product, member.email);
+    await later(async () => {
+      await noteDownload(member, product.id);
+      const stored = await recordLead({ email: member.email, product: product.id, page: `${product.href} (member)` });
+      console.info("[free] member lead", product.id, stored);
+    });
+    const headers = new Headers({ "content-type": "application/json" });
+    for (const c of cookies) headers.append("set-cookie", c);
+    return new Response(JSON.stringify({ ok: true, download }), { headers });
+  }
+
+  const email = typeof body.email === "string" ? body.email.trim().slice(0, 254) : "";
   if (!EMAIL.test(email)) return Response.json({ ok: false, error: "bad-email" }, { status: 400 });
 
   // The honeypot: a real person never sees this field.

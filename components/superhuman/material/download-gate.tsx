@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Download, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ACCOUNT_HREF } from "@/components/account/links";
+import { useMember } from "@/components/account/use-member";
 
 /**
  * THE ONE THING BEFORE THE DOWNLOAD.
@@ -23,6 +27,9 @@ import { Download, X } from "lucide-react";
  * it is `aria-modal` with a labelled heading. A light popup can be all of that
  * and still be light; the weight people object to is the animation and the
  * dimming, not the semantics.
+ *
+ * A SIGNED-IN MEMBER NEVER SEES IT. Their address is already known, so the
+ * button just saves the file (and notes the address, as the card would).
  */
 export function DownloadGate({
   href,
@@ -42,6 +49,8 @@ export function DownloadGate({
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const member = useMember();
+  const pathname = usePathname();
 
   const opener = useRef<HTMLButtonElement>(null);
   const field = useRef<HTMLInputElement>(null);
@@ -73,20 +82,23 @@ export function DownloadGate({
     a.remove();
   }, [href]);
 
+  const note = (address: string) =>
+    fetch("/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: address,
+        source: "superhuman",
+        interest: "material",
+      }),
+    });
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
     try {
-      await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          source: "superhuman",
-          interest: "material",
-        }),
-      });
+      await note(email);
     } catch {
       // Deliberately swallowed. See the note above: the file is not held
       // hostage to my ability to store an address.
@@ -103,6 +115,11 @@ export function DownloadGate({
         ref={opener}
         type="button"
         onClick={() => {
+          if (member) {
+            note(member.email).catch(() => {});
+            save();
+            return;
+          }
           setDone(false);
           setOpen(true);
         }}
@@ -211,6 +228,16 @@ export function DownloadGate({
                     {busy ? "One second" : `Download ${title}`}
                   </button>
                 </form>
+                <p className="mt-4 text-[0.9rem] text-[color:rgba(11,31,58,0.62)]">
+                  Have an account?{" "}
+                  <Link
+                    href={`${ACCOUNT_HREF}?next=${encodeURIComponent(pathname ?? "/projects/construct")}`}
+                    className="text-[var(--ink)] underline underline-offset-4"
+                  >
+                    Sign in
+                  </Link>{" "}
+                  and it downloads straight away.
+                </p>
               </>
             )}
           </div>
