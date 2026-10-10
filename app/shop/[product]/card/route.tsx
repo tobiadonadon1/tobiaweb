@@ -111,6 +111,8 @@ export async function GET(
                 borderRadius: 999,
                 background: "#b93a26",
                 color: PAPER,
+                // "Coming soon" is two words; the pill keeps them on one line.
+                whiteSpace: "nowrap",
                 fontSize: 28,
                 fontWeight: 500,
               }}

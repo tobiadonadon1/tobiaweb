@@ -12,7 +12,7 @@ in Setups and both defined once in `lib/shop/products.ts`:
   "Launchr leads" Google Sheet in tobia10donadon@gmail.com's Drive
   (`lib/shop/leads.ts`; env LEADS_WEBHOOK_URL = the sheet's Apps Script web
   app, LEADS_TOKEN = the secret the script checks). Checkout refuses it. The
-  Stripe product `prod_VKL1qwlByvTm4z` still exists but nothing sells it. Its page is the 3D device stage
+  Its old Stripe product `prod_VKL1qwlByvTm4z` was renamed and now sells Grok Army (€15). Its page is the 3D device stage
   (`launchr-stage.tsx`, `device-stage.tsx`), playing the four example films in
   `public/shop/launchr/`.
 

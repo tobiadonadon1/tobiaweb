@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { productById, thanksHref, type Product } from "@/lib/shop/products";
+import { forSale, productById, thanksHref, type Product } from "@/lib/shop/products";
 import { originFor, stripe } from "@/lib/shop/stripe";
 
 /**
@@ -105,6 +105,12 @@ export async function POST(request: Request) {
   // Given away, not sold: never open a checkout for it.
   if (product.free) {
     return Response.redirect(`${origin}${product.href}`, 303);
+  }
+  // Built ahead of its Stripe product: never reach Stripe, so the first
+  // press cannot create a stray product under an empty or made-up id. The
+  // page reads ?checkout=soon and says the checkout opens soon.
+  if (!forSale(product)) {
+    return Response.redirect(`${origin}${product.href}?checkout=soon#buy`, 303);
   }
 
   try {

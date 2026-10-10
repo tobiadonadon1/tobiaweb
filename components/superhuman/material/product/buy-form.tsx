@@ -21,6 +21,11 @@ import { ArrowRight, LoaderCircle } from "lucide-react";
  *   says so, with the one thing to do about it. Read on the client, so the
  *   page itself stays static and fast.
  *
+ * NOT ON SALE YET. A product built before its Stripe product exists passes
+ * `soon`: the button reads "Checkout opens soon" and is disabled, so it
+ * never posts. (The checkout route refuses such a product anyway and sends
+ * the buyer back with ?checkout=soon, which this form also explains.)
+ *
  * THE FILL IS THE DARKER CLAY. Paper on #ce4631 is 4.35:1, just under AA for
  * text this size; on --accent-clay-text it passes. Same colour to the eye,
  * and the button is the one place on the page contrast cannot be traded.
@@ -32,6 +37,8 @@ export function BuyForm({
   reportErrors = false,
   compact = false,
   label,
+  soon = false,
+  buttonClassName,
   className = "",
 }: {
   productId: string;
@@ -43,10 +50,14 @@ export function BuyForm({
   compact?: boolean;
   /** The button's words, when the price is said elsewhere. */
   label?: string;
+  /** Built ahead of its Stripe product: shown, not sold. */
+  soon?: boolean;
+  /** The button's colours and shadow, for a page whose action is not clay. */
+  buttonClassName?: string;
   className?: string;
 }) {
   const [pending, setPending] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<false | "error" | "soon">(false);
 
   useEffect(() => {
     const reset = (e: PageTransitionEvent) => {
@@ -57,8 +68,9 @@ export function BuyForm({
       const q = new URLSearchParams(window.location.search);
       // Reading the URL once on mount is the point: the page is static, and
       // this flag only exists after a failed redirect from the checkout route.
+      const flag = q.get("checkout");
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (q.get("checkout") === "error") setFailed(true);
+      if (flag === "error" || flag === "soon") setFailed(flag);
     }
     return () => window.removeEventListener("pageshow", reset);
   }, [reportErrors]);
@@ -68,7 +80,7 @@ export function BuyForm({
       action="/api/checkout"
       method="post"
       onSubmit={(e) => {
-        if (pending) {
+        if (pending || soon) {
           e.preventDefault();
           return;
         }
@@ -82,14 +94,18 @@ export function BuyForm({
       <button
         type="submit"
         aria-busy={pending}
-        disabled={pending}
-        className={`group inline-flex items-center justify-center rounded-full bg-[var(--accent-clay-text)] font-medium ${
+        disabled={pending || soon}
+        className={`group inline-flex items-center justify-center rounded-full font-medium ${
+          buttonClassName ?? "bg-[var(--accent-clay-text)] text-[var(--paper)] shadow-[0_18px_40px_-18px_rgba(185,58,38,0.75)] hover:shadow-[0_24px_48px_-18px_rgba(185,58,38,0.85)]"
+        } ${
           compact ? "min-h-[2.9rem] gap-2 px-5 py-2.5 text-[0.95rem]" : "min-h-[3.5rem] gap-3 px-9 py-4 text-[1.05rem]"
-        } tracking-[-0.005em] text-[var(--paper)] shadow-[0_18px_40px_-18px_rgba(185,58,38,0.75)] transition-[transform,box-shadow,background-color] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_24px_48px_-18px_rgba(185,58,38,0.85)] active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
+        } tracking-[-0.005em] transition-[transform,box-shadow,background-color] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 ${soon ? "disabled:cursor-default" : ""} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
           tone === "ink" ? "focus-visible:outline-[var(--paper)]" : "focus-visible:outline-[var(--ink)]"
         }`}
       >
-        {pending ? (
+        {soon ? (
+          compact ? "Opens soon" : "Checkout opens soon"
+        ) : pending ? (
           <>
             <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" />
             {compact ? "Opening" : "Opening checkout"}
@@ -112,7 +128,9 @@ export function BuyForm({
             tone === "ink" ? "text-[var(--paper)]" : "text-[var(--accent-clay-text)]"
           }`}
         >
-          Checkout didn&rsquo;t open. Please try again in a moment.
+          {failed === "soon"
+            ? "Checkout isn\u2019t open yet. It opens soon, on this page."
+            : <>Checkout didn&rsquo;t open. Please try again in a moment.</>}
         </p>
       ) : null}
     </form>

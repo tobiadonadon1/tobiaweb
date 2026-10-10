@@ -26,6 +26,7 @@ export function StickyBuy({
   label,
   note,
   buttonClassName,
+  soon = false,
 }: {
   productId: string;
   name: string;
@@ -39,6 +40,8 @@ export function StickyBuy({
   note?: string;
   /** The button's colours, for a page whose action is not clay. */
   buttonClassName?: string;
+  /** Built ahead of its Stripe product: the button says it opens soon. */
+  soon?: boolean;
 }) {
   const [heroGone, setHeroGone] = useState(false);
   const [closeReached, setCloseReached] = useState(false);
@@ -93,7 +96,14 @@ export function StickyBuy({
             {label ?? "Get it"}
           </a>
         ) : (
-          <BuyForm productId={productId} price={price} compact className="shrink-0" />
+          <BuyForm
+            productId={productId}
+            price={price}
+            compact
+            soon={soon}
+            buttonClassName={buttonClassName}
+            className="shrink-0"
+          />
         )}
       </div>
     </div>

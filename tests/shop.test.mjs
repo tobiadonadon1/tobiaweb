@@ -46,6 +46,8 @@ const WEB_DESIGNER_ZIP = Buffer.from("PK\u0003\u0004 the web design skill " + "w
 writeFileSync(path.join(cwd, "private", "web-designer.zip.enc"), seal(WEB_DESIGNER_ZIP, parseKey(fileKey)));
 const APP_LAUNCHER_ZIP = Buffer.from("PK\u0003\u0004 the app launch skill " + "l".repeat(3300));
 writeFileSync(path.join(cwd, "private", "app-launcher.zip.enc"), seal(APP_LAUNCHER_ZIP, parseKey(fileKey)));
+const GROK_ARMY_ZIP = Buffer.from("PK\u0003\u0004 the grok bot army skill " + "g".repeat(3400));
+writeFileSync(path.join(cwd, "private", "grok-army.zip.enc"), seal(GROK_ARMY_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -148,6 +150,25 @@ test("a sealed file opens with its key and nothing else", () => {
   assert.throws(() => parseKey("too-short"));
 });
 
+test("health: a product not on sale yet, with no sealed file, is pending and does not fail the shop", async () => {
+  const { GROK_ARMY, forSale } = await import("../lib/shop/products.ts");
+  if (forSale(GROK_ARMY)) return;
+  const { renameSync } = await import("node:fs");
+  const sealed = path.join(cwd, "private", "grok-army.zip.enc");
+  renameSync(sealed, sealed + ".away");
+  try {
+    // FIRST in the file on purpose: the shop caches a file once it has
+    // read it, so this must run before anything delivers Grok Army. A failed
+    // read is never cached, so the tests after it still find the file.
+    const body = await (await health()).json();
+    assert.equal(body.files["grok-army"].ok, false);
+    assert.equal(body.files["grok-army"].pending, true);
+    assert.equal(body.ok, true, "a pending product does not fail the shop");
+  } finally {
+    renameSync(sealed + ".away", sealed);
+  }
+});
+
 test("the product, its page and its folder entry agree", async () => {
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
   assert.equal(THE_98C_TRADE.href, entryHref("setups", "the-98c-trade"));
@@ -163,10 +184,17 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["the-98c-trade", "launchr", "jev-crypto-analyst"], "Launchr below the 98¢ Trade, then Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Grok Army first, then the 98¢ Trade, Launchr, Jev");
+  // Grok Army: a setup, its page and its entry agree.
+  const ga = productById("grok-army");
+  assert.equal(ga.href, entryHref("setups", "grok-army"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "grok-army")?.product, "grok-army");
   assert.equal(LAUNCHR.priceCents, 1200);
   assert.equal(LAUNCHR.priceLabel, "€12");
-  assert.equal(LAUNCHR.stripeProductId, "prod_VKL1qwlByvTm4z");
+  assert.equal(LAUNCHR.stripeProductId, "none");
+  assert.equal(ga.stripeProductId, "prod_VKL1qwlByvTm4z", "Launchr's old Stripe product sells Grok Army");
+  assert.equal(ga.priceCents, 1500);
+  assert.equal(ga.priceLabel, "€15");
   assert.equal(productById("__proto__"), undefined);
   assert.equal(productById("nope"), undefined);
 });
@@ -278,6 +306,26 @@ test("webhook: Launchr ships its own file as a link, never as an attachment Gmai
   assert.equal(dl.status, 200);
   assert.match(dl.headers.get("content-disposition"), /filename="launchr.zip"/);
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), LAUNCHR_ZIP, "the video skill, not the bot");
+});
+
+test("webhook: a Grok Army purchase gets its own email, as a link, and the link serves its zip", async () => {
+  const id = purchase({ product: "grok-army", name: "Grace Hopper" });
+  const res = await webhook(signedEvent(id));
+  assert.equal((await res.json()).delivery, "sent");
+  assert.equal(mail().length, 1, "one send, no refused attempt first");
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Grok Army");
+  assert.equal(m.attachments.length, 0, "the skill ships .mjs, so never attached");
+  const link = `${ORIGIN}/api/download?session_id=${id}`;
+  assert.ok(m.text.includes(link) && m.html.includes(link));
+  assert.ok(/Build my army from this file/.test(m.text), "the one line to send Builder");
+  assert.ok(/No income is promised/.test(m.text), "never a promise of income");
+  assert.ok(!/TypeSafe|Launchr|financial advice/i.test(m.text), "none of another product's copy");
+  assert.ok(!/\u2014/.test(m.text + m.html), "no em dashes");
+  const dl = await download(new Request(link));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-disposition"), /filename="grok-army.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), GROK_ARMY_ZIP);
 });
 
 test("checkout: Launchr is free now, so it never opens a checkout", async () => {
@@ -664,6 +712,30 @@ test("checkout: Stripe down sends the buyer back to the page with a message", as
   assert.equal(res.headers.get("location"), `${ORIGIN}${THE_98C_TRADE.href}?checkout=error#buy`);
 });
 
+test("checkout: Grok Army before its Stripe product exists never reaches Stripe", async () => {
+  const { GROK_ARMY, forSale, priceText } = await import("../lib/shop/products.ts");
+  // This test is about the waiting state. Once Tobia's prod_ id is in, it
+  // no longer applies, and the product is sold like the 98¢ Trade.
+  if (forSale(GROK_ARMY)) return;
+  assert.equal(priceText(GROK_ARMY), "Coming soon", "no placeholder price is ever printed");
+  const res = await buy("grok-army");
+  assert.equal(res.status, 303);
+  assert.equal(res.headers.get("location"), `${ORIGIN}${GROK_ARMY.href}?checkout=soon#buy`);
+  assert.equal(globalThis.__stripe.createdSessions.length, 0, "no checkout session");
+  assert.equal(globalThis.__stripe.createdProducts.length, 0, "no stray product created");
+});
+
+test("forSale: only a paid product with a real Stripe product id", async () => {
+  const { forSale, PRODUCTS } = await import("../lib/shop/products.ts");
+  assert.equal(forSale(THE_98C_TRADE), true);
+  assert.equal(forSale(LAUNCHR), false, "free");
+  assert.equal(forSale({ ...THE_98C_TRADE, stripeProductId: "" }), false, "no id yet");
+  assert.equal(forSale({ ...THE_98C_TRADE, stripeProductId: "grok-army" }), false, "a made-up id is not one");
+  for (const p of Object.values(PRODUCTS)) {
+    if (!p.free && p.id !== "grok-army") assert.equal(forSale(p), true, `${p.id} is on sale`);
+  }
+});
+
 test("checkout: an unknown product goes back to the folder", async () => {
   const res = await buy("free-money");
   assert.equal(res.status, 303);
@@ -682,6 +754,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.emailVia, "gmail");
   assert.equal(body.files["the-98c-trade"].bytes, ZIP.length);
   assert.equal(body.files.launchr.bytes, LAUNCHR_ZIP.length);
+  assert.equal(body.files["grok-army"].bytes, GROK_ARMY_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

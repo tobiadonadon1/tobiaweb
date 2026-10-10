@@ -15,6 +15,21 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "grok-army",
+    title: "Grok Army",
+    kind: "setup",
+    summary:
+      "Four questions in Claude, one file to your Desktop, and Grok Bot builds a team that works on your goal 24/7.",
+    // Minutes in Claude to the file on the Desktop; Grok Bot's first result
+    // comes within the first half hour after that.
+    minutes: 10,
+    status: "ready",
+    when: "You use Grok Bot and want bots that do real work every day and keep score until they pay for themselves.",
+    level: "Anyone",
+    body: [],
+    product: "grok-army",
+  },
+  {
     slug: "the-98c-trade",
     title: "The 98¢ Trade",
     kind: "setup",

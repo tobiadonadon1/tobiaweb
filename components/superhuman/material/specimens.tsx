@@ -40,6 +40,8 @@
  * the two that do the most work: they are the far ends of the wheel from each
  * other and both hold their own against the paper.
  * ------------------------------------------------------------------ */
+import { squadShapes } from "./product/grok-army-bots";
+
 const INK = "#0b1f3a";
 const VERMILION = "#ce4631";
 const ULTRAMARINE = "#2743b8";
@@ -835,6 +837,15 @@ function Whitehat() {
   );
 }
 
+/**
+ * GROK ARMY — not cut paper: the army's own bots, the same drawings as its
+ * page and its Stripe image (product/grok-army-bots.ts), standing as a squad.
+ * A product whose mascots ARE the brand gets them on its card too.
+ */
+function GrokArmy() {
+  return <>{squadShapes()}</>;
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -845,6 +856,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "the-98c-trade": The98cTrade,
   launchr: Launchr,
   "jev-crypto-analyst": JevCryptoAnalyst,
+  "grok-army": GrokArmy,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,

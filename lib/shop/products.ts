@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -64,6 +64,10 @@ export type Product = {
    * still sent from here with each checkout, so the page and the charge
    * cannot disagree. If the product is missing (a fresh test-mode account),
    * the checkout route creates it on first use.
+   *
+   * EMPTY MEANS NOT ON SALE YET: the page is built and the button says
+   * "Checkout opens soon", but nothing can reach Stripe, so a checkout can
+   * never create a stray product under a made-up id (see `forSale`).
    */
   stripeProductId: string;
   /** Meta and share descriptions, and the share card's lines. */
@@ -154,8 +158,9 @@ export const LAUNCHR: Product = {
     attach: false,
   },
   // Free since 2026-09-25: Tobia swapped the paywall for an email field.
+  // Its old Stripe product (prod_VKL1qwlByvTm4z) now sells Grok Army.
   free: true,
-  stripeProductId: "prod_VKL1qwlByvTm4z",
+  stripeProductId: "none",
   share: {
     description:
       "Launchr puts a motion-graphics studio inside Claude Code. Drop in your logo, product photos or screenshots and get a finished launch video with its own soundtrack in about ten minutes. Free, unlimited videos.",
@@ -517,6 +522,75 @@ export const APP_LAUNCHER: Product = {
   },
 };
 
+/**
+ * GROK ARMY, a skill for Claude Code that builds a team of Grok Bots.
+ *
+ * Stripe: prod_VKL1qwlByvTm4z (Launchr's old product, renamed "GrokBot Army -
+ * a 24/7 bot team built around your goal"), default price €15 one-time; the
+ * checkout sends priceCents from here, so keep the two equal.
+ * The zip: ~/Desktop/grok-army.zip sealed with `npm run seal -- ~/Desktop/grok-army.zip`
+ * (private/grok-army.zip.enc). Reseal whenever the skill changes.
+ *
+ * Honesty rules for every word about it: never promise income or results.
+ * It's built around the buyer's goal and keeps score on it; X payouts are
+ * not guaranteed.
+ */
+export const GROK_ARMY: Product = {
+  id: "grok-army",
+  name: "Grok Army",
+  description:
+    "A Claude Code skill that turns Grok Bot into a 24/7 bot team built around your goal: a Chief of Staff you talk to and one bot per job. Instant download.",
+  // Stripe's default_price for prod_VKL1qwlByvTm4z (price_1UJgLvB7HQhkKmiFVmnw6Upn,
+  // €15 one-time, read 2026-10-10). The checkout charges this row: keep them equal.
+  priceCents: 1500,
+  currency: "eur",
+  priceLabel: money(1500, "eur"),
+  href: "/projects/construct/material/setups/grok-army",
+  file: {
+    sealed: "grok-army.zip.enc",
+    filename: "grok-army.zip",
+    // The skill ships install.mjs and build.mjs, which Gmail refuses inside a zip.
+    attach: false,
+  },
+  // Stripe "GrokBot Army - a 24/7 bot team built around your goal" (live).
+  stripeProductId: "prod_VKL1qwlByvTm4z",
+  share: {
+    description:
+      "Grok Army turns Grok Bot into a team that works 24/7 on your goal: a Chief of Staff you talk to, and one bot per job, from X research and posts to lead magnets and outbound. It asks before anything is sent, posted or bought, gets better every week, and keeps score on your goal.",
+    kicker: "Skill · for Claude Code",
+    line: "Turn Grok Bot into a bot army that works for you 24/7.",
+    proof: "Asks before anything goes out",
+  },
+  contents: [
+    ["skill/SKILL.md", "what Claude follows: four questions, then your army, then coaching"],
+    ["skill/references/", "the lanes, the playbook craft, the weekly Improve loop, the payback rules"],
+    ["skill/scripts/build.mjs", "checks your army's design and writes the one file Grok Bot reads"],
+    ["START HERE.txt", "the three steps, if you'd rather read than ask"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open Claude Code in the grok-army folder (in a terminal: cd into it, then type claude)",
+    "Type start. Claude installs Grok Army and asks you four quick questions.",
+  ],
+  email: {
+    preheader: "Your download is inside. Open it in Claude Code and type start.",
+    after: [
+      "Claude asks four questions, then writes one file to your Desktop: your army, built around your goal. Give it to a new Grok Bot called Builder and say \"Build my army from this file.\"",
+      "Keep the Claude chat open while you set it up: paste anything Grok Bot shows you and Claude tells you the next step. Nothing is posted, sent, bought or deleted without your OK.",
+    ],
+    footnote: "No income is promised. The army keeps score of what it helps you earn against what your plan costs.",
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code and Grok Bot (included with Cursor Pro or higher, or a linked SuperGrok or X Premium+ plan).",
+    next: [
+      ["In about ten minutes", "Claude has asked its four questions and your army's file is on your Desktop."],
+      ["In the first half hour", "Builder sets up the shared notes and shows you a first result, then creates the bots."],
+      ["Every Friday", "A scoreboard: what worked, what each bot rewrote in its playbook, and payback against your plan."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -526,6 +600,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "app-designer": APP_DESIGNER,
   "web-designer": WEB_DESIGNER,
   "app-launcher": APP_LAUNCHER,
+  "grok-army": GROK_ARMY,
 };
 
 export function productById(id: unknown): Product | undefined {
@@ -540,8 +615,17 @@ export const fileType = (product: Product) =>
 
 export const thanksHref = (product: Product) => `${product.href}/thanks`;
 
+/**
+ * CAN IT BE BOUGHT RIGHT NOW? A paid product with a real Stripe product id.
+ * One built ahead of its Stripe product (an empty id) is shown but not sold:
+ * its button says "Checkout opens soon" and the checkout route refuses it.
+ */
+export const forSale = (product: Product) =>
+  !product.free && product.stripeProductId.startsWith("prod_");
+
 /** What a page prints where a price would go. */
-export const priceText = (product: Product) => (product.free ? "Free" : product.priceLabel);
+export const priceText = (product: Product) =>
+  product.free ? "Free" : forSale(product) ? product.priceLabel : "Coming soon";
 
 /** Where the buyer's copy of the file is fetched from. */
 export const downloadHref = (sessionId: string) =>

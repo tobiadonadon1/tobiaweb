@@ -1,6 +1,6 @@
 import { emailTransport } from "@/lib/shop/deliver";
 import { productFile } from "@/lib/shop/file";
-import { PRODUCTS } from "@/lib/shop/products";
+import { forSale, PRODUCTS } from "@/lib/shop/products";
 
 /**
  * GET /api/shop/health
@@ -12,6 +12,11 @@ import { PRODUCTS } from "@/lib/shop/products";
  * `ok` is true only when a sale could complete end to end: Stripe can create
  * a checkout, the webhook can be verified, the email can be sent, and every
  * product's file decrypts.
+ *
+ * A paid product built ahead of its Stripe product (not `forSale` yet) is
+ * listed as `pending` and does not count against `ok`: it cannot be bought,
+ * so its missing file cannot fail a sale. The moment it gets its Stripe id it
+ * counts like every other product, so a forgotten seal shows up here.
  */
 
 export const dynamic = "force-dynamic";
@@ -24,15 +29,17 @@ export async function GET() {
       ? "test"
       : null;
 
-  const files: Record<string, { ok: boolean; bytes?: number; error?: string }> = {};
+  const files: Record<string, { ok: boolean; bytes?: number; error?: string; pending?: true }> = {};
   for (const product of Object.values(PRODUCTS)) {
+    const pending = !product.free && !forSale(product);
     try {
       const bytes = await productFile(product);
-      files[product.id] = { ok: true, bytes: bytes.length };
+      files[product.id] = { ok: true, bytes: bytes.length, ...(pending ? { pending } : {}) };
     } catch (err) {
       files[product.id] = {
         ok: false,
         error: err instanceof Error ? err.message.replace(/\s+/g, " ").slice(0, 120) : "unreadable",
+        ...(pending ? { pending } : {}),
       };
     }
   }
@@ -50,7 +57,7 @@ export async function GET() {
     checks.stripe &&
     checks.webhookSecret &&
     checks.email &&
-    Object.values(files).every((f) => f.ok);
+    Object.values(files).every((f) => f.ok || f.pending);
 
   return Response.json(
     { ok, ...checks },
