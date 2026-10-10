@@ -24,7 +24,7 @@ export const SETUPS: MaterialEntry[] = [
     // comes within the first half hour after that.
     minutes: 10,
     status: "ready",
-    when: "You use Grok Bot and want bots that do real work every day and keep score until they pay for themselves.",
+    when: "You use Grok Bot and want a team you design, working on your goal every day and keeping score.",
     level: "Anyone",
     body: [],
     product: "grok-army",

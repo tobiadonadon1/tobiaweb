@@ -71,7 +71,14 @@ export type Product = {
    */
   stripeProductId: string;
   /** Meta and share descriptions, and the share card's lines. */
-  share: { description: string; kicker: string; line: string; proof: string };
+  share: {
+    description: string;
+    kicker: string;
+    line: string;
+    proof: string;
+    /** The share card's ground: the site's paper by default, or black for a page that is. */
+    theme?: "dark";
+  };
   /**
    * The delivery email, after the three setup steps. `preheader` is the
    * inbox preview line and `stepsIntro` the line above the steps; both default
@@ -539,7 +546,7 @@ export const GROK_ARMY: Product = {
   id: "grok-army",
   name: "Grok Army",
   description:
-    "A Claude Code skill that turns Grok Bot into a 24/7 bot team built around your goal: a Chief of Staff you talk to and one bot per job. Instant download.",
+    "A Claude Code skill that turns Grok Bot into a 24/7 bot team you design around your goal: one bot you talk to, and one for each job. Instant download.",
   // Stripe's default_price for prod_VKL1qwlByvTm4z (price_1UJgLvB7HQhkKmiFVmnw6Upn,
   // €15 one-time, read 2026-10-10). The checkout charges this row: keep them equal.
   priceCents: 1500,
@@ -556,10 +563,11 @@ export const GROK_ARMY: Product = {
   stripeProductId: "prod_VKL1qwlByvTm4z",
   share: {
     description:
-      "Grok Army turns Grok Bot into a team that works 24/7 on your goal: a Chief of Staff you talk to, and one bot per job, from X research and posts to lead magnets and outbound. It asks before anything is sent, posted or bought, gets better every week, and keeps score on your goal.",
+      "Grok Army turns Grok Bot into a team that works 24/7 on your goal. You set the goal and Claude designs the bots with you: one you talk to, and one for each job. It asks before anything is sent, posted or bought, gets better every week, and keeps score on your goal.",
     kicker: "Skill · for Claude Code",
     line: "Turn Grok Bot into a bot army that works for you 24/7.",
     proof: "Asks before anything goes out",
+    theme: "dark",
   },
   contents: [
     ["skill/SKILL.md", "what Claude follows: four questions, then your army, then coaching"],

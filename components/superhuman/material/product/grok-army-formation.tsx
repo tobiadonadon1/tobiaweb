@@ -1,41 +1,57 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BOTS, botShape, type BotId } from "./grok-army-bots";
+import { COLORS, LEAD, botShape, ghostShape, type BotSpec } from "./grok-army-bots";
 
 /**
- * THE ARMY ASSEMBLES AS YOU READ.
+ * YOUR ARMY, BUILT AS YOU READ.
  *
- * A formation of six empty slots stays pinned while the bots' jobs scroll
- * past it. Each job that reaches the reader drops its bot into its slot (a
- * short fall and a settle, never a spin or a turn: Tobia hates devices that
- * rotate on a transition), lights its name, and pushes the payback bar on.
- * On a phone the formation pins to the top half of the screen and the jobs
- * pass under it; on a wide screen it holds the left column.
+ * There is no fixed roster: the buyer sets the goal and Claude designs the
+ * bots for it with them. So the pinned stage acts that out in order. A goal
+ * is set (the examples rotate until the first step is read, then one stays),
+ * empty places appear in different shapes, the bot you talk to arrives, the
+ * others join one by one, one asks for your OK, and the progress bar moves
+ * toward the goal. The bots have no names or jobs here, on purpose.
  *
- * NOTHING WAITS ON JAVASCRIPT. Server-rendered, every bot is already in
- * place and every job is at full strength, so a crawler, a screenshot, a slow
- * phone or JavaScript switched off sees the finished army. Script only takes
- * the empty state back and plays it forward with the scroll. Reduced motion
- * keeps the assembling (it is the content) but drops the fall.
+ * Movement is a short drop and a settle, never a spin or a turn (Tobia hates
+ * devices that rotate on a transition). On a phone the stage pins to the top
+ * half and the lines pass under it; on a wide screen it holds the left half.
+ *
+ * NOTHING WAITS ON JAVASCRIPT. Server-rendered, the team is complete and every
+ * line is at full strength, so a crawler, a screenshot or a slow phone sees
+ * the finished army. Script takes it back to the empty stage and plays it
+ * forward with the scroll. Reduced motion keeps the building (it is the
+ * content) but drops the fall and the rotating goal.
  */
 
-/** Where each bot stands: the back row, then the front, the Chief in the middle. */
-const FORMATION: BotId[] = ["scout", "voice", "earner", "outbound", "chief", "inbox"];
-const SHORT: Record<BotId, string> = {
-  chief: "Chief",
-  scout: "Scout",
-  voice: "Voice",
-  earner: "Earner",
-  outbound: "Outbound",
-  inbox: "Inbox",
-};
+const GOALS = ["More clients", "Grow on X", "Clear the inbox", "More sales"];
+
+const LINES: [string, string][] = [
+  ["You set the goal.", "One goal the whole army works on. More clients, a bigger X, a clear inbox: yours."],
+  ["Claude designs the team with you.", "One bot you talk to, and one for each job your goal needs. Rename, add, drop or reshape any of them before it’s built."],
+  ["Builder creates it in Grok Bot.", "You give one file to a new Grok Bot. It sets everything up, shows you a first result, then creates the bots."],
+  ["It works around the clock.", "On routines, in Grok Bot’s cloud. It asks before anything is sent, posted, bought or deleted."],
+  ["It gets better every week.", "Each bot learns from your edits and its own numbers, and the scoreboard shows the progress on your goal."],
+];
+
+/** The team's places on a 400 x 240 stage, and when each one joins (in steps read). */
+type Place = BotSpec & { x: number; y: number; s: number; at: number };
+const TEAM: Place[] = [
+  { shape: "circle", color: COLORS.teal, x: 30, y: 20, s: 0.78, at: 2.0 },
+  { shape: "square", color: COLORS.blue, x: 162, y: 0, s: 0.72, at: 2.25 },
+  { shape: "triangle", color: COLORS.indigo, x: 292, y: 16, s: 0.8, at: 2.5 },
+  { shape: "diamond", color: COLORS.violet, x: 14, y: 148, s: 0.88, at: 2.75 },
+  { shape: "circle", color: COLORS.red, x: 300, y: 146, s: 0.84, at: 3.0 },
+  { ...LEAD, x: 132, y: 96, s: 1.36, at: 1.35 },
+];
+const ALL = LINES.length;
 
 export function ArmyFormation() {
-  // -1 before the first job; BOTS.length - 1 at the last. Starts "all in"
-  // so the server's HTML is the finished army.
-  const [active, setActive] = useState(BOTS.length - 1);
+  // How many lines have been read, continuously: 0 before the first, ALL at
+  // the end. Starts at ALL so the server's HTML is the finished army.
+  const [read, setRead] = useState(ALL);
   const [live, setLive] = useState(false);
+  const [goal, setGoal] = useState(0);
   const steps = useRef<(HTMLLIElement | null)[]>([]);
 
   useEffect(() => {
@@ -43,20 +59,20 @@ export function ArmyFormation() {
     const measure = () => {
       raf = 0;
       const phone = window.matchMedia("(max-width: 1023px)").matches;
-      // On a phone the formation covers the top half, so a job counts once
-      // it is well into the half below; on a wide screen, near the middle.
-      const line = window.innerHeight * (phone ? 0.72 : 0.62);
-      let a = -1;
-      steps.current.forEach((el, i) => {
-        if (el && el.getBoundingClientRect().top < line) a = i;
-      });
-      setActive(Math.min(a, BOTS.length - 1));
+      // A line counts once its top passes this line, fully once its
+      // bottom does. On a phone the stage covers the top half.
+      const line = window.innerHeight * (phone ? 0.74 : 0.6);
+      let f = 0;
+      for (const el of steps.current) {
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        f += Math.min(1, Math.max(0, (line - r.top) / Math.max(1, r.height * 0.7)));
+      }
+      setRead(f);
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(measure);
     };
-    // The first read waits a frame: layout is settled, and the empty
-    // formation never flashes before the page has painted.
     raf = requestAnimationFrame(() => {
       measure();
       setLive(true);
@@ -70,75 +86,87 @@ export function ArmyFormation() {
     };
   }, []);
 
-  const joined = active + 1;
-  const indexOf = (id: BotId) => BOTS.findIndex((b) => b.id === id);
+  // The goal examples take turns until the first line is read.
+  const goalSet = !live || read >= 1;
+  useEffect(() => {
+    if (goalSet || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setInterval(() => setGoal((g) => (g + 1) % GOALS.length), 1800);
+    return () => window.clearInterval(t);
+  }, [goalSet]);
+
+  const designing = read >= 1;
+  const asking = read >= 3.3;
+  const progress = Math.min(1, Math.max(0, (read - 3.6) / 1.4)) * 0.7;
 
   return (
     <div className="ga-formation grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16" data-live={live || undefined}>
-      {/* The formation. Pinned; decorative, because the list beside it says
+      {/* The stage. Pinned; decorative, because the lines beside it say
           everything it shows. */}
-      <div className="ga-stage sticky top-0 z-10 -mx-5 flex h-[50svh] min-h-[22rem] flex-col justify-end px-5 pb-5 pt-16 sm:-mx-8 sm:px-8 lg:mx-0 lg:h-svh lg:max-h-[56rem] lg:justify-center lg:px-0 lg:pb-0 lg:pt-0" aria-hidden>
-        <div className="mx-auto grid w-full max-w-[22rem] grid-cols-3 gap-x-3 gap-y-1 sm:max-w-[26rem] lg:max-w-[34rem] lg:gap-x-6 lg:gap-y-3">
-          {FORMATION.map((id) => {
-            const i = indexOf(id);
-            const state = i < joined ? (i === active ? "current" : "in") : "out";
-            return (
-              <div key={id} className={`ga-slot ${id === "chief" ? "ga-slot-chief" : ""}`} data-state={state}>
-                <div className="relative">
-                  <svg viewBox="0 0 100 122" className="ga-ghost absolute inset-0 h-full w-full">
-                    <rect x="9" y="17" width="82" height="91" rx="28" fill="none" stroke="currentColor" strokeWidth="2.4" strokeDasharray="6 7" />
-                  </svg>
-                  <svg viewBox="0 0 100 122" className="ga-bot relative block h-auto w-full">
-                    {botShape(id)}
-                  </svg>
-                </div>
-                <p className="ga-slot-name mt-0.5 text-center text-[0.8rem] font-semibold tracking-[0.01em] lg:text-[0.95rem]">{SHORT[id]}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* The goal bar: it fills as the army fills, toward the one thing
-            that matters, the buyer's goal. No amounts: none would be true. */}
-        <div className="mx-auto mt-4 w-full max-w-[22rem] sm:max-w-[26rem] lg:mt-10 lg:max-w-[34rem]">
-          <div className="flex items-baseline justify-between text-[0.8rem] font-medium lg:text-[0.9rem]">
-            <span className="text-[var(--ga-ink)]">Progress</span>
-            <span className="text-[var(--ga-soft)]">Your goal</span>
+      <div className="ga-stage sticky top-0 z-10 -mx-5 flex h-[56svh] min-h-[25rem] flex-col justify-end px-5 pb-5 pt-16 sm:-mx-8 sm:px-8 lg:mx-0 lg:h-svh lg:max-h-[56rem] lg:justify-center lg:px-0 lg:pb-0 lg:pt-0" aria-hidden>
+        <div className="mx-auto w-full max-w-[22rem] sm:max-w-[26rem] lg:max-w-[32rem]">
+          <div className={`ga-goal flex items-center gap-3 rounded-full border px-4 py-2.5 ${goalSet ? "ga-goal-set" : ""}`}>
+            <span className="text-[0.8rem] font-semibold text-[var(--ga-soft)] lg:text-[0.9rem]">Goal</span>
+            <span className="relative h-[1.4em] flex-1 overflow-hidden text-[1rem] font-semibold lg:text-[1.1rem]">
+              {GOALS.map((g, i) => (
+                <span key={g} className="ga-goal-word absolute inset-0" data-on={i === goal || undefined}>
+                  {g}
+                </span>
+              ))}
+            </span>
           </div>
-          <div className="relative mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--ga-track)]">
-            <div
-              className="ga-fill absolute inset-y-0 left-0 w-full origin-left rounded-full bg-[var(--ga-accent)]"
-              style={{ transform: `scaleX(${Math.max(0, joined) / BOTS.length})` }}
-            />
+
+          <svg viewBox="0 0 400 240" className="mt-5 block h-auto w-full lg:mt-8">
+            {TEAM.map((p, i) => {
+              const state = read >= p.at ? "in" : designing ? "empty" : "none";
+              return (
+                <g key={i} className="ga-place" data-state={state}>
+                  <g className="ga-ghost" transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
+                    {ghostShape(p.shape)}
+                  </g>
+                  <g className="ga-bot">{botShape(p, { x: p.x, y: p.y, s: p.s })}</g>
+                </g>
+              );
+            })}
+          </svg>
+
+          <div className="mt-4 flex h-8 items-center justify-center lg:mt-6">
+            <span className="ga-ask inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-medium lg:text-[0.9rem]" data-on={asking || undefined}>
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--ga-ink)]" />A post is ready. It waits for your OK.
+            </span>
+          </div>
+
+          <div className="mt-3 lg:mt-6">
+            <div className="flex items-baseline justify-between text-[0.8rem] font-medium lg:text-[0.9rem]">
+              <span className="text-[var(--ga-ink)]">Progress</span>
+              <span className="text-[var(--ga-soft)]">Your goal</span>
+            </div>
+            <div className="relative mt-2 h-2 overflow-hidden rounded-full bg-[var(--ga-track)]">
+              <div
+                className="ga-fill absolute inset-y-0 left-0 w-full origin-left rounded-full bg-[var(--ga-ink)]"
+                style={{ transform: `scaleX(${progress})` }}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* The jobs. This list IS the content: real text, read in order. */}
-      <ol className="relative list-none p-0 lg:py-[18svh]">
-        {BOTS.map((bot, i) => (
+      {/* The lines. This list IS the content: real text, read in order. */}
+      <ol className="relative list-none p-0 pb-16 lg:py-[20svh]">
+        {LINES.map(([title, text], i) => (
           <li
-            key={bot.id}
+            key={title}
             ref={(el) => {
               steps.current[i] = el;
             }}
-            className="ga-step flex min-h-[46svh] flex-col justify-center py-10 lg:min-h-[72svh]"
-            data-on={!live || i <= active || undefined}
+            className="ga-step flex min-h-[44svh] flex-col justify-center py-10 lg:min-h-[64svh]"
+            data-on={!live || read > i + 0.15 || undefined}
           >
-            <p className="text-[0.95rem] font-semibold text-[var(--ga-accent)]">{bot.role}</p>
-            <h3 className="mt-2 text-[clamp(2.1rem,6vw,3.2rem)] font-extrabold leading-[0.98] tracking-[-0.035em] text-[var(--ga-ink)]">
-              {bot.name}
+            <h3 className="text-[clamp(1.9rem,5.6vw,3rem)] font-extrabold leading-[1.02] tracking-[-0.035em] text-[var(--ga-ink)]">
+              {title}
             </h3>
-            <p className="mt-4 max-w-[34ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.2rem]">
-              {bot.job}
-            </p>
+            <p className="mt-4 max-w-[34ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.2rem]">{text}</p>
           </li>
         ))}
-        <li className="pb-16 pt-6 lg:pb-0">
-          <p className="max-w-[36ch] text-pretty text-[1.05rem] leading-[1.55] text-[var(--ga-soft)]">
-            More on call when your goal needs them: referrals, LinkedIn, SEO, competitor watch, UGC ads, paid media and store ops.
-          </p>
-        </li>
       </ol>
     </div>
   );

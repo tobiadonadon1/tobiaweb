@@ -4,28 +4,30 @@ import { GROK_ARMY as PRODUCT, forSale } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { ArmyFormation } from "./grok-army-formation";
-import { botShape, squadShapes } from "./grok-army-bots";
+import { LEAD, botShape, squadShapes } from "./grok-army-bots";
+import { LookingSquad } from "./grok-army-look";
 import { StickyBuy } from "./sticky-buy";
 
 /**
- * GROK ARMY, a paid skill: Claude asks four questions and writes one file,
- * and Grok Bot builds a team of bots from it.
+ * GROK ARMY, a paid skill: Claude asks four questions, designs a team of
+ * Grok Bots around the buyer's goal WITH them, and writes one file that Grok
+ * Bot builds the army from.
  *
- * THREE SECTIONS, Tobia's limit: what it is (and the button), the army
- * assembling as you scroll (one bot per job), how you get it (and the button
- * again). Simple colours, simple words, nothing invented: no amounts, no
- * testimonials, no income promised. "Built to pay for itself" and "keeps
- * score until it does" are the only money words.
+ * THREE SECTIONS, Tobia's limit: what it is (and the button), your army being
+ * built as you scroll, how you get it (and the button again). Simple words,
+ * nothing invented: no amounts, no testimonials, no results promised.
  *
- * THE LOOK. Olive drab, because it is an army, and because black would read
- * as Grok's own brand: these are original bots, not xAI's. One yellow does
- * every job that matters (the button, the role labels, the payback bar).
- * The site's own Host Grotesk at 800 for the voice; its round bowls suit the
- * round bots. The mascots are product/grok-army-bots.ts, the same drawings
- * as the Setups card, the share card and the Stripe image.
+ * NO FIXED ROSTER. The buyer has total creative control: they set the goal,
+ * and Claude designs the bots with them (rename, add, drop, reshape). So the
+ * page never names bots or gives them jobs. The only role it mentions is the
+ * one bot you talk to, without a name.
  *
- * NOT ON SALE UNTIL IT HAS A STRIPE ID. With `stripeProductId` empty the
- * buttons say "Checkout opens soon" and cannot submit; see products.ts.
+ * THE LOOK (Tobia, after the first version): matte black, simple colours, and
+ * mascots that look like Grok Bot's real avatars (flat shapes, two white pill
+ * eyes) with the one you talk to as a brushed-metal disc with slot eyes. The
+ * bots are product/grok-army-bots.ts, the same drawings as the Setups card,
+ * the share card and the Stripe image. White is the only accent: the button
+ * and the progress bar. The site's own Host Grotesk at 800 for the voice.
  */
 
 const HERO_ID = "buy";
@@ -33,7 +35,7 @@ const CLOSE_ID = "buy-close";
 const SOON = !forSale(PRODUCT);
 
 const BUTTON =
-  "bg-[var(--ga-accent)] text-[var(--ga-on-accent)] shadow-[0_18px_40px_-20px_rgba(0,0,0,0.65)] hover:bg-[#ffd361]";
+  "bg-[var(--ga-accent)] text-[var(--ga-on-accent)] shadow-[0_18px_40px_-22px_rgba(255,255,255,0.35)] hover:bg-white";
 
 const STEPS: React.ReactNode[] = [
   <>Answer four questions in Claude Code.</>,
@@ -45,9 +47,9 @@ const STEPS: React.ReactNode[] = [
 ];
 
 const PROMISES: [string, string][] = [
+  ["Your army, your design", "Your goal, your bots, your names. Change the team any time, and Claude tunes it with you."],
   ["A first result in the first half hour", "Real work on your goal, before the rest of the army is even created."],
   ["It asks first", "Nothing is sent, posted, bought or deleted without your OK. On X, it prepares the post and you tap Post."],
-  ["Better every week", "Every Friday each bot reads your edits and its own numbers, and rewrites its playbook."],
   ["It keeps score", "A weekly scoreboard on your goal, and a three-line receipt that traces each result back to the work that caused it."],
 ];
 
@@ -99,18 +101,20 @@ export function GrokArmyPage() {
           first screen is bots, the promise and the button. */}
       <section aria-labelledby="ga-title" className="relative">
         <div className="mx-auto grid max-w-[80rem] grid-cols-1 items-center gap-6 px-5 pb-20 pt-20 sm:px-8 md:pt-24 lg:min-h-[min(100svh,58rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24">
-          <svg viewBox="0 0 400 330" className="ga-squad mx-auto block h-auto w-[min(78vw,20rem)] lg:order-2 lg:w-full lg:max-w-[36rem]" aria-hidden>
-            {squadShapes((_, i) => `ga-hop ga-hop-${i}`)}
-          </svg>
+          <LookingSquad className="mx-auto w-[min(80vw,21rem)] lg:order-2 lg:w-full lg:max-w-[36rem]">
+            <svg viewBox="0 0 400 330" className="ga-squad block h-auto w-full" aria-hidden>
+              {squadShapes((i) => `ga-hop ga-hop-${i}`)}
+            </svg>
+          </LookingSquad>
 
           <div className="lg:order-1">
-            <p className="text-[1rem] font-semibold text-[var(--ga-accent)]">Grok Army · a skill for Claude Code</p>
+            <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
             <h1 id="ga-title" className="mt-3 max-w-[15ch] text-balance text-[clamp(2.5rem,10.4vw,5.1rem)] font-extrabold leading-[0.96] tracking-[-0.045em]">
               Turn Grok Bot into an army that works for you 24/7.
             </h1>
             <p className="mt-5 max-w-[38ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.25rem]">
-              Answer four questions in Claude. Grok Bot builds the team: a Chief of Staff you talk to, and one bot for
-              each job. Built around your goal, and it keeps score every week.
+              Answer four questions in Claude and design your own team of Grok bots: one you talk to, and one for each
+              job your goal needs. Built around your goal, and it keeps score every week.
             </p>
             <div id={HERO_ID} className="mt-8 scroll-mt-28">
               <Buy reportErrors />
@@ -122,15 +126,14 @@ export function GrokArmyPage() {
         </div>
       </section>
 
-      {/* 2. THE ARMY, assembling as you scroll: one bot per job. */}
+      {/* 2. YOUR ARMY, built as you scroll: the goal, then the team. */}
       <section aria-labelledby="ga-army" className="relative bg-[var(--ga-ground-2)]">
         <div className="mx-auto max-w-[80rem] px-5 pt-20 sm:px-8 md:pt-28">
-          <h2 id="ga-army" className="max-w-[16ch] text-balance text-[clamp(2.3rem,7vw,4.4rem)] font-extrabold leading-[0.98] tracking-[-0.04em]">
-            One bot for each job, and one boss you talk to.
+          <h2 id="ga-army" className="max-w-[14ch] text-balance text-[clamp(2.3rem,7vw,4.4rem)] font-extrabold leading-[0.98] tracking-[-0.04em]">
+            Your army, designed by you.
           </h2>
           <p className="mt-5 max-w-[44ch] text-pretty text-[1.1rem] leading-[1.55] text-[var(--ga-soft)] lg:text-[1.2rem]">
-            Your army starts with the Chief of Staff and the one or two bots your goal needs. The rest join when they have
-            earned a place. They work around the clock on routines, in Grok Bot&rsquo;s cloud.
+            No fixed roster. You choose the goal, and every bot is made for it, with you.
           </p>
           <ArmyFormation />
         </div>
@@ -147,7 +150,7 @@ export function GrokArmyPage() {
               <ol className="mt-10 list-none border-b border-[var(--ga-line)] p-0">
                 {STEPS.map((step, i) => (
                   <li key={i} className="flex items-baseline gap-5 border-t border-[var(--ga-line)] py-5 text-[1.1rem] leading-[1.45]">
-                    <span className="w-5 shrink-0 text-[1rem] font-extrabold text-[var(--ga-accent)]">{i + 1}</span>
+                    <span className="w-5 shrink-0 text-[1rem] font-extrabold text-[var(--ga-ink)]">{i + 1}</span>
                     <span className="text-[var(--ga-soft)]">{step}</span>
                   </li>
                 ))}
@@ -165,8 +168,8 @@ export function GrokArmyPage() {
           </div>
 
           <div className="mt-16 flex flex-col items-start gap-6 border-t border-[var(--ga-line)] pt-12 sm:flex-row sm:items-center sm:gap-8 md:mt-20">
-            <svg viewBox="0 0 100 122" className="w-[5.5rem] shrink-0" aria-hidden>
-              {botShape("chief")}
+            <svg viewBox="0 0 100 100" className="w-[5rem] shrink-0" aria-hidden>
+              {botShape(LEAD)}
             </svg>
             <div>
               <Buy />

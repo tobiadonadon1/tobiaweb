@@ -839,8 +839,8 @@ function Whitehat() {
 
 /**
  * GROK ARMY — not cut paper: the army's own bots, the same drawings as its
- * page and its Stripe image (product/grok-army-bots.ts), standing as a squad.
- * A product whose mascots ARE the brand gets them on its card too.
+ * page and its Stripe image (product/grok-army-bots.ts), gathered round the
+ * metal disc. A product whose mascots ARE the brand gets them on its card too.
  */
 function GrokArmy() {
   return <>{squadShapes()}</>;

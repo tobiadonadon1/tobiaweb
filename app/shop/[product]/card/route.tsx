@@ -42,6 +42,12 @@ export async function GET(
     medium && { name: "Host", data: medium, weight: 500 as const, style: "normal" as const },
   ].filter((f) => f !== null && f !== undefined);
 
+  // A product whose page is black (Grok Army) gets a black card to match.
+  const dark = product.share.theme === "dark";
+  const ground = dark ? "#0d0d0d" : PAPER;
+  const ink = dark ? "#f4f4f2" : INK;
+  const soft = (a: number) => (dark ? `rgba(244,244,242,${a})` : `rgba(11,31,58,${a})`);
+
   const svg = flatSpecimenSvg(product.id);
   const mark = svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : null;
 
@@ -52,7 +58,7 @@ export async function GET(
           width: "100%",
           height: "100%",
           display: "flex",
-          background: PAPER,
+          background: ground,
           padding: "64px 72px",
           fontFamily: fonts.length ? "Host" : "sans-serif",
         }}
@@ -63,7 +69,7 @@ export async function GET(
               display: "flex",
               fontSize: 24,
               letterSpacing: "0.14em",
-              color: "rgba(11,31,58,0.55)",
+              color: soft(0.6),
             }}
           >
             {product.share.kicker.toUpperCase()}
@@ -79,7 +85,7 @@ export async function GET(
                 fontWeight: 400,
                 letterSpacing: "-0.045em",
                 lineHeight: 0.95,
-                color: INK,
+                color: ink,
               }}
             >
               {product.name}
@@ -91,7 +97,7 @@ export async function GET(
                 maxWidth: 680,
                 fontSize: 36,
                 lineHeight: 1.3,
-                color: "rgba(11,31,58,0.7)",
+                color: soft(0.72),
                 // No single word left alone on the second line.
                 textWrap: "balance",
               }}
@@ -109,8 +115,8 @@ export async function GET(
                 height: 64,
                 padding: "0 30px",
                 borderRadius: 999,
-                background: "#b93a26",
-                color: PAPER,
+                background: dark ? ink : "#b93a26",
+                color: dark ? ground : PAPER,
                 // "Coming soon" is two words; the pill keeps them on one line.
                 whiteSpace: "nowrap",
                 fontSize: 28,
@@ -125,7 +131,7 @@ export async function GET(
                 marginLeft: 26,
                 fontSize: 25,
                 letterSpacing: "0.02em",
-                color: "rgba(11,31,58,0.6)",
+                color: soft(0.64),
               }}
             >
               {product.share.proof}
@@ -145,8 +151,8 @@ export async function GET(
           {/* eslint-disable-next-line @next/next/no-img-element -- Satori only renders <img> */}
           {mark ? <img src={mark} width={320} height={264} alt="" style={{ marginTop: 10 }} /> : <div />}
           <div style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ display: "flex", width: 90, height: 6, background: CLAY, marginRight: 20 }} />
-            <div style={{ display: "flex", fontSize: 24, color: "rgba(11,31,58,0.5)" }}>
+            <div style={{ display: "flex", width: 90, height: 6, background: dark ? ink : CLAY, marginRight: 20 }} />
+            <div style={{ display: "flex", fontSize: 24, color: soft(0.55) }}>
               {SITE_LABEL}
             </div>
           </div>
