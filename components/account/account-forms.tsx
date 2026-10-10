@@ -75,6 +75,7 @@ export function AccountForms() {
   const [mode, setMode] = useState<Mode>(startMode);
   const [email, setEmail] = useState(params.get("email") ?? "");
   const [password, setPassword] = useState("");
+  const [again, setAgain] = useState("");
   const [code, setCode] = useState("");
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -96,6 +97,7 @@ export function AccountForms() {
     setNote("");
     setMismatch(false);
     setCode("");
+    setAgain("");
     if (m !== "signin" && m !== "signup") setPassword("");
   };
 
@@ -107,6 +109,13 @@ export function AccountForms() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
+    // A new password is typed twice, so a slip can't lock anyone out.
+    if ((mode === "signup" || mode === "reset") && password.length >= 8 && password !== again) {
+      setMismatch(false);
+      setNote("");
+      setError("The two passwords don't match.");
+      return;
+    }
     setBusy(true);
     setError("");
     setNote("");
@@ -197,6 +206,30 @@ export function AccountForms() {
 
   return (
     <section aria-labelledby={`${ids}-h`}>
+      {mode === "signin" || mode === "signup" ? (
+        <div className="mb-8 inline-flex rounded-full border border-[var(--hairline-strong)] bg-white p-1 shadow-[0_1px_0_rgba(11,31,58,0.04)]">
+          {(
+            [
+              ["signin", "Sign in"],
+              ["signup", "Create account"],
+            ] as const
+          ).map(([m, text]) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              onClick={() => mode !== m && go(m)}
+              className={`rounded-full px-4 py-2 text-[0.95rem] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] ${
+                mode === m
+                  ? "bg-[var(--ink)] text-[var(--paper)]"
+                  : "text-[color:rgba(11,31,58,0.7)] hover:text-[var(--ink)]"
+              }`}
+            >
+              {text}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <h1 id={`${ids}-h`} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
         {title}
       </h1>
@@ -283,6 +316,24 @@ export function AccountForms() {
           </div>
         ) : null}
 
+        {mode === "signup" || mode === "reset" ? (
+          <div>
+            <label htmlFor={`${ids}-again`} className={label}>
+              Type it again
+            </label>
+            <input
+              id={`${ids}-again`}
+              type={show ? "text" : "password"}
+              required
+              autoComplete="new-password"
+              value={again}
+              onChange={(e) => setAgain(e.target.value)}
+              aria-invalid={again.length > 0 && again !== password.slice(0, again.length)}
+              className={field}
+            />
+          </div>
+        ) : null}
+
         <p role="alert" className="min-h-[1.3em] text-[0.95rem] leading-[1.45] text-[var(--accent-clay-text)]">
           {error}
           {mismatch ? (
@@ -314,21 +365,7 @@ export function AccountForms() {
       </form>
 
       <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-        {mode === "signin" ? (
-          <p className="text-[0.95rem] text-[color:rgba(11,31,58,0.7)]">
-            New here?{" "}
-            <button type="button" onClick={() => go("signup")} className={quiet}>
-              Create an account
-            </button>
-          </p>
-        ) : mode === "signup" ? (
-          <p className="text-[0.95rem] text-[color:rgba(11,31,58,0.7)]">
-            Already have one?{" "}
-            <button type="button" onClick={() => go("signin")} className={quiet}>
-              Sign in
-            </button>
-          </p>
-        ) : (
+        {mode === "signin" || mode === "signup" ? null : (
           <>
             {needsCode ? (
               <button type="button" onClick={resend} className={quiet}>

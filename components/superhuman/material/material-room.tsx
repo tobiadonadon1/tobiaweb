@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { HandNote } from "@/components/ui/hand-note";
-import { PRODUCTS } from "@/lib/shop/products";
 import { MATERIAL_GRID, folderHref } from "./material-data";
 import { Specimen } from "./specimens";
 import type { MaterialFolder } from "./material-types";
@@ -100,16 +99,7 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
   /* ------------------------------------------------------------------ *
    * OPEN. The whole cell is the target, so there is no button inside a
    * card competing with the card for the same click.
-   *
-   * A folder with something for sale says so on its face, with the lowest
-   * price in it, so nobody opens it expecting another free folder.
    * ------------------------------------------------------------------ */
-  // Only things with a price count; a free product is not a "from" price.
-  const prices = folder.entries.flatMap((e) => (e.product && !PRODUCTS[e.product].free ? [PRODUCTS[e.product]] : []));
-  const from = prices.length
-    ? prices.reduce((a, b) => (b.priceCents < a.priceCents ? b : a))
-    : undefined;
-
   return (
     <li
       className="material-cell bg-[var(--paper)]"
@@ -121,14 +111,7 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
       >
         <div className="flex items-start justify-between gap-4">
           {label}
-          <span className="flex shrink-0 items-center gap-3">
-            {from ? (
-              <span className="inline-flex items-center rounded-full bg-[var(--accent-clay-text)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--paper)]">
-                New · {prices.length > 1 ? `from ${from.priceLabel}` : from.priceLabel}
-              </span>
-            ) : null}
-            <ArrowUpRight className="h-4 w-4 text-[color:rgba(11,31,58,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-clay)]" />
-          </span>
+          <ArrowUpRight className="h-4 w-4 shrink-0 text-[color:rgba(11,31,58,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-clay)]" />
         </div>
 
         {specimen}
