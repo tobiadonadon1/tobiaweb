@@ -80,6 +80,9 @@ export function AccountForms() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [note, setNote] = useState("");
+  // A wrong password and an address with no account look the same from here
+  // (Supabase won't say which), so the error offers both ways forward.
+  const [mismatch, setMismatch] = useState(false);
   const first = useRef<HTMLInputElement>(null);
 
   // Each step starts with the cursor where the typing starts.
@@ -91,6 +94,7 @@ export function AccountForms() {
     setMode(m);
     setError("");
     setNote("");
+    setMismatch(false);
     setCode("");
     if (m !== "signin" && m !== "signup") setPassword("");
   };
@@ -106,6 +110,7 @@ export function AccountForms() {
     setBusy(true);
     setError("");
     setNote("");
+    setMismatch(false);
     const action = mode === "code" ? "verify" : mode;
     const r = await call(action, { email, password, code });
     setBusy(false);
@@ -124,6 +129,7 @@ export function AccountForms() {
       setError("There's already an account with this email. Sign in instead.");
       return;
     }
+    setMismatch(r.error === "wrong-password");
     setError(ERRORS[r.error ?? ""] ?? FALLBACK);
   };
 
@@ -279,6 +285,17 @@ export function AccountForms() {
 
         <p role="alert" className="min-h-[1.3em] text-[0.95rem] leading-[1.45] text-[var(--accent-clay-text)]">
           {error}
+          {mismatch ? (
+            <>
+              {" "}
+              <span className="text-[color:rgba(11,31,58,0.72)]">
+                No account yet?{" "}
+                <button type="button" onClick={() => go("signup")} className={quiet}>
+                  Create it with this email
+                </button>
+              </span>
+            </>
+          ) : null}
         </p>
         {note ? (
           <p role="status" className="-mt-4 text-[0.95rem] leading-[1.45] text-[color:rgba(11,31,58,0.72)]">
