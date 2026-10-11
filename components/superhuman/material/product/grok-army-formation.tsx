@@ -24,10 +24,10 @@ import { COLORS, LEAD, botShape, ghostShape, type BotSpec } from "./grok-army-bo
  * content) but drops the fall and the rotating goal.
  */
 
-const GOALS = ["More clients", "Grow on X", "Clear the inbox", "More sales"];
+const GOALS = ["More clients", "More sales", "Launch the app", "Grow on X", "Clear the inbox", "Book more calls"];
 
 const LINES: [string, string][] = [
-  ["You set the goal.", "One goal the whole army works on. More clients, a bigger X, a clear inbox: yours."],
+  ["You set the goal.", "One goal the whole army works on. More clients, more sales, a launch, a bigger audience, a clear inbox. Yours."],
   ["Claude designs the team with you.", "One bot you talk to, and one for each job your goal needs. Rename, add, drop or reshape any of them before it’s built."],
   ["Builder creates it in Grok Bot.", "You give one file to a new Grok Bot. It sets everything up, shows you a first result, then creates the bots."],
   ["It works around the clock.", "On routines, in Grok Bot’s cloud. It asks before anything is sent, posted, bought or deleted."],
@@ -131,7 +131,7 @@ export function ArmyFormation() {
 
           <div className="mt-4 flex h-8 items-center justify-center lg:mt-6">
             <span className="ga-ask inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-medium lg:text-[0.9rem]" data-on={asking || undefined}>
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--ga-ink)]" />A post is ready. It waits for your OK.
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--ga-ink)]" />Something is ready. It waits for your OK.
             </span>
           </div>
 

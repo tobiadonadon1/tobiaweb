@@ -1646,3 +1646,17 @@ body[data-footer-open] .back-link {
   96% { transform: scaleY(0.12); }
 }
 
+
+/* Grok Army banner: the goal word swaps in place, a fade and a small rise. */
+.ga-word {
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+}
+.ga-word[data-on] {
+  opacity: 1;
+  transition-delay: 180ms;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ga-word { transition: opacity 220ms ease-out, translate 420ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .ga-word:not([data-on]) { translate: 0 0.08em; }
+}

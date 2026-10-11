@@ -1,11 +1,12 @@
+import Image from "next/image";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
 import { GROK_ARMY as PRODUCT, forSale } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { ArmyFormation } from "./grok-army-formation";
-import { LEAD, botShape, squadShapes } from "./grok-army-bots";
-import { LookingSquad } from "./grok-army-look";
+import { GrokArmyBanner } from "./grok-army-banner";
+import { LEAD, botShape } from "./grok-army-bots";
 import { StickyBuy } from "./sticky-buy";
 
 /**
@@ -21,6 +22,9 @@ import { StickyBuy } from "./sticky-buy";
  * and Claude designs the bots with them (rename, add, drop, reshape). So the
  * page never names bots or gives them jobs. The only role it mentions is the
  * one bot you talk to, without a name.
+ *
+ * THE BANNER AND THE EXAMPLE BOTS are Tobia's own drawings (public/shop/
+ * grok-army/). The bots strip is examples to start from, never a roster.
  *
  * THE LOOK (Tobia, after the first version): matte black, simple colours, and
  * mascots that look like Grok Bot's real avatars (flat shapes, two white pill
@@ -49,7 +53,7 @@ const STEPS: React.ReactNode[] = [
 const PROMISES: [string, string][] = [
   ["Your army, your design", "Your goal, your bots, your names. Change the team any time, and Claude tunes it with you."],
   ["A first result in the first half hour", "Real work on your goal, before the rest of the army is even created."],
-  ["It asks first", "Nothing is sent, posted, bought or deleted without your OK. On X, it prepares the post and you tap Post."],
+  ["It asks first", "Nothing is sent, posted, bought or deleted without your OK. You always press the last button."],
   ["It keeps score", "A weekly scoreboard on your goal, and a three-line receipt that traces each result back to the work that caused it."],
 ];
 
@@ -97,32 +101,32 @@ export function GrokArmyPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
 
-      {/* 1. WHAT IT IS, AND THE BUTTON. The squad first on a phone, so the
-          first screen is bots, the promise and the button. */}
+      {/* 1. WHAT IT IS, AND THE BUTTON, then the banner: the whole crowd of
+          bots heading for one goal, and the goal keeps changing. */}
       <section aria-labelledby="ga-title" className="relative">
-        <div className="mx-auto grid max-w-[80rem] grid-cols-1 items-center gap-6 px-5 pb-20 pt-20 sm:px-8 md:pt-24 lg:min-h-[min(100svh,58rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24">
-          <LookingSquad className="mx-auto w-[min(80vw,21rem)] lg:order-2 lg:w-full lg:max-w-[36rem]">
-            <svg viewBox="0 0 400 330" className="ga-squad block h-auto w-full" aria-hidden>
-              {squadShapes((i) => `ga-hop ga-hop-${i}`)}
-            </svg>
-          </LookingSquad>
-
-          <div className="lg:order-1">
-            <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
-            <h1 id="ga-title" className="mt-3 max-w-[15ch] text-balance text-[clamp(2.5rem,10.4vw,5.1rem)] font-extrabold leading-[0.96] tracking-[-0.045em]">
-              Turn Grok Bot into an army that works for you 24/7.
-            </h1>
-            <p className="mt-5 max-w-[38ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.25rem]">
-              Answer four questions in Claude and design your own team of Grok bots: one you talk to, and one for each
-              job your goal needs. Built around your goal, and it keeps score every week.
-            </p>
-            <div id={HERO_ID} className="mt-8 scroll-mt-28">
-              <Buy reportErrors />
+        <div className="mx-auto max-w-[80rem] px-5 pb-20 pt-20 sm:px-8 md:pt-24 lg:pb-24">
+          <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
+            <div>
+              <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
+              <h1 id="ga-title" className="mt-3 max-w-[16ch] text-balance text-[clamp(2.5rem,8.6vw,4.6rem)] font-extrabold leading-[0.96] tracking-[-0.045em]">
+                Turn Grok Bot into an army that works for you 24/7.
+              </h1>
             </div>
-            <p className="mt-4 max-w-[40ch] text-pretty text-[0.95rem] leading-[1.5] text-[var(--ga-soft)]">
-              A first result in the first half hour. Nothing is posted, sent or bought without your OK.
-            </p>
+            <div>
+              <p className="max-w-[38ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.2rem]">
+                Answer four questions in Claude and design your own team of Grok bots around your goal: more clients,
+                more sales, more reach, a launch, a clear inbox. It works on it every day and keeps score every week.
+              </p>
+              <div id={HERO_ID} className="mt-7 scroll-mt-28">
+                <Buy reportErrors />
+              </div>
+              <p className="mt-4 max-w-[40ch] text-pretty text-[0.95rem] leading-[1.5] text-[var(--ga-soft)]">
+                A first result in the first half hour. Nothing is posted, sent or bought without your OK.
+              </p>
+            </div>
           </div>
+
+          <GrokArmyBanner className="mt-12 lg:mt-16" />
         </div>
       </section>
 
@@ -135,6 +139,21 @@ export function GrokArmyPage() {
           <p className="mt-5 max-w-[44ch] text-pretty text-[1.1rem] leading-[1.55] text-[var(--ga-soft)] lg:text-[1.2rem]">
             No fixed roster. You choose the goal, and every bot is made for it, with you.
           </p>
+          <figure className="m-0 mt-12 lg:mt-16">
+            <div className="-mx-5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:px-0">
+              <Image
+                src="/shop/grok-army/bots.webp"
+                alt="Example bots: Chief of Staff, Find Clients, Grow X, Write Posts, Inbox Assistant, Lead Magnets, Research and Support"
+                width={1600}
+                height={533}
+                sizes="(min-width: 1280px) 1216px, (min-width: 640px) 100vw, 56rem"
+                className="block h-auto w-[56rem] max-w-none rounded-[1.5rem] sm:w-full sm:max-w-full sm:rounded-[2rem]"
+              />
+            </div>
+            <figcaption className="mt-4 max-w-[52ch] text-pretty text-[1rem] leading-[1.5] text-[var(--ga-soft)]">
+              A few bots people start with. Take any of them, rename them, or design ones nobody has made yet.
+            </figcaption>
+          </figure>
           <ArmyFormation />
         </div>
       </section>
