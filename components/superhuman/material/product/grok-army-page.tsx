@@ -114,7 +114,7 @@ export function GrokArmyPage() {
       <section aria-labelledby="ga-title" className="relative">
         <div className="mx-auto flex max-w-[80rem] flex-col items-center px-5 pb-20 pt-20 text-center sm:px-8 md:pt-24 lg:pb-24">
           <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
-          <h1 id="ga-title" className="mt-4 max-w-[17ch] text-balance text-[clamp(2.6rem,8.4vw,5.6rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
+          <h1 id="ga-title" className="mt-4 max-w-[24ch] text-balance text-[clamp(2.6rem,7.4vw,4.9rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
             Turn Grok Bot into an <span className="text-[var(--ga-red)]">army</span> that works for you 24/7.
           </h1>
           <p className="mt-6 max-w-[34ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[var(--ga-ink)] lg:text-[1.4rem]">
@@ -133,6 +133,12 @@ export function GrokArmyPage() {
               </li>
             ))}
           </ul>
+          <p className="ga-fact mt-3 inline-flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3.5 text-[0.8rem] font-medium text-[var(--ga-soft)]">
+            <span className="ga-peek-in" aria-hidden>
+              👀
+            </span>
+            It could even pay for its own subscription
+          </p>
 
           <GrokArmyBanner className="mt-12 w-full lg:mt-16" />
         </div>

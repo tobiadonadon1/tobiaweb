@@ -1644,24 +1644,13 @@ body[data-footer-open] .back-link {
   .ga-formation[data-live][data-reached] .ga-place:nth-child(6) .ga-bot { animation-delay: 300ms; }
 }
 
-/* The banner's pill, with eyes looking at it from every side. */
-.ga-pill {
-  background: #111;
-  color: #fff;
-  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
-}
-.ga-peek {
-  position: absolute;
-  line-height: 1;
-}
-@keyframes ga-peek {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -0.12em; }
+/* The small pill under the facts: eyes that glance sideways now and then. */
+@keyframes ga-glance {
+  0%, 70%, 100% { translate: 0 0; }
+  78%, 90% { translate: 2px 0; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .ga-peek { animation: ga-peek 2.4s ease-in-out infinite; }
-  .ga-peek:nth-child(2n) { animation-delay: -0.8s; }
-  .ga-peek:nth-child(3n) { animation-delay: -1.6s; }
+  .ga-peek-in { display: inline-block; animation: ga-glance 4s ease-in-out infinite; }
 }
 /* A line not reached yet is quieter, once script is running the stage. */
 .ga-step {
