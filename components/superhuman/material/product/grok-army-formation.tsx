@@ -8,8 +8,8 @@ import { COLORS, LEAD, botShape, ghostShape, type BotSpec } from "./grok-army-bo
  *
  * There is no fixed roster: the buyer sets the goal and Claude designs the
  * bots for it with them. So the pinned stage acts that out in order. A goal
- * is set (the examples rotate until the first step is read, then one stays),
- * empty places appear in different shapes, the bot you talk to arrives, the
+ * is set (the examples rotate until the first step is read, then one stays)
+ * over the empty places, drawn from the start so the stage is never blank, the bot you talk to arrives, the
  * others join one by one, one asks for your OK, and the progress bar moves
  * toward the goal. The bots have no names or jobs here, on purpose.
  *
@@ -117,7 +117,7 @@ export function ArmyFormation() {
 
           <svg viewBox="0 0 400 240" className="mt-5 block h-auto w-full lg:mt-8">
             {TEAM.map((p, i) => {
-              const state = read >= p.at ? "in" : designing ? "empty" : "none";
+              const state = read >= p.at ? "in" : "empty";
               return (
                 <g key={i} className="ga-place" data-state={state}>
                   <g className="ga-ghost" transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
@@ -129,8 +129,11 @@ export function ArmyFormation() {
             })}
           </svg>
 
-          <div className="mt-4 flex h-8 items-center justify-center lg:mt-6">
-            <span className="ga-ask inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-medium lg:text-[0.9rem]" data-on={asking || undefined}>
+          <div className="mt-4 grid h-8 place-items-center lg:mt-6">
+            <span className="ga-ask ga-hint text-[0.8rem] font-medium text-[var(--ga-soft)] [grid-area:1/1] lg:text-[0.9rem]" data-on={(live && !designing) || undefined}>
+              Keep scrolling: your army builds itself here.
+            </span>
+            <span className="[grid-area:1/1] ga-ask inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-medium lg:text-[0.9rem]" data-on={asking || undefined}>
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--ga-ink)]" />Something is ready. It waits for your OK.
             </span>
           </div>

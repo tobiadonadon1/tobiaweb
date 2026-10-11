@@ -1545,6 +1545,9 @@ body[data-footer-open] .back-link {
   --ga-track: rgba(244, 244, 242, 0.14);
   --ga-accent: #f4f4f2;
   --ga-on-accent: #0d0d0d;
+  --ga-red: #fd4239;
+  --ga-red-button: #db2f27;
+  --ga-red-button-hover: #e8372e;
   --ga-spring: linear(0, 0.42 9%, 0.84 21%, 1.02 33%, 1.05 41%, 1.01 55%, 0.99 70%, 1);
 }
 .ga-page .ga-eyes {
@@ -1591,6 +1594,11 @@ body[data-footer-open] .back-link {
   transition: opacity 400ms ease-out;
 }
 .ga-ask[data-on] { opacity: 1; }
+.ga-hint { background: transparent; }
+.ga-fact {
+  background: rgba(244, 244, 242, 0.08);
+  color: var(--ga-ink);
+}
 .ga-fill {
   transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }

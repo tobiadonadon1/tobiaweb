@@ -6,7 +6,7 @@ import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { ArmyFormation } from "./grok-army-formation";
 import { GrokArmyBanner } from "./grok-army-banner";
-import { LEAD, botShape } from "./grok-army-bots";
+import { COLORS, LEAD, botShape, type BotSpec } from "./grok-army-bots";
 import { StickyBuy } from "./sticky-buy";
 
 /**
@@ -30,8 +30,8 @@ import { StickyBuy } from "./sticky-buy";
  * mascots that look like Grok Bot's real avatars (flat shapes, two white pill
  * eyes) with the one you talk to as a brushed-metal disc with slot eyes. The
  * bots are product/grok-army-bots.ts, the same drawings as the Setups card,
- * the share card and the Stripe image. White is the only accent: the button
- * and the progress bar. The site's own Host Grotesk at 800 for the voice.
+ * the share card and the Stripe image. Red (from the banner) marks the word army and the
+ * button; white does the rest. The site's own Host Grotesk at 800 for the voice.
  */
 
 const HERO_ID = "buy";
@@ -39,7 +39,15 @@ const CLOSE_ID = "buy-close";
 const SOON = !forSale(PRODUCT);
 
 const BUTTON =
-  "bg-[var(--ga-accent)] text-[var(--ga-on-accent)] shadow-[0_18px_40px_-22px_rgba(255,255,255,0.35)] hover:bg-white";
+  "bg-[var(--ga-red-button)] text-white shadow-[0_18px_44px_-18px_rgba(253,66,57,0.7)] hover:bg-[var(--ga-red-button-hover)]";
+
+/** The four facts under the button, each with a bot. */
+const FACTS: [string, BotSpec][] = [
+  ["4 questions", { shape: "circle", color: COLORS.teal }],
+  ["1 file to Grok Bot", { shape: "square", color: COLORS.blue }],
+  ["First result in 30 min", { shape: "triangle", color: COLORS.orange }],
+  ["Asks before it acts", { shape: "diamond", color: COLORS.violet }],
+];
 
 const STEPS: React.ReactNode[] = [
   <>Answer four questions in Claude Code.</>,
@@ -101,32 +109,32 @@ export function GrokArmyPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
 
-      {/* 1. WHAT IT IS, AND THE BUTTON, then the banner: the whole crowd of
-          bots heading for one goal, and the goal keeps changing. */}
+      {/* 1. WHAT IT IS, AND THE BUTTON, centred, then the banner: the whole
+          crowd of bots heading for one word, and the word keeps changing. */}
       <section aria-labelledby="ga-title" className="relative">
-        <div className="mx-auto max-w-[80rem] px-5 pb-20 pt-20 sm:px-8 md:pt-24 lg:pb-24">
-          <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
-            <div>
-              <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
-              <h1 id="ga-title" className="mt-3 max-w-[16ch] text-balance text-[clamp(2.5rem,8.6vw,4.6rem)] font-extrabold leading-[0.96] tracking-[-0.045em]">
-                Turn Grok Bot into an army that works for you 24/7.
-              </h1>
-            </div>
-            <div>
-              <p className="max-w-[38ch] text-pretty text-[1.1rem] leading-[1.5] text-[var(--ga-soft)] lg:text-[1.2rem]">
-                Answer four questions in Claude and design your own team of Grok bots around your goal: more clients,
-                more sales, more reach, a launch, a clear inbox. It works on it every day and keeps score every week.
-              </p>
-              <div id={HERO_ID} className="mt-7 scroll-mt-28">
-                <Buy reportErrors />
-              </div>
-              <p className="mt-4 max-w-[40ch] text-pretty text-[0.95rem] leading-[1.5] text-[var(--ga-soft)]">
-                A first result in the first half hour. Nothing is posted, sent or bought without your OK.
-              </p>
-            </div>
+        <div className="mx-auto flex max-w-[80rem] flex-col items-center px-5 pb-20 pt-20 text-center sm:px-8 md:pt-24 lg:pb-24">
+          <p className="text-[1rem] font-semibold text-[var(--ga-soft)]">Grok Army · a skill for Claude Code</p>
+          <h1 id="ga-title" className="mt-4 max-w-[17ch] text-balance text-[clamp(2.6rem,8.4vw,5.6rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
+            Turn Grok Bot into an <span className="text-[var(--ga-red)]">army</span> that works for you 24/7.
+          </h1>
+          <p className="mt-6 max-w-[34ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[var(--ga-ink)] lg:text-[1.4rem]">
+            Four questions. One file. A team of Grok bots that chases your goal day and night, and gets better every week.
+          </p>
+          <div id={HERO_ID} className="mt-8 scroll-mt-28">
+            <Buy reportErrors />
           </div>
+          <ul className="mt-8 flex list-none flex-wrap justify-center gap-2.5 p-0">
+            {FACTS.map(([text, bot]) => (
+              <li key={text} className="ga-fact inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-[0.9rem] font-medium">
+                <svg viewBox="0 0 100 100" className="h-6 w-6 shrink-0" aria-hidden>
+                  {botShape(bot)}
+                </svg>
+                {text}
+              </li>
+            ))}
+          </ul>
 
-          <GrokArmyBanner className="mt-12 lg:mt-16" />
+          <GrokArmyBanner className="mt-12 w-full lg:mt-16" />
         </div>
       </section>
 

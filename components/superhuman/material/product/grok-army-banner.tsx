@@ -6,8 +6,7 @@ import { useEffect, useState } from "react";
 /**
  * THE BANNER: Tobia's drawing of the whole crowd of bots (every shape and
  * colour, arrows all pointing in) with the word in the middle cut out, so the
- * goal can be live text that changes. The army isn't for one thing: clients,
- * sales, reach, a launch, money. The server renders "goal", so a crawler or a
+ * goal can be live text that changes: goal, grok army, $$$$ (Tobia's three). The server renders "goal", so a crawler or a
  * screenshot reads the idea; script then swaps the word in place (a fade and
  * a small rise, nothing turns). Reduced motion keeps "goal".
  *
@@ -16,14 +15,14 @@ import { useEffect, useState } from "react";
  * width (cqw) to sit where the original lettering was.
  */
 
-const WORDS = ["goal", "clients", "sales", "reach", "$$$$", "leads", "launch"];
+const WORDS = ["goal", "grok army", "$$$$"];
 
 export function GrokArmyBanner({ className }: { className?: string }) {
   const [word, setWord] = useState(0);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = window.setInterval(() => setWord((w) => (w + 1) % WORDS.length), 1700);
+    const t = window.setInterval(() => setWord((w) => (w + 1) % WORDS.length), 2000);
     return () => window.clearInterval(t);
   }, []);
 
@@ -45,7 +44,7 @@ export function GrokArmyBanner({ className }: { className?: string }) {
         {WORDS.map((w, i) => (
           <span
             key={w}
-            className="ga-word text-[17cqw] font-extrabold leading-none tracking-[-0.02em] text-[#1a1a1a] [grid-area:1/1] sm:text-[9.2cqw]"
+            className="ga-word whitespace-nowrap text-[14cqw] font-extrabold leading-none tracking-[-0.02em] text-[#1a1a1a] [grid-area:1/1] sm:text-[9.2cqw]"
             data-on={i === word || undefined}
           >
             {w}
