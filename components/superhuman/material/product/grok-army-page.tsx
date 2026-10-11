@@ -41,6 +41,18 @@ const SOON = !forSale(PRODUCT);
 const BUTTON =
   "bg-[var(--ga-red-button)] text-white shadow-[0_18px_44px_-18px_rgba(253,66,57,0.7)] hover:bg-[var(--ga-red-button-hover)]";
 
+/** Eyes peeking at the subscription pill from its sides and below:
+ *  anchor (% of the pill's width), then offsets and size in em, and a tilt. */
+const PEEKS: [number, number, number, number, number][] = [
+  [0, -1.7, 0.1, 1.1, -12],
+  [0, -1.3, 1.5, 0.9, 8],
+  [100, 0.5, 0, 1.1, 12],
+  [100, 0.3, 1.5, 0.9, -8],
+  [18, 0, 2.8, 0.85, -10],
+  [50, -0.5, 3, 0.8, 4],
+  [80, 0, 2.8, 0.9, 6],
+];
+
 /** The four facts under the button, each with a bot. */
 const FACTS: [string, BotSpec][] = [
   ["4 questions", { shape: "circle", color: COLORS.teal }],
@@ -117,7 +129,7 @@ export function GrokArmyPage() {
           <h1 id="ga-title" className="mt-4 max-w-[24ch] text-balance text-[clamp(2.6rem,7.4vw,4.9rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
             Turn Grok Bot into an <span className="text-[var(--ga-red)]">army</span> that works for you 24/7.
           </h1>
-          <p className="mt-6 max-w-[34ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[var(--ga-ink)] lg:text-[1.4rem]">
+          <p className="mt-6 max-w-[52ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[var(--ga-ink)] lg:text-[1.4rem]">
             Four questions. One file. A team of Grok bots that chases your goal day and night, and gets better every week.
           </p>
           <div id={HERO_ID} className="mt-8 scroll-mt-28">
@@ -133,11 +145,24 @@ export function GrokArmyPage() {
               </li>
             ))}
           </ul>
-          <p className="ga-fact mt-3 inline-flex items-center gap-2 rounded-full py-1.5 pl-2.5 pr-3.5 text-[0.8rem] font-medium text-[var(--ga-soft)]">
-            <span className="ga-peek-in" aria-hidden>
-              👀
+          <p className="relative mb-8 mt-5 inline-block text-[0.95rem] lg:text-[1rem]">
+            <span className="ga-fact relative z-10 inline-flex items-center gap-2 rounded-full py-2 pl-3 pr-4 font-semibold">
+              <span className="ga-peek-in" aria-hidden>
+                👀
+              </span>
+              It could even pay for its own subscription
             </span>
-            It could even pay for its own subscription
+            {PEEKS.map(([at, dx, dy, size, tilt], i) => (
+              <span
+                key={i}
+                // The side eyes need room a phone doesn't have.
+                className={`ga-peek ${dy < 2 ? "hidden sm:block" : ""}`}
+                style={{ left: `calc(${at}% + ${dx}em)`, top: `${dy}em`, fontSize: `${size}em`, rotate: `${tilt}deg` }}
+                aria-hidden
+              >
+                👀
+              </span>
+            ))}
           </p>
 
           <GrokArmyBanner className="mt-12 w-full lg:mt-16" />
