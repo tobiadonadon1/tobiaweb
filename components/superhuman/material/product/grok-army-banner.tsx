@@ -17,6 +17,21 @@ import { useEffect, useState } from "react";
 
 const WORDS = ["goal", "grok army", "$$$$"];
 
+/** Eyes around the pill: left %, top % (of the pill), size in em, tilt. */
+const PEEKS: [number, number, number, number][] = [
+  [-13, -45, 1.25, -12],
+  [-19, 38, 1.1, 8],
+  [-8, 112, 1, -6],
+  [8, -100, 1, 6],
+  [101, -50, 1.25, 12],
+  [108, 40, 1.05, -8],
+  [96, 112, 1, 4],
+  [86, -100, 1, -6],
+  [22, 124, 0.95, -10],
+  [47, 130, 1.1, 6],
+  [72, 124, 1, -4],
+];
+
 export function GrokArmyBanner({ className }: { className?: string }) {
   const [word, setWord] = useState(0);
 
@@ -48,6 +63,24 @@ export function GrokArmyBanner({ className }: { className?: string }) {
             data-on={i === word || undefined}
           >
             {w}
+          </span>
+        ))}
+      </div>
+
+      {/* The pill: what it could do for its own bill, honestly hedged, with
+          eyes peeking at it from every side. */}
+      <div className="absolute left-1/2 top-[80%] -translate-x-1/2 -translate-y-1/2 text-[3.4cqw] sm:top-[80%] sm:text-[1.45cqw]">
+        <span className="ga-pill relative z-10 inline-block whitespace-nowrap rounded-full px-[1.1em] py-[0.6em] font-semibold">
+          It could even pay for its own subscription
+        </span>
+        {PEEKS.map(([x, y, s, r], i) => (
+          <span
+            key={i}
+            className="ga-peek"
+            style={{ left: `${x}%`, top: `${y}%`, fontSize: `${s}em`, rotate: `${r}deg` }}
+            aria-hidden
+          >
+            👀
           </span>
         ))}
       </div>

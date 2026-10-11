@@ -1600,7 +1600,68 @@ body[data-footer-open] .back-link {
   color: var(--ga-ink);
 }
 .ga-fill {
+  background: var(--ga-ink);
   transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* Goal reached: the bar turns blue to violet, sparks fly off its end, the
+   bots hop once. */
+.ga-formation[data-reached] .ga-fill {
+  background: linear-gradient(90deg, #3f7bf3, #8152ee);
+}
+.ga-reached-label { color: #a990ff; }
+.ga-sparks i {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  opacity: 0;
+}
+.ga-sparks i:nth-child(1) { --dx: -10px; --dy: -34px; }
+.ga-sparks i:nth-child(2) { --dx: 14px; --dy: -30px; }
+.ga-sparks i:nth-child(3) { --dx: 26px; --dy: -12px; }
+.ga-sparks i:nth-child(4) { --dx: 22px; --dy: 16px; }
+.ga-sparks i:nth-child(5) { --dx: -4px; --dy: 28px; }
+.ga-sparks i:nth-child(6) { --dx: -28px; --dy: 18px; }
+.ga-sparks i:nth-child(7) { --dx: -34px; --dy: -14px; }
+.ga-sparks i:nth-child(8) { --dx: 4px; --dy: -44px; }
+@keyframes ga-spark {
+  0% { opacity: 1; translate: 0 0; scale: 1; }
+  100% { opacity: 0; translate: var(--dx) var(--dy); scale: 0.4; }
+}
+@keyframes ga-cheer {
+  0%, 100% { translate: 0 0; }
+  40% { translate: 0 -16px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ga-formation[data-live][data-reached] .ga-sparks i { animation: ga-spark 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  .ga-formation[data-live][data-reached] .ga-place .ga-bot { animation: ga-cheer 620ms ease-out both; }
+  .ga-formation[data-live][data-reached] .ga-place:nth-child(2) .ga-bot { animation-delay: 60ms; }
+  .ga-formation[data-live][data-reached] .ga-place:nth-child(3) .ga-bot { animation-delay: 120ms; }
+  .ga-formation[data-live][data-reached] .ga-place:nth-child(4) .ga-bot { animation-delay: 180ms; }
+  .ga-formation[data-live][data-reached] .ga-place:nth-child(5) .ga-bot { animation-delay: 240ms; }
+  .ga-formation[data-live][data-reached] .ga-place:nth-child(6) .ga-bot { animation-delay: 300ms; }
+}
+
+/* The banner's pill, with eyes looking at it from every side. */
+.ga-pill {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.55);
+}
+.ga-peek {
+  position: absolute;
+  line-height: 1;
+}
+@keyframes ga-peek {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -0.12em; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ga-peek { animation: ga-peek 2.4s ease-in-out infinite; }
+  .ga-peek:nth-child(2n) { animation-delay: -0.8s; }
+  .ga-peek:nth-child(3n) { animation-delay: -1.6s; }
 }
 /* A line not reached yet is quieter, once script is running the stage. */
 .ga-step {

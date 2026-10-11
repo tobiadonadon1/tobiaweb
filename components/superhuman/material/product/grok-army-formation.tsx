@@ -46,6 +46,9 @@ const TEAM: Place[] = [
 ];
 const ALL = LINES.length;
 
+/** The celebration's sparks, in the bots' colours. */
+const SPARKS = [COLORS.blue, COLORS.violet, COLORS.teal, COLORS.orange, COLORS.red, COLORS.indigo, COLORS.blue, COLORS.violet];
+
 export function ArmyFormation() {
   // How many lines have been read, continuously: 0 before the first, ALL at
   // the end. Starts at ALL so the server's HTML is the finished army.
@@ -86,20 +89,26 @@ export function ArmyFormation() {
     };
   }, []);
 
-  // The goal examples take turns until the first line is read.
+  // The bar reaches the goal before the last line ends, and the stage
+  // celebrates once: the bar turns blue to violet, sparks fly off its end
+  // and the bots hop.
+  const progress = Math.min(1, Math.max(0, (read - 3.3) / 1.3));
+  const reached = progress >= 1;
+
+  // The goal examples keep taking turns, quickly, until the goal is reached.
   const goalSet = !live || read >= 1;
+  const rotating = live && !reached;
   useEffect(() => {
-    if (goalSet || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = window.setInterval(() => setGoal((g) => (g + 1) % GOALS.length), 1800);
+    if (!rotating || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = window.setInterval(() => setGoal((g) => (g + 1) % GOALS.length), 1000);
     return () => window.clearInterval(t);
-  }, [goalSet]);
+  }, [rotating]);
 
   const designing = read >= 1;
   const asking = read >= 3.3;
-  const progress = Math.min(1, Math.max(0, (read - 3.6) / 1.4)) * 0.7;
 
   return (
-    <div className="ga-formation grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16" data-live={live || undefined}>
+    <div className="ga-formation grid grid-cols-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16" data-live={live || undefined} data-reached={reached || undefined}>
       {/* The stage. Pinned; decorative, because the lines beside it say
           everything it shows. */}
       <div className="ga-stage sticky top-0 z-10 -mx-5 flex h-[56svh] min-h-[25rem] flex-col justify-end px-5 pb-5 pt-16 sm:-mx-8 sm:px-8 lg:mx-0 lg:h-svh lg:max-h-[56rem] lg:justify-center lg:px-0 lg:pb-0 lg:pt-0" aria-hidden>
@@ -141,13 +150,22 @@ export function ArmyFormation() {
           <div className="mt-3 lg:mt-6">
             <div className="flex items-baseline justify-between text-[0.8rem] font-medium lg:text-[0.9rem]">
               <span className="text-[var(--ga-ink)]">Progress</span>
-              <span className="text-[var(--ga-soft)]">Your goal</span>
+              <span className={reached ? "ga-reached-label font-semibold" : "text-[var(--ga-soft)]"}>
+                {reached ? "Goal reached" : "Your goal"}
+              </span>
             </div>
-            <div className="relative mt-2 h-2 overflow-hidden rounded-full bg-[var(--ga-track)]">
-              <div
-                className="ga-fill absolute inset-y-0 left-0 w-full origin-left rounded-full bg-[var(--ga-ink)]"
-                style={{ transform: `scaleX(${progress})` }}
-              />
+            <div className="relative mt-2">
+              <div className="relative h-2 overflow-hidden rounded-full bg-[var(--ga-track)]">
+                <div
+                  className="ga-fill absolute inset-y-0 left-0 w-full origin-left rounded-full"
+                  style={{ transform: `scaleX(${progress})` }}
+                />
+              </div>
+              <span className="ga-sparks absolute right-0 top-1/2" aria-hidden>
+                {SPARKS.map((c, i) => (
+                  <i key={i} style={{ background: c }} />
+                ))}
+              </span>
             </div>
           </div>
         </div>
