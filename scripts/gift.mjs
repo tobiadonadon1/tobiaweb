@@ -1,13 +1,23 @@
 /**
  * SEND A PAID PRODUCT AS A GIFT.
  *
- *   node --import ./tests/support/register.mjs scripts/gift.mjs <product-id> <email>
+ *   node scripts/gift.mjs <product-id> <email>
  *
  * Sends the same email a buyer gets, from the shop's Gmail, with a download
  * link signed for that one address (lib/shop/free.ts, giftLink). Reads
  * SHOP_FILE_KEY and GMAIL_APP_PASSWORD from .env.local. The link points at
  * the public site, so the deployed site must have the gift route.
  */
+import { registerHooks } from "node:module";
+import { resolve } from "../tests/support/hooks.mjs";
+
+// The tests' resolver for "@/" and extensionless TypeScript imports, minus its
+// mocks: this sends real mail through the real nodemailer.
+registerHooks({
+  resolve: (specifier, context, next) =>
+    specifier === "stripe" || specifier === "nodemailer" ? next(specifier, context) : resolve(specifier, context, next),
+});
+
 process.loadEnvFile(".env.local");
 
 const [id, to] = process.argv.slice(2);
