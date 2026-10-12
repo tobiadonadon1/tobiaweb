@@ -114,7 +114,7 @@ function Tile({
       className={`adp-tile relative flex flex-col overflow-hidden rounded-[2rem] ${wide ? "lg:col-span-2" : ""}`}
       style={{ background: c.bg, color: c.fg }}
     >
-      <div className="px-7 pt-8 sm:px-9 sm:pt-10">
+      <div className="px-7 pb-8 pt-8 sm:px-9 sm:pt-10">
         <p className="text-[0.95rem] font-semibold opacity-75">{c.sticker}</p>
         <h3 className="mt-2 max-w-[16ch] text-balance text-[clamp(2rem,4.4vw,2.9rem)] font-extrabold leading-[0.98] tracking-[-0.04em]">
           {title}
@@ -123,7 +123,7 @@ function Tile({
       </div>
       {/* The proof, cropped by the tile's bottom edge like a store panel. */}
       <div
-        className={`relative mt-8 flex justify-center overflow-hidden ${
+        className={`relative mt-auto flex justify-center overflow-hidden ${
           fit ? "flex-1 items-end" : wide ? "h-[19rem] sm:h-[25rem] lg:h-[29rem]" : "h-[21rem] sm:h-[25rem]"
         }`}
       >
@@ -201,8 +201,8 @@ export function AppDesignerProPage() {
               wide
             >
               <Shot
-                src={S("android.webp")}
-                alt="The same app designed for iPhone and for Android, side by side."
+                src={S("android-v2.webp")}
+                alt="A savings app designed with App Designer Pro, on iPhone and on Android."
                 w={1600}
                 h={900}
                 className="h-fit w-[175%] max-w-none shrink-0 sm:w-full sm:max-w-[56rem] sm:px-10"
@@ -212,9 +212,9 @@ export function AppDesignerProPage() {
             <Tile k="motion" title="Screens that move." text="The app doing its job, recorded to video. Ready to post the day you launch.">
               <div className="adp-phone h-fit w-[72%] max-w-[17rem]">
                 <LoopVideo
-                  src={S("motion.mp4")}
-                  poster={S("motion.webp")}
-                  label="A living screen of an app designed with App Designer Pro, looping."
+                  src={S("motion-v2.mp4")}
+                  poster={S("motion-v2.webp")}
+                  label="A focus timer designed with App Designer Pro: put the phone down and the gardener keeps watering."
                   className="!aspect-[402/874] rounded-[2.4rem]"
                 />
               </div>
@@ -235,7 +235,7 @@ export function AppDesignerProPage() {
                   ))}
                 </ul>
                 <p className="mt-6 rounded-[1.4rem] bg-white/70 px-5 py-4 text-[1.3rem] font-extrabold leading-[1.2] tracking-[-0.02em] text-[#2A0716] sm:text-[1.5rem]">
-                  Good till 10.20. Four in at 6.40.
+                  <span className="text-[#FF5A36]">€49</span> is three takeaways.
                 </p>
               </div>
             </Tile>
@@ -246,8 +246,8 @@ export function AppDesignerProPage() {
               text="Onboarding and a paywall that convert, inside the App Store and Google Play rules. No fake countdowns, no hidden prices."
             >
               <Shot
-                src={S("paywall.webp")}
-                alt="A paywall designed with App Designer Pro."
+                src={S("paywall-v2.webp")}
+                alt="A savings app paywall designed with App Designer Pro: €29.99 a year, free for 7 days."
                 w={804}
                 h={1748}
                 className="h-fit w-[72%] max-w-[17rem] drop-shadow-[0_24px_40px_rgba(42,27,0,0.25)]"
@@ -255,33 +255,35 @@ export function AppDesignerProPage() {
             </Tile>
 
             <Tile
-              k="store"
-              title="Ready for both stores."
-              text="App Store and Google Play screenshots at the exact sizes, the Play feature graphic, and both app icons."
+              k="taste"
+              title="Taste, turned up."
+              text="Bolder colour, characters with a personality, and a critic that won't pass anything that's merely tidy."
             >
               <Shot
-                src={S("store.webp")}
-                alt="A set of App Store and Google Play screenshots designed with App Designer Pro."
+                src={S("taste-v3.webp")}
+                alt="A focus timer and a weekend trip planner, both designed with App Designer Pro."
                 w={1600}
-                h={1000}
-                className="h-fit w-full px-6 sm:px-9"
+                h={960}
+                className="h-fit w-[125%] max-w-none shrink-0 self-end"
               />
             </Tile>
 
             <Tile
-              k="taste"
-              title="Taste, turned up."
-              text="Bolder colour, characters with a personality, and a critic that won't pass anything that's merely tidy."
+              k="store"
+              title="Ready for both stores."
+              text="App Store and Google Play screenshots at the exact sizes, the Play feature graphic, and both app icons."
               wide
             >
               <Shot
-                src={S("taste.webp")}
-                alt="Screens from apps designed with App Designer Pro."
+                src={S("store-v2.webp")}
+                alt="Five App Store screenshots designed with App Designer Pro."
                 w={1600}
-                h={900}
-                className="h-fit w-[175%] max-w-none shrink-0 sm:w-full sm:max-w-[56rem] sm:px-10"
+                h={706}
+                className="h-fit w-[150%] max-w-none shrink-0 px-4 sm:w-full sm:px-8"
               />
             </Tile>
+
+
           </ul>
         </div>
       </section>
