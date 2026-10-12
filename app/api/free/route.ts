@@ -85,6 +85,9 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ ok: true, download }), { headers });
   }
 
+  // Free with an account only: nothing is emailed, the visitor signs in first.
+  if (product.accountOnly) return Response.json({ ok: false, error: "sign-in" }, { status: 401 });
+
   const email = typeof body.email === "string" ? body.email.trim().slice(0, 254) : "";
   if (!EMAIL.test(email)) return Response.json({ ok: false, error: "bad-email" }, { status: 400 });
 

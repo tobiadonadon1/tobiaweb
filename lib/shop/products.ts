@@ -98,6 +98,12 @@ export type Product = {
    * `priceLabel` stays as the record of what it used to cost; pages say Free.
    */
   free?: boolean;
+  /**
+   * FREE WITH AN ACCOUNT, NOT BY EMAIL. Nothing is sent: a visitor signs in
+   * (or creates an account) once and the file downloads, and their address
+   * is kept with the account. /api/free refuses to email it.
+   */
+  accountOnly?: boolean;
 };
 
 const SYMBOL = { eur: "€", usd: "$" } as const;
@@ -555,6 +561,7 @@ export const COPYCAT_DETECTIVE: Product = {
     attach: false,
   },
   free: true,
+  accountOnly: true,
   stripeProductId: "none",
   share: {
     description:

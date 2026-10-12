@@ -500,7 +500,7 @@ test("free: App Launcher opens a new row on the rack, sent as a link, its comman
   assert.equal((await download(new Request(swapped))).status, 303, "an App Launcher link is not a Web Designer link");
 });
 
-test("free: Copycat Detective sits beside App Launcher, sent as a link, its command set as code", async () => {
+test("free: Copycat Detective sits beside App Launcher, free with an account, never emailed", async () => {
   const { COPYCAT_DETECTIVE } = await import("../lib/shop/products.ts");
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
   assert.equal(COPYCAT_DETECTIVE.href, entryHref("skills", "copycat-detective"));
@@ -513,13 +513,15 @@ test("free: Copycat Detective sits beside App Launcher, sent as a link, its comm
   const words = [COPYCAT_DETECTIVE.description, COPYCAT_DETECTIVE.share.description, ...COPYCAT_DETECTIVE.email.after].join(" ");
   assert.ok(!/\b(thie|stole|steal|expos)/i.test(words), "facts, not verdicts");
 
+  // Free with an account: an address typed into the form gets nothing emailed.
+  assert.equal(COPYCAT_DETECTIVE.accountOnly, true);
   const res = await ask({ product: "copycat-detective", email: "receipts@example.com" }, "203.0.113.73");
-  assert.equal(res.status, 200);
-  const m = mail()[0].message;
-  assert.equal(m.subject, "Your copy of Copycat Detective");
-  assert.equal(m.attachments.length, 0);
-  assert.ok(m.html.includes(">/copycat-detective<"), "the command is set as code");
-  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  assert.equal(res.status, 401);
+  assert.equal((await res.json()).error, "sign-in");
+  assert.equal(mail().length, 0, "nothing is sent");
+  // A signed-in member's link (what /api/free hands them) serves the exact file.
+  const { freeLink } = await import("../lib/shop/free.ts");
+  const link = freeLink("http://localhost:3000", COPYCAT_DETECTIVE, "receipts@example.com");
   const dl = await download(new Request(link));
   assert.match(dl.headers.get("content-disposition"), /filename="copycat-detective.zip"/);
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), COPYCAT_ZIP);

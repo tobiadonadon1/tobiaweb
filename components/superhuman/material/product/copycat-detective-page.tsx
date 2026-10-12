@@ -8,7 +8,7 @@ import { FreeClaim } from "./free-claim";
 import { StickyBuy } from "./sticky-buy";
 
 /**
- * COPYCAT DETECTIVE, the skill, given away for an email.
+ * COPYCAT DETECTIVE, the skill, free with an account: sign in once, it downloads.
  *
  * A small page for a small tool, in the receipt's own clothes: its paper, its
  * Geist and Geist Mono, its rubber-stamp red. The receipt at the top is a real
@@ -199,7 +199,7 @@ export function CopycatDetectivePage() {
         closeId={CLOSE_ID}
         href="#claim"
         label="Get it free"
-        note="Free, sent by email"
+        note="Free with an account"
       />
     </main>
   );

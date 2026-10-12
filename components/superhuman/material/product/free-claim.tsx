@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Check, Download, LoaderCircle } from "lucide-react";
-import { SHOP_EMAIL } from "@/lib/shop/products";
+import { SHOP_EMAIL, productById } from "@/lib/shop/products";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { startDownload, useMember } from "@/components/account/use-member";
 
@@ -245,6 +245,27 @@ export function FreeClaim({
           {state === "failed"
             ? `That didn't work. Try again, or write to ${SHOP_EMAIL}.`
             : <>Downloads now. Signed in as <span className={t.ink}>{member.email}</span>.</>}
+        </p>
+      </div>
+    );
+  }
+
+  // Free with an account (Copycat Detective): no email form. The button goes
+  // to sign in or create an account, which comes straight back here.
+  if (productById(productId)?.accountOnly) {
+    const back = `${ACCOUNT_HREF}?mode=signup&next=${encodeURIComponent(`${pathname ?? "/projects/construct"}#claim`)}`;
+    return (
+      <div ref={wrap} className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
+        <Link
+          href={back}
+          aria-busy={member === undefined}
+          className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring}`}
+        >
+          {reveal ?? "Get it free"}
+          <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+        <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
+          Free with an account. Create one once (or {signIn(t.ink)}), then it downloads.
         </p>
       </div>
     );
