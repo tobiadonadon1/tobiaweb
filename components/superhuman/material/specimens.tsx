@@ -869,6 +869,36 @@ function AppDesignerPro() {
   );
 }
 
+/**
+ * COPYCAT DETECTIVE — two phones cut from the same paper, and a glass.
+ *
+ * The left card is the original: ultramarine, a saffron disc on its screen.
+ * The right one is the same thing again, a step lower. An ink magnifying
+ * glass sits over it and the saffron disc shows through the lens, bigger:
+ * the detail being compared. A vermilion strip across the copy is the
+ * receipt's stamp. Two identical cards is the idea; the glass is the skill.
+ */
+function CopycatDetective() {
+  return (
+    <>
+      <Cut d={CARD} x={62} y={44} s={0.54} sy={1.56} fill={SHADE} rotate={-6} />
+      <Cut d={CARD} x={54} y={36} s={0.54} sy={1.56} fill={ULTRAMARINE} rotate={-6} />
+      <Cut d={CARD} x={66} y={58} s={0.42} sy={1.24} fill="#faf8f2" opacity={0.94} rotate={-6} />
+      <Cut d={DISC} x={80} y={84} s={0.4} fill={SAFFRON} rotate={-6} />
+      <Cut d={CARD} x={176} y={66} s={0.54} sy={1.56} fill={SHADE} rotate={4} />
+      <Cut d={CARD} x={168} y={58} s={0.54} sy={1.56} fill={ULTRAMARINE} rotate={4} />
+      <Cut d={CARD} x={180} y={80} s={0.42} sy={1.24} fill="#faf8f2" opacity={0.94} rotate={4} />
+      <Cut d={CARD} x={150} y={246} s={0.62} sy={0.22} fill={VERMILION} rotate={-7} />
+      <Cut d={CARD} x={280} y={172} s={0.15} sy={0.74} fill={SHADE} rotate={-42} />
+      <Cut d={CARD} x={274} y={166} s={0.15} sy={0.74} fill={INK} rotate={-42} />
+      <Cut d={DISC} x={196} y={78} s={0.86} fill={SHADE} />
+      <Cut d={DISC} x={188} y={70} s={0.86} fill={INK} />
+      <Cut d={DISC} x={201} y={83} s={0.67} fill="#dfe5fb" />
+      <Cut d={DISC} x={218} y={100} s={0.42} fill={SAFFRON} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -889,6 +919,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "app-designer": AppDesigner,
   "web-designer": WebDesigner,
   "app-launcher": AppLauncher,
+  "copycat-detective": CopycatDetective,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

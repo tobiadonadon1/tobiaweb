@@ -282,4 +282,22 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "app-launcher",
   },
+  /* ---------------------------------------------------------------- *
+   * 08
+   *
+   * Paste a link, get the receipt. Given away for an email like the
+   * others; it sits beside App Launcher on the third row.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "copycat-detective",
+    title: "Copycat Detective",
+    kind: "skill",
+    summary: "Finds who posted it first, checks for credit, and makes the receipt.",
+    minutes: 2,
+    status: "ready",
+    when: "Someone posted your work, or work you love, and didn't say where it came from.",
+    level: "Anyone",
+    body: [],
+    product: "copycat-detective",
+  },
 ];

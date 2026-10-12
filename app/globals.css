@@ -1848,3 +1848,44 @@ html[data-adp-intro="done"] .adp-sticker {
 @keyframes adp-curtain-fade {
   to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
+
+/* ------------------------------------------------------------------ *
+ * COPYCAT DETECTIVE (copycat-detective-page.tsx). The refusals drawn as
+ * the receipt's rubber stamps, in paper on black: same mono, same border,
+ * same speckled ink (an SVG noise mask). Where the browser can tie an
+ * animation to scrolling, each stamp lands as it comes into view; anywhere
+ * else, and with reduced motion, it is simply there.
+ * ------------------------------------------------------------------ */
+.cd-stamp {
+  display: inline-block;
+  font-family: var(--cd-mono), ui-monospace, monospace;
+  font-weight: 800;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f3f0e8;
+  padding: 0.62em 0.85em 0.56em;
+  border: 4px solid currentColor;
+  border-radius: 10px;
+  transform: rotate(var(--r, -3deg));
+  transform-origin: left center;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 .6 1 1 1 1 1'/></feComponentTransfer></filter><rect width='300' height='120' fill='white' filter='url(%23n)'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='7'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 .6 1 1 1 1 1'/></feComponentTransfer></filter><rect width='300' height='120' fill='white' filter='url(%23n)'/></svg>");
+  -webkit-mask-size: 300px 120px;
+  mask-size: 300px 120px;
+}
+@keyframes cd-thump {
+  from { opacity: 0; transform: rotate(var(--r, -3deg)) scale(1.4); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: rotate(var(--r, -3deg)) scale(1); }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cd-stamp {
+      animation: cd-thump both ease-out;
+      animation-timeline: view();
+      animation-range: entry 20% cover 35%;
+    }
+  }
+}

@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -530,6 +530,71 @@ export const APP_LAUNCHER: Product = {
 };
 
 /**
+ * COPYCAT DETECTIVE, a free skill: paste a link, get the receipt.
+ *
+ * Built after Tobia's "250 likes and I'll build a tool that exposes every
+ * copycat" post. Honesty rules for every word about it: it shows facts (who
+ * posted first, credit, what matches) and never calls anyone a copycat; it
+ * refuses receipts for things that are only similar, credited, or too close
+ * in time. It never posts for you.
+ * The zip: sealed with `npm run seal -- ~/Desktop/copycat-detective.zip`.
+ */
+export const COPYCAT_DETECTIVE: Product = {
+  id: "copycat-detective",
+  name: "Copycat Detective",
+  description:
+    "A free Claude Code skill. Paste a link: it finds the original, proves who posted first, checks for credit, compares the two, and draws a side-by-side receipt with a calm post you publish with one tap.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/copycat-detective",
+  file: {
+    sealed: "copycat-detective.zip.enc",
+    filename: "copycat-detective.zip",
+    // The skill ships scripts (.mjs), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Copycat Detective is a free skill for Claude Code. Paste a link from X, the App Store, GitHub or any site: it finds the original, proves who posted first from the post's own ID, checks the post and its replies for credit, compares the two, and draws one side-by-side receipt with a calm post you publish with one tap. No receipt for things that are only similar.",
+    kicker: "Skill · for Claude Code",
+    line: "Paste a link. Get the receipt.",
+    proof: "Who posted first, proven from the post itself",
+  },
+  contents: [
+    ["skill/SKILL.md", "how Claude checks a case, from the link to the receipt and the post"],
+    ["references/judging.md", "what counts as a match, what never does, and when to refuse"],
+    ["references/posting.md", "how to write the post: facts, not verdicts"],
+    ["scripts/check.mjs", "reads the links, finds the original, dates, credit, frames, colours, words"],
+    ["scripts/receipt.mjs", "draws the side-by-side receipt, sized for X"],
+    ["scripts/post.mjs", "counts like X, flags loaded words, makes the tap-to-post link"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs Copycat Detective in about a minute.",
+  ],
+  email: {
+    preheader: "Your download is inside. Unzip it, open it in Claude Code, type hi, then paste a link.",
+    after: [
+      "From then on, type /copycat-detective in any Claude Code session and paste a link, or just ask \"is this a copy?\" with the link.",
+      "It finds the original, proves who posted first from the post's own ID, checks for credit, compares the two, and draws the receipt. Then it writes a calm post you can publish with one tap. It never posts for you.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code, Node.js 18 or newer, and Google Chrome or Microsoft Edge. If anything is missing, Claude will tell you.",
+    next: [
+      ["Right after install", "Paste the link you want checked: the suspected copy, or both."],
+      ["Every case", "About a minute to the facts, then the receipt and a post you can publish with one tap."],
+      ["Only similar?", "It says so, and makes no receipt. Credited remakes and same-day coincidences get none either."],
+    ],
+  },
+};
+
+/**
  * GROK ARMY, a skill for Claude Code that builds a team of Grok Bots.
  *
  * Stripe: prod_VKL1qwlByvTm4z (Launchr's old product, renamed "GrokBot Army -
@@ -666,6 +731,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "app-launcher": APP_LAUNCHER,
   "grok-army": GROK_ARMY,
   "app-designer-pro": APP_DESIGNER_PRO,
+  "copycat-detective": COPYCAT_DETECTIVE,
 };
 
 export function productById(id: unknown): Product | undefined {

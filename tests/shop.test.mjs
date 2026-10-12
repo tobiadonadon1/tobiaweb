@@ -50,6 +50,8 @@ const GROK_ARMY_ZIP = Buffer.from("PK\u0003\u0004 the grok bot army skill " + "g
 writeFileSync(path.join(cwd, "private", "grok-army.zip.enc"), seal(GROK_ARMY_ZIP, parseKey(fileKey)));
 const PRO_ZIP = Buffer.from("PK\u0003\u0004 the iphone and android design skill " + "p".repeat(3600));
 writeFileSync(path.join(cwd, "private", "app-designer-pro.zip.enc"), seal(PRO_ZIP, parseKey(fileKey)));
+const COPYCAT_ZIP = Buffer.from("PK\u0003\u0004 the copycat detective skill " + "c".repeat(3700));
+writeFileSync(path.join(cwd, "private", "copycat-detective.zip.enc"), seal(COPYCAT_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -496,6 +498,35 @@ test("free: App Launcher opens a new row on the rack, sent as a link, its comman
   const swapped = new URL(link);
   swapped.searchParams.set("product", "web-designer");
   assert.equal((await download(new Request(swapped))).status, 303, "an App Launcher link is not a Web Designer link");
+});
+
+test("free: Copycat Detective sits beside App Launcher, sent as a link, its command set as code", async () => {
+  const { COPYCAT_DETECTIVE } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(COPYCAT_DETECTIVE.href, entryHref("skills", "copycat-detective"));
+  const skills = FOLDER_BY_ID.skills.entries;
+  assert.equal(skills.find((e) => e.slug === "copycat-detective")?.product, "copycat-detective");
+  assert.equal(skills.findIndex((e) => e.slug === "copycat-detective"), skills.findIndex((e) => e.slug === "app-launcher") + 1);
+  assert.equal(COPYCAT_DETECTIVE.free, true);
+  assert.equal(COPYCAT_DETECTIVE.file.attach, false);
+  // Its own words never call anyone a copycat beyond its name, and never promise a verdict.
+  const words = [COPYCAT_DETECTIVE.description, COPYCAT_DETECTIVE.share.description, ...COPYCAT_DETECTIVE.email.after].join(" ");
+  assert.ok(!/\b(thie|stole|steal|expos)/i.test(words), "facts, not verdicts");
+
+  const res = await ask({ product: "copycat-detective", email: "receipts@example.com" }, "203.0.113.73");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Copycat Detective");
+  assert.equal(m.attachments.length, 0);
+  assert.ok(m.html.includes(">/copycat-detective<"), "the command is set as code");
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.match(dl.headers.get("content-disposition"), /filename="copycat-detective.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), COPYCAT_ZIP);
+
+  const swapped = new URL(link);
+  swapped.searchParams.set("product", "app-launcher");
+  assert.equal((await download(new Request(swapped))).status, 303, "a Copycat Detective link is not an App Launcher link");
 });
 
 test("email: \"costs to run\" in prose is not set as code", async () => {

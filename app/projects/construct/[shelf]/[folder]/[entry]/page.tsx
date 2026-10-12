@@ -11,6 +11,7 @@ import { WebDesignerPage } from "@/components/superhuman/material/product/web-de
 import { AppLauncherPage } from "@/components/superhuman/material/product/app-launcher-page";
 import { GrokArmyPage } from "@/components/superhuman/material/product/grok-army-page";
 import { AppDesignerProPage } from "@/components/superhuman/material/product/app-designer-pro-page";
+import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -154,4 +155,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "app-launcher": AppLauncherPage,
   "grok-army": GrokArmyPage,
   "app-designer-pro": AppDesignerProPage,
+  "copycat-detective": CopycatDetectivePage,
 };
