@@ -135,16 +135,9 @@ function Tile({
 
 /** A phone screen as the skill renders it, cropped by the tile's bottom edge. */
 function Shot({ src, alt, w, h, className = "" }: { src: string; alt: string; w: number; h: number; className?: string }) {
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={w}
-      height={h}
-      sizes="(min-width: 1024px) 520px, 90vw"
-      className={`block h-auto ${className}`}
-    />
-  );
+  // Rendered at two to three times the size they show, so they are served
+  // as they are: resizing them again is what made the first versions soft.
+  return <Image src={src} alt={alt} width={w} height={h} unoptimized className={`block h-auto ${className}`} />;
 }
 
 export function AppDesignerProPage() {
@@ -201,19 +194,19 @@ export function AppDesignerProPage() {
               wide
             >
               <Shot
-                src={S("android-v2.webp")}
+                src={S("hq2-android.webp")}
                 alt="A savings app designed with App Designer Pro, on iPhone and on Android."
-                w={1600}
-                h={900}
-                className="h-fit w-[175%] max-w-none shrink-0 sm:w-full sm:max-w-[56rem] sm:px-10"
+                w={2200}
+                h={1440}
+                className="h-fit w-[150%] max-w-none shrink-0 sm:w-full sm:max-w-[60rem]"
               />
             </Tile>
 
             <Tile k="motion" title="Screens that move." text="The app doing its job, recorded to video. Ready to post the day you launch.">
               <div className="adp-phone h-fit w-[72%] max-w-[17rem]">
                 <LoopVideo
-                  src={S("motion-v2.mp4")}
-                  poster={S("motion-v2.webp")}
+                  src={S("hq-motion.mp4")}
+                  poster={S("hq-motion.webp")}
                   label="A focus timer designed with App Designer Pro: put the phone down and the gardener keeps watering."
                   className="!aspect-[402/874] rounded-[2.4rem]"
                 />
@@ -246,11 +239,11 @@ export function AppDesignerProPage() {
               text="Onboarding and a paywall that convert, inside the App Store and Google Play rules. No fake countdowns, no hidden prices."
             >
               <Shot
-                src={S("paywall-v2.webp")}
+                src={S("hq2-paywall.webp")}
                 alt="A savings app paywall designed with App Designer Pro: €29.99 a year, free for 7 days."
-                w={804}
-                h={1748}
-                className="h-fit w-[72%] max-w-[17rem] drop-shadow-[0_24px_40px_rgba(42,27,0,0.25)]"
+                w={1260}
+                h={2370}
+                className="h-fit w-[94%] max-w-[22rem]"
               />
             </Tile>
 
@@ -260,11 +253,11 @@ export function AppDesignerProPage() {
               text="Bolder colour, characters with a personality, and a critic that won't pass anything that's merely tidy."
             >
               <Shot
-                src={S("taste-v3.webp")}
-                alt="A focus timer and a weekend trip planner, both designed with App Designer Pro."
-                w={1600}
-                h={960}
-                className="h-fit w-[125%] max-w-none shrink-0 self-end"
+                src={S("hq2-taste.webp")}
+                alt="A focus timer and Orbit, an app for watching your coding agents, both designed with App Designer Pro."
+                w={2040}
+                h={1860}
+                className="h-fit w-full max-w-[34rem] px-2"
               />
             </Tile>
 
@@ -275,10 +268,10 @@ export function AppDesignerProPage() {
               wide
             >
               <Shot
-                src={S("store-v2.webp")}
-                alt="Five App Store screenshots designed with App Designer Pro."
-                w={1600}
-                h={706}
+                src={S("hq-store.webp")}
+                alt="Four App Store screenshots for Orbit, designed with App Designer Pro."
+                w={2750}
+                h={1600}
                 className="h-fit w-[150%] max-w-none shrink-0 px-4 sm:w-full sm:px-8"
               />
             </Tile>
