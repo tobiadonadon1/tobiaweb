@@ -15,7 +15,12 @@ const nextConfig: NextConfig = {
     "/api/stripe/webhook": ["./private/**/*"],
     // A free product that is a PDF goes out attached, read from here.
     "/api/free": ["./private/**/*"],
+    // Copycat Detective reads video frames with the ffmpeg binary that
+    // ffmpeg-static downloads at install; it's spawned by path, so list it.
+    "/api/copycat/check": ["./node_modules/ffmpeg-static/ffmpeg"],
   },
+  // Required at runtime from node_modules (it resolves its binary's path).
+  serverExternalPackages: ["ffmpeg-static"],
 
   // Sole was renamed to Mynd. Keep the old path alive permanently so any
   // existing link or indexed result lands on the new page instead of a 404.

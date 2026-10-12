@@ -1875,6 +1875,11 @@ html[data-adp-intro="done"] .adp-sticker {
   -webkit-mask-size: 300px 120px;
   mask-size: 300px 120px;
 }
+/* On paper, in the receipt's own inks; the verdict stamp doesn't animate with scroll. */
+.cd-stamp--red { color: #d2321f; }
+.cd-stamp--green { color: #13824a; }
+.cd-stamp--ink { color: #3d3a33; }
+.cd-stamp--big { font-size: clamp(1.7rem, 4.4vw, 2.6rem); border-width: 5px; }
 @keyframes cd-thump {
   from { opacity: 0; transform: rotate(var(--r, -3deg)) scale(1.4); }
   60% { opacity: 1; }
@@ -1882,7 +1887,7 @@ html[data-adp-intro="done"] .adp-sticker {
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .cd-stamp {
+    .cd-stamp:not(.cd-stamp--still) {
       animation: cd-thump both ease-out;
       animation-timeline: view();
       animation-range: entry 20% cover 35%;
