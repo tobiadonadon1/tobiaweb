@@ -48,6 +48,8 @@ const APP_LAUNCHER_ZIP = Buffer.from("PK\u0003\u0004 the app launch skill " + "l
 writeFileSync(path.join(cwd, "private", "app-launcher.zip.enc"), seal(APP_LAUNCHER_ZIP, parseKey(fileKey)));
 const GROK_ARMY_ZIP = Buffer.from("PK\u0003\u0004 the grok bot army skill " + "g".repeat(3400));
 writeFileSync(path.join(cwd, "private", "grok-army.zip.enc"), seal(GROK_ARMY_ZIP, parseKey(fileKey)));
+const PRO_ZIP = Buffer.from("PK\u0003\u0004 the iphone and android design skill " + "p".repeat(3600));
+writeFileSync(path.join(cwd, "private", "app-designer-pro.zip.enc"), seal(PRO_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -102,7 +104,7 @@ beforeEach(() => {
 });
 
 let n = 0;
-function purchase({ paid = true, product = "the-98c-trade", email = "buyer@example.com", name = "Ada Lovelace", status = "complete" } = {}) {
+function purchase({ paid = true, product = "the-98c-trade", email = "buyer@example.com", name = "Ada Lovelace", status = "complete", amount, paymentStatus } = {}) {
   const id = `cs_test_session${String(++n).padStart(8, "0")}`;
   const pi = `pi_${id}`;
   globalThis.__stripe.paymentIntents.set(pi, { id: pi, object: "payment_intent", metadata: {} });
@@ -110,7 +112,8 @@ function purchase({ paid = true, product = "the-98c-trade", email = "buyer@examp
     id,
     object: "checkout.session",
     status,
-    payment_status: paid ? "paid" : "unpaid",
+    payment_status: paymentStatus ?? (paid ? "paid" : "unpaid"),
+    amount_total: amount ?? productById(product)?.priceCents ?? 500,
     metadata: { product },
     customer_details: { email, name },
     payment_intent: pi,
@@ -184,7 +187,15 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Grok Army first, then the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "App Designer Pro first, then Grok Army, the 98¢ Trade, Launchr, Jev");
+  // App Designer Pro: a setup, sold at €5 on the Stripe product Tobia made.
+  const pro = productById("app-designer-pro");
+  assert.equal(pro.href, entryHref("setups", "app-designer-pro"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "app-designer-pro")?.product, "app-designer-pro");
+  assert.equal(pro.stripeProductId, "prod_VQa83vPcURQp2m");
+  assert.equal(pro.priceCents, 500);
+  assert.equal(pro.priceLabel, "€5");
+  assert.equal(pro.file.attach, false, "the skill ships scripts, so the email carries a link");
   // Grok Army: a setup, its page and its entry agree.
   const ga = productById("grok-army");
   assert.equal(ga.href, entryHref("setups", "grok-army"));
@@ -755,8 +766,26 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["the-98c-trade"].bytes, ZIP.length);
   assert.equal(body.files.launchr.bytes, LAUNCHR_ZIP.length);
   assert.equal(body.files["grok-army"].bytes, GROK_ARMY_ZIP.length);
+  assert.equal(body.files["app-designer-pro"].bytes, PRO_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));
   }
 });
+
+test("no bypass: a zero total or a no-payment-required session never gets App Designer Pro", async () => {
+  const { findPurchase } = await import("../lib/shop/stripe.ts");
+  for (const opts of [{ amount: 0 }, { paymentStatus: "no_payment_required", amount: 0 }, { paymentStatus: "no_payment_required" }]) {
+    const id = purchase({ product: "app-designer-pro", ...opts });
+    const p = await findPurchase(id);
+    assert.equal(p.paid, false, JSON.stringify(opts));
+    const dl = await download(new Request(`${ORIGIN}/api/download?session_id=${id}`));
+    assert.equal(dl.status, 303, "no file, back to the thank-you page");
+    assert.ok(!dl.headers.get("content-disposition"));
+  }
+  const ok = purchase({ product: "app-designer-pro" });
+  const dl = await download(new Request(`${ORIGIN}/api/download?session_id=${ok}`));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-disposition"), /filename="app-designer-pro.zip"/);
+});
+

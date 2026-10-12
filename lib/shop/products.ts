@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -599,6 +599,62 @@ export const GROK_ARMY: Product = {
   },
 };
 
+export const APP_DESIGNER_PRO: Product = {
+  id: "app-designer-pro",
+  name: "App Designer Pro",
+  description:
+    "A Claude Code skill that designs your app for iPhone and Android, and everything that sells it: screens that move, human copy, paywalls, store screenshots and icons. Instant download.",
+  // Stripe's default_price for prod_VQa83vPcURQp2m (price_1UPiy0B7HQhkKmiFrVTtOXTx,
+  // €5 one-time, read 2026-10-12). The checkout charges this row: keep them equal.
+  priceCents: 500,
+  currency: "eur",
+  priceLabel: money(500, "eur"),
+  href: "/projects/construct/material/setups/app-designer-pro",
+  file: {
+    sealed: "app-designer-pro.zip.enc",
+    filename: "app-designer-pro.zip",
+    // The skill ships scripts (.mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  // Stripe "Pro App Designer" (live).
+  stripeProductId: "prod_VQa83vPcURQp2m",
+  share: {
+    description:
+      "App Designer Pro is the follow-up to the free App Designer skill for Claude Code. It designs your app for iPhone and Android, records the screens that move to video, writes copy a person would say, designs onboarding and paywalls inside the store rules, and exports App Store and Google Play screenshots and both icons. €5.",
+    kicker: "Skill · for Claude Code",
+    line: "Your app on iPhone and Android, and everything that sells it.",
+    proof: "Android · motion · paywalls · store assets",
+  },
+  contents: [
+    ["app-designer-pro/SKILL.md", "the process Claude follows, from the brief to the store screenshots"],
+    ["references/", "Android, both platforms, copy, paywalls, motion, stores, directions, critique, code"],
+    ["assets/", "the device kit: iPhone and Pixel screens, hardware frames, store panels, icons"],
+    ["scripts/shoot.mjs", "renders every screen, panel and icon, and scans design and copy for slop"],
+    ["scripts/reel.mjs", "records the screens that move to MP4"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs App Designer Pro in about a minute.",
+  ],
+  email: {
+    preheader: "Your download is inside. Open it in Claude Code and type hi.",
+    after: [
+      "From then on, type /app-designer-pro in any Claude Code session, or just ask Claude to design your app. Say what it does, who it's for, and whether it ships on iPhone, Android or both.",
+      "It explores three directions, designs every screen on both platforms, writes the copy, and has a critic score each round. Ask for the paywall, the moving screens, the store screenshots or the code whenever you're ready.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need a Mac with Google Chrome, Claude Code with a paid Claude plan, and Node.js 18 or newer. The videos need ffmpeg; Claude installs it if you say yes.",
+    next: [
+      ["Right after install", "Claude offers to design your first app. Have one sentence ready: what it does, and who it's for."],
+      ["Every app", "Three directions to choose from, then every screen on iPhone and Android, scanned and scored."],
+      ["Before you launch", "Say \"now the paywall\", \"make the screens move\" or \"the store screenshots\" and it designs them in the same style."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -609,6 +665,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "web-designer": WEB_DESIGNER,
   "app-launcher": APP_LAUNCHER,
   "grok-army": GROK_ARMY,
+  "app-designer-pro": APP_DESIGNER_PRO,
 };
 
 export function productById(id: unknown): Product | undefined {

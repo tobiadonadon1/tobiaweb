@@ -1718,3 +1718,111 @@ body[data-footer-open] .back-link {
   .ga-word { transition: opacity 220ms ease-out, translate 420ms cubic-bezier(0.2, 0.8, 0.2, 1); }
   .ga-word:not([data-on]) { translate: 0 0.08em; }
 }
+
+/* ------------------------------------------------------------------
+ * APP DESIGNER PRO (app-designer-pro-page.tsx, app-designer-pro-intro.tsx).
+ * Paper and ink, and six colours that each belong to one thing Pro adds.
+ * THE OPENING: six full-screen colour layers, one every 0.9s, each word
+ * popping in on a spring; then the whole curtain lifts on the hero. Pure
+ * CSS so it plays from the first paint; the script only ends it early (any
+ * scroll, key or tap, or a second visit in the same tab). Nothing rotates
+ * in motion: the stickers' tilt is still.
+ * The springs live in custom properties: written inside a shorthand, this
+ * toolchain drops a linear() easing and every rule after it.
+ * ------------------------------------------------------------------ */
+.adp-page {
+  --adp-spring: linear(0, 0.42 9%, 0.84 21%, 1.02 33%, 1.05 41%, 1.01 55%, 0.99 70%, 1);
+  --adp-out: cubic-bezier(0.7, 0, 0.2, 1);
+}
+.adp-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  pointer-events: auto;
+  animation: adp-curtain 650ms var(--adp-out) 5.4s forwards;
+}
+.adp-intro[data-done] {
+  animation: adp-curtain 450ms var(--adp-out) forwards;
+}
+.adp-intro__layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--fg);
+  visibility: hidden;
+  animation: adp-show 1ms linear calc(var(--i) * 0.9s) forwards;
+}
+.adp-intro__word {
+  padding: 0 0.06em;
+  font-size: clamp(3.4rem, 14.5vw, 12rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.9;
+  text-align: center;
+  text-wrap: balance;
+  animation: adp-pop 560ms var(--adp-spring) calc(var(--i) * 0.9s) both;
+}
+.adp-intro__name {
+  position: absolute;
+  bottom: max(1.6rem, env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  opacity: 0.7;
+}
+@keyframes adp-show {
+  to { visibility: visible; }
+}
+@keyframes adp-pop {
+  from { opacity: 0; transform: translateY(0.14em) scale(0.8); }
+  25% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+@keyframes adp-curtain {
+  to { transform: translateY(-100%); visibility: hidden; pointer-events: none; }
+}
+/* The site nav sits outside the page's stacking context, so it cannot be
+   covered: it waits out the opening instead, and returns as the curtain lifts.
+   Fill backwards only, so the nav's own show and hide take over afterwards. */
+body:has(.adp-intro) [data-site-nav] {
+  animation: adp-nav-in 400ms ease-out 5.6s backwards;
+}
+body:has(.adp-intro[data-done]) [data-site-nav] {
+  animation: adp-nav-in 300ms ease-out backwards;
+}
+@keyframes adp-nav-in {
+  from { opacity: 0; visibility: hidden; }
+}
+/* The stickers in the hero pop in as the curtain lifts (at once on a second visit). */
+.adp-sticker {
+  transform: rotate(var(--tilt));
+  animation: adp-sticker 520ms var(--adp-spring) calc(5.75s + var(--i) * 70ms) both;
+}
+html[data-adp-intro="done"] .adp-sticker {
+  animation-delay: calc(var(--i) * 70ms);
+}
+@keyframes adp-sticker {
+  from { opacity: 0; transform: translateY(0.6rem) scale(0.7) rotate(var(--tilt)); }
+  to { opacity: 1; transform: rotate(var(--tilt)); }
+}
+.adp-strike {
+  text-decoration: line-through;
+  text-decoration-thickness: 0.09em;
+}
+.adp-phone {
+  border-radius: 2.6rem;
+  padding: 0.55rem;
+  background: #0a0a0b;
+  box-shadow: 0 0 0 2px #3b3a38, 0 30px 60px -24px rgba(0, 0, 0, 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  .adp-intro { display: none; }
+  .adp-sticker { animation: none; }
+  body:has(.adp-intro) [data-site-nav] { animation: none; }
+}

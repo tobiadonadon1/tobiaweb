@@ -15,6 +15,20 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "app-designer-pro",
+    title: "App Designer Pro",
+    kind: "setup",
+    summary:
+      "Your app designed for iPhone and Android, plus everything that sells it: screens that move, human copy, paywalls and store assets.",
+    // Minutes to install it and see the first three directions.
+    minutes: 15,
+    status: "ready",
+    when: "You're about to launch an app and want it to look like a studio designed it, on both platforms.",
+    level: "Anyone",
+    body: [],
+    product: "app-designer-pro",
+  },
+  {
     slug: "grok-army",
     title: "Grok Army",
     kind: "setup",

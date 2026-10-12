@@ -96,10 +96,15 @@ export function purchaseFromSession(session: Stripe.Checkout.Session): Purchase 
   const product = productById(session.metadata?.product);
   if (!product) return null;
 
+  // PAID MEANS MONEY ARRIVED. Not "no payment required" and not a zero
+  // total: a file is only ever delivered for a checkout that actually
+  // charged something, so no coupon or free session can stand in for the
+  // price. (A product given away today still serves the people who paid for
+  // it when it was sold.)
   const paid =
     session.status === "complete" &&
-    (session.payment_status === "paid" ||
-      session.payment_status === "no_payment_required");
+    session.payment_status === "paid" &&
+    (session.amount_total ?? 0) > 0;
 
   const pi = session.payment_intent;
 

@@ -846,6 +846,29 @@ function GrokArmy() {
   return <>{squadShapes()}</>;
 }
 
+/**
+ * APP DESIGNER PRO — two phones, cut from paper, side by side: an iPhone and
+ * an Android, the same app on both. Each holds one decision (a disc, a bar),
+ * and a pink wedge in front is the play button: the screens move now. The
+ * colours are the page's own six (product/app-designer-pro-page.tsx).
+ */
+function AppDesignerPro() {
+  return (
+    <>
+      <Cut d={CARD} x={58} y={44} s={0.6} sy={1.72} fill={SHADE} rotate={-7} />
+      <Cut d={CARD} x={50} y={36} s={0.6} sy={1.72} fill="#2F62F2" rotate={-7} />
+      <Cut d={CARD} x={62} y={58} s={0.47} sy={1.4} fill="#faf8f2" opacity={0.94} rotate={-7} />
+      <Cut d={DISC} x={74} y={82} s={0.44} fill="#FF5B2E" rotate={-7} />
+      <Cut d={CARD} x={174} y={34} s={0.6} sy={1.72} fill={SHADE} rotate={6} />
+      <Cut d={CARD} x={166} y={26} s={0.6} sy={1.72} fill="#2BC46F" rotate={6} />
+      <Cut d={CARD} x={178} y={48} s={0.47} sy={1.4} fill="#faf8f2" opacity={0.94} rotate={6} />
+      <Cut d={BAR} x={184} y={86} s={0.3} sy={1.6} fill="#FFC23A" rotate={6} />
+      <Cut d={WEDGE} x={136} y={214} s={0.62} fill={SHADE} rotate={4} />
+      <Cut d={WEDGE} x={130} y={208} s={0.62} fill="#FF86BC" rotate={4} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -857,6 +880,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   launchr: Launchr,
   "jev-crypto-analyst": JevCryptoAnalyst,
   "grok-army": GrokArmy,
+  "app-designer-pro": AppDesignerPro,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,
