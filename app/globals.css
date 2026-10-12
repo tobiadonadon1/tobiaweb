@@ -1724,9 +1724,10 @@ body[data-footer-open] .back-link {
  * Paper and ink, and six colours that each belong to one thing Pro adds.
  * THE OPENING: six full-screen colour layers, one every 0.9s, each word
  * popping in on a spring; then the whole curtain lifts on the hero. Pure
- * CSS so it plays from the first paint; the script only ends it early (any
- * scroll, key or tap, or a second visit in the same tab). Nothing rotates
- * in motion: the stickers' tilt is still.
+ * CSS so it plays from the first paint, on every visit; the script only ends
+ * it early (any scroll, key or tap) and tints the browser's own bars to the
+ * colour on screen. Nothing rotates in motion: the stickers' tilt is still.
+ * Reduced motion gets the same six words as plain cross-fades.
  * The springs live in custom properties: written inside a shorthand, this
  * toolchain drops a linear() easing and every rule after it.
  * ------------------------------------------------------------------ */
@@ -1740,7 +1741,19 @@ body[data-footer-open] .back-link {
   z-index: 2000;
   overflow: hidden;
   pointer-events: auto;
-  animation: adp-curtain 650ms var(--adp-out) 5.4s forwards;
+  /* The curtain's own ground steps through the six colours too: browsers
+     that tint their bars from a fixed element at the edge (Safari 26) read
+     this one, and it changes on the beat. */
+  background-color: #2bc46f;
+  animation: adp-curtain 650ms var(--adp-out) 5.4s forwards, adp-tint 5400ms step-end forwards;
+}
+@keyframes adp-tint {
+  0% { background-color: #2bc46f; }
+  16.667% { background-color: #2f62f2; }
+  33.333% { background-color: #ff86bc; }
+  50% { background-color: #ffc23a; }
+  66.667% { background-color: #ff5b2e; }
+  83.333%, 100% { background-color: #16171b; }
 }
 .adp-intro[data-done] {
   animation: adp-curtain 450ms var(--adp-out) forwards;
@@ -1822,7 +1835,16 @@ html[data-adp-intro="done"] .adp-sticker {
   box-shadow: 0 0 0 2px #3b3a38, 0 30px 60px -24px rgba(0, 0, 0, 0.5);
 }
 @media (prefers-reduced-motion: reduce) {
-  .adp-intro { display: none; }
+  /* The same six words, as cross-fades: nothing pops, nothing slides. */
+  .adp-intro__word { animation-name: adp-fade; animation-timing-function: ease-out; }
+  .adp-intro, .adp-intro[data-done] { animation-name: adp-curtain-fade, adp-tint; }
+  .adp-intro[data-done] { animation-name: adp-curtain-fade; }
   .adp-sticker { animation: none; }
-  body:has(.adp-intro) [data-site-nav] { animation: none; }
+}
+@keyframes adp-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes adp-curtain-fade {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
