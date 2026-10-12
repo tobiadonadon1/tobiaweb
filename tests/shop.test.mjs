@@ -789,3 +789,41 @@ test("no bypass: a zero total or a no-payment-required session never gets App De
   assert.match(dl.headers.get("content-disposition"), /filename="app-designer-pro.zip"/);
 });
 
+
+test("a gift: the link opens App Designer Pro for that address only, and a free token or a forgery never does", async () => {
+  const { APP_DESIGNER_PRO, APP_DESIGNER } = await import("../lib/shop/products.ts");
+  const { giftLink, freeToken, giftToken } = await import("../lib/shop/free.ts");
+  const { sendGift } = await import("../lib/shop/deliver.ts");
+  const to = "Friend@Example.com";
+
+  const link = giftLink(ORIGIN, APP_DESIGNER_PRO, to);
+  const ok = await download(new Request(link));
+  assert.equal(ok.status, 200);
+  assert.match(ok.headers.get("content-disposition"), /filename="app-designer-pro.zip"/);
+  assert.deepEqual(Buffer.from(await ok.arrayBuffer()), PRO_ZIP);
+
+  const q = (e, g) => `${ORIGIN}/api/download?${new URLSearchParams({ product: "app-designer-pro", e, g })}`;
+  const refused = [
+    q("someone@else.com", giftToken(APP_DESIGNER_PRO, to)),              // another address
+    q(to.toLowerCase(), freeToken(APP_DESIGNER_PRO, to)),                 // a free-product token
+    q(to.toLowerCase(), giftToken(APP_DESIGNER, to)),                     // a gift for another product
+    q(to.toLowerCase(), "x".repeat(32)),                                  // made up
+    `${ORIGIN}/api/download?${new URLSearchParams({ product: "app-designer-pro", e: to, t: giftToken(APP_DESIGNER_PRO, to) })}`, // wrong parameter
+  ];
+  for (const url of refused) {
+    const res = await download(new Request(url));
+    assert.equal(res.status, 303, url);
+    assert.ok(!res.headers.get("content-disposition"), url);
+  }
+
+  mail().length = 0;
+  await sendGift(APP_DESIGNER_PRO, to, "https://www.tobiadonadon.com");
+  const sent = mail().at(-1).message;
+  assert.equal(sent.to, to);
+  assert.equal(sent.subject, "Your copy of App Designer Pro");
+  assert.equal(sent.attachments.length, 0);
+  assert.ok(sent.text.includes("Here's App Designer Pro, on me."));
+  assert.ok(sent.text.includes(giftLink("https://www.tobiadonadon.com", APP_DESIGNER_PRO, to)));
+  assert.ok(sent.html.includes("App Designer Pro · A gift"));
+  assert.ok(!/as promised|Thanks for buying/.test(sent.text));
+});

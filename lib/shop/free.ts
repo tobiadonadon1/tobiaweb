@@ -45,3 +45,37 @@ export function verifyFree(product: Product, email: string, token: string): bool
   const got = Buffer.from(token);
   return want.length === got.length && timingSafeEqual(want, got);
 }
+
+/**
+ * A PAID PRODUCT, GIVEN AS A GIFT.
+ *
+ * When Tobia sends a paid product to someone himself (scripts/gift.mjs), the
+ * link works the same way as a free one, signed for the address, but under its
+ * own derived key and in its own parameter (`g`). A free product's token can
+ * never open a paid file, and nobody can mint a gift without SHOP_FILE_KEY, so
+ * the price still stands for everyone else.
+ */
+function giftKey(): Buffer {
+  const raw = process.env.SHOP_FILE_KEY;
+  if (!raw) throw new Error("SHOP_FILE_KEY is not set");
+  return createHmac("sha256", parseKey(raw)).update("gift-download-v1").digest();
+}
+
+export function giftToken(product: Product, email: string): string {
+  return createHmac("sha256", giftKey())
+    .update(`${product.id}:${norm(email)}`)
+    .digest("base64url")
+    .slice(0, 32);
+}
+
+export function giftLink(base: string, product: Product, email: string): string {
+  const q = new URLSearchParams({ product: product.id, e: norm(email), g: giftToken(product, email) });
+  return `${base}/api/download?${q}`;
+}
+
+export function verifyGift(product: Product, email: string, token: string): boolean {
+  if (!email || !token) return false;
+  const want = Buffer.from(giftToken(product, email));
+  const got = Buffer.from(token);
+  return want.length === got.length && timingSafeEqual(want, got);
+}

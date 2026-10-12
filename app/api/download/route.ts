@@ -1,5 +1,5 @@
 import { productFile } from "@/lib/shop/file";
-import { verifyFree } from "@/lib/shop/free";
+import { verifyFree, verifyGift } from "@/lib/shop/free";
 import { fileType, productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
 import { findPurchase, originFor } from "@/lib/shop/stripe";
 
@@ -17,6 +17,7 @@ import { findPurchase, originFor } from "@/lib/shop/stripe";
  * A buyer never sees a bare error from this route.
  *
  * GET /api/download?product=…&e=…&t=…   (something given away)
+ * GET /api/download?product=…&e=…&g=…   (a paid product Tobia gifted)
  *
  * The link in a free product's email: the address it was sent to and a
  * signature over it (lib/shop/free.ts). A bad or missing signature goes back
@@ -52,6 +53,19 @@ export async function GET(request: Request) {
     } catch (err) {
       console.error("[shop] download: could not read the free product file", err);
       return Response.redirect(`${origin}${free.href}#claim`, 303);
+    }
+  }
+
+  // A paid product Tobia gave someone: signed for their address (free.ts).
+  if (free && params.has("g")) {
+    if (!verifyGift(free, params.get("e") ?? "", params.get("g") ?? "")) {
+      return Response.redirect(`${origin}${free.href}`, 303);
+    }
+    try {
+      return serve(await productFile(free), free);
+    } catch (err) {
+      console.error("[shop] download: could not read the gifted product file", err);
+      return Response.redirect(`${origin}${free.href}`, 303);
     }
   }
 
