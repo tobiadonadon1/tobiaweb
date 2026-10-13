@@ -52,7 +52,9 @@ function reason(err: { message?: string; code?: string; status?: number } | null
   if (/otp_expired|expired|invalid.*(token|otp)|token.*invalid/.test(m)) return "bad-code";
   if (/weak_password|password should/.test(m)) return "weak-password";
   if (/rate|too many|over_.*limit|security purposes/.test(m) || err?.status === 429) return "too-many";
-  if (/user_already_exists|already registered/.test(m)) return "exists";
+  if (/user_already_exists|email_exists|already (been )?registered/.test(m)) return "exists";
+  // The code's email didn't go out (Supabase sends it through Tobia's Gmail).
+  if (/error sending|smtp/.test(m)) return "mail-down";
   return "failed";
 }
 
@@ -114,7 +116,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
         const why = reason(error);
         // Signed up but never typed the code: send a fresh one and go there.
         if (why === "unconfirmed") {
-          await sb.auth.resend({ type: "signup", email });
+          const sent = await sb.auth.resend({ type: "signup", email });
+          if (sent.error && reason(sent.error) === "mail-down") return fail("mail-down", 503);
           return reply({ ok: false, error: "unconfirmed", next: "code" });
         }
         return fail(why);
@@ -123,8 +126,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
     }
     case "forgot": {
       const { error } = await sb.auth.resetPasswordForEmail(email);
-      // Same answer whether or not the address has an account.
-      return error && reason(error) === "too-many" ? fail("too-many", 429) : reply({ ok: true, next: "reset" });
+      // Same answer whether or not the address has an account (Supabase
+      // doesn't error for an unknown one). A send that failed is said, not
+      // hidden: otherwise the visitor waits for a code that isn't coming.
+      if (!error) return reply({ ok: true, next: "reset" });
+      const why = reason(error);
+      if (why === "too-many") return fail("too-many", 429);
+      return why === "mail-down" ? fail("mail-down", 503) : reply({ ok: true, next: "reset" });
     }
     case "reset": {
       if (password.length < MIN_PASSWORD) return fail("weak-password");

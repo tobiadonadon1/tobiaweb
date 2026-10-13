@@ -27,6 +27,7 @@ const ERRORS: Record<string, string> = {
   "bad-code": "That code didn't work. Check it, or send a new one.",
   "too-many": "Too many tries. Wait a few minutes, then try again.",
   unconfirmed: "This account isn't confirmed yet. We just sent you a code.",
+  "mail-down": "We couldn't send your code just now. Our email is down for a moment: try again later.",
 };
 const FALLBACK = "Something went wrong on our side. Try again in a minute.";
 
