@@ -3,10 +3,10 @@ import { accountsConfigured, adminClient, authClient, currentMember, sessionCook
 /**
  * POST /api/account/<action>   (and GET /api/account/me)
  *
- *   signup  { email, password }        creates the account; Supabase emails a code
- *   verify  { email, code }            confirms it and signs in
+ *   signup  { email, password }        creates the account and signs in at once
+ *   verify  { email, code }            confirms an older account with its code
  *   resend  { email }                  a fresh code
- *   signin  { email, password }        signs in (unconfirmed → a code goes out)
+ *   signin  { email, password }        signs in
  *   forgot  { email }                  emails a reset code
  *   reset   { email, code, password }  sets the new password and signs in
  *   signout                            clears the session
@@ -15,6 +15,14 @@ import { accountsConfigured, adminClient, authClient, currentMember, sessionCook
  * Every answer is { ok, error? } with one of a few plain error codes the page
  * turns into a sentence. The session lives in httpOnly cookies set here
  * (lib/account.ts); the browser never holds a token it could leak.
+ *
+ * NO CODE TO SIGN UP (Tobia's call, 2026-10-13). Accounts used to wait for a
+ * six-digit code sent from Tobia's Gmail; when Google locked that login (SMTP
+ * 534-5.7.9) every sign-up failed. Now the account is made already confirmed
+ * and the visitor is signed in: nothing on the way in waits for an email.
+ * The cost, accepted: an address isn't proven to be theirs. Email is still
+ * how a password is reset. Accounts made before and never confirmed are
+ * finished by signing up again or by signing in with their password.
  *
  * LIMITS. Supabase sees every request coming from this server, so its per-IP
  * limits can't tell visitors apart. These in-memory ones can, and stop a
@@ -58,6 +66,21 @@ function reason(err: { message?: string; code?: string; status?: number } | null
   return "failed";
 }
 
+/** The auth user behind an address, through members (one row per account, made by trigger). */
+async function userByEmail(email: string) {
+  const admin = adminClient();
+  const { data: row } = await admin.from("members").select("id").eq("email", email).maybeSingle();
+  if (!row?.id) return null;
+  const { data } = await admin.auth.admin.getUserById(row.id);
+  return data.user ?? null;
+}
+
+/** Confirm an account (and set its password) without a code. Returns the error, if any. */
+async function confirm(id: string, password?: string) {
+  const { error } = await adminClient().auth.admin.updateUserById(id, password ? { password, email_confirm: true } : { email_confirm: true });
+  return error;
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ action: string }> }) {
   if ((await params).action !== "me") return fail("not-found", 404);
   const { member, cookies } = await currentMember(request);
@@ -93,12 +116,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
   switch (action) {
     case "signup": {
       if (password.length < MIN_PASSWORD) return fail("weak-password");
-      const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) return fail(reason(error));
-      // Supabase answers an address that already has a confirmed account with
-      // an empty user rather than an error, and sends nothing.
-      if (data.user && (data.user.identities ?? []).length === 0) return fail("exists");
-      return reply({ ok: true, next: "code" });
+      const made = await adminClient().auth.admin.createUser({ email, password, email_confirm: true });
+      if (made.error) {
+        const why = reason(made.error);
+        if (why !== "exists") return fail(why);
+        // Made before the change but never confirmed (its code never came):
+        // finish it with the password just chosen. A confirmed one stays theirs.
+        const user = await userByEmail(email);
+        if (!user || user.email_confirmed_at) return fail("exists");
+        if (await confirm(user.id, password)) return fail("failed");
+      }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error || !data.session) return fail(reason(error));
+      return signedIn(data.session);
     }
     case "resend": {
       const { error } = await sb.auth.resend({ type: "signup", email });
@@ -114,11 +144,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) {
         const why = reason(error);
-        // Signed up but never typed the code: send a fresh one and go there.
+        // Made before the change and never confirmed. Supabase only says "not
+        // confirmed" once the password has matched, so confirm it and go in.
         if (why === "unconfirmed") {
-          const sent = await sb.auth.resend({ type: "signup", email });
-          if (sent.error && reason(sent.error) === "mail-down") return fail("mail-down", 503);
-          return reply({ ok: false, error: "unconfirmed", next: "code" });
+          const user = await userByEmail(email);
+          if (!user || (await confirm(user.id))) return fail("failed");
+          const again = await sb.auth.signInWithPassword({ email, password });
+          if (again.error || !again.data.session) return fail(reason(again.error));
+          return signedIn(again.data.session);
         }
         return fail(why);
       }
