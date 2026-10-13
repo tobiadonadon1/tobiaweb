@@ -16,12 +16,20 @@ import { day, short } from "./util.mjs";
  * original, when they're under two days apart, or when there are fewer than
  * three matches, whatever the model said. The post is written from a fixed
  * template, never by the model, so it can't call anyone a name.
+ *
+ * WITHOUT THE MODEL. If the gateway can't answer (no credit on the account,
+ * an outage, a timeout), `decide(k, null)` still answers from the facts:
+ * order, same account, credit, the same picture pixel for pixel, under two
+ * days apart. What only eyes can settle, whether two different pictures copy
+ * each other, it leaves open ("unjudged": the facts, both pictures side by
+ * side, no stamp that accuses anyone).
  */
 
 export const MODEL = process.env.COPYCAT_MODEL || "anthropic/claude-opus-5.5";
 
 export const VERDICTS = ["uncredited", "reupload", "credited", "similar", "too-close", "wrong-way", "same-account", "unknown"] as const;
-export type Verdict = (typeof VERDICTS)[number];
+/** The model's verdicts, plus "unjudged": the facts are in, the close look didn't happen. */
+export type Verdict = (typeof VERDICTS)[number] | "unjudged";
 
 const Answer = z.object({
   verdict: z.enum(VERDICTS),
@@ -46,8 +54,8 @@ Decide in this order and stop at the first that applies:
 
 Pick "show" frames that best show the likeness (same screen, same moment). Matches: 1 to 4, each 34 characters or fewer, each starting with "Same", most specific first. "why": one or two short plain sentences with the key facts (who first, how much later, credit or not), written for the person who asked.`;
 
-/** A small JPEG of a frame for the model (640 px wide). */
-function small(file: string): Buffer | null {
+/** A small JPEG of a frame for the model, and for the page's side-by-side (640 px wide). */
+export function small(file: string): Buffer | null {
   try {
     const out = file.replace(/(\.\w+)$/, ".s$1");
     if (!fs.existsSync(/*turbopackIgnore: true*/ out)) normalise(file, out, null, 640);
@@ -105,6 +113,8 @@ export async function judge(k: Kase): Promise<Answer> {
     messages: [{ role: "user", content }],
     output: Output.object({ schema: Answer }),
     maxOutputTokens: 1200,
+    // A slow answer is a missing one: the facts-only result is better than a spinner.
+    abortSignal: AbortSignal.timeout(100_000),
   });
   return output;
 }
@@ -129,21 +139,66 @@ const HEAD: Record<Verdict, string> = {
   "wrong-way": "Wrong way round.",
   "same-account": "Same account.",
   unknown: "Not enough to go on.",
+  unjudged: "The facts.",
 };
+
+const isVideo = (it: Kase) => (it.media || []).some((m: Kase) => m.type !== "photo");
+
+/** Where the credit was looked for, in words. */
+const lookedIn = (k: Kase) => {
+  const L = k.later;
+  if (L.kind === "x") return k.creditRead?.replies === false ? "the post" : "the post or its replies";
+  if (["appstore", "play"].includes(L.kind)) return "the listing";
+  return L.kind === "github" ? "the repo or its README" : "the page";
+};
+
+/** What the facts alone prove the two share: the same pixels, the same words. Never a guess. */
+function factMatches(k: Kase): string[] {
+  const out: string[] = [];
+  if (k.pixels?.same) out.push(isVideo(k.earlier) && isVideo(k.later) ? "Same video frames, pixel for pixel" : "Same picture, pixel for pixel");
+  for (const ph of (k.words?.shared || []) as string[]) {
+    const t = String(ph).trim();
+    out.push(`Same words: “${t.length > 20 ? t.slice(0, 19).replace(/\s+\S*$/, "") + "…" : t}”`);
+  }
+  return out.slice(0, 4);
+}
+
+/** Apps are released, repos published, sites go up; posts are posted. */
+const did = (it: Kase) => (["appstore", "play"].includes(it.kind) ? "released" : it.kind === "github" ? "published" : it.kind === "web" ? "went up" : "posted");
+
+/** The "why" when the model didn't write one: the facts, plainly. */
+function factWhy(k: Kase, v: Verdict): string {
+  const E = k.earlier, L = k.later, ord = k.order || {};
+  if (!ord.known) return "A date is missing, so the order can't be proven.";
+  if (ord.tie) return "They went up at the same moment, so neither came first.";
+  const first = `${who(E)} ${did(E)} first, on ${day(E.when.iso)}.`;
+  const sig = (k.credit?.signals || []).find((x: Kase) => x.kind !== "words" && x.kind !== "generic");
+  switch (v) {
+    case "same-account": return "Both come from the same account, so there's no one to credit.";
+    case "credited": return `${first} ${who(L)} came ${ord.label} and ${sig ? `${sig.text}${sig.where && sig.where !== "the post" ? ` in ${sig.where}` : ""}` : "names the original"}.`;
+    case "reupload": return `${first} ${who(L)} ${did(L)} the same ${isVideo(E) ? "video" : "picture"} ${ord.label}, with no credit in ${lookedIn(k)}.`;
+    case "too-close": return `${first} ${who(L)} ${did(L)} ${ord.label}. Under two days apart is too close to say one copied the other.`;
+    case "unjudged": return `${first} ${who(L)} ${did(L)} ${ord.label}, with no credit in ${lookedIn(k)}.`;
+    default: return `${who(L)} came ${ord.label}.`;
+  }
+}
 
 /** The model's answer, held to the facts. */
 export function decide(k: Kase, a: Answer | null): Decision {
   const ord = k.order || {};
   const named = !!k.credit?.named;
   const admitted = !!k.credit?.wordsOnly && !(k.credit?.elsewhere || []).length;
-  let v: Verdict = a?.verdict ?? "unknown";
+  let v: Verdict = a?.verdict ?? "unjudged";
   if (!ord.known || ord.tie || ord.unproven) v = "unknown";
   else if (k.suspect === "earlier") v = "wrong-way";
   else if (k.sameAccount) v = "same-account";
   else if (named) v = "credited";
   else if (v === "credited") v = "similar"; // the model can't invent a credit
+  // No model: only what the facts settle on their own.
+  else if (!a) v = k.pixels?.same ? "reupload" : ord.close && !admitted ? "too-close" : "unjudged";
   if (v === "reupload" && !k.pixels?.same) v = "uncredited";
-  const matches = (a?.matches || []).map((m) => m.trim()).filter(Boolean).slice(0, 4).map((m) => (m.length > 40 ? m.slice(0, 39).replace(/\s+\S*$/, "") + "…" : m));
+  const said = a ? a.matches : factMatches(k);
+  const matches = said.map((m) => m.trim()).filter(Boolean).slice(0, 4).map((m) => (m.length > 40 ? m.slice(0, 39).replace(/\s+\S*$/, "") + "…" : m));
   if (v === "uncredited" && matches.length < 3) v = "similar";
   if (v === "uncredited" && ord.close && !admitted) v = "too-close";
 
@@ -151,11 +206,13 @@ export function decide(k: Kase, a: Answer | null): Decision {
     const list: Frame[] = k.frames?.[side] || [];
     return list.find((f) => f.label === label) || list.find((f) => !/app icon|share image/.test(f.from)) || list[0] || null;
   };
-  const fe = pick("earlier", a?.show?.earlier), fl = pick("later", a?.show?.later);
+  // The model picks the frames to show; without it, the pair the pixels found most alike.
+  const best = a ? null : k.pixels?.samePairs?.[0] || k.pixels?.closest?.[0];
+  const fe = pick("earlier", a?.show?.earlier ?? best?.e), fl = pick("later", a?.show?.later ?? best?.l);
   const receipt = ["uncredited", "reupload", "credited"].includes(v) && !!fe && !!fl && (v !== "credited" || matches.length > 0);
 
   const E = k.earlier, L = k.later;
-  const why = a?.why?.trim() || (ord.known ? `${who(L)} came ${ord.label}.` : "A date is missing, so the order can't be proven.");
+  const why = a?.why?.trim() || factWhy(k, v);
   // The post: a fixed template (references/posting.md), never the model's words.
   const on = (it: Kase) => day(it.when.iso).replace(/, \d{4}$/, "");
   let post: string | null = null;

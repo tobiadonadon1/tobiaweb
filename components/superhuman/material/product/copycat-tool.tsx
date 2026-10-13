@@ -14,6 +14,9 @@ import { useMember } from "@/components/account/use-member";
  * back with their link still filled in, and the check starts by itself. From
  * then on it just runs. The check streams its steps (app/api/copycat/check),
  * then the verdict, the receipt and a one-tap post replace the example.
+ *
+ * Two links can go in either order (the dates decide). With no receipt, the
+ * two pictures sit side by side so the visitor can look for themselves.
  */
 
 type Side = { who: string; url: string; when: string | null; avatar: string | null; linkHandle: string | null };
@@ -26,10 +29,12 @@ type Result = {
   later: Side;
   matches: string[];
   receipt: string | null;
+  preview: { earlier: string; later: string } | null;
+  judged: boolean;
   post: string | null;
   intent: string | null;
 };
-type NeedsOriginal = { who: string; when: string | null; text: string; url: string; quotes: number | null; linkHandle: string | null };
+type NeedsOriginal = { who: string; when: string | null; text: string; url: string; quotes: number | null; quotesUrl: string | null; linkHandle: string | null };
 
 const STEPS: [string, string][] = [
   ["read", "Reading the link"],
@@ -50,6 +55,7 @@ const STAMP: Record<string, { word: string; tone: string }> = {
   "wrong-way": { word: "Wrong way round", tone: "ink" },
   "same-account": { word: "Same account", tone: "ink" },
   unknown: { word: "Not enough to go on", tone: "ink" },
+  unjudged: { word: "The facts", tone: "ink" },
 };
 
 const ERRORS: Record<string, string> = {
@@ -180,7 +186,19 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
   const copyImage = async () => {
     if (!result?.receipt) return;
     try {
-      const blob = fetch(result.receipt).then((r) => r.blob());
+      // The receipt comes as a JPEG (smaller); clipboards take PNG, so redraw it as one.
+      const blob = new Promise<Blob>((ok, no) => {
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement("canvas");
+          c.width = img.naturalWidth;
+          c.height = img.naturalHeight;
+          c.getContext("2d")?.drawImage(img, 0, 0);
+          c.toBlob((b) => (b ? ok(b) : no(new Error("png"))), "image/png");
+        };
+        img.onerror = no;
+        img.src = result.receipt!;
+      });
       await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
       setCopied("image");
     } catch {
@@ -199,7 +217,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
       {/* The field. */}
       <form onSubmit={submit} className="mx-auto w-full max-w-[44rem]">
         <div className="flex items-center gap-1.5 rounded-full border border-[#d4cfc2] bg-white p-1.5 shadow-[0_1px_0_rgba(18,18,18,0.04),0_18px_40px_-24px_rgba(40,30,10,0.45)] focus-within:border-[#121212]">
-          <label htmlFor="cd-first" className="sr-only">The link you think copied</label>
+          <label htmlFor="cd-first" className="sr-only">{two ? "One link" : "The link to check"}</label>
           <input
             id="cd-first"
             type="url"
@@ -207,7 +225,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
             autoComplete="off"
             spellCheck={false}
             required
-            placeholder={two ? "The one you think copied" : "Paste a link"}
+            placeholder={two ? "One link" : "Paste a link"}
             value={first}
             onChange={(e) => setFirst(e.target.value)}
             className={field}
@@ -225,7 +243,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
 
         {two ? (
           <div className="mt-3 flex items-center gap-1.5 rounded-full border border-[#d4cfc2] bg-white p-1.5 focus-within:border-[#121212]">
-            <label htmlFor="cd-second" className="sr-only">The original</label>
+            <label htmlFor="cd-second" className="sr-only">The other link</label>
             <input
               ref={secondInput}
               id="cd-second"
@@ -233,7 +251,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
               inputMode="url"
               autoComplete="off"
               spellCheck={false}
-              placeholder="The original (optional: it's usually found for you)"
+              placeholder="The other one (either order is fine)"
               value={second}
               onChange={(e) => setSecond(e.target.value)}
               className={field}
@@ -248,7 +266,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
           {two ? null : (
             <button type="button" onClick={() => { setTwo(true); requestAnimationFrame(() => secondInput.current?.focus()); }} className="inline-flex items-center gap-1.5 underline-offset-4 hover:text-[#121212] hover:underline">
               <Plus aria-hidden className="h-3.5 w-3.5" />
-              Add the original&rsquo;s link
+              Add a second link
             </button>
           )}
           <span>
@@ -286,9 +304,13 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
           <div className="mx-auto max-w-[34rem] rounded-[22px] bg-white p-7 shadow-[0_0_0_1px_rgba(18,18,18,0.07)]">
             <p className="text-[1.15rem] font-semibold">This one doesn&rsquo;t point to an earlier post.</p>
             <p className="mt-2 text-[1rem] leading-[1.55] text-[#3d3a33]">
-              {needs.who}{needs.when ? `, ${needs.when}` : ""}. Paste the original&rsquo;s link in the second box and press Check.
-              {needs.quotes ? ` If this is the original, copies are often among the ${needs.quotes} posts that quote it.` : ""}
+              {needs.who}{needs.when ? `, ${needs.when}` : ""}. It doesn&rsquo;t quote, reply to or link anything older, so it may be the original. Paste the other post in the second box and press Check: a copy of it, or the original if this is the copy.
             </p>
+            {needs.quotesUrl ? (
+              <a href={needs.quotesUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-[0.95rem] text-[#121212] underline decoration-[#121212]/30 underline-offset-4 hover:decoration-[#d2321f]">
+                See the {needs.quotes} posts that quote it on X <span aria-hidden>&#8599;</span>
+              </a>
+            ) : null}
             {needs.linkHandle ? <p className="mt-2 text-[0.92rem] text-[#6a665c]">Note: the link says @{needs.linkHandle}, but X shows this post as {needs.who}&rsquo;s.</p> : null}
           </div>
         ) : state === "done" && result && stamp ? (
@@ -324,7 +346,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
                     {copied === "image" ? <Check aria-hidden className="h-4 w-4" /> : <Copy aria-hidden className="h-4 w-4" />}
                     {copied === "image" ? "Copied" : "Copy image"}
                   </button>
-                  <a href={result.receipt} download="receipt.png" className="inline-flex items-center gap-2 rounded-full border border-[#d4cfc2] bg-white px-5 py-3 text-[0.98rem] text-[#121212] hover:border-[#121212]">
+                  <a href={result.receipt} download={result.receipt.startsWith("data:image/jpeg") ? "receipt.jpg" : "receipt.png"} className="inline-flex items-center gap-2 rounded-full border border-[#d4cfc2] bg-white px-5 py-3 text-[0.98rem] text-[#121212] hover:border-[#121212]">
                     <Download aria-hidden className="h-4 w-4" />
                     Download
                   </a>
@@ -344,7 +366,30 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
                 ) : null}
               </>
             ) : (
-              <p className="mt-6 max-w-[40ch] text-center text-[0.95rem] text-[#6a665c]">No receipt for this one: there&rsquo;s nothing that would be fair to post.</p>
+              <>
+                {result.preview ? (
+                  <div className="mt-10 grid w-full max-w-[40rem] grid-cols-2 gap-3 sm:gap-5">
+                    {([["First", result.preview.earlier, result.earlier], ["Later", result.preview.later, result.later]] as const).map(([tag, src, side]) => (
+                      <figure key={tag} className="min-w-0">
+                        <div className="overflow-hidden rounded-[16px] bg-[#e4e0d5] shadow-[0_0_0_1px_rgba(18,18,18,0.07)]">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- a small generated frame */}
+                          <img src={src} alt={`${tag}: a frame from ${side.who}'s post`} className="block aspect-[4/5] h-auto w-full object-contain" />
+                        </div>
+                        <figcaption className="mt-2 truncate font-[family-name:var(--cd-mono)] text-[0.8rem] text-[#6a665c]">
+                          <b className="text-[#121212]">{tag}</b> {side.who}
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
+                <p className="mt-6 max-w-[42ch] text-center text-[0.95rem] text-[#6a665c]">
+                  {result.verdict === "credited"
+                    ? "They named the original, so there’s nothing to call out."
+                    : result.verdict === "unjudged"
+                      ? "No receipt yet: that needs the close look at the pictures, which is down for the moment. Try again later for the full check."
+                      : "No receipt for this one: there’s nothing that would be fair to post."}
+                </p>
+              </>
             )}
             <button type="button" onClick={reset} className="mt-8 inline-flex items-center gap-2 text-[0.95rem] text-[#6a665c] underline-offset-4 hover:text-[#121212] hover:underline">
               <RotateCcw aria-hidden className="h-4 w-4" />
