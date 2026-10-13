@@ -13,9 +13,9 @@ import { useMember } from "./use-member";
  * signed in, and then it goes back where they came from (`?next=`). The
  * address typed on one step carries to the next, so nobody types it twice.
  *
- * Creating an account is an email and a password, and they're signed in (no
- * code since 2026-10-13, see app/api/account/[action]). The code step is
- * still how a forgotten password is reset.
+ * Creating an account is an email, a password, then the six-digit code
+ * Supabase sends (from Tobia's Gmail, see lib/account.ts). Signing in with an
+ * account that never got its code sends a fresh one and opens the code step.
  */
 
 type Mode = "signin" | "signup" | "code" | "forgot" | "reset";
