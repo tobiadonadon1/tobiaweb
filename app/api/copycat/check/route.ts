@@ -12,13 +12,13 @@ import { ffmpeg, normalise } from "@/lib/copycat/media.mjs";
  * Copycat Detective on the page. Signed-in members only: the account is how
  * the tool knows who is asking, and the address stays with it (members). Each
  * account gets a few checks a day and the whole site a daily ceiling, because
- * every check asks Claude to look at the pictures (AI Gateway, billed).
+ * every check asks a model to look at the pictures (AI Gateway, $5/month cap).
  *
  * Answers with newline-delimited JSON, one line per step, so the page can show
  * progress, then a final { done: true, ... } line with the result.
  *
  * The two links can come in either order: the dates decide which was first.
- * If Claude can't be reached (the gateway refused, timed out, failed), the
+ * If the model can't be reached (the gateway refused, timed out, failed), the
  * check still ends with what the facts settle (judge.ts, decide with no
  * answer) and both pictures side by side, never a dead end. A check that
  * ends in an error doesn't count against the day's checks.

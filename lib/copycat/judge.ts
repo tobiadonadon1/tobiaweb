@@ -8,7 +8,7 @@ import { day, short } from "./util.mjs";
 /**
  * THE JUDGEMENT, AND THE GUARDS AROUND IT.
  *
- * The facts come from run.mjs. Claude (through Vercel's AI Gateway) looks at
+ * The facts come from run.mjs. A vision model (through Vercel's AI Gateway) looks at
  * the frames from both sides, with the same rules as the skill's
  * references/judging.md, and answers in a fixed shape: a verdict, the frames
  * to show, and what matches. Then `decide()` checks that answer against the
@@ -25,7 +25,19 @@ import { day, short } from "./util.mjs";
  * side, no stamp that accuses anyone).
  */
 
-export const MODEL = process.env.COPYCAT_MODEL || "anthropic/claude-opus-5.5";
+/**
+ * THE MODEL. GPT-5.2, on the AI Gateway's free tier ($5 of credit a month;
+ * Claude isn't on the free tier). Chosen on 2026-10-13 against five real
+ * cases with the credit hidden (two remakes, two unrelated pairs, two rival
+ * apps): 5/5 twice, 2-13 s, specific matches, never "uncredited" for look-
+ * alikes. o3 and GPT-5 ran out of tokens thinking; Gemini 2.5 Flash couldn't
+ * return the shape; Mistral Large takes 8 images at most. The backup, if the
+ * free tier's rate limit or an outage stops the first: GPT-4.1, which answers
+ * "unknown" where unsure (never a wrong accusation in the same test). The
+ * team's gateway budget is capped at $5 a month (vercel ai-gateway budgets).
+ */
+export const MODEL = process.env.COPYCAT_MODEL || "openai/gpt-5.2";
+export const BACKUP = process.env.COPYCAT_BACKUP || "openai/gpt-4.1";
 
 export const VERDICTS = ["uncredited", "reupload", "credited", "similar", "too-close", "wrong-way", "same-account", "unknown"] as const;
 /** The model's verdicts, plus "unjudged": the facts are in, the close look didn't happen. */
@@ -52,7 +64,7 @@ Decide in this order and stop at the first that applies:
 6. Under 48 hours apart (order.close) and not a reupload → "too-close", unless the later post's own words say it rebuilt something it saw (credit.wordsOnly) and there's no other source (credit.elsewhere empty).
 7. If the later account posted an earlier version of the same thing before the first post (history.later.before), it may be theirs → "unknown".
 
-Pick "show" frames that best show the likeness (same screen, same moment). Matches: 1 to 4, each 34 characters or fewer, each starting with "Same", most specific first. "why": one or two short plain sentences with the key facts (who first, how much later, credit or not), written for the person who asked.`;
+Pick "show" frames that best show the likeness (same screen, same moment). Matches: 1 to 4, each 34 characters or fewer, each starting with "Same", most specific first. "why": one or two short plain sentences with the key facts (who first, how much later, credit or not), written for the person who asked. Call each side by its "who" from the facts (for example @name or the app's maker), never "the earlier post" or "the later one". Plain words only: never a field name from the facts (like pixels.same or credit.named), never JSON.`;
 
 /** A small JPEG of a frame for the model, and for the page's side-by-side (640 px wide). */
 export function small(file: string): Buffer | null {
@@ -77,8 +89,12 @@ function brief(k: Kase) {
   return {
     earlier: side(k.earlier),
     later: side(k.later),
-    order: k.order,
-    suspect: k.suspect,
+    // The order as plain facts. Not run.mjs's "a"/"b" (which link came first in
+    // the input): models read that as the order being reversed.
+    order: k.order?.known
+      ? { known: true, gap: k.order.label, hours: k.order.hours, days: k.order.days, close: k.order.close, tie: k.order.tie, unproven: k.order.unproven, dayPrecision: k.order.dayPrecision }
+      : { known: false, missing: k.order?.missing },
+    ...(k.suspect ? { suspect: k.suspect } : {}),
     sameAccount: k.sameAccount,
     credit: k.credit,
     creditRead: k.creditRead,
@@ -113,6 +129,8 @@ export async function judge(k: Kase): Promise<Answer> {
     messages: [{ role: "user", content }],
     output: Output.object({ schema: Answer }),
     maxOutputTokens: 1200,
+    // The gateway tries the backup itself if the first model fails.
+    providerOptions: { gateway: { models: [BACKUP] } },
     // A slow answer is a missing one: the facts-only result is better than a spinner.
     abortSignal: AbortSignal.timeout(100_000),
   });
@@ -212,7 +230,9 @@ export function decide(k: Kase, a: Answer | null): Decision {
   const receipt = ["uncredited", "reupload", "credited"].includes(v) && !!fe && !!fl && (v !== "credited" || matches.length > 0);
 
   const E = k.earlier, L = k.later;
-  const why = a?.why?.trim() || factWhy(k, v);
+  // Where the facts decided (credit, same account, order), the fact sentence says it
+  // the same way every time; the model's words only where its eyes decided.
+  const why = (["uncredited", "similar", "reupload"].includes(v) && a?.why?.trim()) || factWhy(k, v);
   // The post: a fixed template (references/posting.md), never the model's words.
   const on = (it: Kase) => day(it.when.iso).replace(/, \d{4}$/, "");
   let post: string | null = null;
