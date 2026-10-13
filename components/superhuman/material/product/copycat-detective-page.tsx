@@ -5,6 +5,7 @@ import { abs } from "@/lib/site";
 import { COPYCAT_DETECTIVE as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { CopycatTool } from "./copycat-tool";
+import { XPost, type XPostData } from "./x-post";
 
 /**
  * COPYCAT DETECTIVE, used right here on the page.
@@ -21,6 +22,11 @@ import { CopycatTool } from "./copycat-tool";
  * made-up accounts (@you, @someone), and the caption says so: a receipt naming
  * a real account would be an accusation.
  *
+ * Under the tool, where it started: Tobia's post that promised it at 250
+ * likes, the one that brought people in, drawn as X draws it. The quoted
+ * video is Ansh Nanda's and stays on X: its first frame links there (see
+ * x-post.tsx for why it can't play here). Counts are a snapshot, 2026-10-13.
+ *
  * IMAGES ARE VERSIONED (-v2): Next's image cache keys by URL.
  */
 
@@ -32,6 +38,27 @@ const NO: [string, string][] = [
   ["Credited", "They named the original. Nothing to call out."],
   ["Too close to call", "Under two days apart. Same idea, same week."],
 ];
+
+const ORIGIN: XPostData = {
+  url: "https://x.com/tobiadonadon_/status/2107842303562056051",
+  author: { name: "Tobi", handle: "tobiadonadon_", avatar: "/shop/copycat-detective/tobi-avatar-v1.jpg" },
+  date: "Oct 7",
+  text: "copying projects you see on X is soulless behavior\n\nbuild in public gave people with no marketing budget a chance to get their first users\n\nnow some rats just copy them the second they get traction\n\n250 likes and I’ll build a tool that exposes every copycat so X can do its thing",
+  counts: { replies: "46", reposts: "14", likes: "264", views: "10K" },
+  quote: {
+    url: "https://x.com/anshnanda/status/2107593775946051910",
+    author: { name: "Ansh Nanda", handle: "anshnanda", avatar: "https://pbs.twimg.com/profile_images/1968902578546294785/0VowcdCm_200x200.jpg" },
+    date: "Oct 6",
+    text: "This UI is fantastic.\n\nCouldn’t wait for it to be released so I made it myself.\n\n1.5 prompts on @vibecodeapp",
+    link: { href: "https://x.com/hewad_mubariz/status/2107145896467030483", label: "x.com/hewad_mubariz/…" },
+    video: {
+      poster: "https://pbs.twimg.com/amplify_video_thumb/2107593755742154753/img/Xe7_H8lw6__Vvz5_.jpg",
+      duration: 28.8,
+      aspect: 4 / 3,
+      label: "Two phones side by side: the football app labelled ORIGINAL, and the one labelled VIBE CODED.",
+    },
+  },
+};
 
 const JSON_LD = {
   "@context": "https://schema.org",
@@ -139,7 +166,31 @@ export function CopycatDetectivePage() {
         </div>
       </section>
 
-      {/* 2. How it works, in three pictures. */}
+      {/* 2. Where it started: the post. */}
+      <section aria-labelledby="cd-start" className="border-t-2 border-dashed border-[#d9d4c8] px-4 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto grid max-w-[72rem] grid-cols-1 items-center gap-12 md:grid-cols-[1fr_minmax(0,34rem)] md:gap-16">
+          <div>
+            <p className={kicker}>Where it started</p>
+            <h2 id="cd-start" className={`${display} mt-4 max-w-[12ch] text-[clamp(2.3rem,5.5vw,3.8rem)] leading-[0.98]`}>
+              Promised at 250 likes.
+            </h2>
+            <p className="mt-4 max-w-[30ch] text-pretty text-[1.08rem] leading-[1.5] text-[#3d3a33]">
+              It got 264. So here it is.
+            </p>
+            <a
+              href={ORIGIN.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-1.5 border-b border-[#121212]/30 pb-0.5 font-[family-name:var(--cd-mono)] text-[0.85rem] text-[#3d3a33] transition-colors hover:border-[#d2321f] hover:text-[#d2321f]"
+            >
+              See the post on X <span aria-hidden>&#8599;</span>
+            </a>
+          </div>
+          <XPost post={ORIGIN} />
+        </div>
+      </section>
+
+      {/* 3. How it works, in three pictures. */}
       <section aria-labelledby="cd-how" className="border-t-2 border-dashed border-[#d9d4c8] px-4 py-20 sm:px-8 md:py-28">
         <div className="mx-auto max-w-[72rem]">
           <h2 id="cd-how" className={`${display} text-[clamp(2.3rem,5.5vw,3.8rem)] leading-[0.98]`}>How it works</h2>
@@ -160,7 +211,7 @@ export function CopycatDetectivePage() {
         </div>
       </section>
 
-      {/* 3. When it says no: the refusals, as stamps. */}
+      {/* 4. When it says no: the refusals, as stamps. */}
       <section aria-labelledby="cd-no" className="bg-[#121212] px-4 py-20 text-[#f3f0e8] sm:px-8 md:py-24">
         <div className="mx-auto max-w-[72rem]">
           <h2 id="cd-no" className={`${display} max-w-[16ch] text-[clamp(2.3rem,5.5vw,3.8rem)] leading-[0.98]`}>
@@ -182,7 +233,7 @@ export function CopycatDetectivePage() {
         </div>
       </section>
 
-      {/* 4. Back to the tool. */}
+      {/* 5. Back to the tool. */}
       <section aria-labelledby="cd-close" className="px-4 pb-28 pt-20 text-center sm:px-8 md:pb-36 md:pt-24">
         <h2 id="cd-close" className={`${display} mx-auto max-w-[18ch] text-[clamp(2.3rem,5.5vw,3.8rem)] leading-[0.98]`}>
           Seen something familiar?
