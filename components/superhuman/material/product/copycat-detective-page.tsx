@@ -5,6 +5,7 @@ import { abs } from "@/lib/site";
 import { COPYCAT_DETECTIVE as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { CopycatTool } from "./copycat-tool";
+import { LoopVideo } from "./loop-video";
 import { XPost, type XPostData } from "./x-post";
 
 /**
@@ -12,15 +13,19 @@ import { XPost, type XPostData } from "./x-post";
  *
  * The page IS the tool: one field and a Check button at the top. Signing in
  * once is the only gate (that's how the address is kept); after that it just
- * runs. Under the field sits an example receipt until there's a real one.
+ * runs. Under the field, until there's a real result, the side-by-side that
+ * started it: the first 8 seconds of Ansh Nanda's video (his post, quoted in
+ * Tobia's), the original app by Hewad Mubariz beside his vibe-coded version.
+ * Both are credited under it. Kept here at Tobia's request (2026-10-13); X
+ * won't serve the file to other sites, so it's a copy.
  *
  * Below, the explanation is short and drawn rather than written: three steps
  * as little pictures (a link, the facts, the receipt), then the three verdicts
  * that get no receipt, as the receipt's own rubber stamps.
  *
- * The example receipt was drawn by the skill from a made-up app (Sprout) and
- * made-up accounts (@you, @someone), and the caption says so: a receipt naming
- * a real account would be an accusation.
+ * The small receipt in "How it works" was drawn by the skill from a made-up
+ * app (Sprout) and made-up accounts (@you, @someone): a receipt naming a real
+ * account would be an accusation.
  *
  * Under the tool, where it started: Tobia's post that promised it at 250
  * likes, the one that brought people in, drawn as X draws it. The quoted
@@ -38,6 +43,11 @@ const NO: [string, string][] = [
   ["Credited", "They named the original. Nothing to call out."],
   ["Too close to call", "Under two days apart. Same idea, same week."],
 ];
+
+const CREDIT = {
+  original: "https://x.com/hewad_mubariz/status/2107145896467030483",
+  video: "https://x.com/anshnanda/status/2107593775946051910",
+};
 
 const ORIGIN: XPostData = {
   url: "https://x.com/tobiadonadon_/status/2107842303562056051",
@@ -144,21 +154,25 @@ export function CopycatDetectivePage() {
         <div className="mt-10">
           <CopycatTool
             example={
-              <figure className="mx-auto w-full">
-                <div className="overflow-hidden rounded-[clamp(10px,1.4vw,18px)] shadow-[0_0_0_1px_rgba(18,18,18,0.08),0_40px_80px_-40px_rgba(40,30,10,0.45),0_12px_24px_-12px_rgba(40,30,10,0.18)]">
-                  <Image
-                    src="/shop/copycat-detective/receipt-v2.webp"
-                    alt="An example receipt. On the left, FIRST: a plant-care app screen by @you, Oct 5, 2026. On the right, LATER: a near-identical screen by @someone, Oct 8, 2026. Beside them: Posted 2 days later, a red NO CREDIT stamp, and what matches: the same lime blob behind the countdown, the same 2 days until it needs water, the same dark 250 ml of water card, the same three plant-stat chips."
-                    width={2400}
-                    height={1350}
-                    sizes="(min-width: 1200px) 72rem, 100vw"
-                    unoptimized
-                    preload
-                    className="block h-auto w-full"
+              <figure className="mx-auto w-full max-w-[50rem]">
+                <div className="overflow-hidden rounded-[clamp(10px,1.4vw,18px)] bg-white shadow-[0_0_0_1px_rgba(18,18,18,0.08),0_40px_80px_-40px_rgba(40,30,10,0.45),0_12px_24px_-12px_rgba(40,30,10,0.18)]">
+                  <LoopVideo
+                    src="/shop/copycat-detective/side-by-side-v1.mp4"
+                    poster="/shop/copycat-detective/side-by-side-v1.jpg"
+                    aspect="4/3"
+                    label="Two phones side by side. Left, labelled ORIGINAL: Hewad Mubariz's football juggling app counting touches. Right, labelled VIBE CODED: Ansh Nanda's version, with the same layout, counter, ball ring and stats."
                   />
                 </div>
                 <figcaption className="mt-4 text-center font-[family-name:var(--cd-mono)] text-[0.8rem] text-[#6a665c]">
-                  An example receipt. The app and both accounts are made up.
+                  The original by{" "}
+                  <a href={CREDIT.original} target="_blank" rel="noopener noreferrer" className="underline decoration-[#121212]/25 underline-offset-4 hover:text-[#d2321f]">
+                    @hewad_mubariz
+                  </a>
+                  , and a vibe-coded version by{" "}
+                  <a href={CREDIT.video} target="_blank" rel="noopener noreferrer" className="underline decoration-[#121212]/25 underline-offset-4 hover:text-[#d2321f]">
+                    @anshnanda
+                  </a>
+                  , from his video.
                 </figcaption>
               </figure>
             }

@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
  * them on one phone), and never for someone who asked for reduced motion:
  * they get the poster, which is the piece's resting composition.
  */
-export function LoopVideo({ src, poster, label, className = "" }: { src: string; poster: string; label: string; className?: string }) {
+export function LoopVideo({ src, poster, label, aspect = "16/10", className = "" }: { src: string; poster: string; label: string; aspect?: string; className?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -42,7 +42,8 @@ export function LoopVideo({ src, poster, label, className = "" }: { src: string;
       autoPlay
       preload="metadata"
       aria-label={label}
-      className={`block aspect-[16/10] h-auto w-full object-cover ${className}`}
+      style={{ aspectRatio: aspect }}
+      className={`block h-auto w-full object-cover ${className}`}
     />
   );
 }
