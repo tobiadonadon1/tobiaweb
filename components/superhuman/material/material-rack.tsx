@@ -86,7 +86,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
                   href={`${href}#${product.onPage ? "check" : "claim"}`}
                   className="group/get inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
                 >
-                  {product.onPage ? "Try it free" : "Get it free"}
+                  {product.onPage ? "Try it" : "Get it free"}
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/get:translate-x-0.5" />
                 </Link>
               ) : (
@@ -129,7 +129,7 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         </div>
 
         <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {product ? `${product.priceLabel} · ` : ""}{entry.kind === "guide" && product ? "PDF" : `${entry.minutes} min`} · {entry.level}
+          {product && !product.onPage ? `${product.priceLabel} · ` : ""}{entry.kind === "guide" && product ? "PDF" : `${entry.minutes} min`} · {entry.level}
         </p>
       </div>
     </li>

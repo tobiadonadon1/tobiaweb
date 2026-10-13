@@ -252,7 +252,7 @@ export function CopycatTool({ example }: { example: React.ReactNode }) {
             </button>
           )}
           <span>
-            {member ? <>Signed in as <span className="text-[#121212]">{member.email}</span></> : "Free. Sign in once, then use it any time."}
+            {member ? <>Signed in as <span className="text-[#121212]">{member.email}</span></> : "Sign in once, then use it any time."}
           </span>
         </div>
       </form>

@@ -104,7 +104,7 @@ export type Product = {
    * is kept with the account. /api/free refuses to email it.
    */
   accountOnly?: boolean;
-  /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it free" and goes to the tool (#check). */
+  /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it" and goes to the tool (#check). */
   onPage?: boolean;
 };
 
@@ -538,7 +538,9 @@ export const APP_LAUNCHER: Product = {
 };
 
 /**
- * COPYCAT DETECTIVE, a free skill: paste a link, get the receipt.
+ * COPYCAT DETECTIVE, a tool used right on its page: paste a link, get the
+ * receipt. It costs nothing, but nothing about it says "free": it's a tool to
+ * use, not a giveaway.
  *
  * Built after Tobia's "250 likes and I'll build a tool that exposes every
  * copycat" post. Honesty rules for every word about it: it shows facts (who
@@ -551,7 +553,7 @@ export const COPYCAT_DETECTIVE: Product = {
   id: "copycat-detective",
   name: "Copycat Detective",
   description:
-    "A free Claude Code skill. Paste a link: it finds the original, proves who posted first, checks for credit, compares the two, and draws a side-by-side receipt with a calm post you publish with one tap.",
+    "Paste a link: it finds the original, proves who posted first, checks for credit, compares the two, and draws a side-by-side receipt with a calm post you publish with one tap.",
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
@@ -568,8 +570,8 @@ export const COPYCAT_DETECTIVE: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Copycat Detective is a free skill for Claude Code. Paste a link from X, the App Store, GitHub or any site: it finds the original, proves who posted first from the post's own ID, checks the post and its replies for credit, compares the two, and draws one side-by-side receipt with a calm post you publish with one tap. No receipt for things that are only similar.",
-    kicker: "Skill · for Claude Code",
+      "Paste a link from X, the App Store, GitHub or any site. Copycat Detective finds the original, proves who posted first from the post's own ID, checks the post and its replies for credit, compares the two, and draws one side-by-side receipt with a calm post you publish with one tap. No receipt for things that are only similar.",
+    kicker: "Tool · for posts, apps and sites",
     line: "Paste a link. Get the receipt.",
     proof: "Who posted first, proven from the post itself",
   },
@@ -766,7 +768,7 @@ export const forSale = (product: Product) =>
 
 /** What a page prints where a price would go. */
 export const priceText = (product: Product) =>
-  product.free ? "Free" : forSale(product) ? product.priceLabel : "Coming soon";
+  product.onPage ? "Try it" : product.free ? "Free" : forSale(product) ? product.priceLabel : "Coming soon";
 
 /** Where the buyer's copy of the file is fetched from. */
 export const downloadHref = (sessionId: string) =>

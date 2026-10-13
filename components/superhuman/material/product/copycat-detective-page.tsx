@@ -106,7 +106,7 @@ export function CopycatDetectivePage() {
       {/* 1. The tool. */}
       <section aria-labelledby="cd-title" className="px-4 pb-20 pt-28 sm:px-8 md:pb-28 md:pt-36">
         <div className="mx-auto flex max-w-[52rem] flex-col items-center text-center">
-          <p className={kicker}>Copycat Detective · free</p>
+          <p className={kicker}>Copycat Detective</p>
           <h1 id="cd-title" className={`${display} mt-5 text-[clamp(2.9rem,9.5vw,5.8rem)] leading-[0.93]`}>
             Who posted it first?
           </h1>
@@ -188,7 +188,7 @@ export function CopycatDetectivePage() {
           Seen something familiar?
         </h2>
         <p className="mx-auto mt-4 max-w-[38ch] text-pretty text-[1.08rem] leading-[1.5] text-[#3d3a33]">
-          Free. Sign in once and check whenever you like. Nothing is posted for you.
+          Sign in once and check whenever you like. Nothing is posted for you.
         </p>
         <a
           href="#check"
