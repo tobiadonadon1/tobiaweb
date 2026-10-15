@@ -2015,6 +2015,96 @@ html[data-vm-intro="done"] .vm-crew {
   to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 
+/* THE BUTTON IS A BOT (viral-machine-cta.tsx). Two Grok eyes in the label's
+   colour, four bots under the bottom edge that rise as the pointer comes near
+   (--near, 0 to 1, set by script), and on hover a wobbly body that jumps
+   through the six colours. Touch screens get the eyes looking around and the
+   bots playing peekaboo. The bots sit behind the label (isolation + z -1). */
+.vm-cta {
+  --near: 0;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 1.75rem;
+}
+.vm-face {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 0.15rem;
+  transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(calc(1 + var(--near) * 0.35));
+  transition: transform 0.18s ease-out;
+}
+.vm-eye {
+  width: 5px;
+  height: 11px;
+  border-radius: 3px;
+  background: currentColor;
+  transform: rotate(14deg);
+}
+.vm-peek {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.vm-peek > span {
+  position: absolute;
+  bottom: 0;
+  left: calc(7% + var(--p) * 24%);
+  width: 1.4rem;
+  height: 1.4rem;
+  transform: translateY(calc(100% - var(--near) * 50%));
+  transition: transform 0.4s cubic-bezier(0.3, 1.7, 0.5, 1) calc(var(--p) * 45ms);
+}
+.vm-peek svg { display: block; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .vm-eye { animation: vm-blink 4.2s infinite; }
+  .vm-eye + .vm-eye { animation-delay: 0.02s; }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .vm-cta:hover { animation: vm-blob 1.5s ease-in-out infinite, vm-hue 2.4s steps(1, end) infinite; }
+  .vm-cta:hover .vm-peek > span { transform: translateY(32%); }
+  .vm-cta:hover .vm-face { transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(1.4); }
+}
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  .vm-cta { animation: vm-hue 7.2s steps(1, end) infinite; }
+  .vm-cta:active { animation: vm-blob 0.5s ease-in-out, vm-hue 7.2s steps(1, end) infinite; }
+  .vm-face { animation: vm-look 4.5s ease-in-out infinite; }
+  .vm-peek > span { animation: vm-peekaboo 3.6s ease-in-out infinite; animation-delay: calc(var(--p) * 0.4s); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vm-peek { display: none; }
+}
+@keyframes vm-blink {
+  0%, 92%, 100% { scale: 1 1; }
+  95% { scale: 1 0.12; }
+}
+@keyframes vm-look {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -3px 0; }
+  50% { translate: 0 -1px; }
+  75% { translate: 3px 1px; }
+}
+@keyframes vm-peekaboo {
+  0%, 20%, 100% { transform: translateY(100%); }
+  40%, 60% { transform: translateY(38%); }
+}
+/* Irregular, never more than the button's height can hold vertically. */
+@keyframes vm-blob {
+  0%, 100% { border-radius: 1.75rem; rotate: 0deg; }
+  25% { border-radius: 2.6rem 1.3rem 2.2rem 1.1rem / 1.2rem 2.2rem 1.3rem 2.1rem; rotate: -2deg; }
+  50% { border-radius: 1.2rem 2.8rem 1.4rem 2.4rem / 2.1rem 1.3rem 2.2rem 1.2rem; rotate: 1.5deg; }
+  75% { border-radius: 2.3rem 1.5rem 2.7rem 1.2rem / 1.3rem 2.1rem 1.4rem 2.2rem; rotate: -1deg; }
+}
+@keyframes vm-hue {
+  0% { background-color: #2E66EE; color: #FFFFFF; }
+  16.66% { background-color: #4DB39B; color: #05231B; }
+  33.33% { background-color: #EF9440; color: #2A1300; }
+  50% { background-color: #8152EE; color: #FFFFFF; }
+  66.66% { background-color: #EC5A33; color: #230600; }
+  83.33% { background-color: #16171B; color: #FFFFFF; }
+}
+
 /* ------------------------------------------------------------------ *
  * COPYCAT DETECTIVE (copycat-detective-page.tsx). The refusals drawn as
  * the receipt's rubber stamps, in paper on black: same mono, same border,

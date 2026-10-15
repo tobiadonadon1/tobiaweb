@@ -4,6 +4,7 @@ import { abs } from "@/lib/site";
 import { VIRAL_MACHINE as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
+import { CtaFace } from "./viral-machine-cta";
 import { StickyBuy } from "./sticky-buy";
 import { ViralIntro } from "./viral-machine-intro";
 import { BotSvg, C, SIX, type Key } from "./viral-machine-bits";
@@ -348,7 +349,7 @@ export function ViralMachinePage() {
             <span className="block">It tells you what to post, in your voice.</span>
           </p>
           <div id="claim" className="mt-9 flex w-full justify-center scroll-mt-28">
-            <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="ink" />
+            <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" face={<CtaFace />} buttonClassName="vm-cta" />
           </div>
           <p className={`mt-4 text-center text-[0.95rem] ${MUTED}`}>It never posts, likes or follows for you.</p>
           <div id={HERO_ID} aria-hidden className="h-px" />
@@ -507,7 +508,7 @@ export function ViralMachinePage() {
                 ))}
               </ol>
               <div className="mt-10">
-                <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="ink" align="start" prompt={false} />
+                <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" align="start" prompt={false} face={<CtaFace />} buttonClassName="vm-cta" />
                 <p className={`mt-4 max-w-[46ch] text-pretty text-[0.95rem] leading-[1.5] ${MUTED}`}>
                   Needs Grok Bot (the X Subscription Premium plan or higher) and a public X account.
                 </p>
@@ -524,7 +525,7 @@ export function ViralMachinePage() {
         heroId={HERO_ID}
         closeId={CLOSE_ID}
         href="#claim"
-        label="Get it free"
+        label="Get it for free"
         note="Free, sent by email"
         buttonClassName={BUTTON}
       />
