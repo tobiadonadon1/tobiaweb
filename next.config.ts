@@ -31,6 +31,8 @@ const nextConfig: NextConfig = {
          cached by every browser that ever followed it. */
       { source: "/98c", destination: "/projects/construct/material/setups/the-98c-trade", permanent: false },
       { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
+      /* Viral Machine went free and moved to Skills on its launch day. */
+      { source: "/projects/construct/material/setups/viral-machine", destination: "/projects/construct/material/skills/viral-machine", statusCode: 301 },
       { source: "/projects/superhuman", destination: "/projects/construct", statusCode: 301 },
       { source: "/projects/superhuman/", destination: "/projects/construct", statusCode: 301 },
       { source: "/projects/superhuman/materials", destination: "/projects/construct/material", statusCode: 301 },

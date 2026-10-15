@@ -15,20 +15,6 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
-    slug: "viral-machine",
-    title: "Viral Machine",
-    kind: "setup",
-    summary:
-      "Your X manager inside Grok Bot: it learns your account and your niche, and every morning hands you posts in your voice, one tap from live.",
-    // Minutes from the download to the first three posts.
-    minutes: 20,
-    status: "ready",
-    when: "You want to grow on X and need to know what to post today, written the way you write.",
-    level: "Anyone",
-    body: [],
-    product: "viral-machine",
-  },
-  {
     slug: "app-designer-pro",
     title: "App Designer Pro",
     kind: "setup",

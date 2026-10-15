@@ -736,21 +736,20 @@ export const VIRAL_MACHINE: Product = {
   id: "viral-machine",
   name: "Viral Machine",
   description:
-    "Your X manager inside Grok Bot: it learns your account and your niche, finds the angles, and hands you posts in your voice every morning, one tap from live. Instant download.",
-  // Stripe's default_price for prod_VRir0B4DJgdsn9 is €5 a month (price_1UQpQ9B7HQhkKmiF09ahU4a7,
-  // read 2026-10-15); the checkout sends this row as a one-time €5 against the product instead.
-  priceCents: 500,
+    "Your X manager inside Grok Bot: it learns your account and your niche, finds the angles, and hands you posts in your voice every morning, one tap from live.",
+  // Launched at €5 on 2026-10-15 (Stripe prod_VRir0B4DJgdsn9), given away for an email the same day.
+  priceCents: 0,
   currency: "eur",
-  priceLabel: money(500, "eur"),
-  href: "/projects/construct/material/setups/viral-machine",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/viral-machine",
   file: {
     sealed: "viral-machine.zip.enc",
     filename: "viral-machine.zip",
     // Two text files (the install file and START HERE): no scripts, so Gmail takes it.
     attach: true,
   },
-  // Stripe "Viral Machine" (live).
-  stripeProductId: "prod_VRir0B4DJgdsn9",
+  free: true,
+  stripeProductId: "none",
   share: {
     description:
       "Viral Machine turns Grok Bot into your X manager. It learns what works for your account, watches your niche every morning, finds angles in what people actually ask, and writes posts in your voice that you post with one tap. Built on X's open-sourced ranking code. It never posts for you.",

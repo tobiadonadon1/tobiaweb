@@ -1,8 +1,9 @@
+import Image from "next/image";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
-import { VIRAL_MACHINE as PRODUCT, forSale } from "@/lib/shop/products";
+import { VIRAL_MACHINE as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
-import { BuyForm } from "./buy-form";
+import { FreeClaim } from "./free-claim";
 import { StickyBuy } from "./sticky-buy";
 import { ViralIntro } from "./viral-machine-intro";
 import { BotSvg, C, SIX, type Key } from "./viral-machine-bits";
@@ -12,7 +13,8 @@ import { BotSvg, C, SIX, type Key } from "./viral-machine-bits";
  *
  * THE SAME THREE SECTIONS AS APP DESIGNER PRO, on purpose (Tobia's call): the
  * name and the button, what it does (six tiles, one colour each), and the
- * close. It sells the value, so the price lives on the buttons only.
+ * close. It sells the value. Given away for an email (free-claim.tsx): the
+ * file arrives in the inbox and the address lands in the leads sheet.
  *
  * THE MASCOTS ARE GROK BOT'S OWN AVATARS (grok-army-bots.ts): a flat shape and
  * two leaning pill eyes, recoloured per job. They open the page (six beats),
@@ -28,13 +30,11 @@ import { BotSvg, C, SIX, type Key } from "./viral-machine-bits";
 
 const HERO_ID = "buy";
 const CLOSE_ID = "vm-close";
-const SOON = !forSale(PRODUCT);
-
 const BUTTON = "bg-[#16171B] text-white shadow-[0_18px_40px_-18px_rgba(22,23,27,0.7)] hover:bg-black";
 const MUTED = "text-[color:rgba(11,31,58,0.62)]";
 
 const STEPS: React.ReactNode[] = [
-  <>Buy it and download the file.</>,
+  <>Leave your email. The file is in your inbox a minute later.</>,
   <>
     In Grok Bot, make a new bot, attach the file and send{" "}
     <q className="font-semibold text-[var(--ink)]">Set yourself up from this file.</q>
@@ -52,31 +52,14 @@ const JSON_LD = {
   image: abs(`/shop/${PRODUCT.id}/card`),
   url: abs(PRODUCT.href),
   author: { "@type": "Person", name: "Tobia Donadon" },
-  ...(SOON
-    ? {}
-    : {
-        offers: {
-          "@type": "Offer",
-          price: (PRODUCT.priceCents / 100).toFixed(2),
-          priceCurrency: PRODUCT.currency.toUpperCase(),
-          availability: "https://schema.org/InStock",
-          url: abs(PRODUCT.href),
-        },
-      }),
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: PRODUCT.currency.toUpperCase(),
+    availability: "https://schema.org/InStock",
+    url: abs(PRODUCT.href),
+  },
 };
-
-function Buy({ reportErrors = false }: { reportErrors?: boolean }) {
-  return (
-    <BuyForm
-      productId={PRODUCT.id}
-      price={PRODUCT.priceLabel}
-      label={`Get Viral Machine · ${PRODUCT.priceLabel}`}
-      soon={SOON}
-      reportErrors={reportErrors}
-      buttonClassName={BUTTON}
-    />
-  );
-}
 
 /** One of the six, as a tile in its own colour: the claim, then the proof. */
 function Tile({ k, title, text, children, wide = false }: { k: Key; title: string; text: string; children: React.ReactNode; wide?: boolean }) {
@@ -335,7 +318,7 @@ export function ViralMachinePage() {
     <main className="vm-page relative overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <ViralIntro six={SIX} />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 1. THE CREW, THE NAME AND THE BUTTON. */}
       <section aria-labelledby="vm-title" className="relative">
@@ -362,10 +345,63 @@ export function ViralMachinePage() {
           <p className="mt-7 max-w-[34ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.78)] md:text-[1.45rem]">
             Your X manager, inside Grok Bot. Every morning it tells you what to post, and writes it the way you write.
           </p>
-          <div id={HERO_ID} className="mt-9 scroll-mt-28">
-            <Buy reportErrors />
+          <div id="claim" className="mt-9 w-full max-w-[30rem] scroll-mt-28">
+            <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="ink" />
           </div>
-          <p className={`mt-4 text-[0.95rem] ${MUTED}`}>One payment · instant download · it never posts for you</p>
+          <p className={`mt-4 text-[0.95rem] ${MUTED}`}>Free · sent to your inbox · it never posts for you</p>
+          <div id={HERO_ID} aria-hidden className="h-px" />
+        </div>
+      </section>
+
+      {/* 1b. THE PROOF: Tobia's own X, the four weeks the playbook ran. A real
+          X Analytics screenshot (15 Oct 2026), cropped, never redrawn. */}
+      <section aria-labelledby="vm-mine" className="relative">
+        <div className="mx-auto max-w-[60rem] px-4 pb-24 pt-4 sm:px-8 md:pb-32">
+          <p className="text-center">
+            <span className="inline-block rounded-full bg-[#16171B] px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-white">
+              My own X · the last 4 weeks
+            </span>
+          </p>
+          <h2
+            id="vm-mine"
+            className="mx-auto mt-6 max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
+          >
+            1.5 million views in four weeks.
+          </h2>
+          <p className={`mx-auto mt-5 max-w-[44ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
+            This is my account. Viral Machine is the playbook I ran to get here: read what works, find the angle people
+            are asking for, write it in my own voice, post at the right hour.
+          </p>
+          <ul className="mx-auto mt-10 grid max-w-[44rem] list-none grid-cols-3 gap-2.5 p-0 sm:gap-4">
+            {(
+              [
+                ["1.5M", "impressions", C.account],
+                ["16.9K", "bookmarks", C.niche],
+                ["63,000%", "up on the month before", C.angles],
+              ] as const
+            ).map(([n, label, c]) => (
+              <li key={label} className="rounded-[1.25rem] px-3 py-4 text-center sm:px-5 sm:py-5" style={{ background: c.bg, color: c.fg }}>
+                <span className="block text-[clamp(1.35rem,4.6vw,2.4rem)] font-extrabold leading-none tracking-[-0.04em]">{n}</span>
+                <span className="mt-1.5 block text-[0.8rem] font-semibold leading-[1.25] sm:text-[0.95rem]">{label}</span>
+              </li>
+            ))}
+          </ul>
+          <figure className="mx-auto mt-6 max-w-[54rem] sm:mt-8">
+            <div className="overflow-hidden rounded-[1.5rem] border border-[var(--hairline)] bg-white p-3 shadow-[0_30px_70px_-40px_rgba(11,31,58,0.45)] sm:p-5">
+              <Image
+                src="/shop/viral-machine/x-analytics-4w.png"
+                alt="X Analytics for @tobiadonadon_, last 4 weeks: 1.5M impressions, 2.6% engagement rate, 41K engagements, 5K profile visits, 5.7K replies, 10.4K likes, 2K reposts, 16.9K bookmarks, 777 shares."
+                width={868}
+                height={768}
+                unoptimized
+                className="h-auto w-full"
+              />
+            </div>
+            <figcaption className={`mt-4 text-center text-[0.9rem] leading-[1.5] ${MUTED}`}>
+              @tobiadonadon_ in X Analytics, 18 September to 15 October 2026. The green arrows compare with the four weeks
+              before.
+            </figcaption>
+          </figure>
         </div>
       </section>
 
@@ -469,9 +505,9 @@ export function ViralMachinePage() {
                 ))}
               </ol>
               <div className="mt-10">
-                <Buy />
+                <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="ink" align="start" prompt={false} />
                 <p className={`mt-4 max-w-[46ch] text-pretty text-[0.95rem] leading-[1.5] ${MUTED}`}>
-                  Secure checkout by Stripe. Needs Grok Bot (the X Subscription Premium plan or higher) and a public X account.
+                  Needs Grok Bot (the X Subscription Premium plan or higher) and a public X account.
                 </p>
               </div>
             </div>
@@ -485,8 +521,9 @@ export function ViralMachinePage() {
         price={PRODUCT.priceLabel}
         heroId={HERO_ID}
         closeId={CLOSE_ID}
-        note={SOON ? "Checkout opens soon" : `${PRODUCT.priceLabel} · instant download`}
-        soon={SOON}
+        href="#claim"
+        label="Get it free"
+        note="Free, sent by email"
         buttonClassName={BUTTON}
       />
     </main>

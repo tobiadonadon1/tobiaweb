@@ -300,4 +300,24 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "copycat-detective",
   },
+  /* ---------------------------------------------------------------- *
+   * 09
+   *
+   * The X manager for Grok Bot, given away for an email (it launched at
+   * €5 in Setups the same morning). It closes the third row.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "viral-machine",
+    title: "Viral Machine",
+    kind: "skill",
+    summary:
+      "Your X manager inside Grok Bot: it learns your account and your niche, and every morning hands you posts in your voice, one tap from live.",
+    // Minutes from the download to the first three posts.
+    minutes: 20,
+    status: "ready",
+    when: "You want to grow on X and need to know what to post today, written the way you write.",
+    level: "Anyone",
+    body: [],
+    product: "viral-machine",
+  },
 ];

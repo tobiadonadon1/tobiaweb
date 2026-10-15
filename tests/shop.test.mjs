@@ -191,7 +191,7 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["viral-machine", "app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Viral Machine first, then App Designer Pro, Grok Army, the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "App Designer Pro first, then Grok Army, the 98¢ Trade, Launchr, Jev");
   // App Designer Pro: a setup, sold at €5 on the Stripe product Tobia made.
   const pro = productById("app-designer-pro");
   assert.equal(pro.href, entryHref("setups", "app-designer-pro"));
@@ -500,6 +500,28 @@ test("free: App Launcher opens a new row on the rack, sent as a link, its comman
   const swapped = new URL(link);
   swapped.searchParams.set("product", "web-designer");
   assert.equal((await download(new Request(swapped))).status, 303, "an App Launcher link is not a Web Designer link");
+});
+
+test("free: Viral Machine is given for an email, its file attached, never a checkout", async () => {
+  const { VIRAL_MACHINE, forSale } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(VIRAL_MACHINE.href, entryHref("skills", "viral-machine"));
+  const skills = FOLDER_BY_ID.skills.entries;
+  assert.equal(skills.at(-1)?.slug, "viral-machine", "it closes the third row of the rack");
+  assert.equal(VIRAL_MACHINE.free, true);
+  assert.equal(forSale(VIRAL_MACHINE), false);
+
+  const res = await ask({ product: "viral-machine", email: "viral@example.com" }, "203.0.113.73");
+  assert.equal(res.status, 200);
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Viral Machine");
+  assert.equal(m.attachments.length, 1, "two text files, so Gmail takes the zip");
+  assert.equal(m.attachments[0].filename, "viral-machine.zip");
+  assert.ok(m.text.includes("Set yourself up from this file."));
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.equal(dl.status, 200);
+  assert.equal(Buffer.from(await dl.arrayBuffer()).length, VIRAL_ZIP.length);
 });
 
 test("free: Copycat Detective sits beside App Launcher, free with an account, never emailed", async () => {

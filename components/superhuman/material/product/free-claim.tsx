@@ -42,8 +42,8 @@ export function FreeClaim({
   align?: "center" | "start";
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
-      black pages. */
-  tone?: "dark" | "light" | "saffron" | "forest" | "cobalt";
+      black pages, "ink" for paper with a black button (Viral Machine). */
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt";
   /** Show the one-line ask above the field. */
   prompt?: boolean;
   className?: string;
@@ -121,7 +121,7 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "saffron" || tone === "forest" || tone === "cobalt";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt";
   const t = tone === "cobalt"
     ? {
         ink: "text-white",
@@ -169,9 +169,9 @@ export function FreeClaim({
           "border-[var(--hairline-strong)] bg-white shadow-[0_1px_0_rgba(11,31,58,0.04),0_12px_32px_-18px_rgba(11,31,58,0.28)] focus-within:border-[color:rgba(11,31,58,0.5)]",
         input: "text-[var(--ink)] placeholder:text-[color:rgba(11,31,58,0.38)]",
         ring: "focus-visible:outline-[var(--ink)]",
-        check: "bg-[var(--accent-clay-text)] text-[var(--paper)]",
+        check: tone === "ink" ? "bg-[#16171B] text-white" : "bg-[var(--accent-clay-text)] text-[var(--paper)]",
         error: "text-[var(--accent-clay-text)]",
-        button: "bg-[var(--accent-clay-text)] text-[var(--paper)]",
+        button: tone === "ink" ? "bg-[#16171B] text-white hover:bg-black" : "bg-[var(--accent-clay-text)] text-[var(--paper)]",
       }
     : {
         ink: "text-[#f4f2ec]",
