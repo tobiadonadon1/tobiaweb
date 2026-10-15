@@ -39,11 +39,14 @@ export type Six = {
 };
 
 /**
- * How long the button's speech bubble shows (viral-machine-cta.tsx; the CSS
- * animation .vm-ouch is the same length), and so how long the pill stays
- * after a click. Here, not in the client file, so the server page can read it.
+ * THE BUTTON'S TIMINGS (viral-machine-cta.tsx, globals.css .vm-cta). WAKE_MS
+ * is the letters becoming eyes and the pill becoming a circle; OUCH_MS is the
+ * whole click, wake-up plus speech bubble, and so how long the bot stays
+ * before the email field (or the download) takes its place. Here, not in the
+ * client file, so the server page can read them.
  */
-export const OUCH_MS = 1400;
+export const WAKE_MS = 650;
+export const OUCH_MS = 2500;
 
 export const C = Object.fromEntries(SIX.map((s) => [s.key, s])) as Record<Key, Six>;
 

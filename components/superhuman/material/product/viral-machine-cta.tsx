@@ -1,47 +1,38 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { BotSvg, C, OUCH_MS } from "./viral-machine-bits";
+import { OUCH_MS, WAKE_MS } from "./viral-machine-bits";
 
 /**
- * THE BUTTON IS A BOT.
+ * THE BUTTON IS A SLEEPING BOT.
  *
- * Rendered inside FreeClaim's button (its `face` slot) in place of the arrow:
- * two Grok pill eyes in the label's own colour, and four little bots waiting
- * under the button's bottom edge. The CSS lives in globals.css (VIRAL MACHINE,
- * .vm-cta).
+ * Rendered as FreeClaim's button content (its `face` slot): at rest it is
+ * only "Get it for free", white on a black pill. A click wakes it up:
  *
- *   Far away   the eyes follow the pointer anywhere on the page, and blink.
- *   Closer     --near rises from 0 to 1 over the last 220px: the eyes grow and
- *              the bots rise into the button, as if they noticed you coming.
- *   Hover      the button wobbles into an irregular shape and jumps through
- *              the six colours, the bots pop all the way up.
- *   Touch      no pointer to follow, so the eyes look around and the bots play
- *              peekaboo on their own, slower.
+ *   1. the letters fly to the centre and shrink away, and two Grok pill eyes
+ *      pop out where they meet;
+ *   2. the black pill closes into a circle: a black Grok bot, white eyes;
+ *   3. it frowns (brows down, a shake) and complains in a speech bubble:
+ *      "Ouch, I was sleeping." and friends. Each click says the next line, and
+ *      the place in the list is kept per visitor (localStorage).
  *
- *   Click      it complains, in a speech bubble over its eyes. Each click
- *              says the next line, and the place in the list is kept per
- *              visitor (localStorage), so a returning visitor hears a new one.
- *              The page passes FreeClaim `hold={OUCH_MS}`, so the pill stays
- *              until the bubble is gone and only then gives way to the email
- *              field or the download. The bubble is plain DOM on <body>.
- *
- * Reduced motion keeps the eyes, still, and nothing else moves.
+ * The page passes FreeClaim `hold={OUCH_MS}`, so the bot stays until its
+ * bubble is gone and only then gives way to the email field or the download.
+ * A further click shakes it again, with the next line. The CSS lives in
+ * globals.css (VIRAL MACHINE, .vm-cta); the bubble is plain DOM on <body>.
+ * Reduced motion skips the travel: the bot and its bubble just appear.
  */
 
-const PEEK = [C.angles, C.account, C.niche, C.voice];
-
 const OUCH = [
-  "Ouch.",
-  "Next time, a little softer.",
-  "No need to smash.",
-  "Easy, easy.",
-  "Gently. We bruise.",
-  "Ow. Worth it though.",
-  "Hey, that tickles.",
+  "Ouch, I was sleeping.",
+  "Hey! I was napping.",
+  "Five more minutes.",
+  "Rude. I was dreaming.",
+  "Who woke me up?",
+  "Ow. Knock softer next time.",
+  "I was sleeping. Fine, here.",
 ];
 const OUCH_KEY = "vm-ouch";
-
 
 function nextOuch(): string {
   let i = 0;
@@ -56,82 +47,87 @@ function nextOuch(): string {
   return OUCH[i % OUCH.length];
 }
 
-/** Pops the bubble over the eyes, then lets it float off and removes it. */
-function complain(eyes: HTMLElement) {
+/** Pops the bubble over the bot's head, then lets it float off and removes it. */
+function complain(btn: HTMLElement, ms: number) {
   document.querySelectorAll(".vm-ouch").forEach((b) => b.remove());
-  const r = eyes.getBoundingClientRect();
+  const r = btn.getBoundingClientRect();
   const bubble = document.createElement("div");
   bubble.className = "vm-ouch";
   bubble.setAttribute("aria-hidden", "true");
   bubble.textContent = nextOuch();
+  bubble.style.animationDuration = `${ms}ms`;
   document.body.appendChild(bubble);
   const w = bubble.offsetWidth;
   const cx = r.left + r.width / 2;
   const left = Math.min(Math.max(cx - w / 2, 12), window.innerWidth - w - 12);
   bubble.style.left = `${left + window.scrollX}px`;
-  bubble.style.top = `${r.top + window.scrollY - bubble.offsetHeight - 18}px`;
-  // The tail points at the eyes even when the bubble is pushed off-centre.
+  bubble.style.top = `${r.top + window.scrollY - bubble.offsetHeight - 16}px`;
+  // The tail points at the bot even when the bubble is pushed off-centre.
   bubble.style.setProperty("--tail", `${Math.min(Math.max(cx - left, 16), w - 16)}px`);
-  window.setTimeout(() => bubble.remove(), OUCH_MS);
+  window.setTimeout(() => bubble.remove(), ms);
 }
 
-export function CtaFace() {
-  const face = useRef<HTMLSpanElement>(null);
+export function CtaWake({ label }: { label: string }) {
+  const root = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const el = face.current;
+    const el = root.current;
     const btn = el?.closest<HTMLElement>(".vm-cta");
     if (!el || !btn) return;
-    const onClick = () => complain(el);
-    btn.addEventListener("click", onClick);
-    if (!matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) {
-      return () => btn.removeEventListener("click", onClick);
-    }
+    const timers: number[] = [];
 
-    let raf = 0;
-    let x = 0;
-    let y = 0;
-    const update = () => {
-      raf = 0;
-      const e = el.getBoundingClientRect();
-      const dx = x - (e.left + e.width / 2);
-      const dy = y - (e.top + e.height / 2);
-      const d = Math.hypot(dx, dy) || 1;
-      // Look at the pointer: all the way once it is 80px off, less when close.
-      const m = Math.min(1, d / 80);
-      el.style.setProperty("--lx", `${((dx / d) * m * 3).toFixed(2)}px`);
-      el.style.setProperty("--ly", `${((dy / d) * m * 2.5).toFixed(2)}px`);
-      // How close to the button's edge, 0 (220px or more) to 1 (touching).
-      const r = btn.getBoundingClientRect();
-      const edge = Math.hypot(Math.max(r.left - x, 0, x - r.right), Math.max(r.top - y, 0, y - r.bottom));
-      btn.style.setProperty("--near", Math.max(0, 1 - edge / 220).toFixed(3));
+    const onClick = () => {
+      const asleep = btn.dataset.wake === undefined;
+      if (asleep) {
+        // Where each letter has to travel to reach the middle of the button.
+        const b = btn.getBoundingClientRect();
+        const cx = b.left + b.width / 2;
+        const cy = b.top + b.height / 2;
+        el.querySelectorAll<HTMLElement>(".vm-l").forEach((l) => {
+          const r = l.getBoundingClientRect();
+          l.style.setProperty("--dx", `${(cx - (r.left + r.width / 2)).toFixed(1)}px`);
+          l.style.setProperty("--dy", `${(cy - (r.top + r.height / 2)).toFixed(1)}px`);
+        });
+        btn.style.setProperty("--h", `${b.height}px`);
+        btn.dataset.wake = "";
+      }
+      // Shake again on every click: drop the flag, reflow, set it back.
+      btn.removeAttribute("data-angry");
+      void btn.offsetWidth;
+      const delay = asleep ? WAKE_MS : 0;
+      timers.push(
+        window.setTimeout(() => {
+          btn.dataset.angry = "";
+          complain(btn, OUCH_MS - delay);
+        }, delay),
+      );
     };
-    const onMove = (ev: PointerEvent) => {
-      x = ev.clientX;
-      y = ev.clientY;
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
+
+    btn.addEventListener("click", onClick);
     return () => {
       btn.removeEventListener("click", onClick);
-      window.removeEventListener("pointermove", onMove);
-      cancelAnimationFrame(raf);
+      timers.forEach((t) => window.clearTimeout(t));
     };
   }, []);
 
   return (
-    <>
-      <span ref={face} className="vm-face" aria-hidden>
-        <span className="vm-eye" />
-        <span className="vm-eye" />
-      </span>
-      <span className="vm-peek" aria-hidden>
-        {PEEK.map((s, i) => (
-          <span key={s.key} style={{ "--p": i } as React.CSSProperties}>
-            <BotSvg spec={s.crew} />
+    <span ref={root} className="vm-wake">
+      <span className="sr-only">{label}</span>
+      <span className="vm-letters" aria-hidden>
+        {[...label].map((ch, i) => (
+          <span key={i} className="vm-l" style={{ "--i": i } as React.CSSProperties}>
+            {ch === " " ? " " : ch}
           </span>
         ))}
       </span>
-    </>
+      <span className="vm-bot" aria-hidden>
+        {[0, 1].map((i) => (
+          <span key={i} className="vm-e">
+            <span className="vm-brow" />
+            <span className="vm-pill" />
+          </span>
+        ))}
+      </span>
+    </span>
   );
 }

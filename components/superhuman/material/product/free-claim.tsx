@@ -49,7 +49,7 @@ export function FreeClaim({
   tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt";
   /** Show the one-line ask above the field. */
   prompt?: boolean;
-  /** Drawn in the button in place of its arrow (Viral Machine's eyes, viral-machine-cta.tsx). */
+  /** The button's whole content, in place of its label and icon (Viral Machine's sleeping bot, viral-machine-cta.tsx). */
   face?: React.ReactNode;
   /** Extra classes for that button. */
   buttonClassName?: string;
@@ -254,13 +254,16 @@ export function FreeClaim({
           disabled={state === "sending"}
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
-          {state === "sending" ? (
-            <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
-          ) : (
-            !face && <Download aria-hidden className="h-4 w-4" />
+          {face ?? (
+            <>
+              {state === "sending" ? (
+                <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download aria-hidden className="h-4 w-4" />
+              )}
+              {reveal ?? "Download"}
+            </>
           )}
-          {reveal ?? "Download"}
-          {state !== "sending" && face}
         </button>
         <p role={state === "failed" ? "alert" : undefined} className={`mt-3 min-h-[1.2em] text-balance text-[0.88rem] ${state === "failed" ? t.error : t.soft}`}>
           {state === "failed"
@@ -306,8 +309,12 @@ export function FreeClaim({
           }
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
-          {reveal}
-          {face ?? <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />}
+          {face ?? (
+            <>
+              {reveal}
+              <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </>
+          )}
         </button>
         <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
           Free. It arrives by email, or {signIn(t.ink)} to download it now.

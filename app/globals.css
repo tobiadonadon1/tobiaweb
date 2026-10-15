@@ -2015,67 +2015,85 @@ html[data-vm-intro="done"] .vm-crew {
   to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
 
-/* THE BUTTON IS A BOT (viral-machine-cta.tsx). Two Grok eyes in the label's
-   colour, four bots under the bottom edge that rise as the pointer comes near
-   (--near, 0 to 1, set by script), and on hover a wobbly body that jumps
-   through the six colours. Touch screens get the eyes looking around and the
-   bots playing peekaboo. The bots sit behind the label (isolation + z -1). */
+/* THE BUTTON IS A SLEEPING BOT (viral-machine-cta.tsx). At rest only the
+   label on a black pill. On click (data-wake) the letters fly to the middle
+   and vanish, two pill eyes pop out, and the black shape (::before, so the
+   button keeps its size and nothing below it moves) closes from pill to
+   circle. data-angry brings the brows down and shakes it. */
 .vm-cta {
-  --near: 0;
   position: relative;
-  overflow: hidden;
   isolation: isolate;
-  border-radius: 1.75rem;
+  background: none;
 }
-.vm-face {
-  display: inline-flex;
-  gap: 3px;
-  margin-left: 0.15rem;
-  transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(calc(1 + var(--near) * 0.35));
-  transition: transform 0.18s ease-out;
-}
-.vm-eye {
-  width: 5px;
-  height: 11px;
-  border-radius: 3px;
-  background: currentColor;
-  transform: rotate(14deg);
-}
-.vm-peek {
+.vm-cta::before {
+  content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
-  pointer-events: none;
+  margin: auto;
+  width: 100%;
+  border-radius: 999px;
+  background: #16171B;
+  transition: width 0.4s cubic-bezier(0.6, 0, 0.25, 1) 0.18s, background-color 0.2s;
 }
-.vm-peek > span {
+.vm-cta:hover::before { background-color: #000; }
+.vm-cta[data-wake]::before { width: var(--h, 3.5rem); }
+.vm-cta[data-wake] { scale: 1; }
+.vm-wake { position: relative; display: inline-flex; }
+.vm-letters { display: inline-flex; white-space: pre; }
+.vm-l {
+  display: inline-block;
+  transition:
+    transform 0.36s cubic-bezier(0.55, 0, 0.35, 1) calc(var(--i) * 10ms),
+    opacity 0.22s ease-in calc(var(--i) * 10ms + 0.12s);
+}
+.vm-cta[data-wake] .vm-l { transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0.15); opacity: 0; }
+.vm-bot {
   position: absolute;
-  bottom: 0;
-  left: calc(7% + var(--p) * 24%);
-  width: 1.4rem;
-  height: 1.4rem;
-  transform: translateY(calc(100% - var(--near) * 50%));
-  transition: transform 0.4s cubic-bezier(0.3, 1.7, 0.5, 1) calc(var(--p) * 45ms);
+  left: 50%;
+  top: 50%;
+  display: flex;
+  gap: 6px;
+  transform: translate(-50%, -58%) scale(0);
+  transition: transform 0.32s cubic-bezier(0.3, 1.7, 0.5, 1) 0.3s;
 }
-.vm-peek svg { display: block; width: 100%; height: 100%; }
-@media (prefers-reduced-motion: no-preference) {
-  .vm-eye { animation: vm-blink 4.2s infinite; }
-  .vm-eye + .vm-eye { animation-delay: 0.02s; }
+.vm-cta[data-wake] .vm-bot { transform: translate(-50%, -58%) scale(1); }
+.vm-e { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.vm-pill {
+  width: 6px;
+  height: 15px;
+  border-radius: 3px;
+  background: #fff;
+  transform: rotate(14deg);
+  transition: transform 0.2s ease-out;
 }
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .vm-cta:hover { animation: vm-blob 1.5s ease-in-out infinite, vm-hue 2.4s steps(1, end) infinite; }
-  .vm-cta:hover .vm-peek > span { transform: translateY(32%); }
-  .vm-cta:hover .vm-face { transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(1.4); }
+.vm-brow {
+  width: 11px;
+  height: 3.5px;
+  border-radius: 2px;
+  background: #fff;
+  opacity: 0;
+  transform: translateY(-4px) rotate(0deg);
+  transition: opacity 0.15s, transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
-@media (hover: none) and (prefers-reduced-motion: no-preference) {
-  .vm-cta { animation: vm-hue 7.2s steps(1, end) infinite; }
-  .vm-cta:active { animation: vm-blob 0.5s ease-in-out, vm-hue 7.2s steps(1, end) infinite; }
-  .vm-face { animation: vm-look 4.5s ease-in-out infinite; }
-  .vm-peek > span { animation: vm-peekaboo 3.6s ease-in-out infinite; animation-delay: calc(var(--p) * 0.4s); }
+.vm-cta[data-angry] .vm-e:first-child .vm-brow { opacity: 1; transform: translateY(1px) rotate(28deg); }
+.vm-cta[data-angry] .vm-e:last-child .vm-brow { opacity: 1; transform: translateY(1px) rotate(-28deg); }
+.vm-cta[data-angry] .vm-pill { transform: rotate(14deg) scaleY(0.78); }
+.vm-cta[data-angry] { animation: vm-huff 0.42s ease-in-out; }
+@keyframes vm-huff {
+  0%, 100% { translate: 0 0; }
+  20% { translate: -3px 0; }
+  40% { translate: 3px 0; }
+  60% { translate: -2px 0; }
+  80% { translate: 2px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .vm-peek { display: none; }
+  .vm-cta::before, .vm-l, .vm-bot, .vm-pill, .vm-brow { transition: none; }
+  .vm-cta[data-angry] { animation: none; }
 }
-/* What the button says when it is clicked (viral-machine-cta.tsx). */
+
+/* What the bot says when it is woken up (viral-machine-cta.tsx). Its length
+   is set from the script (OUCH_MS less the wake-up). */
 .vm-ouch {
   position: absolute;
   z-index: 60;
@@ -2093,7 +2111,7 @@ html[data-vm-intro="done"] .vm-crew {
   pointer-events: none;
   box-shadow: 0 12px 28px -14px rgba(11, 31, 58, 0.45);
   transform-origin: var(--tail, 50%) 120%;
-  animation: vm-ouch 1.4s ease-out forwards; /* OUCH_MS */
+  animation: vm-ouch 1.8s ease-out forwards;
 }
 .vm-ouch::after {
   content: "";
@@ -2110,46 +2128,17 @@ html[data-vm-intro="done"] .vm-crew {
 }
 @keyframes vm-ouch {
   0% { opacity: 0; transform: scale(0.4) rotate(-6deg); }
-  14% { opacity: 1; transform: scale(1.08) rotate(2deg); }
-  24% { transform: scale(1) rotate(0deg); }
-  80% { opacity: 1; translate: 0 -3px; }
+  12% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  20% { transform: scale(1) rotate(0deg); }
+  82% { opacity: 1; translate: 0 -3px; }
   100% { opacity: 0; translate: 0 -10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .vm-ouch { animation-name: vm-ouch-still; }
 }
 @keyframes vm-ouch-still {
-  0%, 80% { opacity: 1; }
+  0%, 85% { opacity: 1; }
   100% { opacity: 0; }
-}
-@keyframes vm-blink {
-  0%, 92%, 100% { scale: 1 1; }
-  95% { scale: 1 0.12; }
-}
-@keyframes vm-look {
-  0%, 100% { translate: 0 0; }
-  25% { translate: -3px 0; }
-  50% { translate: 0 -1px; }
-  75% { translate: 3px 1px; }
-}
-@keyframes vm-peekaboo {
-  0%, 20%, 100% { transform: translateY(100%); }
-  40%, 60% { transform: translateY(38%); }
-}
-/* Irregular, never more than the button's height can hold vertically. */
-@keyframes vm-blob {
-  0%, 100% { border-radius: 1.75rem; rotate: 0deg; }
-  25% { border-radius: 2.6rem 1.3rem 2.2rem 1.1rem / 1.2rem 2.2rem 1.3rem 2.1rem; rotate: -2deg; }
-  50% { border-radius: 1.2rem 2.8rem 1.4rem 2.4rem / 2.1rem 1.3rem 2.2rem 1.2rem; rotate: 1.5deg; }
-  75% { border-radius: 2.3rem 1.5rem 2.7rem 1.2rem / 1.3rem 2.1rem 1.4rem 2.2rem; rotate: -1deg; }
-}
-@keyframes vm-hue {
-  0% { background-color: #2E66EE; color: #FFFFFF; }
-  16.66% { background-color: #4DB39B; color: #05231B; }
-  33.33% { background-color: #EF9440; color: #2A1300; }
-  50% { background-color: #8152EE; color: #FFFFFF; }
-  66.66% { background-color: #EC5A33; color: #230600; }
-  83.33% { background-color: #16171B; color: #FFFFFF; }
 }
 
 /* ------------------------------------------------------------------ *
