@@ -342,13 +342,15 @@ export function ViralMachinePage() {
           >
             Viral Machine
           </h1>
-          <p className="mt-7 max-w-[34ch] text-balance text-[1.2rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.78)] md:text-[1.45rem]">
-            Your X manager, inside Grok Bot. Every morning it tells you what to post, and writes it the way you write.
+          {/* Two lines, one per sentence, on every screen (Tobia's ask). */}
+          <p className="mt-7 text-center text-[1.08rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.78)] sm:text-[1.3rem] md:text-[1.45rem]">
+            <span className="block">Your X manager, inside Grok Bot.</span>
+            <span className="block">It tells you what to post, in your voice.</span>
           </p>
-          <div id="claim" className="mt-9 w-full max-w-[30rem] scroll-mt-28">
+          <div id="claim" className="mt-9 flex w-full justify-center scroll-mt-28">
             <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="ink" />
           </div>
-          <p className={`mt-4 text-[0.95rem] ${MUTED}`}>Free · sent to your inbox · it never posts for you</p>
+          <p className={`mt-4 text-center text-[0.95rem] ${MUTED}`}>It never posts, likes or follows for you.</p>
           <div id={HERO_ID} aria-hidden className="h-px" />
         </div>
       </section>

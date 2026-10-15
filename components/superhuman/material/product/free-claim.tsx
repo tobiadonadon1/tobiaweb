@@ -241,7 +241,7 @@ export function FreeClaim({
           )}
           {reveal ?? "Download"}
         </button>
-        <p role={state === "failed" ? "alert" : undefined} className={`mt-3 min-h-[1.2em] text-[0.88rem] ${state === "failed" ? t.error : t.soft}`}>
+        <p role={state === "failed" ? "alert" : undefined} className={`mt-3 min-h-[1.2em] text-balance text-[0.88rem] ${state === "failed" ? t.error : t.soft}`}>
           {state === "failed"
             ? `That didn't work. Try again, or write to ${SHOP_EMAIL}.`
             : <>Downloads now. Signed in as <span className={t.ink}>{member.email}</span>.</>}
