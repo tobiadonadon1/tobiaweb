@@ -23,7 +23,8 @@ import { createElement as h, type ReactElement } from "react";
 
 export type Shape = "disc" | "circle" | "triangle" | "diamond" | "square" | "trio";
 
-export type BotSpec = { shape: Shape; color: string };
+/** `eye` recolours the pill eyes (white by default), for a light bot on a coloured ground. */
+export type BotSpec = { shape: Shape; color: string; eye?: string };
 
 /** Grok Bot's avatar colours, plus a red Tobia asked for. */
 export const COLORS = {
@@ -35,7 +36,7 @@ export const COLORS = {
   red: "#ec5a33",
 } as const;
 
-const EYE = "#ffffff";
+const WHITE = "#ffffff";
 const SLOT = "#050505";
 
 /** Two pill eyes, leaning like Grok Bot's: centred on (cx, cy), w x h each. */
@@ -83,6 +84,7 @@ function metalDefs() {
 
 function body(spec: BotSpec): ReactElement {
   const c = spec.color;
+  const EYE = spec.eye ?? WHITE;
   switch (spec.shape) {
     case "disc":
       return h(

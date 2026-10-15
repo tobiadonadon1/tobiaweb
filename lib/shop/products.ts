@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -732,6 +732,59 @@ export const APP_DESIGNER_PRO: Product = {
   },
 };
 
+export const VIRAL_MACHINE: Product = {
+  id: "viral-machine",
+  name: "Viral Machine",
+  description:
+    "Your X manager inside Grok Bot: it learns your account and your niche, finds the angles, and hands you posts in your voice every morning, one tap from live. Instant download.",
+  // Stripe's default_price for prod_VRir0B4DJgdsn9 is €5 a month (price_1UQpQ9B7HQhkKmiF09ahU4a7,
+  // read 2026-10-15); the checkout sends this row as a one-time €5 against the product instead.
+  priceCents: 500,
+  currency: "eur",
+  priceLabel: money(500, "eur"),
+  href: "/projects/construct/material/setups/viral-machine",
+  file: {
+    sealed: "viral-machine.zip.enc",
+    filename: "viral-machine.zip",
+    // Two text files (the install file and START HERE): no scripts, so Gmail takes it.
+    attach: true,
+  },
+  // Stripe "Viral Machine" (live).
+  stripeProductId: "prod_VRir0B4DJgdsn9",
+  share: {
+    description:
+      "Viral Machine turns Grok Bot into your X manager. It learns what works for your account, watches your niche every morning, finds angles in what people actually ask, and writes posts in your voice that you post with one tap. Built on X's open-sourced ranking code. It never posts for you.",
+    kicker: "Grok Bot · your X manager",
+    line: "Your X manager, inside Grok Bot.",
+    proof: "Your account · your niche · your voice",
+  },
+  contents: [
+    ["Viral Machine.md", "the one file you give Grok Bot: it sets up your X manager from it"],
+    ["START HERE.txt", "the three steps"],
+  ],
+  steps: [
+    "Unzip it. In Grok Bot, tap New, then Create new Bot.",
+    "Attach Viral Machine.md and send: Set yourself up from this file.",
+    "Answer its three questions. Your first posts arrive in about 20 minutes.",
+  ],
+  email: {
+    preheader: "Your X manager is inside. Give the file to Grok Bot.",
+    stepsIntro: "Where to start:",
+    after: [
+      "It asks three things: your X handle, what you want to be known for (and what never), and 1 to 3 accounts you'd like to resemble. Then it reads your X and your niche and sends your first three posts, ready to tap.",
+      "Every morning after that: the posts worth posting today, in your voice. Say \"ideas\", \"write <topic>\", \"article about <topic>\" or \"posted\" any time. It never posts for you: you tap Post.",
+    ],
+  },
+  thanks: {
+    needs: "You'll need Grok Bot (the X Subscription Premium plan or higher) and a public X account.",
+    next: [
+      ["In about 20 minutes", "Your first three posts, each with the reason it should work, one tap from live."],
+      ["Every morning", "The posts worth posting today: from your niche, from what people ask, in your voice."],
+      ["Every Friday", "It learns: your edits become rules, and it checks its posts against the ones you write alone."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -744,6 +797,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "grok-army": GROK_ARMY,
   "app-designer-pro": APP_DESIGNER_PRO,
   "copycat-detective": COPYCAT_DETECTIVE,
+  "viral-machine": VIRAL_MACHINE,
 };
 
 export function productById(id: unknown): Product | undefined {

@@ -40,7 +40,8 @@
  * the two that do the most work: they are the far ends of the wheel from each
  * other and both hold their own against the paper.
  * ------------------------------------------------------------------ */
-import { squadShapes } from "./product/grok-army-bots";
+import { botShape, squadShapes } from "./product/grok-army-bots";
+import { SIX as VM_SIX } from "./product/viral-machine-bits";
 
 const INK = "#0b1f3a";
 const VERMILION = "#ce4631";
@@ -847,6 +848,23 @@ function GrokArmy() {
 }
 
 /**
+ * VIRAL MACHINE — its six Grok bots, one per job, in the page's own colours
+ * (product/viral-machine-bits.tsx): the metal disc, the one you talk to, in
+ * front and largest, the five others gathered round it.
+ */
+const VM_LAYOUT = [
+  { x: 30, y: 40, s: 0.78 },
+  { x: 150, y: 14, s: 0.7 },
+  { x: 282, y: 36, s: 0.8 },
+  { x: 24, y: 196, s: 0.86 },
+  { x: 290, y: 190, s: 0.8 },
+  { x: 118, y: 104, s: 1.7 },
+];
+function ViralMachine() {
+  return <>{VM_SIX.map((b, i) => botShape(b.crew, { ...VM_LAYOUT[i], key: `vm-${i}` }))}</>;
+}
+
+/**
  * APP DESIGNER PRO — two phones, cut from paper, side by side: an iPhone and
  * an Android, the same app on both. Each holds one decision (a disc, a bar),
  * and a pink wedge in front is the play button: the screens move now. The
@@ -911,6 +929,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "jev-crypto-analyst": JevCryptoAnalyst,
   "grok-army": GrokArmy,
   "app-designer-pro": AppDesignerPro,
+  "viral-machine": ViralMachine,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,

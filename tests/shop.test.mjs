@@ -52,6 +52,8 @@ const PRO_ZIP = Buffer.from("PK\u0003\u0004 the iphone and android design skill 
 writeFileSync(path.join(cwd, "private", "app-designer-pro.zip.enc"), seal(PRO_ZIP, parseKey(fileKey)));
 const COPYCAT_ZIP = Buffer.from("PK\u0003\u0004 the copycat detective skill " + "c".repeat(3700));
 writeFileSync(path.join(cwd, "private", "copycat-detective.zip.enc"), seal(COPYCAT_ZIP, parseKey(fileKey)));
+const VIRAL_ZIP = Buffer.from("PK\u0003\u0004 the x manager for grok bot " + "v".repeat(3800));
+writeFileSync(path.join(cwd, "private", "viral-machine.zip.enc"), seal(VIRAL_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -189,7 +191,7 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "App Designer Pro first, then Grok Army, the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["viral-machine", "app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Viral Machine first, then App Designer Pro, Grok Army, the 98¢ Trade, Launchr, Jev");
   // App Designer Pro: a setup, sold at €5 on the Stripe product Tobia made.
   const pro = productById("app-designer-pro");
   assert.equal(pro.href, entryHref("setups", "app-designer-pro"));
@@ -800,6 +802,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files.launchr.bytes, LAUNCHR_ZIP.length);
   assert.equal(body.files["grok-army"].bytes, GROK_ARMY_ZIP.length);
   assert.equal(body.files["app-designer-pro"].bytes, PRO_ZIP.length);
+  assert.equal(body.files["viral-machine"].bytes, VIRAL_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));
