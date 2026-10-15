@@ -38,6 +38,13 @@ export type Six = {
   crew: BotSpec;
 };
 
+/**
+ * How long the button's speech bubble shows (viral-machine-cta.tsx; the CSS
+ * animation .vm-ouch is the same length), and so how long the pill stays
+ * after a click. Here, not in the client file, so the server page can read it.
+ */
+export const OUCH_MS = 1400;
+
 export const C = Object.fromEntries(SIX.map((s) => [s.key, s])) as Record<Key, Six>;
 
 /** One Grok bot in a 100 x 100 box. */

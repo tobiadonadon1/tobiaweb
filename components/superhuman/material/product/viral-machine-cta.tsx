@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { BotSvg, C } from "./viral-machine-bits";
+import { BotSvg, C, OUCH_MS } from "./viral-machine-bits";
 
 /**
  * THE BUTTON IS A BOT.
@@ -22,8 +22,9 @@ import { BotSvg, C } from "./viral-machine-bits";
  *   Click      it complains, in a speech bubble over its eyes. Each click
  *              says the next line, and the place in the list is kept per
  *              visitor (localStorage), so a returning visitor hears a new one.
- *              The bubble is plain DOM on <body>: the click swaps the button
- *              for the email field, and the bubble has to outlive it.
+ *              The page passes FreeClaim `hold={OUCH_MS}`, so the pill stays
+ *              until the bubble is gone and only then gives way to the email
+ *              field or the download. The bubble is plain DOM on <body>.
  *
  * Reduced motion keeps the eyes, still, and nothing else moves.
  */
@@ -40,6 +41,7 @@ const OUCH = [
   "Hey, that tickles.",
 ];
 const OUCH_KEY = "vm-ouch";
+
 
 function nextOuch(): string {
   let i = 0;
@@ -70,7 +72,7 @@ function complain(eyes: HTMLElement) {
   bubble.style.top = `${r.top + window.scrollY - bubble.offsetHeight - 18}px`;
   // The tail points at the eyes even when the bubble is pushed off-centre.
   bubble.style.setProperty("--tail", `${Math.min(Math.max(cx - left, 16), w - 16)}px`);
-  window.setTimeout(() => bubble.remove(), 2200);
+  window.setTimeout(() => bubble.remove(), OUCH_MS);
 }
 
 export function CtaFace() {

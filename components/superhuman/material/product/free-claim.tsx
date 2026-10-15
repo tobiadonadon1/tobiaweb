@@ -32,6 +32,7 @@ export function FreeClaim({
   tone = "dark",
   reveal,
   face,
+  hold = 0,
   buttonClassName = "",
   className = "",
 }: {
@@ -52,6 +53,12 @@ export function FreeClaim({
   face?: React.ReactNode;
   /** Extra classes for that button. */
   buttonClassName?: string;
+  /**
+   * Milliseconds the button stays after a click before the form (or the
+   * download) takes its place, so what it says in its speech bubble is said
+   * on the pill. Each further click starts the wait again.
+   */
+  hold?: number;
   className?: string;
 }) {
   const id = useId();
@@ -65,6 +72,13 @@ export function FreeClaim({
   const [open, setOpen] = useState(!reveal);
   const input = useRef<HTMLInputElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
+  const holding = useRef(0);
+  useEffect(() => () => window.clearTimeout(holding.current), []);
+  const afterHold = (go: () => void) => {
+    if (!hold) return go();
+    window.clearTimeout(holding.current);
+    holding.current = window.setTimeout(go, hold);
+  };
 
   // The phone's sticky bar links to #claim: arriving there means "I want it"
   // was already tapped once, so open the field instead of asking twice.
@@ -236,7 +250,7 @@ export function FreeClaim({
       <div ref={wrap} className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
         <button
           type="button"
-          onClick={take}
+          onClick={() => afterHold(take)}
           disabled={state === "sending"}
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
@@ -283,11 +297,13 @@ export function FreeClaim({
       <div ref={wrap} className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
         <button
           type="button"
-          onClick={() => {
-            setOpen(true);
-            // The field takes the button's place; put the cursor in it.
-            requestAnimationFrame(() => input.current?.focus());
-          }}
+          onClick={() =>
+            afterHold(() => {
+              setOpen(true);
+              // The field takes the button's place; put the cursor in it.
+              requestAnimationFrame(() => input.current?.focus());
+            })
+          }
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
           {reveal}

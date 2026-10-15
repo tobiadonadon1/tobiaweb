@@ -2093,7 +2093,7 @@ html[data-vm-intro="done"] .vm-crew {
   pointer-events: none;
   box-shadow: 0 12px 28px -14px rgba(11, 31, 58, 0.45);
   transform-origin: var(--tail, 50%) 120%;
-  animation: vm-ouch 2.2s ease-out forwards;
+  animation: vm-ouch 1.4s ease-out forwards; /* OUCH_MS */
 }
 .vm-ouch::after {
   content: "";
@@ -2110,10 +2110,10 @@ html[data-vm-intro="done"] .vm-crew {
 }
 @keyframes vm-ouch {
   0% { opacity: 0; transform: scale(0.4) rotate(-6deg); }
-  12% { opacity: 1; transform: scale(1.08) rotate(2deg); }
-  20% { transform: scale(1) rotate(0deg); }
-  75% { opacity: 1; translate: 0 -4px; }
-  100% { opacity: 0; translate: 0 -14px; }
+  14% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  24% { transform: scale(1) rotate(0deg); }
+  80% { opacity: 1; translate: 0 -3px; }
+  100% { opacity: 0; translate: 0 -10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .vm-ouch { animation-name: vm-ouch-still; }
