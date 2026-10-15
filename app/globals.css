@@ -2075,6 +2075,53 @@ html[data-vm-intro="done"] .vm-crew {
 @media (prefers-reduced-motion: reduce) {
   .vm-peek { display: none; }
 }
+/* What the button says when it is clicked (viral-machine-cta.tsx). */
+.vm-ouch {
+  position: absolute;
+  z-index: 60;
+  max-width: min(16rem, calc(100vw - 24px));
+  padding: 0.55rem 0.9rem;
+  border: 2px solid #16171B;
+  border-radius: 1rem;
+  background: #fff;
+  color: #16171B;
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 12px 28px -14px rgba(11, 31, 58, 0.45);
+  transform-origin: var(--tail, 50%) 120%;
+  animation: vm-ouch 2.2s ease-out forwards;
+}
+.vm-ouch::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: var(--tail, 50%);
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: solid #16171B;
+  border-width: 0 2px 2px 0;
+  background: #fff;
+  transform: rotate(45deg);
+}
+@keyframes vm-ouch {
+  0% { opacity: 0; transform: scale(0.4) rotate(-6deg); }
+  12% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  20% { transform: scale(1) rotate(0deg); }
+  75% { opacity: 1; translate: 0 -4px; }
+  100% { opacity: 0; translate: 0 -14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vm-ouch { animation-name: vm-ouch-still; }
+}
+@keyframes vm-ouch-still {
+  0%, 80% { opacity: 1; }
+  100% { opacity: 0; }
+}
 @keyframes vm-blink {
   0%, 92%, 100% { scale: 1 1; }
   95% { scale: 1 0.12; }

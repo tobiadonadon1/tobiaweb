@@ -19,10 +19,59 @@ import { BotSvg, C } from "./viral-machine-bits";
  *   Touch      no pointer to follow, so the eyes look around and the bots play
  *              peekaboo on their own, slower.
  *
+ *   Click      it complains, in a speech bubble over its eyes. Each click
+ *              says the next line, and the place in the list is kept per
+ *              visitor (localStorage), so a returning visitor hears a new one.
+ *              The bubble is plain DOM on <body>: the click swaps the button
+ *              for the email field, and the bubble has to outlive it.
+ *
  * Reduced motion keeps the eyes, still, and nothing else moves.
  */
 
 const PEEK = [C.angles, C.account, C.niche, C.voice];
+
+const OUCH = [
+  "Ouch.",
+  "Next time, a little softer.",
+  "No need to smash.",
+  "Easy, easy.",
+  "Gently. We bruise.",
+  "Ow. Worth it though.",
+  "Hey, that tickles.",
+];
+const OUCH_KEY = "vm-ouch";
+
+function nextOuch(): string {
+  let i = 0;
+  try {
+    i = Number(localStorage.getItem(OUCH_KEY)) || 0;
+    localStorage.setItem(OUCH_KEY, String(i + 1));
+  } catch {
+    // Storage blocked: count for this page view only.
+    i = (window as { __vmOuch?: number }).__vmOuch ?? 0;
+    (window as { __vmOuch?: number }).__vmOuch = i + 1;
+  }
+  return OUCH[i % OUCH.length];
+}
+
+/** Pops the bubble over the eyes, then lets it float off and removes it. */
+function complain(eyes: HTMLElement) {
+  document.querySelectorAll(".vm-ouch").forEach((b) => b.remove());
+  const r = eyes.getBoundingClientRect();
+  const bubble = document.createElement("div");
+  bubble.className = "vm-ouch";
+  bubble.setAttribute("aria-hidden", "true");
+  bubble.textContent = nextOuch();
+  document.body.appendChild(bubble);
+  const w = bubble.offsetWidth;
+  const cx = r.left + r.width / 2;
+  const left = Math.min(Math.max(cx - w / 2, 12), window.innerWidth - w - 12);
+  bubble.style.left = `${left + window.scrollX}px`;
+  bubble.style.top = `${r.top + window.scrollY - bubble.offsetHeight - 18}px`;
+  // The tail points at the eyes even when the bubble is pushed off-centre.
+  bubble.style.setProperty("--tail", `${Math.min(Math.max(cx - left, 16), w - 16)}px`);
+  window.setTimeout(() => bubble.remove(), 2200);
+}
 
 export function CtaFace() {
   const face = useRef<HTMLSpanElement>(null);
@@ -31,7 +80,11 @@ export function CtaFace() {
     const el = face.current;
     const btn = el?.closest<HTMLElement>(".vm-cta");
     if (!el || !btn) return;
-    if (!matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) return;
+    const onClick = () => complain(el);
+    btn.addEventListener("click", onClick);
+    if (!matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches) {
+      return () => btn.removeEventListener("click", onClick);
+    }
 
     let raf = 0;
     let x = 0;
@@ -58,6 +111,7 @@ export function CtaFace() {
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => {
+      btn.removeEventListener("click", onClick);
       window.removeEventListener("pointermove", onMove);
       cancelAnimationFrame(raf);
     };
