@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { KEY, SKIP_CSS } from "./web-designer-pro-skip";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { SKIP_CSS } from "./web-designer-pro-skip";
 
 /**
  * THE OPENING: A NAME, DESIGNED IN FRONT OF YOU.
@@ -19,11 +19,12 @@ import { KEY, SKIP_CSS } from "./web-designer-pro-skip";
  * tints the browser's own bars: paper while the canvas is up, cobalt once it
  * floods, then back.
  *
- * ONCE PER VISIT, like the homepage's rule: coming back to this page in the
- * same tab, or back from Stripe (?checkout=), goes straight to the hero; a
- * refresh plays it again. SKIP_SCRIPT (web-designer-pro-skip.ts) decides
- * before the first paint on a full load; the layout effect decides on a
- * client-side visit. Either adds the one <style id="wdp-skip"> that hides it.
+ * EVERY TIME the page is opened (Tobia's call: leaving and coming back plays
+ * it again), except on the way back from Stripe (?checkout=), where the
+ * visitor needs the hero and its message at once. SKIP_SCRIPT
+ * (web-designer-pro-skip.ts) catches that before the first paint on a full
+ * load, the layout effect on a client-side visit; either adds the one
+ * <style id="wdp-skip"> that hides it.
  *
  * Reduced motion shows the last frame and fades it away. Decoration over a
  * page that is already there, so hidden from assistive tech.
@@ -48,8 +49,6 @@ function themeMeta(): HTMLMetaElement {
 
 const LINES = ["Web", "Designer"];
 
-/** False until the first mount in this document: that one is a full load, later ones are client-side visits. */
-let mountedBefore = false;
 
 /** The name as typed: one span per letter (the same in both layers, so they line up to the pixel). */
 function Name({ live = false }: { live?: boolean }) {
@@ -95,28 +94,11 @@ function Name({ live = false }: { live?: boolean }) {
 export function WebDesignerProIntro() {
   const [done, setDone] = useState(false);
 
-  // Decided once per mount: React's development replay of effects must reuse
-  // the decision, not read back the "played" flag it just wrote.
-  const skip = useRef<boolean | null>(null);
-
-  // Before paint: skip a return visit, and measure where the pour starts.
+  // Before paint: skip the way back from Stripe, and measure where the pour starts.
   useLayoutEffect(() => {
     const root = document.querySelector<HTMLElement>(".wdp-intro");
     if (!root) return;
-    if (skip.current === null) {
-      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-      const fullLoad = !mountedBefore && !!nav && new URL(nav.name).pathname === location.pathname;
-      mountedBefore = true;
-      let played = false;
-      try {
-        played = sessionStorage.getItem(KEY) === "1";
-        sessionStorage.setItem(KEY, "1");
-      } catch {
-        // Blocked storage: it just plays.
-      }
-      skip.current = fullLoad ? skipping() : played || location.search.includes("checkout=");
-    }
-    if (skip.current && !skipping()) {
+    if (location.search.includes("checkout=") && !skipping()) {
       const s = document.createElement("style");
       s.id = "wdp-skip";
       s.textContent = SKIP_CSS;
