@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { currentMember, noteDownload } from "@/lib/account";
+import { subscribe } from "@/lib/newsletter";
 import { sendFree } from "@/lib/shop/deliver";
 import { freeLink } from "@/lib/shop/free";
 import { recordLead } from "@/lib/shop/leads";
@@ -7,7 +8,7 @@ import { productById } from "@/lib/shop/products";
 import { originFor } from "@/lib/shop/stripe";
 
 /**
- * POST /api/free   { product, email, website? }
+ * POST /api/free   { product, email, website?, newsletter? }
  *
  * "Let me know where you want me to send the product": the free product's
  * whole checkout. It emails the product (the same email a buyer gets, with a
@@ -25,6 +26,11 @@ import { originFor } from "@/lib/shop/stripe";
  * no email to wait for. The answer carries the signed download link for their
  * own address and the page starts the download at once. The lead is still
  * recorded, so the sheet keeps counting who took what.
+ *
+ * THE NEWSLETTER BOX under the button (lib/newsletter.ts): `newsletter: true`
+ * only when the visitor ticked it. The address goes on the list, and its
+ * lead row says " · newsletter", so the sheet has it even if the list's
+ * table is not there yet.
  */
 
 export const dynamic = "force-dynamic";
@@ -72,12 +78,16 @@ export async function POST(request: Request) {
   const product = productById(body.product);
   if (!product || !product.free) return Response.json({ ok: false, error: "not-free" }, { status: 404 });
 
+  const news = body.newsletter === true;
+  const tag = news ? " · newsletter" : "";
+
   const { member, cookies } = await currentMember(request);
   if (member) {
     const download = freeLink(originFor(request), product, member.email);
     await later(async () => {
       await noteDownload(member, product.id);
-      const stored = await recordLead({ email: member.email, product: product.id, page: `${product.href} (member)` });
+      if (news) await subscribe(member.email, product.id);
+      const stored = await recordLead({ email: member.email, product: product.id, page: `${product.href} (member)${tag}` });
       console.info("[free] member lead", product.id, stored);
     });
     const headers = new Headers({ "content-type": "application/json" });
@@ -104,14 +114,18 @@ export async function POST(request: Request) {
     const sent = await sendFree(product, email, origin);
     console.info("[free] sent", product.id, sent.via);
     await later(async () => {
-      const stored = await recordLead({ email, product: product.id, page: product.href });
+      if (news) await subscribe(email, product.id);
+      const stored = await recordLead({ email, product: product.id, page: `${product.href}${tag}` });
       console.info("[free] lead", product.id, stored);
     });
     return Response.json({ ok: true });
   } catch (err) {
     console.error("[free] could not send", product.id, err);
     // Keep the address even if the send failed, so Tobia can follow up.
-    await later(() => recordLead({ email, product: product.id, page: `${product.href} (send failed)` }));
+    await later(async () => {
+      if (news) await subscribe(email, product.id);
+      await recordLead({ email, product: product.id, page: `${product.href} (send failed)${tag}` });
+    });
     return Response.json({ ok: false, error: "send-failed" }, { status: 502 });
   }
 }

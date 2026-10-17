@@ -1,16 +1,19 @@
 import { accountsConfigured, adminClient, authClient, currentMember, sessionCookies, type Session } from "@/lib/account";
+import { isSubscribed, setMailing, subscribe } from "@/lib/newsletter";
 
 /**
  * POST /api/account/<action>   (and GET /api/account/me)
  *
- *   signup  { email, password }        creates the account; Supabase emails a code
+ *   signup  { email, password, newsletter? }  creates the account; Supabase emails a code
  *   verify  { email, code }            confirms it and signs in
  *   resend  { email }                  a fresh code
- *   signin  { email, password }        signs in (unconfirmed → a code goes out)
+ *   signin  { email, password, newsletter? }  signs in (unconfirmed → a code goes out);
+ *                                     the reply says whether they're subscribed
+ *   newsletter                         the signed-in member ticks the box (the sign-in nudge)
  *   forgot  { email }                  emails a reset code
  *   reset   { email, code, password }  sets the new password and signs in
  *   signout                            clears the session
- *   me      (GET)                      { member: { email } | null }
+ *   me      (GET)                      { member: { email, newsletter } | null }
  *
  * Every answer is { ok, error? } with one of a few plain error codes the page
  * turns into a sentence. The session lives in httpOnly cookies set here
@@ -61,7 +64,8 @@ function reason(err: { message?: string; code?: string; status?: number } | null
 export async function GET(request: Request, { params }: { params: Promise<{ action: string }> }) {
   if ((await params).action !== "me") return fail("not-found", 404);
   const { member, cookies } = await currentMember(request);
-  return reply({ ok: true, member: member ? { email: member.email } : null }, 200, cookies);
+  if (!member) return reply({ ok: true, member: null }, 200, cookies);
+  return reply({ ok: true, member: { email: member.email, newsletter: await isSubscribed(member.email) } }, 200, cookies);
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ action: string }> }) {
@@ -72,6 +76,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
 
   if (action === "signout") return signedIn(null);
 
+  // The box ticked after signing in (the bot's nudge on the sign-in form).
+  if (action === "newsletter") {
+    const { member, cookies } = await currentMember(request);
+    if (!member) return fail("signed-out", 401);
+    await subscribe(member.email, "signin");
+    return reply({ ok: true }, 200, cookies);
+  }
+
   let body: Record<string, unknown> = {};
   try {
     body = await request.json();
@@ -81,6 +93,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase().slice(0, 254) : "";
   const password = typeof body.password === "string" ? body.password : "";
   const code = typeof body.code === "string" ? body.code.replace(/\D/g, "").slice(0, 10) : "";
+  // The newsletter box: only a real tick counts, never a default.
+  const newsletter = body.newsletter === true;
   if (!EMAIL.test(email)) return fail("bad-email");
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -98,6 +112,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
       // Supabase answers an address that already has a confirmed account with
       // an empty user rather than an error, and sends nothing.
       if (data.user && (data.user.identities ?? []).length === 0) return fail("exists");
+      // The trigger made the members row; write the box's answer on it.
+      await setMailing(email, newsletter, "signup");
       return reply({ ok: true, next: "code" });
     }
     case "resend": {
@@ -116,13 +132,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
         const why = reason(error);
         // Signed up but never typed the code: send a fresh one and go there.
         if (why === "unconfirmed") {
+          // The password was right (Supabase checks it first): a tick counts.
+          if (newsletter) await subscribe(email, "signin");
           const sent = await sb.auth.resend({ type: "signup", email });
           if (sent.error && reason(sent.error) === "mail-down") return fail("mail-down", 503);
           return reply({ ok: false, error: "unconfirmed", next: "code" });
         }
         return fail(why);
       }
-      return signedIn(data.session);
+      if (newsletter) await subscribe(email, "signin");
+      const subscribed = newsletter || (await isSubscribed(email));
+      return reply({ ok: true, newsletter: subscribed }, 200, sessionCookies(data.session, secure));
     }
     case "forgot": {
       const { error } = await sb.auth.resetPasswordForEmail(email);

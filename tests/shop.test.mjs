@@ -54,6 +54,8 @@ const COPYCAT_ZIP = Buffer.from("PK\u0003\u0004 the copycat detective skill " + 
 writeFileSync(path.join(cwd, "private", "copycat-detective.zip.enc"), seal(COPYCAT_ZIP, parseKey(fileKey)));
 const VIRAL_ZIP = Buffer.from("PK\u0003\u0004 the x manager for grok bot " + "v".repeat(3800));
 writeFileSync(path.join(cwd, "private", "viral-machine.zip.enc"), seal(VIRAL_ZIP, parseKey(fileKey)));
+const WDP_ZIP = Buffer.from("PK\u0003\u0004 the website and component design skill " + "w".repeat(3700));
+writeFileSync(path.join(cwd, "private", "web-designer-pro.zip.enc"), seal(WDP_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -191,7 +193,15 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "App Designer Pro first, then Grok Army, the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["web-designer-pro", "app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Web Designer Pro first, then App Designer Pro, Grok Army, the 98¢ Trade, Launchr, Jev");
+  // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
+  const wdp = productById("web-designer-pro");
+  assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "web-designer-pro")?.product, "web-designer-pro");
+  assert.equal(wdp.stripeProductId, "prod_VRir0B4DJgdsn9");
+  assert.equal(wdp.priceCents, 500);
+  assert.equal(wdp.priceLabel, "€5");
+  assert.equal(wdp.file.attach, false, "the skill ships scripts, so the email carries a link");
   // App Designer Pro: a setup, sold at €5 on the Stripe product Tobia made.
   const pro = productById("app-designer-pro");
   assert.equal(pro.href, entryHref("setups", "app-designer-pro"));
@@ -656,6 +666,25 @@ test("free: if Gmail fails the visitor is told, and the address is still kept", 
   }
 });
 
+test("free: the newsletter box rides with the claim, and only a real tick marks the lead row", async () => {
+  process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
+  sheetRows.length = 0;
+  try {
+    const ticked = await ask({ product: "launchr", email: "yes-please@example.com", newsletter: true }, "203.0.113.40");
+    assert.equal(ticked.status, 200);
+    const left = await ask({ product: "launchr", email: "no-thanks@example.com" }, "203.0.113.41");
+    assert.equal(left.status, 200);
+    const sneaky = await ask({ product: "launchr", email: "string@example.com", newsletter: "true" }, "203.0.113.42");
+    assert.equal(sneaky.status, 200);
+    assert.equal(sheetRows.length, 3);
+    assert.match(sheetRows[0].page, / · newsletter$/);
+    assert.doesNotMatch(sheetRows[1].page, /newsletter/);
+    assert.doesNotMatch(sheetRows[2].page, /newsletter/, "only a boolean true is a tick");
+  } finally {
+    delete process.env.LEADS_WEBHOOK_URL;
+  }
+});
+
 test("webhook: the same event twice sends one email", async () => {
   const id = purchase();
   await webhook(signedEvent(id));
@@ -825,6 +854,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["grok-army"].bytes, GROK_ARMY_ZIP.length);
   assert.equal(body.files["app-designer-pro"].bytes, PRO_ZIP.length);
   assert.equal(body.files["viral-machine"].bytes, VIRAL_ZIP.length);
+  assert.equal(body.files["web-designer-pro"].bytes, WDP_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

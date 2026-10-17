@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -784,6 +784,62 @@ export const VIRAL_MACHINE: Product = {
   },
 };
 
+export const WEB_DESIGNER_PRO: Product = {
+  id: "web-designer-pro",
+  name: "Web Designer Pro",
+  description:
+    "A €5 skill for Claude Code and Codex that designs websites that don't look AI-made: it asks first, starts from real kits and checks every screen.",
+  // Stripe "Web Design 2.0" (prod_VRir0B4DJgdsn9, live). Its default price is €5
+  // recurring (price_1UQpQ9B7HQhkKmiF09ahU4a7, read 2026-10-16); the checkout
+  // ignores it and charges this row once, like every other skill. Keep €5 here.
+  priceCents: 500,
+  currency: "eur",
+  priceLabel: money(500, "eur"),
+  href: "/projects/construct/material/setups/web-designer-pro",
+  file: {
+    sealed: "web-designer-pro.zip.enc",
+    filename: "web-designer-pro.zip",
+    // The skill ships scripts (.mjs, .swift), and Gmail refuses those zips.
+    attach: false,
+  },
+  stripeProductId: "prod_VRir0B4DJgdsn9",
+  share: {
+    description:
+      "Every AI-built site looks the same. Web Designer Pro, a €5 skill for Claude Code and Codex, designs yours like a studio: it asks first, starts from real kits and checks every screen.",
+    kicker: "Skill · for Claude Code & Codex",
+    line: "Every AI-built site looks the same. Yours won't.",
+    proof: "Asks first · no stock photos · every screen",
+  },
+  contents: [
+    ["web-designer-pro/SKILL.md", "the process it follows, from the first questions to the checked, scored site"],
+    ["assets/kits/", "the kits every design starts from: glass components, a dashboard, poster pages, serif pages"],
+    ["references/", "the bar, layering and light, the Claude look to avoid, directions, copy that converts, critique"],
+    ["scripts/shoot.mjs, matrix.mjs", "render every page at four widths and on Windows, Linux, Safari and Firefox, and scan it for slop"],
+    ["scripts/image.mjs, cutout.swift", "product photos made on your ChatGPT plan through Codex, and cut-outs of your own photos on a Mac"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude, or codex.",
+    "Type hi. It installs Web Designer Pro in about a minute.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code or Codex, and type hi.",
+    after: [
+      "From then on, type /web-designer-pro in Claude Code or $web-designer-pro in Codex, or just ask it to design your site, a page or a component.",
+      "It asks a few questions first (what it's for, how it should feel, screenshots you love, whether you have photos), then shows you three directions. If you pay for ChatGPT, it makes the photos on your plan through Codex.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), and Node.js 18 or newer, on a Mac, Windows or Linux. Photos are optional: send your own, or let Codex make them on your ChatGPT plan.",
+    next: [
+      ["Right after install", "It offers to design your first page. Have one sentence ready: what it is, and who it's for."],
+      ["Every design", "A few questions, three directions on your real first screen, then the build, checked at four widths and on Windows, Linux, Safari and Firefox."],
+      ["Whenever you want", "Say \"a pricing component\", \"make it a dashboard\", \"try it without photos\" or \"redesign my site\"."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -797,6 +853,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "app-designer-pro": APP_DESIGNER_PRO,
   "copycat-detective": COPYCAT_DETECTIVE,
   "viral-machine": VIRAL_MACHINE,
+  "web-designer-pro": WEB_DESIGNER_PRO,
 };
 
 export function productById(id: unknown): Product | undefined {

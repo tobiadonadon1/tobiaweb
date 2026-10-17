@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Check, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useMember } from "./use-member";
+import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } from "./newsletter";
 
 /**
  * SIGN IN, CREATE AN ACCOUNT, RESET THE PASSWORD.
@@ -16,6 +17,11 @@ import { useMember } from "./use-member";
  * Creating an account is an email, a password, then the six-digit code
  * Supabase sends (from Tobia's Gmail, see lib/account.ts). Signing in with an
  * account that never got its code sends a fresh one and opens the code step.
+ *
+ * THE NEWSLETTER BOX (newsletter.tsx) sits under Create account and Sign in,
+ * never ticked, never required. Signing in without it, to an account that
+ * isn't subscribed, holds the redirect for one moment: a small bot pops up
+ * and asks, the button becomes Continue, and Continue goes on either way.
  */
 
 type Mode = "signin" | "signup" | "code" | "forgot" | "reset";
@@ -35,7 +41,7 @@ const HEAD: Record<Mode, [string, string]> = {
   signin: ["Sign in", "Take any free skill or guide in one click, without typing your email each time."],
   signup: [
     "Create your account",
-    "One account for all of Construct. Free skills and guides download in one click, and new ones reach you by email.",
+    "One account for all of Construct. Every free skill and guide downloads in one click.",
   ],
   code: ["Check your email", ""],
   forgot: ["Reset your password", "Type your email and we'll send you a code."],
@@ -47,14 +53,14 @@ function safeNext(raw: string | null) {
   return raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
 }
 
-async function call(action: string, body?: Record<string, string>) {
+async function call(action: string, body?: Record<string, string | boolean>) {
   try {
     const res = await fetch(`/api/account/${action}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body ?? {}),
     });
-    return (await res.json().catch(() => ({ ok: false }))) as { ok?: boolean; error?: string; next?: string };
+    return (await res.json().catch(() => ({ ok: false }))) as { ok?: boolean; error?: string; next?: string; newsletter?: boolean };
   } catch {
     return { ok: false, error: "failed" };
   }
@@ -85,6 +91,10 @@ export function AccountForms() {
   // A wrong password and an address with no account look the same from here
   // (Supabase won't say which), so the error offers both ways forward.
   const [mismatch, setMismatch] = useState(false);
+  const [news, setNews] = useState(false);
+  // Signed in, not subscribed, box left empty: the bot asks once (see above).
+  const [nudge, setNudge] = useState(false);
+  const known = useKnownSubscribed();
   const first = useRef<HTMLInputElement>(null);
 
   // Each step starts with the cursor where the typing starts.
@@ -94,6 +104,7 @@ export function AccountForms() {
 
   const go = (m: Mode) => {
     setMode(m);
+    setNudge(false);
     setError("");
     setNote("");
     setMismatch(false);
@@ -110,6 +121,15 @@ export function AccountForms() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (busy) return;
+    // Already signed in; the bot asked. Continue, with the box as it is now.
+    if (nudge) {
+      setBusy(true);
+      if (news) {
+        const r = await call("newsletter");
+        if (r.ok) rememberSubscribed();
+      }
+      return finish();
+    }
     // A new password is typed twice, so a slip can't lock anyone out.
     if ((mode === "signup" || mode === "reset") && password.length >= 8 && password !== again) {
       setMismatch(false);
@@ -122,11 +142,17 @@ export function AccountForms() {
     setNote("");
     setMismatch(false);
     const action = mode === "code" ? "verify" : mode;
-    const r = await call(action, { email, password, code });
+    const ticked = (mode === "signin" || mode === "signup") && news;
+    const r = await call(action, { email, password, code, newsletter: ticked });
     setBusy(false);
     if (r.ok) {
+      if (ticked || r.newsletter) rememberSubscribed();
       if (r.next === "code") return go("code");
       if (r.next === "reset") return go("reset");
+      if (mode === "signin" && r.newsletter === false && !ticked) {
+        setNudge(true);
+        return;
+      }
       return finish();
     }
     if (r.error === "unconfirmed") {
@@ -198,7 +224,7 @@ export function AccountForms() {
   const needsPassword = mode === "signin" || mode === "signup" || mode === "reset";
   const needsCode = mode === "code" || mode === "reset";
   const button = {
-    signin: "Sign in",
+    signin: nudge ? "Continue" : "Sign in",
     signup: "Create account",
     code: "Confirm",
     forgot: "Send the code",
@@ -331,6 +357,22 @@ export function AccountForms() {
               onChange={(e) => setAgain(e.target.value)}
               aria-invalid={again.length > 0 && again !== password.slice(0, again.length)}
               className={field}
+            />
+          </div>
+        ) : null}
+
+        {mode === "signup" || (mode === "signin" && (nudge || known === false)) ? (
+          <div className="flex flex-col gap-4">
+            {nudge ? <NewsletterBot happy={news} /> : null}
+            <NewsletterBox
+              checked={news}
+              onChange={setNews}
+              soft="text-[color:rgba(11,31,58,0.75)]"
+              accent="var(--accent-clay-text)"
+              mark="var(--paper)"
+              line="rgba(11,31,58,0.45)"
+              nudge={nudge}
+              className="max-w-none"
             />
           </div>
         ) : null}

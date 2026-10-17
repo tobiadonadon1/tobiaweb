@@ -8,7 +8,11 @@ import { useEffect, useState } from "react";
  * load, shared by every caller; `undefined` while it is still asking, so a
  * form never flashes in and out.
  */
-export type MemberInfo = { email: string } | null;
+export type MemberInfo = {
+  email: string;
+  /** Said yes to the newsletter box (lib/newsletter.ts), so it isn't shown to them. */
+  newsletter?: boolean;
+} | null;
 
 let pending: Promise<MemberInfo> | null = null;
 

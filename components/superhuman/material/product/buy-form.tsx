@@ -39,6 +39,7 @@ export function BuyForm({
   label,
   soon = false,
   buttonClassName,
+  align = "center",
   className = "",
 }: {
   productId: string;
@@ -54,6 +55,8 @@ export function BuyForm({
   soon?: boolean;
   /** The button's colours and shadow, for a page whose action is not clay. */
   buttonClassName?: string;
+  /** Where the checkout error sits: under a centred button, or flush left under a left one. */
+  align?: "center" | "start";
   className?: string;
 }) {
   const [pending, setPending] = useState(false);
@@ -124,7 +127,7 @@ export function BuyForm({
       {failed ? (
         <p
           role="alert"
-          className={`mx-auto mt-5 max-w-[30ch] text-pretty text-[0.95rem] leading-[1.5] ${
+          className={`${align === "center" ? "mx-auto" : ""} mt-5 max-w-[30ch] text-pretty text-[0.95rem] leading-[1.5] ${
             tone === "ink" ? "text-[var(--paper)]" : "text-[var(--accent-clay-text)]"
           }`}
         >

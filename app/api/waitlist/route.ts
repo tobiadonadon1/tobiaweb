@@ -1,5 +1,6 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
+import { subscribe } from "@/lib/newsletter";
 
 /**
  * POST /api/waitlist
@@ -19,6 +20,12 @@ import path from "node:path";
  *                serverless host this is EPHEMERAL, which is why the response
  *                says `durable: false` and the form tells the visitor to email
  *                instead.
+ *
+ * THE NEWSLETTER BOX on the skills-shelf popup (download-gate.tsx) sends
+ * `newsletter: true` and the shelf item's title only when ticked. The address
+ * goes on the list (lib/newsletter.ts, source "shelf:<item>"), and the
+ * forwarded or logged row carries `newsletter: true` too, so it is never lost
+ * even before the list's table exists.
  *
  * TODO(tobia): set WAITLIST_WEBHOOK_URL in the deployment env and this becomes
  * a real list with no code change.
@@ -48,7 +55,7 @@ const INTERESTS = new Set([
   "",
 ]);
 
-type Payload = { email: string; source: string; interest: string };
+type Payload = { email: string; source: string; interest: string; newsletter?: true; item?: string };
 
 function parse(body: unknown): Payload | null {
   if (typeof body !== "object" || body === null) return null;
@@ -59,7 +66,10 @@ function parse(body: unknown): Payload | null {
   if (!EMAIL.test(email)) return null;
   if (!SOURCES.has(source)) return null;
   if (!INTERESTS.has(interest)) return null;
-  return { email, source, interest };
+  // Only a real tick counts. The item is reduced to a slug, never free text.
+  if (b.newsletter !== true) return { email, source, interest };
+  const item = typeof b.item === "string" ? b.item.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) : "";
+  return { email, source, interest, newsletter: true, ...(item ? { item } : {}) };
 }
 
 export async function POST(request: Request) {
@@ -76,6 +86,8 @@ export async function POST(request: Request) {
   }
 
   const row = { ...payload, at: new Date().toISOString() };
+  // Never fails the request: a missing table is logged inside subscribe().
+  if (payload.newsletter) await subscribe(payload.email, `shelf:${payload.item || "skill"}`);
   const webhook = process.env.WAITLIST_WEBHOOK_URL;
 
   if (webhook) {

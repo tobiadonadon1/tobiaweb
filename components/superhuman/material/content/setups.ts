@@ -15,6 +15,20 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "web-designer-pro",
+    title: "Web Designer Pro",
+    kind: "setup",
+    summary:
+      "Websites and components that look like a studio made them: it asks first, starts from real kits, and works with or without photos.",
+    // Minutes to install it, answer its questions and see three directions.
+    minutes: 15,
+    status: "ready",
+    when: "You want a site, a landing page or a component that doesn't look like every other AI page.",
+    level: "Anyone",
+    body: [],
+    product: "web-designer-pro",
+  },
+  {
     slug: "app-designer-pro",
     title: "App Designer Pro",
     kind: "setup",

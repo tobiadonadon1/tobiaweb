@@ -2186,3 +2186,362 @@ html[data-vm-intro="done"] .vm-crew {
     }
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * WEB DESIGNER PRO (web-designer-pro-page.tsx, web-designer-pro-intro.tsx).
+ * The poster family the skill teaches: cobalt, huge wide red type crossing
+ * a cut-out portrait, mono labels.
+ * THE OPENING happens in a design tool: on a ruled paper canvas a caret
+ * types WEB DESIGNER in cobalt, the text is selected and its corner dragged
+ * until the name fills the screen (the size readout counts up), then a click
+ * pours cobalt from the handle, turning the type red where it passes, PRO.
+ * lands, and at 2.8s it dissolves into the hero. No linear() easings here: in the
+ * animation shorthand one silently dropped the rest of this file once.
+ * Reduced motion: the last frame fades in and out.
+ * ------------------------------------------------------------------ */
+@property --wdp-px {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 32;
+}
+.wdp-page {
+  --wdp-out: cubic-bezier(0.7, 0, 0.2, 1);
+  --wdp-slam: cubic-bezier(0.2, 1.35, 0.4, 1);
+  --wdp-select: #0d99ff;
+}
+.wdp-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  background: #eceae3;
+  color: #1f3ad6;
+  font-family: var(--wdp-archivo), sans-serif;
+  /* The type's size before and after the drag. --wdp-at-x/y (where the
+     colour pours from) are measured by the script; these are the fallback. */
+  --wdp-from: 8vw;
+  --wdp-to: 21vw;
+  --wdp-at-x: 90%;
+  --wdp-at-y: 55%;
+  animation: wdp-curtain 450ms ease-out 2.8s forwards;
+}
+@media (min-width: 768px) {
+  .wdp-intro { --wdp-from: 3.4vw; --wdp-to: 10vw; --wdp-at-x: 94%; --wdp-at-y: 52%; }
+}
+.wdp-intro[data-done] {
+  animation: wdp-curtain 300ms ease-out forwards;
+}
+/* The rulers along the top and left edge, like any design tool. */
+.wdp-intro__ruler {
+  position: absolute;
+  z-index: 3;
+  background-color: #e2dfd6;
+  animation: wdp-fade-out 200ms ease-out 1.85s forwards;
+}
+.wdp-intro__ruler--x {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.25rem;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.18);
+  background-image: repeating-linear-gradient(90deg, rgba(17, 17, 17, 0.35) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(90deg, rgba(17, 17, 17, 0.55) 0 1px, transparent 1px 100px);
+  background-size: 100% 0.35rem, 100% 0.7rem;
+  background-position: 0 100%, 0 100%;
+  background-repeat: repeat-x;
+}
+.wdp-intro__ruler--y {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1.25rem;
+  border-right: 1px solid rgba(17, 17, 17, 0.18);
+  background-image: repeating-linear-gradient(180deg, rgba(17, 17, 17, 0.35) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(180deg, rgba(17, 17, 17, 0.55) 0 1px, transparent 1px 100px);
+  background-size: 0.35rem 100%, 0.7rem 100%;
+  background-position: 100% 0, 100% 0;
+  background-repeat: repeat-y;
+}
+.wdp-intro__file {
+  position: absolute;
+  z-index: 3;
+  top: 2rem;
+  left: 2.25rem;
+  font-family: var(--wdp-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.6);
+  animation: wdp-fade-out 200ms ease-out 1.85s forwards;
+}
+/* The fill: cobalt, with the name in red on it, revealed by a circle that
+   grows from the cursor. */
+.wdp-intro__flood {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #1f3ad6;
+  color: #ff3b1f;
+  clip-path: circle(0 at var(--wdp-at-x) var(--wdp-at-y));
+  animation: wdp-flood 560ms var(--wdp-out) 1.85s forwards;
+}
+.wdp-intro__stage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  padding: 0 1.25rem;
+}
+.wdp-intro__box {
+  display: block;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  /* Set left on a phone, where the name breaks in two: the letters type in
+     from the left edge instead of appearing around a centre. */
+  text-align: left;
+  font-size: var(--wdp-to);
+  font-variation-settings: "wdth" 62;
+}
+@media (min-width: 768px) {
+  .wdp-intro__box { text-align: center; font-variation-settings: "wdth" 112; }
+}
+.wdp-intro__box--live {
+  font-size: var(--wdp-from);
+  animation: wdp-grow 700ms cubic-bezier(0.55, 0, 0.15, 1) 1.05s forwards;
+}
+.wdp-intro__text { position: relative; display: inline-block; }
+.wdp-intro__line { display: block; white-space: nowrap; }
+@media (min-width: 768px) {
+  .wdp-intro__line { display: inline; }
+}
+.wdp-intro__box--live .wdp-intro__ch {
+  position: relative;
+  opacity: 0;
+  animation: wdp-type 1ms linear calc(0.2s + var(--n) * 45ms) forwards;
+}
+/* The caret: each letter carries it for as long as it is the last one typed;
+   the last letter keeps it until the text is selected. */
+.wdp-intro__box--live .wdp-intro__ch::after {
+  content: "";
+  position: absolute;
+  right: -0.05em;
+  top: 0.02em;
+  width: 0.05em;
+  height: 0.8em;
+  background: currentColor;
+  opacity: 0;
+  animation: wdp-caret 45ms steps(1) calc(0.2s + var(--n) * 45ms);
+}
+.wdp-intro__box--live .wdp-intro__ch--last::after {
+  animation-duration: 250ms;
+}
+/* The selection: a hairline, four handles and the size readout. */
+.wdp-intro__sel {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--wdp-select);
+  opacity: 0;
+  pointer-events: none;
+  animation: wdp-fade-in-full 1ms linear 0.95s forwards, wdp-fade-out 160ms ease-out 1.85s forwards;
+}
+.wdp-intro__sel i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #fff;
+  border: 1.5px solid var(--wdp-select);
+}
+.wdp-intro__sel i:nth-child(1) { left: -5px; top: -5px; }
+.wdp-intro__sel i:nth-child(2) { right: -5px; top: -5px; }
+.wdp-intro__sel i:nth-child(3) { left: -5px; bottom: -5px; }
+.wdp-intro__sel i:nth-child(4) { right: -5px; bottom: -5px; }
+/* The readout counts the type's size up during the drag. The numbers are
+   written into the keyframes (Firefox won't animate a var() there), and
+   rounded where they're read (Safari animates the integer through
+   fractions, which counter-reset rejects). */
+.wdp-intro__size {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 10px);
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--wdp-select);
+  color: #fff;
+  font-family: var(--wdp-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-transform: none;
+  font-variation-settings: normal;
+  --wdp-px: 32;
+  counter-reset: px round(var(--wdp-px), 1);
+  animation: wdp-count-m 700ms cubic-bezier(0.55, 0, 0.15, 1) 1.05s forwards;
+}
+@media (min-width: 768px) {
+  .wdp-intro__size { --wdp-px: 48; animation-name: wdp-count-d; }
+}
+.wdp-intro__size::after {
+  content: "Archivo · 900 · " counter(px) " px";
+}
+/* The cursor rides the bottom-right handle. */
+.wdp-intro__cursor {
+  position: absolute;
+  right: -14px;
+  bottom: -18px;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  animation: wdp-cursor-in 300ms var(--wdp-out) 0.8s forwards, wdp-click 160ms ease-out 1.72s, wdp-fade-out 200ms ease-out 2.1s forwards;
+}
+.wdp-intro__pro {
+  display: block;
+  opacity: 0;
+}
+.wdp-intro__flood .wdp-intro__pro {
+  animation: wdp-drop 340ms var(--wdp-slam) 2.15s forwards;
+}
+.wdp-intro__edge {
+  position: absolute;
+  z-index: 4;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--wdp-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0;
+  animation: wdp-fade-in 300ms ease-out 2.25s forwards;
+}
+@keyframes wdp-type { to { opacity: 1; } }
+@keyframes wdp-caret { 0%, 100% { opacity: 1; } }
+@keyframes wdp-grow { to { font-size: var(--wdp-to); } }
+@keyframes wdp-count-m { from { --wdp-px: 32; } to { --wdp-px: 82; } }
+@keyframes wdp-count-d { from { --wdp-px: 48; } to { --wdp-px: 144; } }
+@keyframes wdp-flood { to { clip-path: circle(150vmax at var(--wdp-at-x) var(--wdp-at-y)); } }
+@keyframes wdp-cursor-in { from { opacity: 0; transform: translate(40px, 30px); } to { opacity: 1; transform: none; } }
+@keyframes wdp-click { 50% { transform: scale(0.82); } }
+@keyframes wdp-drop { from { opacity: 1; transform: scale(1.7); } to { opacity: 1; transform: none; } }
+@keyframes wdp-fade-in { from { opacity: 0; } to { opacity: 0.85; } }
+@keyframes wdp-fade-in-full { to { opacity: 1; } }
+@keyframes wdp-fade-out { to { opacity: 0; } }
+@keyframes wdp-curtain { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+@keyframes wdp-curtain-fade { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+@keyframes wdp-nav-in { from { opacity: 0; visibility: hidden; } }
+body:has(.wdp-intro) [data-site-nav] {
+  animation: wdp-nav-in 400ms ease-out 3s backwards;
+}
+body:has(.wdp-intro[data-done]) [data-site-nav] {
+  animation: wdp-nav-in 300ms ease-out backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wdp-intro { animation-name: wdp-curtain-fade; animation-delay: 1.8s; }
+  .wdp-intro[data-done] { animation-name: wdp-curtain-fade; animation-delay: 0s; }
+  .wdp-intro__ruler, .wdp-intro__file, .wdp-intro__sel { display: none; }
+  .wdp-intro__flood { clip-path: none; animation: none; }
+  .wdp-intro__flood .wdp-intro__pro, .wdp-intro__edge { animation: none; opacity: 1; }
+  body:has(.wdp-intro) [data-site-nav] { animation-delay: 1.8s; }
+}
+
+/* THE HERO. Phone (and a tablet held upright): the name, then the portrait
+   in the flow, cropped at the waist and fading into the cobalt, the caption
+   beside it. Landscape from 768px: the name is sized by the screen's width
+   AND height (25svh - 10px is the size at which the portrait, capped below,
+   exactly fills from the labels to the bottom edge), and the portrait hangs from just under the labels, never taller
+   than lets his chin clear the second line (chin at 20% of the photo, the
+   line at 0.8em: height <= (0.8em - 1.25rem) / 0.2), so the type always
+   crosses his chest, never his face, at any laptop size. */
+.wdp-title {
+  font-size: clamp(4.6rem, 23vw, 9rem);
+  font-variation-settings: "wdth" 62;
+  -webkit-mask-image: linear-gradient(180deg, #000 0 18%, transparent 18% 18.9%, #000 18.9% 51%, transparent 51% 51.9%, #000 51.9%);
+  mask-image: linear-gradient(180deg, #000 0 18%, transparent 18% 18.9%, #000 18.9% 51%, transparent 51% 51.9%, #000 51.9%);
+}
+.wdp-figure {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin: -16vw -1.25rem 0 0;
+}
+.wdp-figure__cap {
+  max-width: 8.5rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+.wdp-figure__crop {
+  height: 40svh;
+  aspect-ratio: 777 / 850;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 76%, transparent);
+  mask-image: linear-gradient(180deg, #000 76%, transparent);
+}
+.wdp-figure__crop img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media (min-width: 640px) {
+  .wdp-figure { margin-right: -2rem; }
+}
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) {
+  .wdp-title {
+    --wdp-title: clamp(6rem, min(15.5vw, 25svh - 10px), 22rem);
+    font-size: var(--wdp-title);
+    font-variation-settings: "wdth" 112;
+  }
+  .wdp-figure {
+    position: absolute;
+    top: 8.75rem;
+    right: 4%;
+    display: block;
+    margin: 0;
+    height: min(calc(100svh - 8.75rem), calc((0.8 * clamp(6rem, min(15.5vw, 25svh - 10px), 22rem) - 1.25rem) / 0.2));
+  }
+  .wdp-figure__cap {
+    position: absolute;
+    top: 9%;
+    right: 100%;
+    margin-right: 1rem;
+    max-width: none;
+    white-space: nowrap;
+  }
+  .wdp-figure__crop {
+    height: 100%;
+    aspect-ratio: 777 / 1392;
+    -webkit-mask-image: linear-gradient(180deg, #000 86%, transparent);
+    mask-image: linear-gradient(180deg, #000 86%, transparent);
+  }
+}
+/* Narrower landscape screens: the caption takes two lines, so it never
+   reaches the B of WEB. */
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) and (max-width: 1279px) {
+  .wdp-figure__cap { width: 8rem; white-space: normal; text-align: right; }
+}
+/* A tablet held upright: the phone layout, scaled up so the name fills the
+   width and the portrait tucks under it. */
+@media (min-width: 640px) and (max-aspect-ratio: 1/1) {
+  .wdp-title { font-size: min(23vw, 13rem); }
+  .wdp-figure { margin-top: -22vw; }
+}
+/* Short phones: a shorter portrait, so the button is on the first screen. */
+@media (max-aspect-ratio: 1/1) and (max-height: 700px) {
+  .wdp-figure__crop { height: 30svh; }
+}
+/* Short laptop screens: the line under the button gives way, so the button
+   stays on the first screen. */
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) and (max-height: 800px) {
+  .wdp-short-hide { display: none; }
+}

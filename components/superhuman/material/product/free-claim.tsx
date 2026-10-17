@@ -7,6 +7,7 @@ import { ArrowRight, Check, Download, LoaderCircle } from "lucide-react";
 import { SHOP_EMAIL, productById } from "@/lib/shop/products";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { startDownload, useMember } from "@/components/account/use-member";
+import { NewsletterBox, rememberSubscribed, useKnownSubscribed } from "@/components/account/newsletter";
 
 /**
  * "LET ME KNOW WHERE YOU WANT ME TO SEND THE PRODUCT."
@@ -24,6 +25,10 @@ import { startDownload, useMember } from "@/components/account/use-member";
  * the same button, and pressing it downloads the product there and then:
  * no field, no email to wait for. Everyone else, once it's sent, is told
  * they can skip the form next time with an account.
+ *
+ * THE NEWSLETTER BOX sits right under the button, in every state that has
+ * one, until this visitor has said yes (components/account/newsletter.tsx):
+ * never ticked for them, never required. A tick rides along with the claim.
  */
 export function FreeClaim({
   productId,
@@ -70,6 +75,12 @@ export function FreeClaim({
   const member = useMember();
   const pathname = usePathname();
   const [open, setOpen] = useState(!reveal);
+  const [news, setNews] = useState(false);
+  const known = useKnownSubscribed();
+  // Members: their own flag. Everyone else: whether this device said yes.
+  // While either is still unknown the box keeps its place, unseen.
+  const askNews = member ? member.newsletter === false : member === null && known === false;
+  const waitNews = member === undefined || (member === null && known === undefined);
   const input = useRef<HTMLInputElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const holding = useRef(0);
@@ -103,9 +114,10 @@ export function FreeClaim({
       const res = await fetch("/api/free", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ product: productId, email, website: trap }),
+        body: JSON.stringify({ product: productId, email, website: trap, newsletter: news }),
       });
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (body.ok && news) rememberSubscribed();
       if (body.ok) setState("sent");
       else if (body.error === "bad-email") setState("bad-email");
       else if (body.error === "too-many") setState("too-many");
@@ -122,9 +134,10 @@ export function FreeClaim({
       const res = await fetch("/api/free", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ product: productId }),
+        body: JSON.stringify({ product: productId, newsletter: news }),
       });
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; download?: string };
+      if (body.ok && news) rememberSubscribed();
       if (body.ok && body.download) {
         startDownload(body.download);
         setState("downloaded");
@@ -153,6 +166,7 @@ export function FreeClaim({
         check: "bg-white text-[#1636e6]",
         error: "text-[#ffd9cf]",
         button: "bg-[#d4361a] text-white",
+        box: ["#ffffff", "#1636e6", "rgba(255,255,255,0.75)"],
       }
     : tone === "forest"
     ? {
@@ -166,6 +180,7 @@ export function FreeClaim({
         check: "bg-[#f6f1e4] text-[#0e2a20]",
         error: "text-[#ffd2c6]",
         button: "bg-[#c43d27] text-[#fff8ef]",
+        box: ["#f6f1e4", "#0e2a20", "rgba(246,241,228,0.7)"],
       }
     : tone === "saffron"
     ? {
@@ -179,6 +194,7 @@ export function FreeClaim({
         check: "bg-[#0b1f3a] text-[#fdf6ea]",
         error: "text-[#7a1d0c]",
         button: "bg-[#0b1f3a] text-[#fdf6ea]",
+        box: ["#0b1f3a", "#fdf6ea", "rgba(11,31,58,0.55)"],
       }
     : light
     ? {
@@ -192,6 +208,7 @@ export function FreeClaim({
         check: tone === "ink" ? "bg-[#16171B] text-white" : "bg-[var(--accent-clay-text)] text-[var(--paper)]",
         error: "text-[var(--accent-clay-text)]",
         button: tone === "ink" ? "bg-[#16171B] text-white hover:bg-black" : "bg-[var(--accent-clay-text)] text-[var(--paper)]",
+        box: tone === "ink" ? ["#16171B", "#ffffff", "rgba(11,31,58,0.5)"] : ["var(--accent-clay-text)", "var(--paper)", "rgba(11,31,58,0.5)"],
       }
     : {
         ink: "text-[#f4f2ec]",
@@ -203,7 +220,24 @@ export function FreeClaim({
         check: "bg-[#f07a5f] text-[#050507]",
         error: "text-[#f07a5f]",
         button: "bg-[var(--accent-clay-text)] text-[var(--paper)]",
+        box: ["#f07a5f", "#050507", "rgba(244,242,236,0.5)"],
       };
+
+  // Right under the button, wherever there is one.
+  const newsBox =
+    askNews || waitNews ? (
+      <NewsletterBox
+        checked={news}
+        onChange={setNews}
+        soft={t.soft}
+        accent={t.box[0]}
+        mark={t.box[1]}
+        line={t.box[2]}
+        center={center}
+        hidden={!askNews}
+        className="mt-3.5"
+      />
+    ) : null;
 
   if (state === "sent") {
     return (
@@ -265,6 +299,7 @@ export function FreeClaim({
             </>
           )}
         </button>
+        {newsBox}
         <p role={state === "failed" ? "alert" : undefined} className={`mt-3 min-h-[1.2em] text-balance text-[0.88rem] ${state === "failed" ? t.error : t.soft}`}>
           {state === "failed"
             ? `That didn't work. Try again, or write to ${SHOP_EMAIL}.`
@@ -316,6 +351,7 @@ export function FreeClaim({
             </>
           )}
         </button>
+        {newsBox}
         <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
           Free. It arrives by email, or {signIn(t.ink)} to download it now.
         </p>
@@ -371,6 +407,7 @@ export function FreeClaim({
           )}
         </button>
       </div>
+      {newsBox}
       {/* The honeypot. Off screen, out of the tab order, ignored by people. */}
       <input
         type="text"

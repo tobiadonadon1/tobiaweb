@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/sections/SiteFooter";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { SHARE_DESCRIPTION } from "@/lib/bio";
 import { SITE } from "@/lib/site";
+import { SKIP_SCRIPT as WDP_SKIP_SCRIPT } from "@/components/superhuman/material/product/web-designer-pro-skip";
 
 /**
  * ONE TYPEFACE, everywhere.
@@ -135,6 +136,9 @@ export default function RootLayout({
             (lib/intro-policy.ts). Chrome restores before any script on the
             new page runs, so the homepage also marks itself "manual" as it
             unloads. Moving between pages inside the site is untouched. */}
+        {/* Web Designer Pro's opening plays once per visit: this hides it
+            before the first paint on a return (web-designer-pro-skip.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: WDP_SKIP_SCRIPT }} />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"&&location.pathname==="/"){history.scrollRestoration="manual";if(location.hash)history.replaceState(history.state,"",location.pathname+location.search);window.scrollTo(0,0)}addEventListener("pagehide",function(){if(location.pathname==="/")history.scrollRestoration="manual"})}catch(e){}`,

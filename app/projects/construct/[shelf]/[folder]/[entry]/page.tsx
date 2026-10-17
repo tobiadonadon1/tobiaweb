@@ -12,6 +12,7 @@ import { AppLauncherPage } from "@/components/superhuman/material/product/app-la
 import { GrokArmyPage } from "@/components/superhuman/material/product/grok-army-page";
 import { AppDesignerProPage } from "@/components/superhuman/material/product/app-designer-pro-page";
 import { ViralMachinePage } from "@/components/superhuman/material/product/viral-machine-page";
+import { WebDesignerProPage } from "@/components/superhuman/material/product/web-designer-pro-page";
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
@@ -158,4 +159,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "app-designer-pro": AppDesignerProPage,
   "copycat-detective": CopycatDetectivePage,
   "viral-machine": ViralMachinePage,
+  "web-designer-pro": WebDesignerProPage,
 };

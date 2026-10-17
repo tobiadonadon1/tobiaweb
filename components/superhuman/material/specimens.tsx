@@ -888,6 +888,29 @@ function AppDesignerPro() {
 }
 
 /**
+ * WEB DESIGNER PRO — a cobalt screen cut from paper, and two red bars, the
+ * headline, laid across it and running off its edge: the type breaks the
+ * frame, the way the page's poster does. A lime disc is the stamp. Nothing is
+ * tilted: tilted cards are on the skill's banned list. The colours are the
+ * page's own (product/web-designer-pro-page.tsx).
+ */
+function WebDesignerPro() {
+  return (
+    <>
+      <Cut d={CARD} x={78} y={58} s={1.3} sy={1.36} fill={SHADE} />
+      <Cut d={CARD} x={70} y={50} s={1.3} sy={1.36} fill="#1F3AD6" />
+      <Cut d={BAR} x={44} y={104} s={1.12} sy={1.9} fill={SHADE} />
+      <Cut d={BAR} x={38} y={98} s={1.12} sy={1.9} fill="#FF3B1F" />
+      <Cut d={BAR} x={60} y={168} s={0.86} sy={1.9} fill={SHADE} />
+      <Cut d={BAR} x={54} y={162} s={0.86} sy={1.9} fill="#FF3B1F" />
+      <Cut d={CARD} x={92} y={222} s={0.42} sy={0.2} fill="#faf8f2" opacity={0.94} />
+      <Cut d={DISC} x={286} y={30} s={0.56} fill={SHADE} />
+      <Cut d={DISC} x={280} y={24} s={0.56} fill="#E7F04F" />
+    </>
+  );
+}
+
+/**
  * COPYCAT DETECTIVE — two phones cut from the same paper, and a glass.
  *
  * The left card is the original: ultramarine, a saffron disc on its screen.
@@ -930,6 +953,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "grok-army": GrokArmy,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
+  "web-designer-pro": WebDesignerPro,
   // the skills themselves
   "art-director": ArtDirector,
   "product-manager": ProductManager,

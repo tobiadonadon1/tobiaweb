@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
+import { NewsletterBox, rememberSubscribed, useKnownSubscribed } from "@/components/account/newsletter";
 
 /**
  * THE ONE THING BEFORE THE DOWNLOAD.
@@ -30,6 +31,10 @@ import { useMember } from "@/components/account/use-member";
  *
  * A SIGNED-IN MEMBER NEVER SEES IT. Their address is already known, so the
  * button just saves the file (and notes the address, as the card would).
+ *
+ * THE NEWSLETTER BOX sits under the card's Download button, never ticked,
+ * until this device has said yes (components/account/newsletter.tsx). A tick
+ * rides along to /api/waitlist, which puts the address on the list.
  */
 export function DownloadGate({
   href,
@@ -49,6 +54,8 @@ export function DownloadGate({
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [news, setNews] = useState(false);
+  const known = useKnownSubscribed();
   const member = useMember();
   const pathname = usePathname();
 
@@ -82,7 +89,7 @@ export function DownloadGate({
     a.remove();
   }, [href]);
 
-  const note = (address: string) =>
+  const note = (address: string, newsletter = false) =>
     fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -90,6 +97,8 @@ export function DownloadGate({
         email: address,
         source: "superhuman",
         interest: "material",
+        // Only a tick is sent; the shelf item names where it was ticked.
+        ...(newsletter ? { newsletter: true, item: title } : {}),
       }),
     });
 
@@ -98,7 +107,8 @@ export function DownloadGate({
     if (busy) return;
     setBusy(true);
     try {
-      await note(email);
+      const res = await note(email, news);
+      if (news && res.ok) rememberSubscribed();
     } catch {
       // Deliberately swallowed. See the note above: the file is not held
       // hostage to my ability to store an address.
@@ -227,6 +237,17 @@ export function DownloadGate({
                     <Download className="h-4 w-4" />
                     {busy ? "One second" : `Download ${title}`}
                   </button>
+                  {known === false ? (
+                    <NewsletterBox
+                      checked={news}
+                      onChange={setNews}
+                      soft="text-[color:rgba(11,31,58,0.7)]"
+                      accent="var(--accent-clay)"
+                      mark="var(--paper)"
+                      line="rgba(11,31,58,0.45)"
+                      className="mt-4 max-w-none"
+                    />
+                  ) : null}
                 </form>
                 <p className="mt-4 text-[0.9rem] text-[color:rgba(11,31,58,0.62)]">
                   Have an account?{" "}
