@@ -1,5 +1,5 @@
-import { after } from "next/server";
 import { currentMember, noteDownload } from "@/lib/account";
+import { later } from "@/lib/later";
 import { subscribe } from "@/lib/newsletter";
 import { sendFree } from "@/lib/shop/deliver";
 import { freeLink } from "@/lib/shop/free";
@@ -28,26 +28,13 @@ import { originFor } from "@/lib/shop/stripe";
  * recorded, so the sheet keeps counting who took what.
  *
  * THE NEWSLETTER BOX under the button (lib/newsletter.ts): `newsletter: true`
- * only when the visitor ticked it. The address goes on the list, and its
- * lead row says " · newsletter", so the sheet has it even if the list's
- * table is not there yet.
+ * only when the visitor ticked it. The address goes on the list and to
+ * beehiiv (campaign free_skill), and its lead row says " · newsletter" too.
  */
 
 export const dynamic = "force-dynamic";
 // Room for the sheet's slow first answer, which runs after the response.
 export const maxDuration = 60;
-
-/**
- * Run `task` after the response has gone. Outside a request (the tests call
- * the handler directly) there is nothing to run after, so run it now.
- */
-async function later(task: () => Promise<unknown>) {
-  try {
-    after(task);
-  } catch {
-    await task();
-  }
-}
 
 const EMAIL = /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']{2,}$/;
 const WINDOW_MS = 10 * 60_000;
@@ -86,7 +73,7 @@ export async function POST(request: Request) {
     const download = freeLink(originFor(request), product, member.email);
     await later(async () => {
       await noteDownload(member, product.id);
-      if (news) await subscribe(member.email, product.id);
+      if (news) await subscribe(member.email, "free_skill", product.id);
       const stored = await recordLead({ email: member.email, product: product.id, page: `${product.href} (member)${tag}` });
       console.info("[free] member lead", product.id, stored);
     });
@@ -114,7 +101,7 @@ export async function POST(request: Request) {
     const sent = await sendFree(product, email, origin);
     console.info("[free] sent", product.id, sent.via);
     await later(async () => {
-      if (news) await subscribe(email, product.id);
+      if (news) await subscribe(email, "free_skill", product.id);
       const stored = await recordLead({ email, product: product.id, page: `${product.href}${tag}` });
       console.info("[free] lead", product.id, stored);
     });
@@ -123,7 +110,7 @@ export async function POST(request: Request) {
     console.error("[free] could not send", product.id, err);
     // Keep the address even if the send failed, so Tobia can follow up.
     await later(async () => {
-      if (news) await subscribe(email, product.id);
+      if (news) await subscribe(email, "free_skill", product.id);
       await recordLead({ email, product: product.id, page: `${product.href} (send failed)${tag}` });
     });
     return Response.json({ ok: false, error: "send-failed" }, { status: 502 });

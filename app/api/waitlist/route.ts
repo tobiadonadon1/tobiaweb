@@ -1,5 +1,6 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
+import { later } from "@/lib/later";
 import { subscribe } from "@/lib/newsletter";
 
 /**
@@ -23,7 +24,7 @@ import { subscribe } from "@/lib/newsletter";
  *
  * THE NEWSLETTER BOX on the skills-shelf popup (download-gate.tsx) sends
  * `newsletter: true` and the shelf item's title only when ticked. The address
- * goes on the list (lib/newsletter.ts, source "shelf:<item>"), and the
+ * goes on the list and to beehiiv (lib/newsletter.ts, source "shelf:<item>"), and the
  * forwarded or logged row carries `newsletter: true` too, so it is never lost
  * even before the list's table exists.
  *
@@ -86,8 +87,9 @@ export async function POST(request: Request) {
   }
 
   const row = { ...payload, at: new Date().toISOString() };
-  // Never fails the request: a missing table is logged inside subscribe().
-  if (payload.newsletter) await subscribe(payload.email, `shelf:${payload.item || "skill"}`);
+  // A free download like any other (campaign free_skill), sent after the
+  // response; subscribe() never throws.
+  if (payload.newsletter) await later(() => subscribe(payload.email, "free_skill", `shelf:${payload.item || "skill"}`));
   const webhook = process.env.WAITLIST_WEBHOOK_URL;
 
   if (webhook) {

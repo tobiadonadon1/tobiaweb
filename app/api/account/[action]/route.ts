@@ -1,4 +1,5 @@
 import { accountsConfigured, adminClient, authClient, currentMember, sessionCookies, type Session } from "@/lib/account";
+import { later } from "@/lib/later";
 import { isSubscribed, setMailing, subscribe } from "@/lib/newsletter";
 
 /**
@@ -10,6 +11,10 @@ import { isSubscribed, setMailing, subscribe } from "@/lib/newsletter";
  *   signin  { email, password, newsletter? }  signs in (unconfirmed → a code goes out);
  *                                     the reply says whether they're subscribed
  *   newsletter                         the signed-in member ticks the box (the sign-in nudge)
+ *
+ * The newsletter boxes go to lib/newsletter.ts after the response: Create
+ * account as beehiiv campaign account_signup, Sign in and its nudge as
+ * login_prompt. Their answer never changes what these actions reply.
  *   forgot  { email }                  emails a reset code
  *   reset   { email, code, password }  sets the new password and signs in
  *   signout                            clears the session
@@ -80,7 +85,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
   if (action === "newsletter") {
     const { member, cookies } = await currentMember(request);
     if (!member) return fail("signed-out", 401);
-    await subscribe(member.email, "signin");
+    await later(() => subscribe(member.email, "login_prompt", "signin:nudge"));
     return reply({ ok: true }, 200, cookies);
   }
 
@@ -113,7 +118,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
       // an empty user rather than an error, and sends nothing.
       if (data.user && (data.user.identities ?? []).length === 0) return fail("exists");
       // The trigger made the members row; write the box's answer on it.
-      await setMailing(email, newsletter, "signup");
+      await later(() => setMailing(email, newsletter, "account_signup", "signup"));
       return reply({ ok: true, next: "code" });
     }
     case "resend": {
@@ -133,14 +138,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
         // Signed up but never typed the code: send a fresh one and go there.
         if (why === "unconfirmed") {
           // The password was right (Supabase checks it first): a tick counts.
-          if (newsletter) await subscribe(email, "signin");
+          if (newsletter) await later(() => subscribe(email, "login_prompt", "signin"));
           const sent = await sb.auth.resend({ type: "signup", email });
           if (sent.error && reason(sent.error) === "mail-down") return fail("mail-down", 503);
           return reply({ ok: false, error: "unconfirmed", next: "code" });
         }
         return fail(why);
       }
-      if (newsletter) await subscribe(email, "signin");
+      if (newsletter) await later(() => subscribe(email, "login_prompt", "signin"));
       const subscribed = newsletter || (await isSubscribed(email));
       return reply({ ok: true, newsletter: subscribed }, 200, sessionCookies(data.session, secure));
     }
