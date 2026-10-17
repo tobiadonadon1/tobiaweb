@@ -2545,3 +2545,154 @@ body:has(.wdp-intro[data-done]) [data-site-nav] {
 @media (min-width: 768px) and (min-aspect-ratio: 1/1) and (max-height: 800px) {
   .wdp-short-hide { display: none; }
 }
+
+/* WHAT PRO ADDS: design-tool comment pins on the hero (one corner square,
+   where the pin points), popping in one by one as the opening dissolves. */
+.wdp-adds { align-self: end; }
+.wdp-pin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.4rem;
+  border-radius: 1.2rem 1.2rem 1.2rem 0.3rem;
+  background: #fff;
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  box-shadow: 0 14px 30px -16px rgba(0, 0, 30, 0.55);
+  animation: wdp-pin-in 420ms var(--wdp-slam) calc(2.95s + var(--i) * 110ms) backwards;
+}
+@media (min-width: 768px) {
+  .wdp-pin:nth-child(2) { margin-left: 2.2rem; }
+  .wdp-pin:nth-child(3) { margin-left: 0.9rem; }
+  .wdp-pin:nth-child(4) { margin-left: 3.1rem; }
+}
+.wdp-pin__dot {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: #ff3b1f;
+  color: #140300;
+  font-family: var(--wdp-mono), monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.wdp-pin__dot--kept { background: #e7f04f; }
+/* No opening (skipped, or already skipped by the visitor): no wait. */
+body:has(.wdp-intro[data-done]) .wdp-pin,
+html:has(#wdp-skip) .wdp-pin { animation-delay: calc(var(--i) * 110ms); }
+/* Short laptop screens: the pins wrap into two rows instead of a column, so
+   the button stays on the first screen. */
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) and (max-height: 820px) {
+  .wdp-adds > span { display: none; }
+  .wdp-adds ul { flex-direction: row; flex-wrap: wrap; max-width: 30rem; margin-top: 0; }
+  .wdp-pin:nth-child(n) { margin-left: 0; }
+}
+@keyframes wdp-pin-in { from { opacity: 0; transform: translateY(0.6rem) scale(0.85); } }
+
+/* THE BUY BUTTON AS A CANVAS OBJECT (web-designer-pro-cta.tsx). Hover or
+   focus selects it; a press snaps the handles and pops a comment pin. */
+.wdp-cta { position: relative; display: inline-block; }
+.wdp-cta__sel {
+  position: absolute;
+  left: calc(var(--x, 0px) - 6px);
+  top: calc(var(--y, 0px) - 6px);
+  width: calc(var(--w, 0px) + 12px);
+  height: calc(var(--h, 0px) + 12px);
+  border: 1.5px solid var(--wdp-select);
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.97);
+  transition: opacity 160ms ease-out, transform 220ms var(--wdp-slam);
+}
+.wdp-cta__sel i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #fff;
+  border: 1.5px solid var(--wdp-select);
+}
+.wdp-cta__sel i:nth-child(1) { left: -5px; top: -5px; }
+.wdp-cta__sel i:nth-child(2) { right: -5px; top: -5px; }
+.wdp-cta__sel i:nth-child(3) { left: -5px; bottom: -5px; }
+.wdp-cta__sel i:nth-child(4) { right: -5px; bottom: -5px; }
+/* Beside the button, where nothing else lives; a phone has no room (and no
+   hover), so there the comment pin speaks for it. */
+.wdp-cta__tag {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--wdp-select);
+  color: #fff;
+  font-family: var(--wdp-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+@media (hover: hover) {
+  .wdp-cta:hover .wdp-cta__sel { opacity: 1; transform: none; }
+}
+@media (max-width: 639px) {
+  .wdp-cta__tag { display: none; }
+}
+.wdp-cta:focus-within .wdp-cta__sel,
+.wdp-cta[data-press] .wdp-cta__sel { opacity: 1; transform: none; }
+.wdp-cta[data-press] .wdp-cta__sel i { animation: wdp-handle 420ms var(--wdp-slam); }
+.wdp-cta__sel i:nth-child(1) { --hx: -6px; --hy: -6px; }
+.wdp-cta__sel i:nth-child(2) { --hx: 6px; --hy: -6px; }
+.wdp-cta__sel i:nth-child(3) { --hx: -6px; --hy: 6px; }
+.wdp-cta__sel i:nth-child(4) { --hx: 6px; --hy: 6px; }
+@keyframes wdp-handle { 40% { translate: var(--hx) var(--hy); scale: 1.35; } }
+.wdp-cta__pin {
+  position: absolute;
+  left: calc(var(--x, 0px) + var(--w, 0px) - 1.5rem);
+  top: calc(var(--y, 0px) - 3.1rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.85rem 0.3rem 0.3rem;
+  border-radius: 1.1rem 1.1rem 1.1rem 0.25rem;
+  background: #fff;
+  color: #111;
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 30, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 0 100%;
+  z-index: 5;
+}
+.wdp-cta__avatar {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: #1f3ad6;
+  color: #fff;
+  font-family: var(--wdp-archivo), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+.wdp-cta[data-press] .wdp-cta__pin { animation: wdp-comment 2.3s var(--wdp-slam) forwards; }
+@keyframes wdp-comment {
+  0% { opacity: 0; transform: translateY(6px) scale(0.6); }
+  14%, 82% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wdp-pin { animation: none; }
+  .wdp-cta__sel { transition: none; }
+  .wdp-cta[data-press] .wdp-cta__sel i { animation: none; }
+  .wdp-cta[data-press] .wdp-cta__pin { animation: none; opacity: 1; }
+}

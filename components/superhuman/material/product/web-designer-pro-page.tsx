@@ -6,6 +6,7 @@ import { WEB_DESIGNER_PRO as PRODUCT, forSale } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { StickyBuy } from "./sticky-buy";
+import { WdpCta } from "./web-designer-pro-cta";
 import { WebDesignerProIntro } from "./web-designer-pro-intro";
 
 /**
@@ -49,8 +50,10 @@ const COBALT = "#1F3AD6";
 const RED = "#FF3B1F";
 /** The red on paper, a step darker so large type clears 3:1 (#FF3B1F is 2.96:1 on #ECEAE3). */
 const RED_ON_PAPER = "#E8341A";
-const BUTTON = "whitespace-nowrap max-[359px]:px-5 max-[359px]:text-[0.92rem] bg-[#FF3B1F] text-[#140300] shadow-[0_18px_40px_-18px_rgba(255,59,31,0.75)] hover:bg-[#ff5236]";
-const INK_BUTTON = "whitespace-nowrap max-[359px]:px-5 max-[359px]:text-[0.92rem] bg-[#111111] text-white shadow-[0_18px_40px_-18px_rgba(17,17,17,0.7)] hover:bg-black";
+const BUTTON =
+  "whitespace-nowrap max-[359px]:px-5 max-[359px]:text-[0.92rem] bg-[#FF3B1F] text-[#140300] shadow-[0_18px_40px_-18px_rgba(255,59,31,0.75)] hover:bg-[#ff5236]";
+const INK_BUTTON =
+  "whitespace-nowrap max-[359px]:px-5 max-[359px]:text-[0.92rem] bg-[#111111] text-white shadow-[0_18px_40px_-18px_rgba(17,17,17,0.7)] hover:bg-black";
 const MUTED = "text-[color:rgba(17,17,17,0.64)]";
 
 const STEPS: React.ReactNode[] = [
@@ -86,22 +89,60 @@ const JSON_LD = {
 
 function Buy({ reportErrors = false, ink = false }: { reportErrors?: boolean; ink?: boolean }) {
   return (
-    <BuyForm
-      productId={PRODUCT.id}
-      price={PRODUCT.priceLabel}
-      label={`Get Web Designer Pro · ${PRODUCT.priceLabel}`}
-      soon={SOON}
-      tone={ink ? "paper" : "ink"}
-      reportErrors={reportErrors}
-      align="start"
-      buttonClassName={ink ? INK_BUTTON : BUTTON}
-    />
+    <WdpCta>
+      <BuyForm
+        productId={PRODUCT.id}
+        price={PRODUCT.priceLabel}
+        label={`Get Web Designer Pro · ${PRODUCT.priceLabel}`}
+        soon={SOON}
+        tone={ink ? "paper" : "ink"}
+        reportErrors={reportErrors}
+        align="start"
+        buttonClassName={ink ? INK_BUTTON : BUTTON}
+      />
+    </WdpCta>
+  );
+}
+
+/**
+ * WHAT PRO ADDS, as design-tool comment pins on the hero: "+" for what the
+ * free Web Designer doesn't have, a tick for what Pro keeps.
+ */
+const ADDS: { mark: "+" | "✓"; text: string }[] = [
+  { mark: "+", text: "Better taste, from real kits" },
+  { mark: "+", text: "Photos made for you" },
+  { mark: "+", text: "Works in Codex too" },
+  { mark: "✓", text: "All the motion design, kept" },
+];
+
+function Adds() {
+  return (
+    <div className="wdp-adds">
+      <Mono className="text-white/75">Over the free Web Designer</Mono>
+      <ul className="mt-3 flex list-none flex-wrap gap-2 p-0 md:flex-col md:items-start">
+        {ADDS.map((a, i) => (
+          <li key={a.text} className="wdp-pin" style={{ "--i": i } as React.CSSProperties}>
+            <span aria-hidden className={`wdp-pin__dot ${a.mark === "✓" ? "wdp-pin__dot--kept" : ""}`}>
+              {a.mark}
+            </span>
+            <span>
+              <span className="sr-only">{a.mark === "+" ? "Adds: " : "Keeps: "}</span>
+              {a.text}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 /** A small mono label, the page's editorial voice. */
 function Mono({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <span className={`font-[family-name:var(--wdp-mono)] text-[0.72rem] uppercase tracking-[0.08em] ${className}`}>{children}</span>;
+  return (
+    <span className={`font-[family-name:var(--wdp-mono)] text-[0.72rem] uppercase tracking-[0.08em] ${className}`}>
+      {children}
+    </span>
+  );
 }
 
 /** A render, framed like a screen. */
@@ -128,10 +169,42 @@ function Shot({
 }
 
 const MADE = [
-  { n: "01", name: "Night Shift", kind: "Fashion · with photos", src: S("made-night-shift-v1.webp"), alt: "A fashion page: huge wide red letters NIGHT SHIFT over a cut-out portrait on cobalt, with small labels on the edges.", bg: COBALT, fg: "#fff" },
-  { n: "02", name: "Lumo", kind: "Dashboard · no photos", src: S("made-lumo-v2.webp"), alt: "A home energy dashboard: a glowing battery orb with hotspot labels, six pastel metric cards, a day timeline and an insights list.", bg: "#E7F04F", fg: "#111" },
-  { n: "03", name: "Afterglow", kind: "Music · one photo", src: S("made-afterglow-v1.webp"), alt: "A record label page: the word Afterglow edge to edge in black with a cover photo dropped on it, and a tracklist below.", bg: "#FFFFFF", fg: "#111" },
-  { n: "04", name: "Still", kind: "Product · no photos", src: S("made-still-v2.webp"), alt: "A product page for an air monitor: a dusk sky, a glass orb showing 12, three glowing cards for CO2, humidity and temperature.", bg: "#111111", fg: "#fff" },
+  {
+    n: "01",
+    name: "Night Shift",
+    kind: "Fashion · with photos",
+    src: S("made-night-shift-v1.webp"),
+    alt: "A fashion page: huge wide red letters NIGHT SHIFT over a cut-out portrait on cobalt, with small labels on the edges.",
+    bg: COBALT,
+    fg: "#fff",
+  },
+  {
+    n: "02",
+    name: "Lumo",
+    kind: "Dashboard · no photos",
+    src: S("made-lumo-v2.webp"),
+    alt: "A home energy dashboard: a glowing battery orb with hotspot labels, six pastel metric cards, a day timeline and an insights list.",
+    bg: "#E7F04F",
+    fg: "#111",
+  },
+  {
+    n: "03",
+    name: "Afterglow",
+    kind: "Music · one photo",
+    src: S("made-afterglow-v1.webp"),
+    alt: "A record label page: the word Afterglow edge to edge in black with a cover photo dropped on it, and a tracklist below.",
+    bg: "#FFFFFF",
+    fg: "#111",
+  },
+  {
+    n: "04",
+    name: "Still",
+    kind: "Product · no photos",
+    src: S("made-still-v2.webp"),
+    alt: "A product page for an air monitor: a dusk sky, a glass orb showing 12, three glowing cards for CO2, humidity and temperature.",
+    bg: "#111111",
+    fg: "#fff",
+  },
 ];
 
 /** One of the six, as a tile in its own colour: the claim, then the proof. */
@@ -153,7 +226,10 @@ function Tile({
   wide?: boolean;
 }) {
   return (
-    <li className={`relative flex flex-col overflow-hidden rounded-[1.6rem] ${wide ? "lg:col-span-2" : ""}`} style={{ background: bg, color: fg }}>
+    <li
+      className={`relative flex flex-col overflow-hidden rounded-[1.6rem] ${wide ? "lg:col-span-2" : ""}`}
+      style={{ background: bg, color: fg }}
+    >
       <div className="px-7 pb-7 pt-7 sm:px-9 sm:pt-9">
         <Mono>{n}</Mono>
         <h3 className="mt-3 max-w-[16ch] text-balance font-[family-name:var(--wdp-archivo)] text-[clamp(2.1rem,4.6vw,3.2rem)] font-black uppercase leading-[0.92] tracking-[-0.02em] [font-variation-settings:'wdth'_70]">
@@ -189,7 +265,14 @@ function AsksProof() {
 }
 
 function BannedProof() {
-  const banned = ["White receipt cards", "Tilted cards", "Purple gradients", "Emoji icons", "“✨ New” pills", "Inter, again"];
+  const banned = [
+    "White receipt cards",
+    "Tilted cards",
+    "Purple gradients",
+    "Emoji icons",
+    "“✨ New” pills",
+    "Inter, again",
+  ];
   return (
     <div className="w-full">
       <ul className="flex list-none flex-wrap gap-2.5 p-0">
@@ -218,7 +301,10 @@ function ProductDrop() {
       aria-label="A product page made with the skill: the name AERO 2 huge in black with a running shoe cut out over it, €149, only 31 left, an Add to bag button, and a photo of the same shoe on a wet street at night."
       className="w-full max-w-[34rem]"
     >
-      <div aria-hidden className="relative rounded-[1rem] bg-[#ECEAE3] px-5 pb-5 pt-4 text-[#111] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.6)] sm:px-6">
+      <div
+        aria-hidden
+        className="relative rounded-[1rem] bg-[#ECEAE3] px-5 pb-5 pt-4 text-[#111] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.6)] sm:px-6"
+      >
         <div className="flex items-center justify-between gap-4">
           <Mono className="font-semibold">Stride</Mono>
           <Mono className="opacity-60">Run · Train · Bag (0)</Mono>
@@ -240,14 +326,25 @@ function ProductDrop() {
         </div>
         <div className="relative flex items-end justify-between gap-4">
           <div>
-            <p className="font-[family-name:var(--wdp-archivo)] text-[2rem] font-black leading-none tracking-[-0.02em]">€149</p>
+            <p className="font-[family-name:var(--wdp-archivo)] text-[2rem] font-black leading-none tracking-[-0.02em]">
+              €149
+            </p>
             <Mono className="mt-2 block opacity-70">Only 31 left</Mono>
           </div>
-          <span className="shrink-0 rounded-full bg-[#111] px-5 py-3 text-[0.95rem] font-semibold text-white">Add to bag</span>
+          <span className="shrink-0 rounded-full bg-[#111] px-5 py-3 text-[0.95rem] font-semibold text-white">
+            Add to bag
+          </span>
         </div>
       </div>
       <div aria-hidden className="relative mt-3 overflow-hidden rounded-[1rem]">
-        <Image src={S("street-v1.webp")} alt="" width={1200} height={800} unoptimized className="block aspect-[2.4/1] h-auto w-full object-cover object-[50%_62%]" />
+        <Image
+          src={S("street-v1.webp")}
+          alt=""
+          width={1200}
+          height={800}
+          unoptimized
+          className="block aspect-[2.4/1] h-auto w-full object-cover object-[50%_62%]"
+        />
         <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
         <Mono className="absolute bottom-3 left-4 text-white">Same shoe · same shoot</Mono>
       </div>
@@ -265,7 +362,11 @@ export function WebDesignerProPage() {
       {/* 001. THE POSTER: the name, Tobia, and the button. The title and the
           portrait are both sized from the viewport (globals.css .wdp-title,
           .wdp-figure) so his head always clears the second line. */}
-      <section aria-labelledby="wdp-title" className="wdp-hero relative isolate overflow-hidden text-white" style={{ background: COBALT }}>
+      <section
+        aria-labelledby="wdp-title"
+        className="wdp-hero relative isolate overflow-hidden text-white"
+        style={{ background: COBALT }}
+      >
         <div className="mx-auto grid min-h-[100svh] max-w-[90rem] grid-rows-[auto_auto_1fr_auto] px-5 pb-10 pt-24 sm:px-8 md:pt-28">
           <div className="relative z-20 flex items-start justify-between gap-4">
             <Mono>
@@ -282,7 +383,8 @@ export function WebDesignerProPage() {
               className="wdp-title font-[family-name:var(--wdp-archivo)] font-black uppercase leading-[0.8] tracking-[-0.035em]"
               style={{ color: RED }}
             >
-              <span className="block">Web</span> <span className="block">Designer</span> <span className="block">Pro.</span>
+              <span className="block">Web</span> <span className="block">Designer</span>{" "}
+              <span className="block">Pro.</span>
             </h1>
           </div>
 
@@ -304,18 +406,22 @@ export function WebDesignerProPage() {
             </div>
           </figure>
 
-          <div className="relative z-20 self-end pt-2">
-            <p className="max-w-[34ch] text-pretty text-[1.15rem] font-medium leading-[1.45] sm:text-[1.3rem]">
-              <span className="block text-white/75">Every AI-built site looks the same.</span>
-              <span className="block">Yours won&rsquo;t.</span>
-            </p>
-            <div id={HERO_ID} className="mt-7 scroll-mt-28">
-              <Buy reportErrors />
+          <div className="relative z-20 grid grid-cols-1 items-end gap-x-14 gap-y-8 self-end pt-2 md:grid-cols-[auto_minmax(0,1fr)]">
+            <div>
+              <p className="max-w-[34ch] text-pretty text-[1.15rem] font-medium leading-[1.45] sm:text-[1.3rem]">
+                <span className="block text-white/75">Every AI-built site looks the same.</span>
+                <span className="block">Yours won&rsquo;t.</span>
+              </p>
+              <div id={HERO_ID} className="mt-7 scroll-mt-28">
+                <Buy reportErrors />
+              </div>
+              <Mono className="wdp-short-hide mt-5 block text-balance text-white/75">
+                <span className="whitespace-nowrap">Asks first ·</span>{" "}
+                <span className="whitespace-nowrap">no stock photos ·</span>{" "}
+                <span className="whitespace-nowrap">checked on every screen</span>
+              </Mono>
             </div>
-            <Mono className="wdp-short-hide mt-5 block text-balance text-white/75">
-              <span className="whitespace-nowrap">Asks first ·</span> <span className="whitespace-nowrap">no stock photos ·</span>{" "}
-              <span className="whitespace-nowrap">checked on every screen</span>
-            </Mono>
+            <Adds />
           </div>
         </div>
       </section>
@@ -346,7 +452,11 @@ export function WebDesignerProPage() {
 
           <ul className="mt-12 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 md:mt-16">
             {MADE.map((m) => (
-              <li key={m.n} className="flex flex-col rounded-[1.1rem] p-5 sm:p-6" style={{ background: m.bg, color: m.fg }}>
+              <li
+                key={m.n}
+                className="flex flex-col rounded-[1.1rem] p-5 sm:p-6"
+                style={{ background: m.bg, color: m.fg }}
+              >
                 <Mono className="opacity-70">{m.n}</Mono>
                 <h3 className="mt-2 font-[family-name:var(--wdp-archivo)] text-[2.3rem] font-black uppercase leading-[0.9] tracking-[-0.02em] [font-variation-settings:'wdth'_66]">
                   {m.name}
@@ -393,8 +503,8 @@ export function WebDesignerProPage() {
               What {PRODUCT.priceLabel} gets you.
             </h2>
             <p className={`mx-auto mt-5 max-w-[46ch] text-balance text-[1.08rem] font-medium leading-[1.5] ${MUTED}`}>
-              The free Web Designer avoids the obvious mistakes. Pro starts from real kits, makes the photos, and won&rsquo;t
-              stop at tidy.
+              The free Web Designer avoids the obvious mistakes. Pro starts from real kits, makes the photos, and
+              won&rsquo;t stop at tidy.
             </p>
           </div>
 
@@ -416,7 +526,13 @@ export function WebDesignerProPage() {
               bg="#111111"
               fg="#ffffff"
             >
-              <Shot src={S("made-cards-v4.webp")} alt="Five rounded metric cards glowing from inside in rose, sage, magenta, cobalt and rust, over a softly blurred photo." w={1512} h={1290} className="max-w-[30rem]" />
+              <Shot
+                src={S("made-cards-v4.webp")}
+                alt="Five rounded metric cards glowing from inside in rose, sage, magenta, cobalt and rust, over a softly blurred photo."
+                w={1512}
+                h={1290}
+                className="max-w-[30rem]"
+              />
             </Tile>
 
             <Tile
@@ -427,7 +543,13 @@ export function WebDesignerProPage() {
               fg="#ffffff"
               wide
             >
-              <Shot src={S("made-live-crop-v1.webp")} alt="A red events page: the date 07.11 and a giant black word LIVE cropped by the bottom edge." w={1440} h={540} className="w-full" />
+              <Shot
+                src={S("made-live-crop-v1.webp")}
+                alt="A red events page: the date 07.11 and a giant black word LIVE cropped by the bottom edge."
+                w={1440}
+                h={540}
+                className="w-full"
+              />
             </Tile>
 
             <Tile
@@ -437,7 +559,13 @@ export function WebDesignerProPage() {
               bg="#E7F04F"
               fg="#111"
             >
-              <Shot src={S("made-tondo-v1.webp")} alt="A ceramics school page in three colour sections, a serif headline with italics, and a hand-drawn circle around the words wet clay." w={1440} h={1640} className="max-w-[24rem]" />
+              <Shot
+                src={S("made-tondo-v1.webp")}
+                alt="A ceramics school page in three colour sections, a serif headline with italics, and a hand-drawn circle around the words wet clay."
+                w={1440}
+                h={1640}
+                className="max-w-[24rem]"
+              />
             </Tile>
 
             <Tile
@@ -462,8 +590,8 @@ export function WebDesignerProPage() {
             </Tile>
           </ul>
           <p className={`mx-auto mt-8 max-w-[56ch] text-balance text-center text-[0.98rem] leading-[1.5] ${MUTED}`}>
-            Plain HTML, React, Next.js, Tailwind, Vue, Svelte or Astro. Checked from phone to desktop, on Windows, Linux,
-            Safari and Firefox.
+            Plain HTML, React, Next.js, Tailwind, Vue, Svelte or Astro. Checked from phone to desktop, on Windows,
+            Linux, Safari and Firefox.
           </p>
         </div>
       </section>
@@ -487,8 +615,13 @@ export function WebDesignerProPage() {
             <div className="self-end">
               <ol className="list-none border-b border-black/10 p-0">
                 {STEPS.map((step, i) => (
-                  <li key={i} className="flex items-baseline gap-5 border-t border-black/10 py-5 text-[1.1rem] leading-[1.45]">
-                    <span className="w-5 shrink-0 font-[family-name:var(--wdp-mono)] text-[0.95rem] font-bold">{i + 1}</span>
+                  <li
+                    key={i}
+                    className="flex items-baseline gap-5 border-t border-black/10 py-5 text-[1.1rem] leading-[1.45]"
+                  >
+                    <span className="w-5 shrink-0 font-[family-name:var(--wdp-mono)] text-[0.95rem] font-bold">
+                      {i + 1}
+                    </span>
                     <span className="text-[color:rgba(17,17,17,0.75)]">{step}</span>
                   </li>
                 ))}
@@ -496,8 +629,8 @@ export function WebDesignerProPage() {
               <div className="mt-10">
                 <Buy ink />
                 <p className={`mt-4 max-w-[46ch] text-pretty text-[0.95rem] leading-[1.5] ${MUTED}`}>
-                  One-time {PRODUCT.priceLabel}. Secure checkout by Stripe. Needs Claude Code (paid Claude plan) or Codex
-                  (ChatGPT plan), and Node.js 18+. Mac, Windows or Linux.
+                  One-time {PRODUCT.priceLabel}. Secure checkout by Stripe. Needs Claude Code (paid Claude plan) or
+                  Codex (ChatGPT plan), and Node.js 18+. Mac, Windows or Linux.
                 </p>
               </div>
             </div>
