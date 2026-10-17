@@ -320,7 +320,7 @@ export function WebDesignerProPage() {
         </div>
       </section>
 
-      {/* 002. THE LEVEL IT STARTS FROM: the kits inside the skill. */}
+      {/* 002. THIS IS THE FLOOR: the kits inside the skill, the level it starts from. */}
       <section aria-labelledby="wdp-made" className="relative border-b border-black/10">
         <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
           <div className="grid grid-cols-1 items-end gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -330,13 +330,16 @@ export function WebDesignerProPage() {
                 id="wdp-made"
                 className="mt-3 max-w-[12ch] font-[family-name:var(--wdp-archivo)] text-[clamp(3rem,8.5vw,7.5rem)] font-black uppercase leading-[0.86] tracking-[-0.03em] [font-variation-settings:'wdth'_68]"
               >
-                The level it <span style={{ color: RED_ON_PAPER }}>starts from.</span>
+                This is{" "}
+                <span className="block" style={{ color: RED_ON_PAPER }}>
+                  the floor.
+                </span>
               </h2>
             </div>
             <div className="relative md:pb-3">
               <p className={`max-w-[40ch] text-pretty text-[1.12rem] font-medium leading-[1.5] ${MUTED}`}>
-                Four kits ship inside the skill. Your site starts at this level, then takes your name, words, colours and
-                type.
+                Four kits ship inside the skill. Every site it designs starts here, then takes your name, words, colours
+                and type.
               </p>
             </div>
           </div>
