@@ -10,7 +10,8 @@ import { originFor, stripe } from "@/lib/shop/stripe";
  * The Join button. A plain form posting here, like the Buy button, and the
  * answer is always a 303 somewhere a person can read:
  *
- *   not signed in       → the account page, then back to the plans
+ *   not signed in       → the account page with the plan chosen, which comes
+ *                         back here once the account exists
  *   already a member    → Stripe's billing portal, where the plan is changed
  *                         (an upgrade is prorated there; no second subscription)
  *   otherwise           → Stripe Checkout for the plan, tied to the account
@@ -35,8 +36,9 @@ export async function POST(request: Request) {
 
   const { member } = await currentMember(request);
   if (!member) {
-    const next = `${JOIN_HREF}?tier=${tier}#${tier}`;
-    return Response.redirect(`${origin}${ACCOUNT_HREF}?mode=signup&next=${encodeURIComponent(next)}`, 303);
+    // The account page asks for the email and password with this plan
+    // chosen, then posts here again, signed in.
+    return Response.redirect(`${origin}${ACCOUNT_HREF}?mode=signup&plan=${tier}`, 303);
   }
 
   try {

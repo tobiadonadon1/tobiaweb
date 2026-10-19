@@ -3,10 +3,13 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, Check, Eye, EyeOff, LoaderCircle } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useMember } from "./use-member";
 import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } from "./newsletter";
 import { MemberPanel } from "@/components/membership/member-panel";
+import { PlanBadge } from "@/components/membership/plan-badge";
+import { isTier, money, PLANS, planName, type Tier } from "@/lib/membership/tiers";
+import { ACCOUNT_HREF, JOIN_HREF } from "./links";
 
 /**
  * SIGN IN, CREATE AN ACCOUNT, RESET THE PASSWORD.
@@ -18,6 +21,14 @@ import { MemberPanel } from "@/components/membership/member-panel";
  * Creating an account is an email, a password, then the six-digit code
  * Supabase sends (from Tobia's Gmail, see lib/account.ts). Signing in with an
  * account that never got its code sends a fresh one and opens the code step.
+ *
+ * CREATING AN ACCOUNT STARTS WITH THE PLAN: Free, Pro, Ultimate or
+ * Universal, then the email and password. A paid plan goes on to Stripe
+ * Checkout (/api/membership/join) the moment the account exists. Signing in
+ * carries a plan too when one was chosen (the Join buttons send `?plan=`),
+ * unless the member already has it. Arriving from a free skill (`?next=`),
+ * the plan starts as Free and the picker is one "Change" away, so taking a
+ * free skill is never a step longer.
  *
  * THE NEWSLETTER BOX (newsletter.tsx) sits under Create account and Sign in,
  * never ticked, never required. Signing in without it, to an account that
@@ -39,7 +50,7 @@ const ERRORS: Record<string, string> = {
 const FALLBACK = "Something went wrong on our side. Try again in a minute.";
 
 const HEAD: Record<Mode, [string, string]> = {
-  signin: ["Sign in", "Take any free skill or guide in one click, without typing your email each time."],
+  signin: ["Sign in", "Your skills, your plan and everything it opens, in one place."],
   signup: [
     "Create your account",
     "One account for all of Construct. Every free skill and guide downloads in one click.",
@@ -73,14 +84,84 @@ const label = "mb-1.5 block text-[0.92rem] text-[color:rgba(11,31,58,0.75)]";
 const quiet =
   "rounded text-[0.95rem] text-[color:rgba(11,31,58,0.7)] underline underline-offset-4 hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
 
+/** On to Stripe for a plan: the same plain form the plans page posts. */
+function join(tier: Tier) {
+  const form = document.createElement("form");
+  form.method = "post";
+  form.action = "/api/membership/join";
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "tier";
+  input.value = tier;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+}
+
+const priceOf = (tier: Tier) =>
+  tier === "free" ? "$0" : `${money(PLANS[tier].priceCents, PLANS[tier].currency)} a month`;
+
+const CHOICES: { tier: Tier; line: string }[] = [
+  { tier: "free", line: "Every free skill and guide, in one click." },
+  { tier: "pro", line: PLANS.pro.line },
+  { tier: "ultimate", line: PLANS.ultimate.line },
+  { tier: "universal", line: PLANS.universal.line },
+];
+
+function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }) {
+  return (
+    <>
+      <h1 id={id} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
+        Choose your plan
+      </h1>
+      <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
+        Start free, or pick a plan. You can change it any time from your account.
+      </p>
+      <ul className="mt-8 flex flex-col gap-3">
+        {CHOICES.map((c) => (
+          <li key={c.tier}>
+            <button
+              type="button"
+              onClick={() => onPick(c.tier)}
+              className="group flex w-full items-center gap-4 rounded-2xl border border-[var(--hairline-strong)] bg-white px-5 py-4 text-left shadow-[0_1px_0_rgba(11,31,58,0.04)] transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+            >
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <PlanBadge tier={c.tier} className="!px-2.5 !py-1 !text-[0.85rem]" />
+                  <span className="text-[1.05rem] font-medium">{priceOf(c.tier)}</span>
+                </span>
+                <span className="mt-2 block text-[0.95rem] leading-[1.45] text-[color:rgba(11,31,58,0.68)]">{c.line}</span>
+              </span>
+              <ArrowRight
+                aria-hidden
+                className="h-5 w-5 flex-none text-[color:rgba(11,31,58,0.45)] transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-[var(--ink)]"
+              />
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-6">
+        <Link href={JOIN_HREF} className={quiet}>
+          Compare everything each plan includes
+        </Link>
+      </p>
+    </>
+  );
+}
+
 export function AccountForms() {
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
   const member = useMember();
   const ids = useId();
 
-  const startMode = params.get("mode") === "signup" ? "signup" : "signin";
+  // No mode asked for: from the corner chip (no `next`) the first step is the
+  // plan; from a free skill's "sign in" link (with `next`) it is Sign in.
+  const asked = params.get("mode");
+  const startMode = asked === "signup" || (!asked && !next) ? "signup" : "signin";
   const [mode, setMode] = useState<Mode>(startMode);
+  const fromUrl = params.get("plan");
+  const [plan, setPlan] = useState<Tier | null>(isTier(fromUrl) ? fromUrl : next ? "free" : null);
   const [email, setEmail] = useState(params.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [again, setAgain] = useState("");
@@ -114,9 +195,16 @@ export function AccountForms() {
     if (m !== "signin" && m !== "signup") setPassword("");
   };
 
-  const finish = () => {
+  const finish = async () => {
+    if (plan && plan !== "free") {
+      // Signed in now: on to Stripe for the plan, unless it is already theirs.
+      const me = await fetch("/api/account/me", { cache: "no-store", credentials: "same-origin" })
+        .then((r) => r.json())
+        .catch(() => null);
+      if (me?.member?.tier !== plan) return join(plan);
+    }
     // A full load, so every part of the page sees the new session.
-    window.location.assign(next ?? "/projects/construct/account");
+    window.location.assign(next ?? ACCOUNT_HREF);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -189,15 +277,12 @@ export function AccountForms() {
   if (member) {
     return (
       <section aria-labelledby={`${ids}-h`}>
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--accent-clay-text)] text-[var(--paper)]">
-          <Check aria-hidden className="h-5 w-5" />
-        </span>
-        <h1 id={`${ids}-h`} className="mt-6 font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
-          You&rsquo;re signed in.
+        <PlanBadge tier={member.tier} className="!px-3 !py-1.5 !text-[0.85rem]" />
+        <h1 id={`${ids}-h`} className="mt-5 font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
+          Your account
         </h1>
         <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
-          As <span className="text-[var(--ink)]">{member.email}</span>. Every free skill and guide on Construct now
-          downloads in one click.
+          Signed in as <span className="text-[var(--ink)]">{member.email}</span>.
         </p>
         <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
           <Link
@@ -217,8 +302,12 @@ export function AccountForms() {
   }
 
   const [title, lead] = HEAD[mode];
+  const paidPlan = plan && plan !== "free" ? plan : null;
+  const picking = mode === "signup" && plan === null;
   const sub =
-    mode === "code"
+    mode === "signup" && paidPlan
+      ? `Your account first, then ${planName(paidPlan)} on Stripe's secure page. Cancel any time from your account.`
+      : mode === "code"
       ? `We sent a 6-digit code to ${email}. Type it here to finish.`
       : mode === "reset"
         ? `We sent a 6-digit code to ${email}. Type it with your new password.`
@@ -227,7 +316,7 @@ export function AccountForms() {
   const needsCode = mode === "code" || mode === "reset";
   const button = {
     signin: nudge ? "Continue" : "Sign in",
-    signup: "Create account",
+    signup: paidPlan ? "Create account and continue" : "Create account",
     code: "Confirm",
     forgot: "Send the code",
     reset: "Save and sign in",
@@ -259,10 +348,27 @@ export function AccountForms() {
           ))}
         </div>
       ) : null}
+      {picking ? (
+        <PlanPicker id={`${ids}-h`} onPick={setPlan} />
+      ) : (
+        <>
       <h1 id={`${ids}-h`} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
         {title}
       </h1>
       <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">{sub}</p>
+
+      {plan && (mode === "signup" || (mode === "signin" && paidPlan)) ? (
+        <div className="mt-7 flex items-center justify-between gap-4 rounded-2xl border border-[var(--hairline-strong)] bg-white px-4 py-3">
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-[0.9rem] text-[color:rgba(11,31,58,0.6)]">{mode === "signin" ? "Then" : "Plan"}</span>
+            <PlanBadge tier={plan} className="!px-2.5 !py-1 !text-[0.85rem]" />
+            <span className="text-[0.98rem] font-medium">{priceOf(plan)}</span>
+          </span>
+          <button type="button" onClick={() => setPlan(null)} className={quiet}>
+            {mode === "signin" ? "Not now" : "Change"}
+          </button>
+        </div>
+      ) : null}
 
       <form onSubmit={submit} className="mt-9 flex flex-col gap-5" noValidate>
         {!needsCode ? (
@@ -423,6 +529,8 @@ export function AccountForms() {
           </>
         )}
       </div>
+        </>
+      )}
     </section>
   );
 }

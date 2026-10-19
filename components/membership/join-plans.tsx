@@ -3,7 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, LoaderCircle } from "lucide-react";
-import { ACCOUNT_HREF, JOIN_HREF } from "@/components/account/links";
+import { ACCOUNT_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
 import { money, PLANS, type PaidTier, type Tier } from "@/lib/membership/tiers";
 import { productById } from "@/lib/shop/products";
@@ -172,7 +172,7 @@ export function JoinPlans() {
               <YourPlan dark={false} />
             ) : member ? null : (
               <Link
-                href={`${ACCOUNT_HREF}?mode=signup&next=${encodeURIComponent(JOIN_HREF)}`}
+                href={`${ACCOUNT_HREF}?mode=signup&plan=free`}
                 className={`${button} border border-[var(--hairline-strong)] bg-white text-[var(--ink)] focus-visible:outline-[var(--ink)]`}
               >
                 Create a free account
