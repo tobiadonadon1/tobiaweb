@@ -24,9 +24,11 @@ export default function JoinPage() {
           <h1 className="mt-4 text-balance font-serif text-[clamp(2.8rem,9vw,5rem)] leading-[0.95] tracking-[-0.04em]">
             Closer to the <em>work</em>.
           </h1>
-          <p className="mx-auto mt-6 max-w-[36rem] text-pretty text-[1.15rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
-            Free stays free. Pro opens every premium skill and a line to me. Ultimate opens everything: the training,
-            the calls, the people, and a say in what I build next. Universal is all of it, and we build with you.
+          <p className="mt-7 font-serif text-[clamp(1.6rem,4vw,2.1rem)] leading-[1.1] tracking-[-0.02em] text-[var(--accent-clay-text)]">
+            Free stays <em>free</em>.
+          </p>
+          <p className="mx-auto mt-2 max-w-[44rem] text-pretty text-[1.15rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
+            Pay only for more: premium skills, my training, the calls and the people.
           </p>
         </header>
         <JoinPlans />

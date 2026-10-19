@@ -14,7 +14,8 @@
  *              skills, all the training, the workshop, 1-on-1 calls,
  *              commissions, the network, requests and voting
  *   Universal  everything in Ultimate, plus help building, design reviews
- *              and marketing; $399 a month, joined like the others
+ *              and marketing; shown as "Custom", charged $399 a month,
+ *              joined like the others
  *
  * Pure data and pure functions: safe to import from a page.
  */
@@ -64,6 +65,8 @@ export type Plan = {
   currency: "usd";
   /** The Stripe price's lookup_key (scripts/membership-setup.mjs makes it). */
   lookupKey: string;
+  /** Printed instead of the price, with no "a month" (Universal: Custom). Checkout still charges `priceCents`. */
+  priceLabel?: string;
   line: string;
   /** What the join page lists, in order. */
   includes: string[];
@@ -111,17 +114,26 @@ export const PLANS: Record<PaidTier, Plan> = {
     priceCents: 39900,
     currency: "usd",
     lookupKey: "construct_universal_monthly",
+    priceLabel: "Custom",
     line: "We build it with you.",
     includes: [
       "Everything in Ultimate",
       "We help you build what you're building",
       "We review your designs and make a better version",
       "We help you market what you sell",
+      "And more",
     ],
   },
 };
 
 export const planName = (tier: Tier) => (tier === "free" ? "Free" : PLANS[tier].name);
+
+/** A plan's price as people read it: "$0", "$19" with "a month", or its label ("Custom"). */
+export const planPrice = (tier: Tier): { amount: string; per: string | null } => {
+  if (tier === "free") return { amount: "$0", per: null };
+  const plan = PLANS[tier];
+  return plan.priceLabel ? { amount: plan.priceLabel, per: null } : { amount: money(plan.priceCents, plan.currency), per: "a month" };
+};
 
 /** Paid plans someone can start from the join page. */
 export const SELF_SERVE: PaidTier[] = ["pro", "ultimate", "universal"];

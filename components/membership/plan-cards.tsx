@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Check } from "lucide-react";
-import { money, PLANS, type Tier } from "@/lib/membership/tiers";
+import { planPrice, PLANS, type Tier } from "@/lib/membership/tiers";
 
 /**
  * THE FOUR PLANS, SIDE BY SIDE, SAME SIZE: Free, Pro, Ultimate, Universal,
@@ -73,9 +73,9 @@ export function PlanCards({ action }: { action: (tier: Tier) => ReactNode }) {
             <h2 className="font-serif text-[2rem] leading-none tracking-[-0.03em]">{plan.name}</h2>
             <p className="mt-4 flex items-baseline gap-1.5">
               <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
-                {tier === "free" ? "$0" : money(PLANS[tier].priceCents, PLANS[tier].currency)}
+                {planPrice(tier).amount}
               </span>
-              <span className={look.soft}>{tier === "free" ? "always" : "a month"}</span>
+              <span className={look.soft}>{tier === "free" ? "always" : planPrice(tier).per}</span>
             </p>
             <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>{plan.line}</p>
             <ul className="mt-6 flex flex-col gap-2.5">

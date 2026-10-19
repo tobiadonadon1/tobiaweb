@@ -9,7 +9,7 @@ import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } 
 import { MemberPanel } from "@/components/membership/member-panel";
 import { PlanBadge } from "@/components/membership/plan-badge";
 import { LOOK, PLAN_BUTTON, PlanCards } from "@/components/membership/plan-cards";
-import { isTier, money, PLANS, planName, type Tier } from "@/lib/membership/tiers";
+import { isTier, planName, planPrice, type Tier } from "@/lib/membership/tiers";
 import { ACCOUNT_HREF } from "./links";
 
 /**
@@ -99,8 +99,10 @@ function join(tier: Tier) {
   form.submit();
 }
 
-const priceOf = (tier: Tier) =>
-  tier === "free" ? "$0" : `${money(PLANS[tier].priceCents, PLANS[tier].currency)} a month`;
+const priceOf = (tier: Tier) => {
+  const { amount, per } = planPrice(tier);
+  return per ? `${amount} ${per}` : amount;
+};
 
 /** Signing up starts here: the four plans in full, each with its own button. */
 function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }) {
