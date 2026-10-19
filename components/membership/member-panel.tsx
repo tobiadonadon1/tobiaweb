@@ -20,8 +20,8 @@ import { RequestsBoard } from "./requests-board";
  *   go further    the plans above theirs, each one click from Stripe
  *                 (Checkout, or for a member the portal's "confirm the new
  *                 plan"); Universal is an email to Tobia
- *   your skills   every paid skill the plan includes, every one they
- *                 bought (each a download), and the free ones
+ *   your skills   every paid skill the plan includes, and every one they
+ *                 bought, each one a download
  *   your line     the private links the plan opens (Telegram, Q&A, workshop,
  *                 calls, network), or "coming soon" when one isn't set yet
  *   training      the videos and files their tier reaches
@@ -110,7 +110,6 @@ export function MemberPanel({
   const library = Object.values(PRODUCTS).filter(
     (p) => !p.free && (owned.has(p.id) || offer(p, tier).kind === "included"),
   );
-  const freebies = Object.values(PRODUCTS).filter((p) => p.free);
 
   return (
     <div className="flex flex-col gap-16">
@@ -238,54 +237,35 @@ export function MemberPanel({
       ) : null}
 
       {/* YOUR SKILLS */}
-      <section aria-labelledby={`${ids}-skills`}>
-        <h2 id={`${ids}-skills`} className={h2}>
-          Your skills
-        </h2>
-        <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-          {library.length
-            ? paid
-              ? "Every one your plan includes, every one you bought, and the free ones."
-              : "The ones you bought, and the free ones."
-            : "Every free one, a click away while you're signed in."}
-        </p>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-          {library.map((p) => (
-            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
-              <div className="min-w-0">
-                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
-                  {p.name}
-                </Link>
-                <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
-              </div>
-              <a
-                href={`/api/download?product=${p.id}&member=1`}
-                className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-              >
-                <Download aria-hidden className="h-4 w-4" />
-                Download
-              </a>
-            </li>
-          ))}
-          {freebies.map((p) => (
-            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
-              <div className="min-w-0">
-                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
-                  {p.name}
-                </Link>
-                <p className={`text-[0.88rem] ${soft}`}>Free</p>
-              </div>
-              <Link
-                href={p.onPage ? `${p.href}#check` : p.href}
-                className="inline-flex flex-none items-center gap-2 rounded-full border border-[var(--hairline-strong)] px-4 py-2 text-[0.92rem] hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-              >
-                {p.onPage ? "Try it" : "Get it"}
-                <ArrowRight aria-hidden className="h-4 w-4" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {library.length ? (
+        <section aria-labelledby={`${ids}-skills`}>
+          <h2 id={`${ids}-skills`} className={h2}>
+            Your skills
+          </h2>
+          <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
+            {paid ? "Every one your plan includes, and every one you bought." : "The ones you bought."}
+          </p>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {library.map((p) => (
+              <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
+                <div className="min-w-0">
+                  <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+                    {p.name}
+                  </Link>
+                  <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
+                </div>
+                <a
+                  href={`/api/download?product=${p.id}&member=1`}
+                  className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                >
+                  <Download aria-hidden className="h-4 w-4" />
+                  Download
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {/* YOUR LINE TO ME */}
       {paid && perks ? (
