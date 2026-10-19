@@ -5,7 +5,7 @@ import { JoinPlans } from "@/components/membership/join-plans";
 export const metadata: Metadata = {
   title: "Membership · Construct",
   description:
-    "Free, Pro and Ultimate: every premium skill, my training, live Q&As and workshops, 1-on-1 calls and a direct line to me. Cancel any time.",
+    "Free, Pro, Ultimate and Universal: every premium skill, my training, live Q&As and workshops, 1-on-1 calls and a direct line to me. Cancel any time.",
   alternates: { canonical: "/projects/construct/join" },
 };
 
@@ -26,7 +26,7 @@ export default function JoinPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-[36rem] text-pretty text-[1.15rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
             Free stays free. Pro opens every premium skill and a line to me. Ultimate opens everything: the training,
-            the calls, the people, and a say in what I build next.
+            the calls, the people, and a say in what I build next. Universal is all of it, and we build with you.
           </p>
         </header>
         <JoinPlans />

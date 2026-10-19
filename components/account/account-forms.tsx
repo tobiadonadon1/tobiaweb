@@ -8,8 +8,9 @@ import { useMember } from "./use-member";
 import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } from "./newsletter";
 import { MemberPanel } from "@/components/membership/member-panel";
 import { PlanBadge } from "@/components/membership/plan-badge";
+import { LOOK, PLAN_BUTTON, PlanCards } from "@/components/membership/plan-cards";
 import { isTier, money, PLANS, planName, type Tier } from "@/lib/membership/tiers";
-import { ACCOUNT_HREF, JOIN_HREF } from "./links";
+import { ACCOUNT_HREF } from "./links";
 
 /**
  * SIGN IN, CREATE AN ACCOUNT, RESET THE PASSWORD.
@@ -101,49 +102,29 @@ function join(tier: Tier) {
 const priceOf = (tier: Tier) =>
   tier === "free" ? "$0" : `${money(PLANS[tier].priceCents, PLANS[tier].currency)} a month`;
 
-const CHOICES: { tier: Tier; line: string }[] = [
-  { tier: "free", line: "Every free skill and guide, in one click." },
-  { tier: "pro", line: PLANS.pro.line },
-  { tier: "ultimate", line: PLANS.ultimate.line },
-  { tier: "universal", line: PLANS.universal.line },
-];
-
+/** Signing up starts here: the four plans in full, each with its own button. */
 function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }) {
   return (
     <>
-      <h1 id={id} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
-        Choose your plan
-      </h1>
-      <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
-        Start free, or pick a plan. You can change it any time from your account.
-      </p>
-      <ul className="mt-8 flex flex-col gap-3">
-        {CHOICES.map((c) => (
-          <li key={c.tier}>
-            <button
-              type="button"
-              onClick={() => onPick(c.tier)}
-              className="group flex w-full items-center gap-4 rounded-2xl border border-[var(--hairline-strong)] bg-white px-5 py-4 text-left shadow-[0_1px_0_rgba(11,31,58,0.04)] transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <PlanBadge tier={c.tier} className="!px-2.5 !py-1 !text-[0.85rem]" />
-                  <span className="text-[1.05rem] font-medium">{priceOf(c.tier)}</span>
-                </span>
-                <span className="mt-2 block text-[0.95rem] leading-[1.45] text-[color:rgba(11,31,58,0.68)]">{c.line}</span>
-              </span>
-              <ArrowRight
-                aria-hidden
-                className="h-5 w-5 flex-none text-[color:rgba(11,31,58,0.45)] transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-[var(--ink)]"
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
-      <p className="mt-6">
-        <Link href={JOIN_HREF} className={quiet}>
-          Compare everything each plan includes
-        </Link>
+      <header className="mx-auto mb-12 max-w-[40rem] text-center">
+        <h1 id={id} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
+          Choose your <em>plan</em>
+        </h1>
+        <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
+          Start free, or pick a plan. You can change it any time from your account.
+        </p>
+      </header>
+      <PlanCards
+        action={(tier) => (
+          <button type="button" onClick={() => onPick(tier)} className={`${PLAN_BUTTON} ${LOOK[tier].button}`}>
+            {tier === "free" ? "Start free" : `Choose ${planName(tier)}`}
+            <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </button>
+        )}
+      />
+      <p className="mx-auto mt-8 max-w-[44rem] text-center text-[0.95rem] leading-[1.55] text-[color:rgba(11,31,58,0.62)]">
+        Billed monthly. Cancel any time from your account and keep everything until the end of the month you paid
+        for.
       </p>
     </>
   );
@@ -276,7 +257,7 @@ export function AccountForms() {
 
   if (member) {
     return (
-      <section aria-labelledby={`${ids}-h`}>
+      <section aria-labelledby={`${ids}-h`} className="mx-auto max-w-[42rem]">
         <PlanBadge tier={member.tier} className="!px-3 !py-1.5 !text-[0.85rem]" />
         <h1 id={`${ids}-h`} className="mt-5 font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
           Your account
@@ -323,9 +304,10 @@ export function AccountForms() {
   }[mode];
 
   return (
-    <section aria-labelledby={`${ids}-h`} className="mx-auto max-w-[30rem]">
+    <section aria-labelledby={`${ids}-h`} className={picking ? "" : "mx-auto max-w-[30rem]"}>
       {mode === "signin" || mode === "signup" ? (
-        <div className="mb-8 inline-flex rounded-full border border-[var(--hairline-strong)] bg-white p-1 shadow-[0_1px_0_rgba(11,31,58,0.04)]">
+        <div className={`mb-8 ${picking ? "flex justify-center" : ""}`}>
+        <div className="inline-flex rounded-full border border-[var(--hairline-strong)] bg-white p-1 shadow-[0_1px_0_rgba(11,31,58,0.04)]">
           {(
             [
               ["signin", "Sign in"],
@@ -346,6 +328,7 @@ export function AccountForms() {
               {text}
             </button>
           ))}
+        </div>
         </div>
       ) : null}
       {picking ? (

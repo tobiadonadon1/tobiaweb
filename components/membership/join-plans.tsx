@@ -5,12 +5,14 @@ import Link from "next/link";
 import { ArrowRight, Check, LoaderCircle } from "lucide-react";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
-import { money, PLANS, type PaidTier, type Tier } from "@/lib/membership/tiers";
+import { PLANS, type PaidTier, type Tier } from "@/lib/membership/tiers";
+import { LOOK, PLAN_BUTTON, PlanCards } from "@/components/membership/plan-cards";
 import { productById } from "@/lib/shop/products";
 
 /**
- * THE PLANS: Free, Pro, Ultimate side by side, Universal under them with a
- * note to Tobia beside its button, for anyone who wants to talk first.
+ * THE PLANS: Free, Pro, Ultimate and Universal side by side, the same size
+ * (components/membership/plan-cards.tsx), and under them a note to Tobia
+ * (/api/membership/inquire) for anyone who wants to talk before Universal.
  *
  * Everything printed comes from lib/membership/tiers.ts, the same file the
  * checkout and every gate read, so the page can't promise what the site
@@ -24,21 +26,9 @@ import { productById } from "@/lib/shop/products";
  * from the URL on the client, so the page itself stays static.
  */
 
-const FREE_INCLUDES = [
-  "Every free skill and guide, in one click",
-  "Buy any premium or unique skill",
-  "Notes from Tobi, if you want them",
-];
-
 type Flags = { join: string | null; forSkill: string | null };
 
-/** The cards in the row; Universal has its own section under them. */
-const CARDS: PaidTier[] = ["pro", "ultimate"];
-
-const button =
-  "group inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-[1.02rem] font-medium transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4";
-
-function JoinButton({ tier, label, dark }: { tier: PaidTier; label: string; dark: boolean }) {
+function JoinButton({ tier, label }: { tier: PaidTier; label: string }) {
   const [pending, setPending] = useState(false);
   useEffect(() => {
     // Back from Stripe with the back button: the page may come from the cache still pending.
@@ -56,16 +46,7 @@ function JoinButton({ tier, label, dark }: { tier: PaidTier; label: string; dark
       }}
     >
       <input type="hidden" name="tier" value={tier} />
-      <button
-        type="submit"
-        aria-busy={pending}
-        disabled={pending}
-        className={`${button} ${
-          dark
-            ? "bg-[var(--paper)] text-[var(--ink)] focus-visible:outline-[var(--paper)]"
-            : "bg-[var(--accent-clay-text)] text-[var(--paper)] shadow-[0_18px_40px_-18px_rgba(185,58,38,0.75)] focus-visible:outline-[var(--ink)]"
-        }`}
-      >
+      <button type="submit" aria-busy={pending} disabled={pending} className={`${PLAN_BUTTON} ${LOOK[tier].button}`}>
         {pending ? <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" /> : null}
         {pending ? "Opening" : label}
         {pending ? null : (
@@ -76,42 +57,17 @@ function JoinButton({ tier, label, dark }: { tier: PaidTier; label: string; dark
   );
 }
 
-function YourPlan({ dark }: { dark: boolean }) {
+function YourPlan() {
   return (
     <div className="flex flex-col items-center gap-3">
-      <span
-        className={`${button} cursor-default hover:translate-y-0 border ${
-          dark ? "border-[var(--hairline-on-ink)] text-[var(--paper)]" : "border-[var(--hairline-strong)] text-[var(--ink)]"
-        }`}
-      >
+      <span className={`${PLAN_BUTTON} cursor-default border border-current shadow-none hover:translate-y-0`}>
         <Check aria-hidden className="h-5 w-5" />
         Your plan
       </span>
-      <Link
-        href={ACCOUNT_HREF}
-        className={`text-[0.92rem] underline underline-offset-4 ${dark ? "text-[color:rgba(250,248,242,0.75)] hover:text-[var(--paper)]" : "text-[color:rgba(11,31,58,0.7)] hover:text-[var(--ink)]"}`}
-      >
+      <Link href={ACCOUNT_HREF} className="text-[0.92rem] underline underline-offset-4 opacity-80 hover:opacity-100">
         See what it opens
       </Link>
     </div>
-  );
-}
-
-function Includes({ items, dark }: { items: string[]; dark: boolean }) {
-  return (
-    <ul className="mt-7 flex flex-col gap-3">
-      {items.map((item, i) => (
-        <li key={item} className="flex gap-3 text-[1rem] leading-[1.45]">
-          <Check
-            aria-hidden
-            className={`mt-[0.2rem] h-4 w-4 flex-none ${
-              i === 0 && item.startsWith("Everything") ? "opacity-50" : ""
-            } ${dark ? "text-[#f0a58f]" : "text-[var(--accent-clay-text)]"}`}
-          />
-          <span className={dark ? "text-[color:rgba(250,248,242,0.88)]" : "text-[color:rgba(11,31,58,0.82)]"}>{item}</span>
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -151,101 +107,36 @@ export function JoinPlans() {
         </p>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-3 lg:items-stretch">
-        {/* FREE */}
-        <article
-          id="free"
-          className="flex scroll-mt-28 flex-col rounded-[1.75rem] border border-[var(--hairline-strong)] bg-[rgba(255,255,255,0.55)] p-7 md:p-8"
-        >
-          <h2 className="font-serif text-[2rem] leading-none tracking-[-0.03em]">Free</h2>
-          <p className="mt-4 text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
-            $0
-          </p>
-          <p className="mt-4 text-[1.02rem] leading-[1.5] text-[color:rgba(11,31,58,0.72)]">
-            An account, and everything I give away.
-          </p>
-          <Includes items={FREE_INCLUDES} dark={false} />
-          <div className="mt-auto pt-9">
-            {tier === undefined ? (
-              <div className="h-[3.25rem]" />
-            ) : tier === "free" && member ? (
-              <YourPlan dark={false} />
-            ) : member ? null : (
-              <Link
-                href={`${ACCOUNT_HREF}?mode=signup&plan=free`}
-                className={`${button} border border-[var(--hairline-strong)] bg-white text-[var(--ink)] focus-visible:outline-[var(--ink)]`}
-              >
+      <PlanCards
+        action={(t) => {
+          if (tier === undefined) return <div className="h-[3.25rem]" />;
+          if (t === "free") {
+            if (member) return tier === "free" ? <YourPlan /> : null;
+            return (
+              <Link href={`${ACCOUNT_HREF}?mode=signup&plan=free`} className={`${PLAN_BUTTON} ${LOOK.free.button}`}>
                 Create a free account
               </Link>
-            )}
-          </div>
-        </article>
-
-        {CARDS.map((t) => {
-          const plan = PLANS[t];
-          const dark = t === "ultimate";
+            );
+          }
+          if (tier === "universal" && t !== "universal")
+            return <p className="text-center text-[0.95rem] opacity-80">Included in your Universal plan.</p>;
           const label = cta(t);
-          return (
-            <article
-              key={t}
-              id={t}
-              className={`relative flex scroll-mt-28 flex-col rounded-[1.75rem] p-7 md:p-8 ${
-                dark
-                  ? "bg-[var(--ink)] text-[var(--paper)] shadow-[0_40px_80px_-40px_rgba(11,31,58,0.7)]"
-                  : "border border-[rgba(185,58,38,0.35)] bg-white shadow-[0_30px_60px_-40px_rgba(185,58,38,0.55)]"
-              }`}
-            >
-              {dark ? (
-                <span className="absolute right-6 top-6 rounded-full bg-[var(--accent-clay-text)] px-3 py-1 text-[0.8rem] font-medium text-[var(--paper)]">
-                  Everything
-                </span>
-              ) : null}
-              <h2 className="font-serif text-[2rem] leading-none tracking-[-0.03em]">{plan.name}</h2>
-              <p className="mt-4 flex items-baseline gap-1.5">
-                <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
-                  {money(plan.priceCents, plan.currency)}
-                </span>
-                <span className={dark ? "text-[color:rgba(250,248,242,0.65)]" : "text-[color:rgba(11,31,58,0.6)]"}>
-                  a month
-                </span>
-              </p>
-              <p
-                className={`mt-4 text-[1.02rem] leading-[1.5] ${
-                  dark ? "text-[color:rgba(250,248,242,0.75)]" : "text-[color:rgba(11,31,58,0.72)]"
-                }`}
-              >
-                {plan.line}
-              </p>
-              <Includes items={plan.includes} dark={dark} />
-              <div className="mt-auto pt-9">
-                {tier === undefined ? (
-                  <div className="h-[3.25rem]" />
-                ) : tier === "universal" ? (
-                  <p className="text-center text-[0.95rem] opacity-70">Included in your Universal plan.</p>
-                ) : label ? (
-                  <JoinButton tier={t} label={label} dark={dark} />
-                ) : (
-                  <YourPlan dark={dark} />
-                )}
-              </div>
-            </article>
-          );
-        })}
-      </div>
+          return label ? <JoinButton tier={t} label={label} /> : <YourPlan />;
+        }}
+      />
 
       <p className="mx-auto mt-8 max-w-[44rem] text-center text-[0.95rem] leading-[1.55] text-[color:rgba(11,31,58,0.62)]">
         Billed monthly. Cancel any time from your account and keep everything until the end of the month you paid
         for. Switching plans is prorated to the day.
       </p>
 
-      <Universal tier={tier} signedIn={Boolean(member)} label={cta("universal")} />
+      {tier === "universal" ? null : <UniversalQuestions signedIn={Boolean(member)} />}
     </>
   );
 }
 
-/** Universal: its Join button, and a note to Tobia (/api/membership/inquire) for questions first. */
-function Universal({ tier, signedIn, label }: { tier: Tier | undefined; signedIn: boolean; label: string | null }) {
-  const plan = PLANS.universal;
+/** Before Universal: a note to Tobia (/api/membership/inquire), for questions first. */
+function UniversalQuestions({ signedIn }: { signedIn: boolean }) {
   const ids = useId();
   const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
   const [error, setError] = useState("");
@@ -285,54 +176,29 @@ function Universal({ tier, signedIn, label }: { tier: Tier | undefined; signedIn
 
   return (
     <section
-      id="universal"
       aria-labelledby={`${ids}-h`}
-      className="mt-16 scroll-mt-28 overflow-hidden rounded-[2rem] bg-[var(--accent-clay-text)] text-[var(--paper)]"
+      className="mx-auto mt-16 max-w-[60rem] overflow-hidden rounded-[2rem] bg-[image:radial-gradient(90%_80%_at_100%_100%,rgba(236,138,53,0.35),transparent_60%),linear-gradient(160deg,#0b1f3a_0%,#2a1838_100%)] text-[var(--paper)]"
     >
-      <div className="grid gap-10 p-7 md:p-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:p-12">
-        <div>
-          <h2 id={`${ids}-h`} className="font-serif text-[clamp(2.4rem,6vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
-            {plan.name}
+      <div className="grid gap-8 p-7 md:p-10 lg:grid-cols-[1fr_1.3fr] lg:gap-12">
+        <div className="self-center">
+          <p className="text-[0.92rem] uppercase tracking-[0.14em] text-[#ffc98a]">Universal</p>
+          <h2 id={`${ids}-h`} className="mt-3 font-serif text-[clamp(2.2rem,5vw,3rem)] leading-[0.98] tracking-[-0.035em]">
+            Questions <em>first</em>?
           </h2>
-          <p className="mt-4 flex items-baseline gap-1.5">
-            <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
-              {money(plan.priceCents, plan.currency)}
-            </span>
-            <span className="text-[color:rgba(250,248,242,0.75)]">a month</span>
+          <p className="mt-4 text-[1.05rem] leading-[1.5] text-[color:rgba(250,248,242,0.8)]">
+            Tell me what you&rsquo;re building and I&rsquo;ll write back before you join.
           </p>
-          <p className="mt-4 text-[1.15rem] leading-[1.5] text-[color:rgba(250,248,242,0.88)]">{plan.line}</p>
-          <ul className="mt-7 flex flex-col gap-3">
-            {plan.includes.map((item) => (
-              <li key={item} className="flex gap-3 text-[1rem] leading-[1.45]">
-                <Check aria-hidden className="mt-[0.2rem] h-4 w-4 flex-none" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-9 max-w-[22rem]">
-            {tier === undefined ? (
-              <div className="h-[3.25rem]" />
-            ) : label ? (
-              <JoinButton tier="universal" label={label} dark />
-            ) : (
-              <YourPlan dark />
-            )}
-          </div>
         </div>
 
-        {tier === "universal" ? null : state === "sent" ? (
-          <div role="status" className="self-center rounded-2xl bg-[var(--ink)] p-7">
+        {state === "sent" ? (
+          <div role="status" className="self-center rounded-2xl bg-[rgba(250,248,242,0.06)] p-7">
             <p className="font-serif text-[1.8rem] leading-[1.05] tracking-[-0.03em]">Sent. I&rsquo;ll write back.</p>
             <p className="mt-3 text-[1rem] leading-[1.5] text-[color:rgba(250,248,242,0.75)]">
               Usually within two days, from my own inbox.
             </p>
           </div>
         ) : (
-          <form onSubmit={submit} className="flex flex-col gap-4 rounded-2xl bg-[var(--ink)] p-6 md:p-7" noValidate>
-            <p className="font-serif text-[1.6rem] leading-[1.05] tracking-[-0.02em]">Questions first?</p>
-            <p className="-mt-1 text-[1.02rem] leading-[1.5] text-[color:rgba(250,248,242,0.8)]">
-              Tell me what you&rsquo;re building and I&rsquo;ll write back before you join.
-            </p>
+          <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
             {/* No person fills this in; the route drops a form that has it. */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
             {signedIn ? null : (
@@ -372,7 +238,7 @@ function Universal({ tier, signedIn, label }: { tier: Tier | undefined; signedIn
             <button
               type="submit"
               disabled={state === "busy"}
-              className={`${button} -mt-2 bg-[var(--paper)] text-[var(--ink)] focus-visible:outline-[var(--paper)]`}
+              className={`${PLAN_BUTTON} -mt-2 ${LOOK.ultimate.button}`}
             >
               {state === "busy" ? <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" /> : null}
               Send it to me

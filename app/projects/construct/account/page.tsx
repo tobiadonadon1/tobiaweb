@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 /**
  * THE CONSTRUCT ACCOUNT: sign in, create one, or reset the password; signed
  * in, the membership (components/membership/member-panel.tsx). One column on
- * paper, like the shelves it serves. The forms are a client
+ * paper, like the shelves it serves; only "Choose your plan" uses the full
+ * width, for the four plans side by side. The forms are a client
  * component (components/account/account-forms.tsx) because every step
  * answers in place.
  */
@@ -21,7 +22,7 @@ export default function AccountPage() {
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[var(--ink)]">
       <BackLink href="/projects/construct" label="Construct" />
-      <div className="mx-auto w-full max-w-[42rem] px-6 pb-28 pt-28 md:pt-36">
+      <div className="mx-auto w-full max-w-[76rem] px-5 md:px-8 pb-28 pt-28 md:pt-36">
         <Suspense>
           <AccountForms />
         </Suspense>
