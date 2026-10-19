@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Check } from "lucide-react";
+import { Check, Mail } from "lucide-react";
+import { UNIVERSAL_MAILTO } from "@/components/account/links";
 import { planPrice, PLANS, type Tier } from "@/lib/membership/tiers";
 
 /**
@@ -57,6 +58,16 @@ export const LOOK: Record<Tier, Look> = {
 /** The big round button at the bottom of a card; add LOOK[tier].button for its colours. */
 export const PLAN_BUTTON =
   "group inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2.5 rounded-full px-6 py-3.5 text-[1.02rem] font-medium shadow-[0_14px_30px_-18px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4";
+
+/** Universal is priced per person: the button writes Tobia an email, ready to send. */
+export function UniversalMail() {
+  return (
+    <a href={UNIVERSAL_MAILTO} className={`${PLAN_BUTTON} ${LOOK.universal.button}`}>
+      <Mail aria-hidden className="h-5 w-5" />
+      Email me
+    </a>
+  );
+}
 
 export function PlanCards({ action }: { action: (tier: Tier) => ReactNode }) {
   return (

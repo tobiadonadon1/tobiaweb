@@ -8,12 +8,16 @@
  *   subscription events (it must already exist in this mode)
  *
  * Makes, or finds and leaves alone:
- *   products   construct-pro, construct-ultimate, construct-universal (metadata tier)
- *   prices     $19, $59 and $399 a month, lookup keys construct_pro_monthly,
- *              construct_ultimate_monthly and construct_universal_monthly
- *              (lib/membership/tiers.ts). A changed
- *              amount makes a new price and moves the lookup key to it, so
- *              existing members keep what they pay until moved in Stripe.
+ *   products   live: Tobia's own "Pro Membership" and "Ultimate Membership"
+ *              (prod_VTIbTqejpEbcta, prod_VTIczo47yeQ0Uz); test:
+ *              construct-pro and construct-ultimate. Each gets metadata tier.
+ *   prices     €19 and €59 a month, lookup keys construct_pro_monthly and
+ *              construct_ultimate_monthly (lib/membership/tiers.ts). The
+ *              product's own default price is used when it already matches;
+ *              a changed amount makes a new price and moves the lookup key to
+ *              it, so existing members keep what they pay until moved in Stripe.
+ *              Universal is priced per person: Tobia makes its price by hand,
+ *              with metadata tier=universal.
  *   portal     a billing portal configuration (metadata construct=membership):
  *              switch between the plans with proration, cancel at period end,
  *              update card and email, invoice history.
@@ -28,14 +32,16 @@ if (live !== /^(sk|rk)_live_/.test(key)) throw new Error("the key's mode doesn't
 const stripe = new Stripe(key);
 const webhookAt = process.argv.includes("--webhook") ? process.argv[process.argv.indexOf("--webhook") + 1] : null;
 
+const CURRENCY = "eur";
 const PLANS = [
-  { tier: "pro", product: "construct-pro", name: "Construct Pro", amount: 1900, lookup: "construct_pro_monthly",
-    description: "Every premium skill, part of the training, the bi-monthly Q&A and Telegram DMs." },
-  { tier: "ultimate", product: "construct-ultimate", name: "Construct Ultimate", amount: 5900, lookup: "construct_ultimate_monthly",
-    description: "Everything in Pro, all the training, workshops, 1-on-1 calls, the network and a say in what's built." },
-  { tier: "universal", product: "construct-universal", name: "Construct Universal", amount: 39900, lookup: "construct_universal_monthly",
-    description: "Everything in Ultimate, plus help building what you're building, design reviews and marketing." },
+  { tier: "pro", product: live ? "prod_VTIbTqejpEbcta" : "construct-pro", name: "Pro Membership", amount: 1900,
+    lookup: "construct_pro_monthly", description: "Every premium skill, the Q&A, and a direct line to me." },
+  { tier: "ultimate", product: live ? "prod_VTIczo47yeQ0Uz" : "construct-ultimate", name: "Ultimate Membership", amount: 5900,
+    lookup: "construct_ultimate_monthly", description: "Everything, plus the people, the calls and a say in what I build." },
 ];
+const fits = (price, plan) =>
+  price && price.active && price.unit_amount === plan.amount && price.currency === CURRENCY &&
+  price.recurring?.interval === "month" && price.recurring?.interval_count === 1;
 
 const prices = {};
 for (const plan of PLANS) {
@@ -43,18 +49,28 @@ for (const plan of PLANS) {
   try {
     product = await stripe.products.retrieve(plan.product);
   } catch {
+    if (live) throw new Error(`live product ${plan.product} not found`);
     product = await stripe.products.create({ id: plan.product, name: plan.name, description: plan.description, metadata: { tier: plan.tier } });
     console.log("product created", product.id);
   }
+  if (product.metadata?.tier !== plan.tier) await stripe.products.update(product.id, { metadata: { tier: plan.tier } });
   const found = (await stripe.prices.list({ lookup_keys: [plan.lookup], limit: 1 })).data[0];
-  if (found && found.active && found.unit_amount === plan.amount && found.recurring?.interval === "month") {
+  if (fits(found, plan) && found.product === product.id) {
     prices[plan.tier] = found.id;
     console.log("price ok", plan.lookup, found.id);
     continue;
   }
+  // The product's own price, made in the dashboard: give it the lookup key rather than make another.
+  const own = product.default_price ? await stripe.prices.retrieve(product.default_price) : null;
+  if (fits(own, plan)) {
+    await stripe.prices.update(own.id, { lookup_key: plan.lookup, transfer_lookup_key: true, metadata: { tier: plan.tier } });
+    prices[plan.tier] = own.id;
+    console.log("price adopted", plan.lookup, own.id);
+    continue;
+  }
   const price = await stripe.prices.create({
     product: product.id,
-    currency: "usd",
+    currency: CURRENCY,
     unit_amount: plan.amount,
     recurring: { interval: "month" },
     lookup_key: plan.lookup,

@@ -2,19 +2,26 @@
 
 import { useEffect, useId, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Download, LoaderCircle } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Download, LoaderCircle } from "lucide-react";
 import { JOIN_HREF } from "@/components/account/links";
 import type { MemberInfo } from "@/components/account/use-member";
-import { offer, planName, type Perk, type Tier } from "@/lib/membership/tiers";
+import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type PaidTier, type Perk, type Tier } from "@/lib/membership/tiers";
+import { JoinButton } from "./join-plans";
+import { FREE_PLAN, LOOK, PLAN_BUTTON, UniversalMail } from "./plan-cards";
 import { PRODUCTS } from "@/lib/shop/products";
 import { RequestsBoard } from "./requests-board";
 
 /**
- * WHAT A MEMBER HAS, ON THEIR ACCOUNT PAGE.
+ * THE ACCOUNT PAGE, SIGNED IN.
  *
- *   the plan      which one, when it renews (or ends), Manage billing
- *   your skills   every paid skill the plan includes, and every one they
- *                 bought, each one a download
+ *   who           the address, sign out, back to where they were
+ *   the plan      a card in the plan's gradient: which one, when it renews
+ *                 (or ends), Manage billing, and everything it includes
+ *   go further    the plans above theirs, each one click from Stripe
+ *                 (Checkout, or for a member the portal's "confirm the new
+ *                 plan"); Universal is an email to Tobia
+ *   your skills   every paid skill the plan includes, every one they
+ *                 bought (each a download), and the free ones
  *   your line     the private links the plan opens (Telegram, Q&A, workshop,
  *                 calls, network), or "coming soon" when one isn't set yet
  *   training      the videos and files their tier reaches
@@ -57,7 +64,15 @@ function statusLine(sub: NonNullable<NonNullable<MemberInfo>["subscription"]>) {
   return when ? `Renews on ${when}.` : "Active.";
 }
 
-export function MemberPanel({ member }: { member: NonNullable<MemberInfo> }) {
+export function MemberPanel({
+  member,
+  next,
+  onSignOut,
+}: {
+  member: NonNullable<MemberInfo>;
+  next: string | null;
+  onSignOut: () => void;
+}) {
   const ids = useId();
   const [perks, setPerks] = useState<Perks | null>(null);
   const [joined, setJoined] = useState<string | null>(null);
@@ -86,18 +101,47 @@ export function MemberPanel({ member }: { member: NonNullable<MemberInfo> }) {
   const tier = member.tier;
   const paid = tier !== "free";
   const sub = member.subscription;
+  const look = LOOK[tier];
+  const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
+  const price = planPrice(tier);
+  const upgrades = SELF_SERVE.filter((t) => higher(t, tier) === t && t !== tier);
 
   const owned = new Set(perks?.owned ?? []);
   const library = Object.values(PRODUCTS).filter(
     (p) => !p.free && (owned.has(p.id) || offer(p, tier).kind === "included"),
   );
+  const freebies = Object.values(PRODUCTS).filter((p) => p.free);
 
   return (
-    <div className="mt-14 flex flex-col gap-14">
+    <div className="flex flex-col gap-16">
+      {/* WHO */}
+      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="min-w-0">
+          <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${soft}`}>Your account</p>
+          <h1 id={`${ids}-h`} className="mt-3 font-serif text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.98] tracking-[-0.035em]">
+            Welcome <em>back</em>.
+          </h1>
+          <p className={`mt-4 break-all text-[1.05rem] ${soft}`}>
+            {member.email}
+            <span aria-hidden> · </span>
+            <button type="button" onClick={onSignOut} className={quiet}>
+              Sign out
+            </button>
+          </p>
+        </div>
+        <Link
+          href={next ?? "/projects/construct"}
+          className="group inline-flex items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-white px-5 py-2.5 text-[0.98rem] transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+        >
+          {next ? "Back to where you were" : "Browse Construct"}
+          <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </Link>
+      </header>
+
       {joined ? (
         <p
           role="status"
-          className="rounded-2xl bg-[var(--ink)] px-6 py-5 text-[1.05rem] leading-[1.5] text-[var(--paper)]"
+          className="-mt-6 rounded-2xl bg-[var(--ink)] px-6 py-5 text-[1.05rem] leading-[1.5] text-[var(--paper)]"
         >
           {paid ? (
             <>
@@ -111,92 +155,137 @@ export function MemberPanel({ member }: { member: NonNullable<MemberInfo> }) {
         </p>
       ) : null}
 
-      {/* THE PLAN */}
-      <section aria-labelledby={`${ids}-plan`}>
-        <div className={`${card} p-6 md:p-7 ${tier === "ultimate" || tier === "universal" ? "!border-transparent !bg-[var(--ink)] text-[var(--paper)]" : ""}`}>
-          <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${paid && tier !== "pro" ? "text-[color:rgba(250,248,242,0.65)]" : soft}`}>
-            Your plan
-          </p>
-          <h2 id={`${ids}-plan`} className="mt-2 font-serif text-[2.6rem] leading-none tracking-[-0.035em]">
-            {planName(tier)}
-          </h2>
-          <p className={`mt-3 text-[1.02rem] leading-[1.5] ${paid && tier !== "pro" ? "text-[color:rgba(250,248,242,0.78)]" : soft}`}>
-            {sub ? statusLine(sub) : paid ? "Set up with me directly." : "Every free skill and guide, in one click."}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
+      {/* THE PLAN: a membership card in the plan's own gradient */}
+      <section aria-labelledby={`${ids}-plan`} className={`overflow-hidden rounded-[2rem] p-7 md:p-10 ${look.card}`}>
+        <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-12">
+          <div className="flex flex-col">
+            <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>Your plan</p>
+            <h2 id={`${ids}-plan`} className="mt-3 font-serif text-[clamp(3rem,8vw,4.4rem)] leading-[0.9] tracking-[-0.04em]">
+              {plan.name}
+            </h2>
+            <p className="mt-4 flex items-baseline gap-1.5">
+              <span className="text-[1.6rem] font-medium leading-none tracking-[-0.02em]">{price.amount}</span>
+              <span className={look.soft}>{tier === "free" ? "always" : price.per}</span>
+            </p>
+            <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>
+              {sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}
+            </p>
             {sub ? (
-              <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)}>
+              <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)} className="mt-auto pt-8">
                 <button
                   type="submit"
                   disabled={opening}
-                  className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-[1rem] font-medium transition-transform duration-200 hover:scale-[1.02] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                    tier === "pro"
-                      ? "bg-[var(--ink)] text-[var(--paper)] focus-visible:outline-[var(--ink)]"
-                      : "bg-[var(--paper)] text-[var(--ink)] focus-visible:outline-[var(--paper)]"
-                  }`}
+                  className={`${PLAN_BUTTON} w-auto px-6 ${look.button}`}
                 >
                   {opening ? <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" /> : null}
                   Manage billing
                 </button>
+                <p className={`mt-3 text-[0.88rem] leading-[1.45] ${look.soft}`}>
+                  Card, invoices, plan or cancel. Handled by Stripe.
+                </p>
               </form>
             ) : null}
-            {tier === "free" ? (
-              <Link
-                href={JOIN_HREF}
-                className="group inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-6 py-3 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-              >
-                See Pro and Ultimate
-                <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-              </Link>
-            ) : tier === "pro" ? (
-              <Link href={`${JOIN_HREF}#ultimate`} className={quiet}>
-                What Ultimate adds
-              </Link>
+            {billingError ? (
+              <p role="alert" className="mt-3 text-[0.95rem] font-medium">
+                Billing didn&rsquo;t open. Please try again in a moment.
+              </p>
             ) : null}
           </div>
-          {sub ? (
-            <p className={`mt-4 text-[0.88rem] leading-[1.45] ${tier === "pro" ? soft : "text-[color:rgba(250,248,242,0.6)]"}`}>
-              Change plan, card or address, get invoices, or cancel. Handled by Stripe.
-            </p>
-          ) : null}
-          {billingError ? (
-            <p role="alert" className="mt-3 text-[0.95rem] text-[var(--accent-clay-text)]">
-              Billing didn&rsquo;t open. Please try again in a moment.
-            </p>
-          ) : null}
+          <div>
+            <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>What it opens</p>
+            <ul className="mt-4 grid gap-2.5">
+              {plan.includes.map((item, i) => (
+                <li key={item} className="flex gap-2.5 text-[0.98rem] leading-[1.45]">
+                  <Check aria-hidden className={`mt-[0.2rem] h-4 w-4 flex-none ${look.check}`} />
+                  <span className={i === 0 && item.startsWith("Everything") ? "font-medium" : look.soft}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* YOUR SKILLS */}
-      {library.length ? (
-        <section aria-labelledby={`${ids}-skills`}>
-          <h2 id={`${ids}-skills`} className={h2}>
-            Your skills
+      {/* UPGRADE: one click to Stripe (or, for a member, straight to "confirm the new plan") */}
+      {tier !== "universal" ? (
+        <section aria-labelledby={`${ids}-up`}>
+          <h2 id={`${ids}-up`} className={h2}>
+            {upgrades.length ? (
+              <>
+                Go <em>further</em>
+              </>
+            ) : (
+              "Want us to build it with you?"
+            )}
           </h2>
-          <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-            {paid ? "Every one your plan includes, and every one you bought." : "The ones you bought."}
-          </p>
-          <ul className={`${card} mt-6 divide-y divide-[var(--hairline)]`}>
-            {library.map((p) => (
-              <li key={p.id} className="flex items-center justify-between gap-4 px-5 py-4">
-                <div className="min-w-0">
-                  <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
-                    {p.name}
-                  </Link>
-                  <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
-                </div>
-                <a
-                  href={`/api/download?product=${p.id}&member=1`}
-                  className="inline-flex flex-none items-center gap-2 rounded-full border border-[var(--hairline-strong)] px-4 py-2 text-[0.92rem] hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-                >
-                  <Download aria-hidden className="h-4 w-4" />
-                  Download
-                </a>
-              </li>
+          {upgrades.length ? (
+            <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
+              {paid
+                ? "Switch in one click. You only pay the difference for the rest of the month."
+                : "One click to Stripe's secure checkout. Cancel any time from here."}
+            </p>
+          ) : null}
+          <div className={`mt-7 grid gap-5 ${upgrades.length ? "md:grid-cols-2 xl:grid-cols-3" : "md:max-w-[26rem]"}`}>
+            {upgrades.map((t) => (
+              <UpgradeCard key={t} tier={t}>
+                <JoinButton tier={t} label={paid ? `Switch to ${PLANS[t].name}` : `Join ${PLANS[t].name}`} />
+              </UpgradeCard>
             ))}
-          </ul>
+            <UpgradeCard tier="universal">
+              <UniversalMail />
+            </UpgradeCard>
+          </div>
         </section>
       ) : null}
+
+      {/* YOUR SKILLS */}
+      <section aria-labelledby={`${ids}-skills`}>
+        <h2 id={`${ids}-skills`} className={h2}>
+          Your skills
+        </h2>
+        <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
+          {library.length
+            ? paid
+              ? "Every one your plan includes, every one you bought, and the free ones."
+              : "The ones you bought, and the free ones."
+            : "Every free one, a click away while you're signed in."}
+        </p>
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {library.map((p) => (
+            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
+              <div className="min-w-0">
+                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+                  {p.name}
+                </Link>
+                <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
+              </div>
+              <a
+                href={`/api/download?product=${p.id}&member=1`}
+                className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+              >
+                <Download aria-hidden className="h-4 w-4" />
+                Download
+              </a>
+            </li>
+          ))}
+          {freebies.map((p) => (
+            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
+              <div className="min-w-0">
+                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+                  {p.name}
+                </Link>
+                <p className={`text-[0.88rem] ${soft}`}>Free</p>
+              </div>
+              <Link
+                href={p.onPage ? `${p.href}#check` : p.href}
+                className="inline-flex flex-none items-center gap-2 rounded-full border border-[var(--hairline-strong)] px-4 py-2 text-[0.92rem] hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+              >
+                {p.onPage ? "Try it" : "Get it"}
+                <ArrowRight aria-hidden className="h-4 w-4" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {/* YOUR LINE TO ME */}
       {paid && perks ? (
@@ -287,6 +376,37 @@ export function MemberPanel({ member }: { member: NonNullable<MemberInfo> }) {
         </>
       ) : null}
     </div>
+  );
+}
+
+/** A plan above theirs, small: name, price, what it adds, and its one button. */
+function UpgradeCard({ tier, children }: { tier: PaidTier; children: React.ReactNode }) {
+  const look = LOOK[tier];
+  const plan = PLANS[tier];
+  const price = planPrice(tier);
+  return (
+    <article className={`flex flex-col overflow-hidden rounded-[1.6rem] p-6 ${look.card}`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="font-serif text-[1.8rem] leading-none tracking-[-0.03em]">{plan.name}</h3>
+        <p className="flex items-baseline gap-1">
+          <span className="text-[1.3rem] font-medium">{price.amount}</span>
+          {price.per ? <span className={`text-[0.9rem] ${look.soft}`}>{price.per}</span> : null}
+        </p>
+      </div>
+      <p className={`mt-3 text-[0.95rem] leading-[1.45] ${look.soft}`}>{plan.line}</p>
+      <ul className="mt-5 grid gap-2">
+        {plan.includes.slice(0, 5).map((item, i) => (
+          <li key={item} className="flex gap-2.5 text-[0.92rem] leading-[1.4]">
+            <Check aria-hidden className={`mt-[0.15rem] h-4 w-4 flex-none ${look.check}`} />
+            <span className={i === 0 && item.startsWith("Everything") ? "font-medium" : look.soft}>{item}</span>
+          </li>
+        ))}
+        {plan.includes.length > 5 ? (
+          <li className={`pl-[1.6rem] text-[0.92rem] ${look.soft}`}>and {plan.includes.length - 5} more</li>
+        ) : null}
+      </ul>
+      <div className="mt-auto pt-7">{children}</div>
+    </article>
   );
 }
 

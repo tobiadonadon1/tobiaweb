@@ -12,8 +12,9 @@ import { originFor, stripe } from "@/lib/shop/stripe";
  *
  *   not signed in       → the account page with the plan chosen, which comes
  *                         back here once the account exists
- *   already a member    → Stripe's billing portal, where the plan is changed
- *                         (an upgrade is prorated there; no second subscription)
+ *   already a member    → Stripe's billing portal, opened on "confirm your
+ *                         new plan" (prorated; no second subscription), then
+ *                         back to the account with ?joined=<tier>
  *   otherwise           → Stripe Checkout for the plan, tied to the account
  *   anything wrong      → the plans, with ?join=error (or soon, before the
  *                         Stripe prices exist)
@@ -45,12 +46,21 @@ export async function POST(request: Request) {
     const now = await membershipOf(member);
     const customer = await customerFor(member);
 
+    const price = await priceFor(tier);
+
     if (now.subscription) {
-      const portal = await portalSession(customer, `${origin}${ACCOUNT_HREF}`);
+      const change =
+        price && now.subscription.tier !== tier
+          ? { subscription: now.subscription.id, price, done: `${origin}${ACCOUNT_HREF}?joined=${tier}` }
+          : undefined;
+      const portal = await portalSession(customer, `${origin}${ACCOUNT_HREF}`, change).catch((err) => {
+        // A subscription the flow can't change (one Tobia set up by hand): the plain portal.
+        console.warn("[membership] plan change flow failed, opening the portal", err);
+        return portalSession(customer, `${origin}${ACCOUNT_HREF}`);
+      });
       return Response.redirect(portal.url, 303);
     }
 
-    const price = await priceFor(tier);
     if (!price) return back("soon");
 
     const session = await stripe().checkout.sessions.create({

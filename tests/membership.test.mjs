@@ -24,7 +24,7 @@ test("tiers: ranks, and nothing that isn't a tier passes for one", () => {
   assert.ok(!atLeast("pro", "ultimate"));
   assert.equal(higher("pro", "universal"), "universal");
   for (const bad of ["", "admin", "toString", "__proto__", null, 3]) assert.equal(isTier(bad), false);
-  assert.deepEqual(SELF_SERVE, ["pro", "ultimate", "universal"]);
+  assert.deepEqual(SELF_SERVE, ["pro", "ultimate"]);
 });
 
 test("free skills are free for everyone", () => {
@@ -59,8 +59,8 @@ test("perks: Free opens none of the paid ones, Ultimate opens everything Pro doe
   for (const perk of ["premium-skills", "training", "qa", "telegram", "calls", "requests", "commission"]) {
     assert.equal(hasPerk("free", perk), false, perk);
   }
-  for (const perk of ["premium-skills", "training", "qa", "telegram"]) assert.ok(hasPerk("pro", perk), perk);
-  for (const perk of ["workshop", "calls", "network", "commission", "requests", "exclusive-skills"]) {
+  for (const perk of ["premium-skills", "training", "qa", "workshop", "telegram"]) assert.ok(hasPerk("pro", perk), perk);
+  for (const perk of ["calls", "network", "commission", "requests", "exclusive-skills"]) {
     assert.equal(hasPerk("pro", perk), false, perk);
     assert.ok(hasPerk("ultimate", perk), perk);
     assert.ok(hasPerk("universal", perk), perk);
@@ -75,7 +75,9 @@ test("plans: each has a monthly price and a Stripe lookup key, cheapest first", 
     assert.ok(PLANS[t].priceCents > 0, t);
     assert.match(PLANS[t].lookupKey, /^construct_[a-z]+_monthly$/);
   }
-  assert.deepEqual(SELF_SERVE.map((t) => PLANS[t].priceCents), [1900, 5900, 39900]);
+  assert.deepEqual(SELF_SERVE.map((t) => PLANS[t].priceCents), [1900, 5900]);
+  for (const t of SELF_SERVE) assert.equal(PLANS[t].currency, "eur", t);
+  assert.equal(PLANS.universal.priceLabel, "Custom");
   assert.equal(money(1900, "usd"), "$19");
   assert.equal(money(450, "eur"), "€4.50");
 });

@@ -224,15 +224,36 @@ let portalConfig: string | null | undefined;
  * THE BILLING PORTAL, SET UP FOR MEMBERSHIPS: switch between Pro and Ultimate,
  * cancel at period end, card, invoices. scripts/membership-setup.mjs makes it
  * (metadata construct=membership); without it, Stripe's default is used.
+ *
+ * With `change`, the portal opens straight on "confirm your new plan" for
+ * that subscription and price (one click to switch), and comes back to
+ * `change.done` once it's confirmed.
  */
-export async function portalSession(customer: string, returnUrl: string) {
+export async function portalSession(
+  customer: string,
+  returnUrl: string,
+  change?: { subscription: string; price: string; done: string },
+) {
   if (portalConfig === undefined) {
     const list = await stripe().billingPortal.configurations.list({ active: true, limit: 100 });
     portalConfig = list.data.find((c) => c.metadata?.construct === "membership")?.id ?? null;
+  }
+  let flow: Stripe.BillingPortal.SessionCreateParams.FlowData | undefined;
+  if (change) {
+    const sub = await stripe().subscriptions.retrieve(change.subscription);
+    const item = sub.items.data[0];
+    if (item && item.price.id !== change.price) {
+      flow = {
+        type: "subscription_update_confirm",
+        subscription_update_confirm: { subscription: sub.id, items: [{ id: item.id, price: change.price, quantity: 1 }] },
+        after_completion: { type: "redirect", redirect: { return_url: change.done } },
+      };
+    }
   }
   return stripe().billingPortal.sessions.create({
     customer,
     return_url: returnUrl,
     ...(portalConfig ? { configuration: portalConfig } : {}),
+    ...(flow ? { flow_data: flow } : {}),
   });
 }

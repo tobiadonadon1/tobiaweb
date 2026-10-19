@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useMember } from "./use-member";
 import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } from "./newsletter";
 import { MemberPanel } from "@/components/membership/member-panel";
 import { PlanBadge } from "@/components/membership/plan-badge";
-import { LOOK, PLAN_BUTTON, PlanCards } from "@/components/membership/plan-cards";
-import { isTier, planName, planPrice, type Tier } from "@/lib/membership/tiers";
+import { LOOK, PLAN_BUTTON, PlanCards, UniversalMail } from "@/components/membership/plan-cards";
+import { isTier, planName, planPrice, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { ACCOUNT_HREF } from "./links";
 
 /**
@@ -104,6 +103,9 @@ const priceOf = (tier: Tier) => {
   return per ? `${amount} ${per}` : amount;
 };
 
+/** A plan an account can start on: Free, or one paid for on Stripe (not Universal, which is an email). */
+const startable = (t: unknown): t is Tier => isTier(t) && (t === "free" || SELF_SERVE.includes(t));
+
 /** Signing up starts here: the four plans in full, each with its own button. */
 function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }) {
   return (
@@ -117,12 +119,16 @@ function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }
         </p>
       </header>
       <PlanCards
-        action={(tier) => (
-          <button type="button" onClick={() => onPick(tier)} className={`${PLAN_BUTTON} ${LOOK[tier].button}`}>
-            {tier === "free" ? "Start free" : `Choose ${planName(tier)}`}
-            <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
-        )}
+        action={(tier) =>
+          tier === "universal" ? (
+            <UniversalMail />
+          ) : (
+            <button type="button" onClick={() => onPick(tier)} className={`${PLAN_BUTTON} ${LOOK[tier].button}`}>
+              {tier === "free" ? "Start free" : `Choose ${planName(tier)}`}
+              <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+          )
+        }
       />
       <p className="mx-auto mt-8 max-w-[44rem] text-center text-[0.95rem] leading-[1.55] text-[color:rgba(11,31,58,0.62)]">
         Billed monthly. Cancel any time from your account and keep everything until the end of the month you paid
@@ -144,7 +150,7 @@ export function AccountForms() {
   const startMode = asked === "signup" || (!asked && !next) ? "signup" : "signin";
   const [mode, setMode] = useState<Mode>(startMode);
   const fromUrl = params.get("plan");
-  const [plan, setPlan] = useState<Tier | null>(isTier(fromUrl) ? fromUrl : next ? "free" : null);
+  const [plan, setPlan] = useState<Tier | null>(startable(fromUrl) ? fromUrl : next ? "free" : null);
   const [email, setEmail] = useState(params.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [again, setAgain] = useState("");
@@ -259,27 +265,8 @@ export function AccountForms() {
 
   if (member) {
     return (
-      <section aria-labelledby={`${ids}-h`} className="mx-auto max-w-[42rem]">
-        <PlanBadge tier={member.tier} className="!px-3 !py-1.5 !text-[0.85rem]" />
-        <h1 id={`${ids}-h`} className="mt-5 font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
-          Your account
-        </h1>
-        <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
-          Signed in as <span className="text-[var(--ink)]">{member.email}</span>.
-        </p>
-        <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <Link
-            href={next ?? "/projects/construct"}
-            className="group inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-7 py-3.5 text-[1.05rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-          >
-            {next ? "Back to where you were" : "Browse Construct"}
-            <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </Link>
-          <button type="button" onClick={signOut} className={quiet}>
-            Sign out
-          </button>
-        </div>
-        <MemberPanel member={member} />
+      <section className="mx-auto max-w-[64rem]">
+        <MemberPanel member={member} next={next} onSignOut={signOut} />
       </section>
     );
   }

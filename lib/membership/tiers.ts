@@ -9,13 +9,15 @@
  *
  *   Free       free skills; premium and unique skills are bought
  *   Pro        + premium skills included, unique skills a little cheaper,
- *              some of the training, the bi-monthly Q&A, Telegram DMs
+ *              some of the training, the bi-monthly Q&A and workshop,
+ *              Telegram DMs
  *   Ultimate   + unique skills much cheaper (some free), Ultimate-only
- *              skills, all the training, the workshop, 1-on-1 calls,
+ *              skills, all the training, 1-on-1 calls,
  *              commissions, the network, requests and voting
  *   Universal  everything in Ultimate, plus help building, design reviews
- *              and marketing; shown as "Custom", charged $399 a month,
- *              joined like the others
+ *              and marketing; priced per person ("Custom"), so it starts
+ *              with an email to Tobia. He sets it up in Stripe on a price
+ *              with metadata tier=universal, and the site follows.
  *
  * Pure data and pure functions: safe to import from a page.
  */
@@ -45,7 +47,7 @@ export type Perk =
 
 const PERKS: Record<Tier, Perk[]> = {
   free: [],
-  pro: ["premium-skills", "training", "qa", "telegram"],
+  pro: ["premium-skills", "training", "qa", "workshop", "telegram"],
   ultimate: ["premium-skills", "exclusive-skills", "training", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
   universal: ["premium-skills", "exclusive-skills", "training", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
 };
@@ -62,10 +64,10 @@ export type Plan = {
   name: string;
   /** Minor units a month. */
   priceCents: number;
-  currency: "usd";
+  currency: "eur";
   /** The Stripe price's lookup_key (scripts/membership-setup.mjs makes it). */
   lookupKey: string;
-  /** Printed instead of the price, with no "a month" (Universal: Custom). Checkout still charges `priceCents`. */
+  /** Printed instead of the price, with no "a month" (Universal: Custom). */
   priceLabel?: string;
   line: string;
   /** What the join page lists, in order. */
@@ -77,7 +79,7 @@ export const PLANS: Record<PaidTier, Plan> = {
     tier: "pro",
     name: "Pro",
     priceCents: 1900,
-    currency: "usd",
+    currency: "eur",
     lookupKey: "construct_pro_monthly",
     line: "Every premium skill, the Q&A, and a direct line to me.",
     includes: [
@@ -86,6 +88,7 @@ export const PLANS: Record<PaidTier, Plan> = {
       "Unique skills at a member price",
       "Part of my training: videos and files",
       "Live group Q&A every two months",
+      "Live workshop every two months",
       "Direct messages with me on Telegram",
     ],
   },
@@ -93,7 +96,7 @@ export const PLANS: Record<PaidTier, Plan> = {
     tier: "ultimate",
     name: "Ultimate",
     priceCents: 5900,
-    currency: "usd",
+    currency: "eur",
     lookupKey: "construct_ultimate_monthly",
     line: "Everything, plus the people, the calls and a say in what I build.",
     includes: [
@@ -101,7 +104,6 @@ export const PLANS: Record<PaidTier, Plan> = {
       "Unique skills at a big discount, some free",
       "Skills only Ultimate members get",
       "All of my training",
-      "Live workshop every two months",
       "1-on-1 calls with me",
       "Commission a skill built for you (paid separately)",
       "The network of members who ship",
@@ -112,7 +114,7 @@ export const PLANS: Record<PaidTier, Plan> = {
     tier: "universal",
     name: "Universal",
     priceCents: 39900,
-    currency: "usd",
+    currency: "eur",
     lookupKey: "construct_universal_monthly",
     priceLabel: "Custom",
     line: "We build it with you.",
@@ -128,15 +130,15 @@ export const PLANS: Record<PaidTier, Plan> = {
 
 export const planName = (tier: Tier) => (tier === "free" ? "Free" : PLANS[tier].name);
 
-/** A plan's price as people read it: "$0", "$19" with "a month", or its label ("Custom"). */
+/** A plan's price as people read it: "€0", "€19" with "a month", or its label ("Custom"). */
 export const planPrice = (tier: Tier): { amount: string; per: string | null } => {
-  if (tier === "free") return { amount: "$0", per: null };
+  if (tier === "free") return { amount: "€0", per: null };
   const plan = PLANS[tier];
   return plan.priceLabel ? { amount: plan.priceLabel, per: null } : { amount: money(plan.priceCents, plan.currency), per: "a month" };
 };
 
-/** Paid plans someone can start from the join page. */
-export const SELF_SERVE: PaidTier[] = ["pro", "ultimate", "universal"];
+/** Paid plans someone can start from the join page; Universal starts with an email. */
+export const SELF_SERVE: PaidTier[] = ["pro", "ultimate"];
 
 /**
  * A SKILL, AS ONE TIER SEES IT.

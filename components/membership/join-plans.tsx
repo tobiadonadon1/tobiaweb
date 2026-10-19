@@ -6,7 +6,7 @@ import { ArrowRight, Check, LoaderCircle } from "lucide-react";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
 import { PLANS, type PaidTier, type Tier } from "@/lib/membership/tiers";
-import { LOOK, PLAN_BUTTON, PlanCards } from "@/components/membership/plan-cards";
+import { LOOK, PLAN_BUTTON, PlanCards, UniversalMail } from "@/components/membership/plan-cards";
 import { productById } from "@/lib/shop/products";
 
 /**
@@ -20,6 +20,7 @@ import { productById } from "@/lib/shop/products";
  * where to go (sign up first, Stripe Checkout, or the billing portal for a
  * member changing plan).
  *
+ * Universal's button is an email to Tobia, already written (UNIVERSAL_MAILTO).
  * Signed in, the member's own plan says "Your plan" instead of a button.
  * The flags the routes send back (?join=error|soon, ?for=<skill>) are read
  * from the URL on the client, so the page itself stays static.
@@ -27,7 +28,7 @@ import { productById } from "@/lib/shop/products";
 
 type Flags = { join: string | null; forSkill: string | null };
 
-function JoinButton({ tier, label }: { tier: PaidTier; label: string }) {
+export function JoinButton({ tier, label }: { tier: PaidTier; label: string }) {
   const [pending, setPending] = useState(false);
   useEffect(() => {
     // Back from Stripe with the back button: the page may come from the cache still pending.
@@ -119,6 +120,7 @@ export function JoinPlans() {
           }
           if (tier === "universal" && t !== "universal")
             return <p className="text-center text-[0.95rem] opacity-80">Included in your Universal plan.</p>;
+          if (t === "universal") return tier === "universal" ? <YourPlan /> : <UniversalMail />;
           const label = cta(t);
           return label ? <JoinButton tier={t} label={label} /> : <YourPlan />;
         }}
