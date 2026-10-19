@@ -216,11 +216,9 @@ export function MemberPanel({
               "Want us to build it with you?"
             )}
           </h2>
-          {upgrades.length ? (
+          {upgrades.length && paid ? (
             <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-              {paid
-                ? "Switch in one click. You only pay the difference for the rest of the month."
-                : "One click to Stripe's secure checkout. Cancel any time from here."}
+              Switch in one click. You only pay the difference for the rest of the month.
             </p>
           ) : null}
           <div className={`mt-7 grid gap-5 ${upgrades.length ? "md:grid-cols-2 xl:grid-cols-3" : "md:max-w-[26rem]"}`}>
