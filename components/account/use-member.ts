@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { PaidTier, Tier } from "@/lib/membership/tiers";
 
 /**
  * Who is signed in, for the parts of the page that change with it (the
- * claim button, the download card, the corner chip). One request per page
- * load, shared by every caller; `undefined` while it is still asking, so a
- * form never flashes in and out.
+ * claim button, the download card, the corner chip, the buy button's price).
+ * One request per page load, shared by every caller; `undefined` while it is
+ * still asking, so a form never flashes in and out.
  */
 export type MemberInfo = {
   email: string;
+  /** Their plan: "free" without a membership (lib/membership/tiers.ts). */
+  tier: Tier;
+  subscription: { tier: PaidTier; status: string; renews: string | null; cancelAtPeriodEnd: boolean } | null;
   /** Said yes to the newsletter box (lib/newsletter.ts), so it isn't shown to them. */
   newsletter?: boolean;
 } | null;

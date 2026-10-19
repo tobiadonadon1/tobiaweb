@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
+import { useMember } from "@/components/account/use-member";
+import { money, offer, planName } from "@/lib/membership/tiers";
+import { productById } from "@/lib/shop/products";
 
 /**
  * THE BUY BUTTON.
@@ -25,6 +28,13 @@ import { ArrowRight, LoaderCircle } from "lucide-react";
  * `soon`: the button reads "Checkout opens soon" and is disabled, so it
  * never posts. (The checkout route refuses such a product anyway and sends
  * the buyer back with ?checkout=soon, which this form also explains.)
+ *
+ * A MEMBER SEES THEIR OWN DEAL (lib/membership/tiers.ts, `offer`): "Included
+ * in Pro · Download" for a skill the plan includes, their member price for a
+ * unique skill, "Ultimate only" for an exclusive one. It's only the words:
+ * the same form posts to the same route, which reads the plan again on the
+ * server and charges, downloads or sends to the plans accordingly. Signed
+ * out, or still asking, the button reads as it always did.
  *
  * THE FILL IS THE DARKER CLAY. Paper on #ce4631 is 4.35:1, just under AA for
  * text this size; on --accent-clay-text it passes. Same colour to the eye,
@@ -61,6 +71,21 @@ export function BuyForm({
 }) {
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState<false | "error" | "soon">(false);
+  const member = useMember();
+  const product = productById(productId);
+  const deal = member && product ? offer(product, member.tier) : null;
+  const memberLabel =
+    deal?.kind === "included"
+      ? compact
+        ? "Download"
+        : `Included in ${planName(member!.tier)} · Download`
+      : deal?.kind === "buy" && deal.priceCents < deal.fullCents
+        ? compact
+          ? `Buy · ${money(deal.priceCents, product!.currency)}`
+          : `Buy it for ${money(deal.priceCents, product!.currency)} · member price`
+        : deal?.kind === "locked"
+          ? `${planName(deal.needs)} only · See the plan`
+          : null;
 
   useEffect(() => {
     const reset = (e: PageTransitionEvent) => {
@@ -115,7 +140,7 @@ export function BuyForm({
           </>
         ) : (
           <>
-            {label ?? (compact ? `Buy · ${price}` : `Buy it for ${price}`)}
+            {memberLabel ?? label ?? (compact ? `Buy · ${price}` : `Buy it for ${price}`)}
             <ArrowRight
               aria-hidden
               className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"

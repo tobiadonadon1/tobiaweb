@@ -181,7 +181,7 @@ test("beehiiv: the request matches the spec, and the key never leaves the header
     assert.equal(seen.url, "https://api.beehiiv.com/v2/publications/pub_test/subscriptions");
     assert.equal(seen.init.headers.authorization, "Bearer test-key");
     assert.deepEqual(JSON.parse(seen.init.body), {
-      email: "ada@example.com", reactivate_existing: false, send_welcome_email: false,
+      email: "ada@example.com", reactivate_existing: false, send_welcome_email: true,
       utm_source: "tobia_website", utm_medium: "website", utm_campaign: "login_prompt",
     });
     const limited = await addSubscriber("a@b.co", "free_skill", async () => new Response(JSON.stringify({ errors: [{ message: "Too many" }] }), { status: 429 }));

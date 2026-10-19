@@ -1,3 +1,7 @@
+import { currentMember, noteDownload } from "@/lib/account";
+import { JOIN_HREF } from "@/components/account/links";
+import { membershipOf, owns } from "@/lib/membership/server";
+import { offer } from "@/lib/membership/tiers";
 import { productFile } from "@/lib/shop/file";
 import { verifyFree, verifyGift } from "@/lib/shop/free";
 import { fileType, productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
@@ -15,6 +19,12 @@ import { findPurchase, originFor } from "@/lib/shop/stripe";
  * ANYTHING WRONG GOES TO THE THANK-YOU PAGE, which runs the same check and
  * explains the answer in words: still processing, not found, or "email me".
  * A buyer never sees a bare error from this route.
+ *
+ * GET /api/download?product=…&member=1   (a member's copy)
+ *
+ * For a signed-in member whose plan includes the skill, or who bought it
+ * (on the account, or before it with the same address). Anyone else goes
+ * back to the skill's page, or to the plans for an Ultimate-only skill.
  *
  * GET /api/download?product=…&e=…&t=…   (something given away)
  * GET /api/download?product=…&e=…&g=…   (a paid product Tobia gifted)
@@ -44,6 +54,26 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
 
   const free = productById(params.get("product"));
+
+  if (free && !free.free && params.get("member") === "1") {
+    const { member } = await currentMember(request);
+    const { tier } = await membershipOf(member);
+    const deal = offer(free, tier);
+    if (!member) return Response.redirect(`${origin}${free.href}#buy`, 303);
+    if (deal.kind === "included" || (await owns(member, free.id))) {
+      try {
+        const res = serve(await productFile(free), free);
+        await noteDownload(member, free.id);
+        return res;
+      } catch (err) {
+        console.error("[shop] download: could not read the member's product file", err);
+        return Response.redirect(`${origin}${free.href}?checkout=error#buy`, 303);
+      }
+    }
+    if (deal.kind === "locked") return Response.redirect(`${origin}${JOIN_HREF}?for=${free.id}#${deal.needs}`, 303);
+    return Response.redirect(`${origin}${free.href}#buy`, 303);
+  }
+
   if (free?.free) {
     if (!verifyFree(free, params.get("e") ?? "", params.get("t") ?? "")) {
       return Response.redirect(`${origin}${free.href}#claim`, 303);

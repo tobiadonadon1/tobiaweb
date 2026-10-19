@@ -9,8 +9,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *   addSubscriber   a tick on the site → a subscriber in the publication.
  *                   Never reactivates an address that unsubscribed there
  *                   (reactivate_existing: false: beehiiv answers "inactive"
- *                   and the site records them as unsubscribed), and sends no
- *                   welcome email of its own. utm_campaign says which box.
+ *                   and the site records them as unsubscribed), and has beehiiv
+ *                   send its welcome email. utm_campaign says which box.
  *   verifyWebhook   beehiiv → the site, when someone unsubscribes
  *                   (app/api/newsletter/beehiiv). beehiiv signs its webhooks
  *                   the Svix way: HMAC-SHA256 of "<svix-id>.<svix-timestamp>.<raw body>"
@@ -50,7 +50,7 @@ export async function addSubscriber(email: string, campaign: Campaign, fetcher: 
       body: JSON.stringify({
         email,
         reactivate_existing: false,
-        send_welcome_email: false,
+        send_welcome_email: true,
         utm_source: "tobia_website",
         utm_medium: "website",
         utm_campaign: campaign,

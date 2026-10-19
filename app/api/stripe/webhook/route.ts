@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { recordPurchase, syncSubscription } from "@/lib/membership/server";
 import { deliver } from "@/lib/shop/deliver";
 import { findPurchase, originFor, stripe } from "@/lib/shop/stripe";
 
@@ -21,9 +22,21 @@ import { findPurchase, originFor, stripe } from "@/lib/shop/stripe";
  *   backoff for up to three days. Anything that will never succeed (an event
  *   for a product this shop does not sell) answers 200 so it stops.
  *
- * Events to send (Stripe dashboard → Developers → Webhooks):
+ *   MEMBERSHIPS ARE COPIED, NOT DELIVERED. A subscription event (or a
+ *   subscription checkout finishing) re-reads that subscription from Stripe
+ *   and copies its plan and status into `subscriptions` (lib/membership).
+ *   Renewals, failed cards, plan changes and cancellations all arrive as
+ *   customer.subscription.updated or .deleted.
+ *
+ * Events to send (Stripe dashboard → Developers → Webhooks, or
+ * scripts/membership-setup.mjs, which adds the subscription ones):
  *   checkout.session.completed
  *   checkout.session.async_payment_succeeded
+ *   customer.subscription.created
+ *   customer.subscription.updated
+ *   customer.subscription.deleted
+ *   customer.subscription.paused
+ *   customer.subscription.resumed
  */
 
 export const dynamic = "force-dynamic";
@@ -32,6 +45,26 @@ const DELIVER_ON = new Set<Stripe.Event.Type>([
   "checkout.session.completed",
   "checkout.session.async_payment_succeeded",
 ]);
+
+const SUBSCRIPTION_EVENTS = new Set<Stripe.Event.Type>([
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "customer.subscription.paused",
+  "customer.subscription.resumed",
+]);
+
+/** Copy a subscription; a database or Stripe failure answers 500 so Stripe retries. */
+async function membership(subscriptionId: string, eventId: string) {
+  try {
+    const result = await syncSubscription(subscriptionId);
+    console.info("[membership] webhook sync", eventId, subscriptionId, result.status);
+    return Response.json({ received: true, membership: result.status });
+  } catch (err) {
+    console.error("[membership] webhook sync failed, Stripe will retry", subscriptionId, err);
+    return new Response("sync failed", { status: 500 });
+  }
+}
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -55,11 +88,21 @@ export async function POST(request: Request) {
     return new Response("bad signature", { status: 400 });
   }
 
+  if (SUBSCRIPTION_EVENTS.has(event.type)) {
+    return membership((event.data.object as Stripe.Subscription).id, event.id);
+  }
+
   if (!DELIVER_ON.has(event.type)) {
     return Response.json({ received: true, ignored: event.type });
   }
 
-  const sessionId = (event.data.object as { id?: string }).id;
+  const object = event.data.object as Stripe.Checkout.Session;
+  if (object.mode === "subscription") {
+    const sub = typeof object.subscription === "string" ? object.subscription : object.subscription?.id;
+    return sub ? membership(sub, event.id) : Response.json({ received: true, ignored: "no-subscription" });
+  }
+
+  const sessionId = object.id;
 
   try {
     const purchase = await findPurchase(sessionId);
@@ -69,6 +112,7 @@ export async function POST(request: Request) {
       return Response.json({ received: true, delivered: false, reason: "not-ours" });
     }
 
+    await recordPurchase(purchase);
     const result = await deliver(purchase, originFor(request));
     console.info("[shop] webhook delivery", sessionId, result.status);
     return Response.json({ received: true, delivery: result.status });

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowRight, Check, Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { useMember } from "./use-member";
 import { NewsletterBot, NewsletterBox, rememberSubscribed, useKnownSubscribed } from "./newsletter";
+import { MemberPanel } from "@/components/membership/member-panel";
 
 /**
  * SIGN IN, CREATE AN ACCOUNT, RESET THE PASSWORD.
@@ -210,6 +211,7 @@ export function AccountForms() {
             Sign out
           </button>
         </div>
+        <MemberPanel member={member} />
       </section>
     );
   }
@@ -232,7 +234,7 @@ export function AccountForms() {
   }[mode];
 
   return (
-    <section aria-labelledby={`${ids}-h`}>
+    <section aria-labelledby={`${ids}-h`} className="mx-auto max-w-[30rem]">
       {mode === "signin" || mode === "signup" ? (
         <div className="mb-8 inline-flex rounded-full border border-[var(--hairline-strong)] bg-white p-1 shadow-[0_1px_0_rgba(11,31,58,0.04)]">
           {(

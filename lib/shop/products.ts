@@ -106,6 +106,15 @@ export type Product = {
   accountOnly?: boolean;
   /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it" and goes to the tool (#check). */
   onPage?: boolean;
+  /**
+   * WHAT A MEMBERSHIP DOES TO A PAID SKILL (lib/membership/tiers.ts):
+   *   premium    included with Pro and Ultimate (the default)
+   *   unique     everyone pays, members less (`memberPrice`)
+   *   exclusive  Ultimate only, never sold
+   */
+  level?: "premium" | "unique" | "exclusive";
+  /** A unique skill's member prices, minor units; 0 is included. Unset: 15% off Pro, 50% off Ultimate. */
+  memberPrice?: { pro?: number; ultimate?: number };
 };
 
 const SYMBOL = { eur: "€", usd: "$" } as const;

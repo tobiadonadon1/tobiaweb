@@ -1,4 +1,8 @@
 import Stripe from "stripe";
+import { currentMember, type Member } from "@/lib/account";
+import { JOIN_HREF } from "@/components/account/links";
+import { membershipOf, owns } from "@/lib/membership/server";
+import { offer, type Tier } from "@/lib/membership/tiers";
 import { forSale, productById, thanksHref, type Product } from "@/lib/shop/products";
 import { originFor, stripe } from "@/lib/shop/stripe";
 
@@ -14,11 +18,22 @@ import { originFor, stripe } from "@/lib/shop/stripe";
  *
  * ANY FAILURE LANDS BACK ON THE PAGE, never on a JSON error. The product page
  * reads `?checkout=error` and tells the buyer, in words, what to do.
+ *
+ * MEMBERS SEE THEIR OWN PRICE (lib/membership/tiers.ts, `offer`). The tier is
+ * read here, on the server, from the signed-in account, so the price can't be
+ * chosen by the form:
+ *   included   no checkout: straight to the member download (also for a
+ *              skill the member already bought)
+ *   buy        a checkout at the member price (or the full one)
+ *   locked     an Ultimate-only skill: to the plans
  */
 
 export const dynamic = "force-dynamic";
 
-function sessionParams(product: Product, origin: string): Stripe.Checkout.SessionCreateParams {
+type Buyer = { member: Member | null; tier: Tier; priceCents: number };
+
+function sessionParams(product: Product, origin: string, buyer: Buyer): Stripe.Checkout.SessionCreateParams {
+  const who: Record<string, string> = buyer.member ? { member: buyer.member.id, tier: buyer.tier } : {};
   return {
     mode: "payment",
     line_items: [
@@ -26,7 +41,7 @@ function sessionParams(product: Product, origin: string): Stripe.Checkout.Sessio
         quantity: 1,
         price_data: {
           currency: product.currency,
-          unit_amount: product.priceCents,
+          unit_amount: buyer.priceCents,
           product: product.stripeProductId,
         },
       },
@@ -34,13 +49,14 @@ function sessionParams(product: Product, origin: string): Stripe.Checkout.Sessio
     // A real Customer per buyer, so the dashboard has a list of who bought
     // what, ready for the next product.
     customer_creation: "always",
+    ...(buyer.member ? { customer_email: buyer.member.email, client_reference_id: buyer.member.id } : {}),
     submit_type: "pay",
     success_url: `${origin}${thanksHref(product)}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}${product.href}`,
-    metadata: { product: product.id },
+    metadata: { product: product.id, ...who },
     payment_intent_data: {
       description: product.name,
-      metadata: { product: product.id },
+      metadata: { product: product.id, ...who },
     },
     custom_text: {
       submit: {
@@ -79,8 +95,8 @@ async function ensureProduct(product: Product, origin: string) {
   }
 }
 
-async function createSession(product: Product, origin: string) {
-  const params = sessionParams(product, origin);
+async function createSession(product: Product, origin: string, buyer: Buyer) {
+  const params = sessionParams(product, origin, buyer);
   try {
     return await stripe().checkout.sessions.create(params);
   } catch (err) {
@@ -113,8 +129,19 @@ export async function POST(request: Request) {
     return Response.redirect(`${origin}${product.href}?checkout=soon#buy`, 303);
   }
 
+  const { member } = await currentMember(request);
+  const { tier } = await membershipOf(member);
+  const deal = offer(product, tier);
+  if (member && (deal.kind === "included" || (await owns(member, product.id)))) {
+    return Response.redirect(`${origin}/api/download?product=${product.id}&member=1`, 303);
+  }
+  if (deal.kind === "locked") {
+    return Response.redirect(`${origin}${JOIN_HREF}?for=${product.id}#${deal.needs}`, 303);
+  }
+  const priceCents = deal.kind === "buy" ? deal.priceCents : product.priceCents;
+
   try {
-    const session = await createSession(product, origin);
+    const session = await createSession(product, origin, { member, tier, priceCents });
     if (!session.url) throw new Error("Stripe returned a session without a URL");
     return Response.redirect(session.url, 303);
   } catch (err) {
