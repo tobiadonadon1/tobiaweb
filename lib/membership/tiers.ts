@@ -13,8 +13,8 @@
  *   Ultimate   + unique skills much cheaper (some free), Ultimate-only
  *              skills, all the training, the workshop, 1-on-1 calls,
  *              commissions, the network, requests and voting
- *   Universal  everything in Ultimate, priced on a call; Tobia sets up its
- *              subscription by hand in Stripe (a price with metadata tier=universal)
+ *   Universal  everything in Ultimate, plus help building, design reviews
+ *              and marketing; $399 a month, joined like the others
  *
  * Pure data and pure functions: safe to import from a page.
  */
@@ -59,11 +59,11 @@ export const trainingReach = (tier: Tier): ("pro" | "ultimate")[] =>
 export type Plan = {
   tier: PaidTier;
   name: string;
-  /** Minor units a month; null is "priced on a call". */
-  priceCents: number | null;
+  /** Minor units a month. */
+  priceCents: number;
   currency: "usd";
   /** The Stripe price's lookup_key (scripts/membership-setup.mjs makes it). */
-  lookupKey: string | null;
+  lookupKey: string;
   line: string;
   /** What the join page lists, in order. */
   includes: string[];
@@ -108,9 +108,9 @@ export const PLANS: Record<PaidTier, Plan> = {
   universal: {
     tier: "universal",
     name: "Universal",
-    priceCents: null,
+    priceCents: 39900,
     currency: "usd",
-    lookupKey: null,
+    lookupKey: "construct_universal_monthly",
     line: "We build it with you.",
     includes: [
       "Everything in Ultimate",
@@ -123,8 +123,8 @@ export const PLANS: Record<PaidTier, Plan> = {
 
 export const planName = (tier: Tier) => (tier === "free" ? "Free" : PLANS[tier].name);
 
-/** Paid plans someone can start from the join page (Universal is by call). */
-export const SELF_SERVE: PaidTier[] = ["pro", "ultimate"];
+/** Paid plans someone can start from the join page. */
+export const SELF_SERVE: PaidTier[] = ["pro", "ultimate", "universal"];
 
 /**
  * A SKILL, AS ONE TIER SEES IT.

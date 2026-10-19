@@ -5,11 +5,12 @@ import Link from "next/link";
 import { ArrowRight, Check, LoaderCircle } from "lucide-react";
 import { ACCOUNT_HREF, JOIN_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
-import { money, PLANS, SELF_SERVE, type PaidTier, type Tier } from "@/lib/membership/tiers";
+import { money, PLANS, type PaidTier, type Tier } from "@/lib/membership/tiers";
 import { productById } from "@/lib/shop/products";
 
 /**
- * THE PLANS: Free, Pro, Ultimate side by side, Universal under them.
+ * THE PLANS: Free, Pro, Ultimate side by side, Universal under them with a
+ * note to Tobia beside its button, for anyone who wants to talk first.
  *
  * Everything printed comes from lib/membership/tiers.ts, the same file the
  * checkout and every gate read, so the page can't promise what the site
@@ -30,6 +31,9 @@ const FREE_INCLUDES = [
 ];
 
 type Flags = { join: string | null; forSkill: string | null };
+
+/** The cards in the row; Universal has its own section under them. */
+const CARDS: PaidTier[] = ["pro", "ultimate"];
 
 const button =
   "group inline-flex min-h-[3.25rem] w-full items-center justify-center gap-2.5 rounded-full px-7 py-3.5 text-[1.02rem] font-medium transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4";
@@ -177,7 +181,7 @@ export function JoinPlans() {
           </div>
         </article>
 
-        {SELF_SERVE.map((t) => {
+        {CARDS.map((t) => {
           const plan = PLANS[t];
           const dark = t === "ultimate";
           const label = cta(t);
@@ -199,7 +203,7 @@ export function JoinPlans() {
               <h2 className="font-serif text-[2rem] leading-none tracking-[-0.03em]">{plan.name}</h2>
               <p className="mt-4 flex items-baseline gap-1.5">
                 <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
-                  {money(plan.priceCents!, plan.currency)}
+                  {money(plan.priceCents, plan.currency)}
                 </span>
                 <span className={dark ? "text-[color:rgba(250,248,242,0.65)]" : "text-[color:rgba(11,31,58,0.6)]"}>
                   a month
@@ -231,16 +235,16 @@ export function JoinPlans() {
 
       <p className="mx-auto mt-8 max-w-[44rem] text-center text-[0.95rem] leading-[1.55] text-[color:rgba(11,31,58,0.62)]">
         Billed monthly. Cancel any time from your account and keep everything until the end of the month you paid
-        for. Switching between Pro and Ultimate is prorated to the day.
+        for. Switching plans is prorated to the day.
       </p>
 
-      <Universal tier={tier} signedIn={Boolean(member)} />
+      <Universal tier={tier} signedIn={Boolean(member)} label={cta("universal")} />
     </>
   );
 }
 
-/** Universal: no button, a note to Tobia. Posts to /api/membership/inquire. */
-function Universal({ tier, signedIn }: { tier: Tier | undefined; signedIn: boolean }) {
+/** Universal: its Join button, and a note to Tobia (/api/membership/inquire) for questions first. */
+function Universal({ tier, signedIn, label }: { tier: Tier | undefined; signedIn: boolean; label: string | null }) {
   const plan = PLANS.universal;
   const ids = useId();
   const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
@@ -287,12 +291,15 @@ function Universal({ tier, signedIn }: { tier: Tier | undefined; signedIn: boole
     >
       <div className="grid gap-10 p-7 md:p-10 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:p-12">
         <div>
-          <p className="text-[0.92rem] uppercase tracking-[0.14em] text-[color:rgba(250,248,242,0.75)]">
-            Priced on a call
-          </p>
-          <h2 id={`${ids}-h`} className="mt-3 font-serif text-[clamp(2.4rem,6vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
+          <h2 id={`${ids}-h`} className="font-serif text-[clamp(2.4rem,6vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
             {plan.name}
           </h2>
+          <p className="mt-4 flex items-baseline gap-1.5">
+            <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
+              {money(plan.priceCents, plan.currency)}
+            </span>
+            <span className="text-[color:rgba(250,248,242,0.75)]">a month</span>
+          </p>
           <p className="mt-4 text-[1.15rem] leading-[1.5] text-[color:rgba(250,248,242,0.88)]">{plan.line}</p>
           <ul className="mt-7 flex flex-col gap-3">
             {plan.includes.map((item) => (
@@ -302,23 +309,29 @@ function Universal({ tier, signedIn }: { tier: Tier | undefined; signedIn: boole
               </li>
             ))}
           </ul>
+          <div className="mt-9 max-w-[22rem]">
+            {tier === undefined ? (
+              <div className="h-[3.25rem]" />
+            ) : label ? (
+              <JoinButton tier="universal" label={label} dark />
+            ) : (
+              <YourPlan dark />
+            )}
+          </div>
         </div>
 
-        {tier === "universal" ? (
-          <div className="self-center">
-            <YourPlan dark />
-          </div>
-        ) : state === "sent" ? (
+        {tier === "universal" ? null : state === "sent" ? (
           <div role="status" className="self-center rounded-2xl bg-[var(--ink)] p-7">
             <p className="font-serif text-[1.8rem] leading-[1.05] tracking-[-0.03em]">Sent. I&rsquo;ll write back.</p>
             <p className="mt-3 text-[1rem] leading-[1.5] text-[color:rgba(250,248,242,0.75)]">
-              Usually within two days, from my own inbox, to set up a call.
+              Usually within two days, from my own inbox.
             </p>
           </div>
         ) : (
           <form onSubmit={submit} className="flex flex-col gap-4 rounded-2xl bg-[var(--ink)] p-6 md:p-7" noValidate>
-            <p className="text-[1.05rem] leading-[1.5] text-[color:rgba(250,248,242,0.85)]">
-              Tell me what you&rsquo;re building. I&rsquo;ll answer to set up a call.
+            <p className="font-serif text-[1.6rem] leading-[1.05] tracking-[-0.02em]">Questions first?</p>
+            <p className="-mt-1 text-[1.02rem] leading-[1.5] text-[color:rgba(250,248,242,0.8)]">
+              Tell me what you&rsquo;re building and I&rsquo;ll write back before you join.
             </p>
             {/* No person fills this in; the route drops a form that has it. */}
             <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
@@ -362,7 +375,7 @@ function Universal({ tier, signedIn }: { tier: Tier | undefined; signedIn: boole
               className={`${button} -mt-2 bg-[var(--paper)] text-[var(--ink)] focus-visible:outline-[var(--paper)]`}
             >
               {state === "busy" ? <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" /> : null}
-              Let&rsquo;s talk
+              Send it to me
             </button>
           </form>
         )}

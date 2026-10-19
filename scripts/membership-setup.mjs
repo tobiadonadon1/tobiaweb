@@ -8,18 +8,15 @@
  *   subscription events (it must already exist in this mode)
  *
  * Makes, or finds and leaves alone:
- *   products   construct-pro, construct-ultimate (metadata tier)
- *   prices     $19/month and $59/month, lookup keys construct_pro_monthly and
- *              construct_ultimate_monthly (lib/membership/tiers.ts). A changed
+ *   products   construct-pro, construct-ultimate, construct-universal (metadata tier)
+ *   prices     $19, $59 and $399 a month, lookup keys construct_pro_monthly,
+ *              construct_ultimate_monthly and construct_universal_monthly
+ *              (lib/membership/tiers.ts). A changed
  *              amount makes a new price and moves the lookup key to it, so
  *              existing members keep what they pay until moved in Stripe.
  *   portal     a billing portal configuration (metadata construct=membership):
- *              switch Pro ⇄ Ultimate with proration, cancel at period end,
+ *              switch between the plans with proration, cancel at period end,
  *              update card and email, invoice history.
- *
- * Universal is priced on a call: in Stripe, add a price to any product with
- * metadata tier=universal and subscribe the member's customer to it, with
- * metadata member=<their member id>. The webhook does the rest.
  */
 import Stripe from "stripe";
 
@@ -36,6 +33,8 @@ const PLANS = [
     description: "Every premium skill, part of the training, the bi-monthly Q&A and Telegram DMs." },
   { tier: "ultimate", product: "construct-ultimate", name: "Construct Ultimate", amount: 5900, lookup: "construct_ultimate_monthly",
     description: "Everything in Pro, all the training, workshops, 1-on-1 calls, the network and a say in what's built." },
+  { tier: "universal", product: "construct-universal", name: "Construct Universal", amount: 39900, lookup: "construct_universal_monthly",
+    description: "Everything in Ultimate, plus help building what you're building, design reviews and marketing." },
 ];
 
 const prices = {};

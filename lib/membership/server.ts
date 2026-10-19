@@ -100,9 +100,7 @@ export async function existingCustomer(member: Member): Promise<string | null> {
   return (data as Record<string, string | null> | null)?.[column] ?? null;
 }
 
-const LOOKUP_TIER = Object.fromEntries(
-  Object.values(PLANS).filter((p) => p.lookupKey).map((p) => [p.lookupKey, p.tier]),
-) as Record<string, PaidTier>;
+const LOOKUP_TIER = Object.fromEntries(Object.values(PLANS).map((p) => [p.lookupKey, p.tier])) as Record<string, PaidTier>;
 
 /** The tier a Stripe price sells: its metadata.tier, or its lookup key. Null: not a membership. */
 export function tierOfPrice(price: Stripe.Price | null | undefined): PaidTier | null {
@@ -117,7 +115,6 @@ const prices = new Map<string, string>();
 /** The live price id behind a plan, by lookup key (cached per server). */
 export async function priceFor(tier: PaidTier): Promise<string | null> {
   const key = PLANS[tier].lookupKey;
-  if (!key) return null;
   const cached = prices.get(key);
   if (cached) return cached;
   const list = await stripe().prices.list({ lookup_keys: [key], active: true, limit: 1 });
