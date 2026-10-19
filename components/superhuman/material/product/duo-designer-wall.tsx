@@ -6,9 +6,9 @@ import Image from "next/image";
  * Ten screens designed by GPT from Tobia's reference shots (the skill's
  * own targets.md step), five for the outer display and five open, each in a
  * thin titanium frame drawn in CSS. Two rows drift in opposite directions
- * under the film (CSS only; paused on hover; still and scrollable under
- * reduced motion). On wide screens two closed phones float beside the name.
- * They are designs, not shipping apps: the alt text says so.
+ * under the film (CSS only; they keep drifting under the cursor; still and
+ * scrollable under reduced motion). On wide screens two closed phones float
+ * beside the name. They are designs, not shipping apps: the alt text says so.
  */
 
 type Shot = { src: string; alt: string; kind: "outer" | "inner" };

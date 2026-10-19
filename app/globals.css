@@ -2905,7 +2905,6 @@ html:has(.dd-page) body { background-color: #ffffff; }
 }
 .dd-wall__track { display: flex; width: max-content; animation: dd-drift 70s linear infinite; }
 .dd-wall__track--rev { animation-direction: reverse; animation-duration: 82s; }
-.dd-wall:hover .dd-wall__track { animation-play-state: paused; }
 .dd-wall__set { display: flex; align-items: center; gap: clamp(1.25rem, 2.6vw, 2rem); padding-right: clamp(1.25rem, 2.6vw, 2rem); }
 @keyframes dd-drift { to { transform: translateX(-50%); } }
 @media (max-width: 767px) {
