@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -840,6 +840,76 @@ export const WEB_DESIGNER_PRO: Product = {
   },
 };
 
+/**
+ * DUO DESIGNER, a skill for Claude Code and Codex that designs, builds and
+ * launches apps for iPhone Duo, Apple's foldable iPhone. Given away like the
+ * other skills: an email gets the link, a signed-in member downloads at once.
+ *
+ * The zip (folder "Duo Designer": START HERE.txt, README.md, the installer
+ * CLAUDE.md/AGENTS.md, install.mjs, duo-designer/) ships .mjs scripts, so the
+ * email carries the link only. Reseal whenever the skill changes:
+ *   npm run seal -- <path to>/duo-designer.zip
+ * (writes private/duo-designer.zip.enc; keep it under about 4 MB).
+ *
+ * Honesty rule for every word about it: nothing can promise App Review
+ * approval. It says what it checked and what only a real iPhone Duo can show.
+ */
+export const DUO_DESIGNER: Product = {
+  id: "duo-designer",
+  name: "Duo Designer",
+  description:
+    "A skill for Claude Code and Codex that designs, builds and launches apps for iPhone Duo: one app for the closed screen, the open spread and the unfold between them, your code made ready for Apple's rules, and the Duo App Store screenshots.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/duo-designer",
+  file: {
+    sealed: "duo-designer.zip.enc",
+    filename: "duo-designer.zip",
+    // The skill ships scripts (.mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Most apps will reach iPhone Duo as a stretched iPhone app. Duo Designer, a free skill for Claude Code and Codex, designs yours for the closed screen, the open spread and the unfold between them, audits your code against Apple's iPhone Duo rules and fixes it, and makes the Duo App Store screenshots and the unfold reel.",
+    kicker: "Skill · for Claude Code and Codex",
+    line: "Apps for iPhone Duo that use both screens.",
+    proof: "Closed · open · the unfold between",
+  },
+  contents: [
+    ["duo-designer/SKILL.md", "the process it follows, from your app's Duo story to the scored screens and the fixed code"],
+    ["references/", "iPhone Duo's rules and playbook, compliance, directions, type, colour, motion, paywalls, stores, critique"],
+    ["assets/", "the iPhone Duo device kit: both displays, the vertical status column, the camera and the fold"],
+    ["scripts/shoot.mjs", "renders the closed and open screens at the App Store sizes and scans them for slop and Duo mistakes"],
+    ["scripts/audit.mjs", "reads your code (SwiftUI, UIKit, Expo, React Native, Flutter) against Apple's iPhone Duo rules"],
+    ["scripts/reel.mjs, photo.mjs", "the unfold reel, and photos of hands holding the phone with your real screen on it"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude, or codex.",
+    "Type hi. It installs Duo Designer in about a minute.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code or Codex, and type hi.",
+    after: [
+      "From then on, type /duo-designer in Claude Code or $duo-designer in Codex, or just ask it to design your app for iPhone Duo. For an app you already have, start it inside the app's folder.",
+      "It writes your app's Duo story first (the glance when it's closed, the spread when it's open, what stays put as it unfolds), shows you three directions on the real screens, then designs every screen and has a critic score them. Point it at your code and it checks it against Apple's iPhone Duo rules and fixes what it finds, so your app arrives on the fold ready instead of stretched.",
+    ],
+    footnote: "Nothing can promise App Review approval: it tells you what it checked, and what only a real iPhone Duo can show.",
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), and Node.js 18 or newer. A Mac is best: Apple's fonts in the mockups, and Xcode 27.1 for the iPhone Duo simulator. Designing and the code audit also work on Windows and Linux.",
+    next: [
+      ["Right after install", "It offers to start. Tell it about your app, or open it in your app's folder."],
+      ["Every app", "Your Duo story first, then three directions on the closed and open screens, then every screen, scanned and scored."],
+      ["Before you ship", "Say \"audit my code\", \"the Duo screenshots\" or \"make the unfold reel\"."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -854,6 +924,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "copycat-detective": COPYCAT_DETECTIVE,
   "viral-machine": VIRAL_MACHINE,
   "web-designer-pro": WEB_DESIGNER_PRO,
+  "duo-designer": DUO_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

@@ -38,6 +38,7 @@ export function FreeClaim({
   reveal,
   face,
   hold = 0,
+  fine = false,
   buttonClassName = "",
   className = "",
 }: {
@@ -52,6 +53,8 @@ export function FreeClaim({
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
   tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt";
+  /** The newsletter consent as very small fine print (Duo Designer). */
+  fine?: boolean;
   /** Show the one-line ask above the field. */
   prompt?: boolean;
   /** The button's whole content, in place of its label and icon (Viral Machine's sleeping bot, viral-machine-cta.tsx). */
@@ -234,6 +237,7 @@ export function FreeClaim({
         mark={t.box[1]}
         line={t.box[2]}
         center={center}
+        fine={fine}
         hidden={!askNews}
         className="mt-3.5"
       />

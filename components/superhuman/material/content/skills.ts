@@ -320,4 +320,24 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "viral-machine",
   },
+  /* ---------------------------------------------------------------- *
+   * 10
+   *
+   * Apps for iPhone Duo, Apple's foldable iPhone: designed for the closed
+   * screen, the open spread and the unfold, and the code made ready. Given
+   * away for an email like the others (duo-designer-page.tsx). The rack is
+   * three wide, so it opens the fourth row on its own.
+   * ---------------------------------------------------------------- */
+  {
+    slug: "duo-designer",
+    title: "Duo Designer",
+    kind: "skill",
+    summary: "Designs, builds and launches apps for iPhone Duo that use both screens.",
+    minutes: 30,
+    status: "ready",
+    when: "Your app is headed for iPhone Duo, and today it would arrive as a stretched iPhone app.",
+    level: "Anyone",
+    body: [],
+    product: "duo-designer",
+  },
 ];

@@ -56,6 +56,8 @@ const VIRAL_ZIP = Buffer.from("PK\u0003\u0004 the x manager for grok bot " + "v"
 writeFileSync(path.join(cwd, "private", "viral-machine.zip.enc"), seal(VIRAL_ZIP, parseKey(fileKey)));
 const WDP_ZIP = Buffer.from("PK\u0003\u0004 the website and component design skill " + "w".repeat(3700));
 writeFileSync(path.join(cwd, "private", "web-designer-pro.zip.enc"), seal(WDP_ZIP, parseKey(fileKey)));
+const DUO_ZIP = Buffer.from("PK\u0003\u0004 the iphone duo design skill " + "d".repeat(3900));
+writeFileSync(path.join(cwd, "private", "duo-designer.zip.enc"), seal(DUO_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -517,7 +519,7 @@ test("free: Viral Machine is given for an email, its file attached, never a chec
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
   assert.equal(VIRAL_MACHINE.href, entryHref("skills", "viral-machine"));
   const skills = FOLDER_BY_ID.skills.entries;
-  assert.equal(skills.at(-1)?.slug, "viral-machine", "it closes the third row of the rack");
+  assert.equal(skills.findIndex((e) => e.slug === "viral-machine"), 8, "it closes the third row of the rack");
   assert.equal(VIRAL_MACHINE.free, true);
   assert.equal(forSale(VIRAL_MACHINE), false);
 
@@ -532,6 +534,80 @@ test("free: Viral Machine is given for an email, its file attached, never a chec
   const dl = await download(new Request(link));
   assert.equal(dl.status, 200);
   assert.equal(Buffer.from(await dl.arrayBuffer()).length, VIRAL_ZIP.length);
+});
+
+test("free: Duo Designer opens the fourth row, sent as a link for an email, at once for a member", async () => {
+  const { DUO_DESIGNER, forSale } = await import("../lib/shop/products.ts");
+  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(DUO_DESIGNER.href, entryHref("skills", "duo-designer"));
+  const skills = FOLDER_BY_ID.skills.entries;
+  assert.equal(skills.find((e) => e.slug === "duo-designer")?.product, "duo-designer");
+  // The tenth card: the rack is three wide, so it starts the fourth row.
+  assert.equal(skills.findIndex((e) => e.slug === "duo-designer"), 9);
+  assert.equal(skills.at(-1)?.slug, "duo-designer");
+  assert.equal(DUO_DESIGNER.free, true);
+  assert.equal(DUO_DESIGNER.accountOnly, undefined, "an email is enough, no account needed");
+  assert.equal(forSale(DUO_DESIGNER), false);
+  assert.equal(DUO_DESIGNER.stripeProductId, "none");
+  // It ships scripts (.mjs), and Gmail refuses a zip that holds them.
+  assert.equal(DUO_DESIGNER.file.attach, false);
+  // Nobody can promise App Review approval, and no word about it does.
+  const words = [DUO_DESIGNER.description, DUO_DESIGNER.share.description, ...DUO_DESIGNER.email.after].join(" ");
+  assert.ok(!/guarantee|always approved|never rejected/i.test(words), "no approval promised");
+
+  // An email: the link only, both agents' commands set as code.
+  const res = await ask({ product: "duo-designer", email: "fold@example.com" }, "203.0.113.81");
+  assert.equal(res.status, 200);
+  assert.equal(mail().length, 1);
+  const m = mail()[0].message;
+  assert.equal(m.to, "fold@example.com");
+  assert.equal(m.subject, "Your copy of Duo Designer");
+  assert.equal(m.attachments.length, 0);
+  assert.ok(m.html.includes(">/duo-designer<") && m.html.includes(">$duo-designer<"), "both agents' commands are set as code");
+  assert.ok(m.html.includes(">codex<") && m.html.includes(">hi<"));
+  const link = m.text.match(/http:\/\/localhost:3000\/api\/download\?\S+/)[0];
+  const dl = await download(new Request(link));
+  assert.equal(dl.status, 200);
+  assert.equal(dl.headers.get("content-type"), "application/zip");
+  assert.match(dl.headers.get("content-disposition"), /filename="duo-designer.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), DUO_ZIP);
+
+  // A tampered, borrowed or swapped link never downloads it.
+  for (const change of [
+    (u) => u.searchParams.set("t", "A".repeat(32)),
+    (u) => u.searchParams.set("e", "someone-else@example.com"),
+    (u) => u.searchParams.delete("t"),
+    (u) => u.searchParams.set("product", "app-designer"),
+  ]) {
+    const u = new URL(link);
+    change(u);
+    const r = await download(new Request(u));
+    assert.equal(r.status, 303, u.search);
+  }
+  const back = await download(new Request(`${ORIGIN}/api/download?product=duo-designer&e=fold@example.com&t=${"B".repeat(32)}`));
+  assert.equal(back.headers.get("location"), `${ORIGIN}${DUO_DESIGNER.href}#claim`, "a forgery goes back to the form");
+
+  // A member's link (what /api/free hands a signed-in visitor) serves the exact file.
+  const { freeLink } = await import("../lib/shop/free.ts");
+  const member = await download(new Request(freeLink(ORIGIN, DUO_DESIGNER, "member@example.com")));
+  assert.deepEqual(Buffer.from(await member.arrayBuffer()), DUO_ZIP);
+});
+
+test("free: Duo Designer's newsletter tick is recorded only when it is a real tick", async () => {
+  process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
+  sheetRows.length = 0;
+  try {
+    assert.equal((await ask({ product: "duo-designer", email: "duo-yes@example.com", newsletter: true }, "203.0.113.82")).status, 200);
+    assert.equal((await ask({ product: "duo-designer", email: "duo-no@example.com" }, "203.0.113.83")).status, 200);
+    assert.equal((await ask({ product: "duo-designer", email: "duo-str@example.com", newsletter: "yes" }, "203.0.113.84")).status, 200);
+    assert.equal(sheetRows.length, 3);
+    assert.deepEqual(sheetRows.map((r) => r.product), ["duo-designer", "duo-designer", "duo-designer"]);
+    assert.equal(sheetRows[0].page, "/projects/construct/material/skills/duo-designer · newsletter");
+    assert.equal(sheetRows[1].page, "/projects/construct/material/skills/duo-designer");
+    assert.equal(sheetRows[2].page, "/projects/construct/material/skills/duo-designer", "only a boolean true is a tick");
+  } finally {
+    delete process.env.LEADS_WEBHOOK_URL;
+  }
 });
 
 test("free: Copycat Detective sits beside App Launcher, free with an account, never emailed", async () => {
@@ -855,6 +931,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["app-designer-pro"].bytes, PRO_ZIP.length);
   assert.equal(body.files["viral-machine"].bytes, VIRAL_ZIP.length);
   assert.equal(body.files["web-designer-pro"].bytes, WDP_ZIP.length);
+  assert.equal(body.files["duo-designer"].bytes, DUO_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

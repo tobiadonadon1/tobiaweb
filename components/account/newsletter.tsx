@@ -55,6 +55,7 @@ export function NewsletterBox({
   center = false,
   hidden = false,
   nudge = false,
+  fine = false,
   className = "",
 }: {
   checked: boolean;
@@ -70,6 +71,8 @@ export function NewsletterBox({
   hidden?: boolean;
   /** The sign-in bot is pointing at it. */
   nudge?: boolean;
+  /** Very small fine print: a smaller box and text (Duo Designer). */
+  fine?: boolean;
   className?: string;
 }) {
   const id = useId();
@@ -78,6 +81,7 @@ export function NewsletterBox({
       className={`nl-row ${hidden ? "invisible" : ""} ${className}`}
       data-center={center || undefined}
       data-nudge={nudge || undefined}
+      data-fine={fine || undefined}
       aria-hidden={hidden || undefined}
       style={{ "--nl-accent": accent, "--nl-mark": mark, "--nl-line": line } as React.CSSProperties}
     >

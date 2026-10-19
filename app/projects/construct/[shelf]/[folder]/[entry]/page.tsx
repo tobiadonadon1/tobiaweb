@@ -14,6 +14,7 @@ import { AppDesignerProPage } from "@/components/superhuman/material/product/app
 import { ViralMachinePage } from "@/components/superhuman/material/product/viral-machine-page";
 import { WebDesignerProPage } from "@/components/superhuman/material/product/web-designer-pro-page";
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
+import { DuoDesignerPage } from "@/components/superhuman/material/product/duo-designer-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -160,4 +161,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "copycat-detective": CopycatDetectivePage,
   "viral-machine": ViralMachinePage,
   "web-designer-pro": WebDesignerProPage,
+  "duo-designer": DuoDesignerPage,
 };

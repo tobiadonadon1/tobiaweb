@@ -940,6 +940,30 @@ function CopycatDetective() {
   );
 }
 
+/**
+ * DUO DESIGNER — iPhone Duo open like a book, cut from paper: an ink body,
+ * a paper page on the left with its list (one line lit vermilion, the
+ * ingredient this step uses) and a vermilion page on the right with a saffron
+ * disc, the timer. A hair of ink between the pages is the fold. The colours
+ * are Mise's, the app on the page's photos (product/duo-designer-page.tsx).
+ */
+function DuoDesigner() {
+  return (
+    <>
+      <Cut d={CARD} x={66} y={64} s={1.42} sy={1.42} fill={SHADE} />
+      <Cut d={CARD} x={58} y={56} s={1.42} sy={1.42} fill={INK} />
+      <Cut d={CARD} x={72} y={70} s={0.64} sy={1.24} fill="#faf8f2" opacity={0.96} />
+      <Cut d={CARD} x={204} y={70} s={0.64} sy={1.24} fill={VERMILION} />
+      {[0, 1, 2, 3].map((i) => (
+        <Cut key={i} d={BAR} x={88} y={118 + i * 30} s={0.33} sy={0.5} fill={i === 2 ? VERMILION : INK} opacity={i === 2 ? 1 : 0.22} />
+      ))}
+      <Cut d={DISC} x={236} y={176} s={0.44} fill={SHADE} />
+      <Cut d={DISC} x={230} y={170} s={0.44} fill={SAFFRON} />
+      <Cut d={BAR} x={222} y={110} s={0.3} sy={0.6} fill="#faf8f2" opacity={0.9} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -963,6 +987,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "web-designer": WebDesigner,
   "app-launcher": AppLauncher,
   "copycat-detective": CopycatDetective,
+  "duo-designer": DuoDesigner,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

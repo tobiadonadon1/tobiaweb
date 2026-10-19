@@ -52,6 +52,11 @@
   cursor: pointer;
   text-wrap: pretty;
 }
+/* Fine print: the box and the words a size down, set quietly under a button. */
+.nl-row[data-fine] { gap: 0.45rem; }
+.nl-row[data-fine] .nl-box { width: 0.85rem; height: 0.85rem; border-radius: 0.24rem; border-width: 1.25px; margin-top: 0.08rem; }
+.nl-row[data-fine] .nl-box::before { width: 0.48rem; height: 0.48rem; }
+.nl-row[data-fine] .nl-text { font-size: 0.7rem; line-height: 1.4; letter-spacing: 0.005em; }
 /* The bot is pointing at it: the box breathes until it is ticked. */
 .nl-row[data-nudge] .nl-box:not(:checked) { animation: nl-breathe 1.1s ease-in-out 0.4s 3; }
 @keyframes nl-breathe {
