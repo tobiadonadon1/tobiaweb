@@ -29,7 +29,7 @@ const key = live ? process.env.STRIPE_SECRET_KEY : process.env.STRIPE_TEST_SECRE
 if (!key) throw new Error(`${live ? "STRIPE_SECRET_KEY" : "STRIPE_TEST_SECRET_KEY"} is not set`);
 if (live !== /^(sk|rk)_live_/.test(key)) throw new Error("the key's mode doesn't match --live");
 const stripe = new Stripe(key);
-const webhookAt = process.argv[process.argv.indexOf("--webhook") + 1];
+const webhookAt = process.argv.includes("--webhook") ? process.argv[process.argv.indexOf("--webhook") + 1] : null;
 
 const PLANS = [
   { tier: "pro", product: "construct-pro", name: "Construct Pro", amount: 1900, lookup: "construct_pro_monthly",
