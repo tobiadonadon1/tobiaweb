@@ -2912,16 +2912,20 @@ html:has(.dd-page) body { background-color: #ffffff; }
   .dd-wall .dd-dev { --dd-h: 200px; }
 }
 .dd-floats { display: none; }
-@media (min-width: 1180px) {
+/* Only where the margins beside the name (at most 860px wide) really hold a
+   phone: each one is sized to its margin and centred in it, so it never
+   touches the name or the window's edge. Narrower screens see the same apps
+   in the wall under the film. */
+@media (min-width: 1360px) {
   .dd-floats { display: block; position: absolute; inset: 0; pointer-events: none; }
   .dd-float {
     position: absolute;
     top: clamp(7rem, 9vw, 8.5rem);
     animation: dd-float-in 1100ms var(--dd-out) 900ms backwards;
   }
-  .dd-float .dd-dev { --dd-h: clamp(220px, 19vw, 280px); animation: dd-bob 7s ease-in-out 2s infinite; }
-  .dd-float--l { left: max(1.5rem, calc(50% - 44rem)); transform: rotate(-7deg); }
-  .dd-float--r { right: max(1.5rem, calc(50% - 44rem)); transform: rotate(7deg); }
+  .dd-float .dd-dev { --dd-h: clamp(190px, calc((100vw - 900px) * 0.45), 270px); animation: dd-bob 7s ease-in-out 2s infinite; }
+  .dd-float--l { left: calc((100% - 860px) / 4); transform: translateX(-50%) rotate(-7deg); }
+  .dd-float--r { right: calc((100% - 860px) / 4); transform: translateX(50%) rotate(7deg); }
   .dd-float--r .dd-dev { animation-delay: 3.2s; }
 }
 @keyframes dd-float-in { from { opacity: 0; translate: 0 40px; } }
