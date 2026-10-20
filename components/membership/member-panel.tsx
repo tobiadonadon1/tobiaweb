@@ -164,7 +164,7 @@ export function MemberPanel({
             </h2>
             <p className="mt-4 flex items-baseline gap-1.5">
               <span className="text-[1.6rem] font-medium leading-none tracking-[-0.02em]">{price.amount}</span>
-              <span className={look.soft}>{tier === "free" ? "always" : price.per}</span>
+              <span className={look.soft}>{tier === "free" ? "forever" : price.per}</span>
             </p>
             <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>
               {sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}

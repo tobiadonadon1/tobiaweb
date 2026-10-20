@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 /**
  * THE CONSTRUCT ACCOUNT: sign in, create one, or reset the password; signed
  * in, the membership (components/membership/member-panel.tsx). One column on
- * paper, like the shelves it serves; only "Choose your plan" uses the full
+ * paper, like the shelves it serves; only "Choose your Construct plan" uses the full
  * width, for the four plans side by side. The forms are a client
  * component (components/account/account-forms.tsx) because every step
  * answers in place.

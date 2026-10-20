@@ -112,7 +112,7 @@ function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }
     <>
       <header className="mx-auto mb-12 max-w-[40rem] text-center">
         <h1 id={id} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
-          Choose your <em>plan</em>
+          Choose your Construct <em>plan</em>
         </h1>
         <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
           Start free, or pick a plan. You can change it any time from your account.
@@ -124,7 +124,7 @@ function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }
             <UniversalMail />
           ) : (
             <button type="button" onClick={() => onPick(tier)} className={`${PLAN_BUTTON} ${LOOK[tier].button}`}>
-              {tier === "free" ? "Start free" : `Choose ${planName(tier)}`}
+              {tier === "free" ? "Get started free" : `Choose ${planName(tier)}`}
               <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           )

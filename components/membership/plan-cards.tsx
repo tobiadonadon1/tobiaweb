@@ -6,7 +6,7 @@ import { planPrice, PLANS, type Tier } from "@/lib/membership/tiers";
 /**
  * THE FOUR PLANS, SIDE BY SIDE, SAME SIZE: Free, Pro, Ultimate, Universal,
  * each with everything it includes, so nobody picks a plan blind. The join
- * page and the "Choose your plan" step of signing up both print these; each
+ * page and the "Choose your Construct plan" step of signing up both print these; each
  * passes the button that goes at the bottom of a card (`action`).
  *
  * Every plan owns a gradient (with a soft light in a corner), climbing from
@@ -16,14 +16,22 @@ import { planPrice, PLANS, type Tier } from "@/lib/membership/tiers";
  *   Pro        the hot clay
  *   Ultimate   deep navy, lit from the corner
  *   Universal  navy into sunset
+ *
+ * Hover a card (or tab into it) and its gradient comes alive: two lights in
+ * the plan's own family drift across it and shift its colour (.plan-card in
+ * globals.css).
  */
 
 export const TIERS: Tier[] = ["free", "pro", "ultimate", "universal"];
 
 export const FREE_PLAN = {
   name: "Free",
-  line: "An account, and everything I give away.",
-  includes: ["Every free skill and guide, in one click", "Buy any premium or unique skill", "Notes from Tobi, if you want them"],
+  line: "The essentials to get started. Create an account and unlock the entire free library.",
+  includes: [
+    "All free skills and guides, installed in one click",
+    "Purchase premium and unique skills individually",
+    "Optional updates and insights from Tobi",
+  ],
 };
 
 type Look = { card: string; soft: string; check: string; button: string };
@@ -64,7 +72,7 @@ export function UniversalMail() {
   return (
     <a href={UNIVERSAL_MAILTO} className={`${PLAN_BUTTON} ${LOOK.universal.button}`}>
       <Mail aria-hidden className="h-5 w-5" />
-      Email me
+      Get in touch
     </a>
   );
 }
@@ -79,14 +87,15 @@ export function PlanCards({ action }: { action: (tier: Tier) => ReactNode }) {
           <article
             key={tier}
             id={tier}
-            className={`relative flex scroll-mt-28 flex-col overflow-hidden rounded-[1.75rem] p-7 ${look.card}`}
+            data-tier={tier}
+            className={`plan-card relative isolate flex scroll-mt-28 flex-col overflow-clip rounded-[1.75rem] p-7 ${look.card}`}
           >
             <h2 className="font-serif text-[2rem] leading-none tracking-[-0.03em]">{plan.name}</h2>
             <p className="mt-4 flex items-baseline gap-1.5">
               <span className="text-[2.4rem] font-medium leading-none tracking-[-0.03em]">
                 {planPrice(tier).amount}
               </span>
-              <span className={look.soft}>{tier === "free" ? "always" : planPrice(tier).per}</span>
+              <span className={look.soft}>{tier === "free" ? "forever" : planPrice(tier).per}</span>
             </p>
             <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>{plan.line}</p>
             <ul className="mt-6 flex flex-col gap-2.5">

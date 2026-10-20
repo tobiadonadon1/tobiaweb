@@ -114,7 +114,7 @@ export function JoinPlans() {
             if (member) return tier === "free" ? <YourPlan /> : null;
             return (
               <Link href={`${ACCOUNT_HREF}?mode=signup&plan=free`} className={`${PLAN_BUTTON} ${LOOK.free.button}`}>
-                Create a free account
+                Get started free
               </Link>
             );
           }

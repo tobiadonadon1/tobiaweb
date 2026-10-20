@@ -67,7 +67,7 @@ export type Plan = {
   currency: "eur";
   /** The Stripe price's lookup_key (scripts/membership-setup.mjs makes it). */
   lookupKey: string;
-  /** Printed instead of the price, with no "a month" (Universal: Custom). */
+  /** Printed instead of the price, with no "per month" (Universal: Custom). */
   priceLabel?: string;
   line: string;
   /** What the join page lists, in order. */
@@ -81,15 +81,14 @@ export const PLANS: Record<PaidTier, Plan> = {
     priceCents: 1900,
     currency: "eur",
     lookupKey: "construct_pro_monthly",
-    line: "Every premium skill, the Q&A, and a direct line to me.",
+    line: "The complete premium library, live sessions and direct access to me.",
     includes: [
-      "Every free skill",
+      "All free skills and guides",
       "Every premium skill, included",
-      "Unique skills at a member price",
-      "Part of my training: videos and files",
-      "Live group Q&A every two months",
-      "Live workshop every two months",
-      "Direct messages with me on Telegram",
+      "Unique skills at member pricing",
+      "Selected training videos and resources",
+      "Live group Q&A, twice a month",
+      "Direct messaging with me on Telegram",
     ],
   },
   ultimate: {
@@ -98,16 +97,16 @@ export const PLANS: Record<PaidTier, Plan> = {
     priceCents: 5900,
     currency: "eur",
     lookupKey: "construct_ultimate_monthly",
-    line: "Everything, plus the people, the calls and a say in what I build.",
+    line: "Everything in Pro, plus 1-on-1 access, a private community and a voice in the roadmap.",
     includes: [
       "Everything in Pro",
-      "Unique skills at a big discount, some free",
-      "Skills only Ultimate members get",
-      "All of my training",
-      "1-on-1 calls with me",
-      "Commission a skill built for you (paid separately)",
-      "The network of members who ship",
-      "Request skills and vote on what comes next",
+      "Unique skills at a deep discount, with some included",
+      "Exclusive skills, available only to Ultimate members",
+      "The complete training library",
+      "A private 1-on-1 call with me",
+      "Custom skills built to your spec (billed separately)",
+      "A private network of builders who ship",
+      "Request new skills and vote on the roadmap",
     ],
   },
   universal: {
@@ -117,24 +116,24 @@ export const PLANS: Record<PaidTier, Plan> = {
     currency: "eur",
     lookupKey: "construct_universal_monthly",
     priceLabel: "Custom",
-    line: "We build it with you.",
+    line: "A hands-on partnership. We work alongside you, from product to launch.",
     includes: [
       "Everything in Ultimate",
-      "We help you build what you're building",
-      "We review your designs and make a better version",
-      "We help you market what you sell",
-      "And more",
+      "Hands-on support building your product",
+      "Expert design reviews, with improved versions delivered",
+      "Go-to-market and marketing strategy",
+      "A scope tailored to your goals",
     ],
   },
 };
 
 export const planName = (tier: Tier) => (tier === "free" ? "Free" : PLANS[tier].name);
 
-/** A plan's price as people read it: "€0", "€19" with "a month", or its label ("Custom"). */
+/** A plan's price as people read it: "€0", "€19" with "per month", or its label ("Custom"). */
 export const planPrice = (tier: Tier): { amount: string; per: string | null } => {
   if (tier === "free") return { amount: "€0", per: null };
   const plan = PLANS[tier];
-  return plan.priceLabel ? { amount: plan.priceLabel, per: null } : { amount: money(plan.priceCents, plan.currency), per: "a month" };
+  return plan.priceLabel ? { amount: plan.priceLabel, per: null } : { amount: money(plan.priceCents, plan.currency), per: "per month" };
 };
 
 /** Paid plans someone can start from the join page; Universal starts with an email. */

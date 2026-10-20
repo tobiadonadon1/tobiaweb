@@ -3079,3 +3079,77 @@ html:has(.dd-page) body { background-color: #ffffff; }
   .dd-unfold__frame--end { display: block; }
   .dd-unfold__video { display: none; }
 }
+
+/* ------------------------------------------------------------------ *
+ * THE PLAN CARDS COME ALIVE (components/membership/plan-cards.tsx).
+ * Hover a plan, or tab into it: two soft lights in the plan's own family
+ * fade in over its gradient and drift, so the colour shifts as if the card
+ * breathes. They sit under the text (z-index -1 inside the card's own
+ * stacking context, .isolate) and pause where they are when the pointer
+ * leaves, so the next hover picks up from there.
+ * ------------------------------------------------------------------ */
+.plan-card[data-tier="free"] {
+  --plan-a: rgba(255, 176, 130, 0.85);
+  --plan-c: rgba(255, 218, 120, 0.8);
+  --plan-b: rgba(160, 196, 255, 0.85);
+}
+.plan-card[data-tier="pro"] {
+  --plan-a: rgba(255, 176, 72, 0.9);
+  --plan-c: rgba(255, 70, 128, 0.75);
+  --plan-b: rgba(120, 14, 40, 0.75);
+}
+.plan-card[data-tier="ultimate"] {
+  --plan-a: rgba(70, 140, 255, 0.85);
+  --plan-c: rgba(24, 196, 190, 0.6);
+  --plan-b: rgba(128, 86, 232, 0.75);
+}
+.plan-card[data-tier="universal"] {
+  --plan-a: rgba(255, 80, 120, 0.75);
+  --plan-c: rgba(130, 64, 220, 0.7);
+  --plan-b: rgba(255, 196, 80, 0.9);
+}
+.plan-card::before,
+.plan-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 700ms ease;
+  animation: plan-drift-a 7s ease-in-out infinite alternate paused;
+}
+/* Each light is as big as the card, so the colour moves across all of it. */
+.plan-card::before {
+  inset: -35% -70% 25% -70%;
+  background:
+    radial-gradient(closest-side at 38% 42%, var(--plan-a), transparent),
+    radial-gradient(closest-side at 70% 72%, var(--plan-c), transparent);
+}
+.plan-card::after {
+  inset: 30% -70% -35% -70%;
+  background: radial-gradient(closest-side, var(--plan-b), transparent);
+  animation-name: plan-drift-b;
+  animation-duration: 8.5s;
+}
+.plan-card:hover::before,
+.plan-card:hover::after,
+.plan-card:focus-within::before,
+.plan-card:focus-within::after {
+  opacity: 1;
+  animation-play-state: running;
+}
+@keyframes plan-drift-a {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(18%, 14%) scale(1.15) rotate(25deg); }
+  66% { transform: translate(-14%, 30%) scale(0.92) rotate(-15deg); }
+  100% { transform: translate(12%, 4%) scale(1.1) rotate(10deg); }
+}
+@keyframes plan-drift-b {
+  0% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-18%, -24%) scale(0.88); }
+  100% { transform: translate(14%, -40%) scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plan-card::before,
+  .plan-card::after { animation: none; }
+}
