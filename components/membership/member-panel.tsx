@@ -377,7 +377,8 @@ function Overview({
         </div>
         <div className="flex-none">
           <a href="#billing" className={`${PLAN_BUTTON} px-7 ${look.button}`}>
-            Plan &amp; billing
+            {/* Universal has nothing above it, so there it stays the billing door. */}
+            {tier === "universal" ? "Plan & billing" : "Upgrade"}
             <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         </div>
