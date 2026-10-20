@@ -44,12 +44,17 @@ export async function GET(request: Request) {
   let training: { id: string; title: string; summary: string | null; kind: string; url: string; tier: string }[] = [];
   const reach = trainingReach(tier);
   if (reach.length && accountsConfigured()) {
-    const { data } = await adminClient()
+    const { data, error } = await adminClient()
       .from("training")
       .select("id, title, summary, kind, url, tier")
       .eq("published", true)
       .in("tier", reach)
       .order("sort");
+    // Said as a failure, so the dashboard offers "Try again" rather than "soon".
+    if (error) {
+      console.error("[membership] could not read training", error);
+      return new Response(JSON.stringify({ ok: false, error: "failed" }), { status: 500, headers });
+    }
     training = data ?? [];
   }
 

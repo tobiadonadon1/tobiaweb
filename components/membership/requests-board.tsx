@@ -7,7 +7,8 @@ import { ChevronUp, LoaderCircle } from "lucide-react";
  * THE REQUESTS BOARD, for Ultimate members: ask for a skill, vote on the
  * ones others asked for. Most votes first. Tobia moves a request along
  * (planned, building, shipped, declined) in the database; the board shows it.
- * All of it goes through /api/membership/requests, which checks the plan.
+ * A member can take back their own while it's still open. All of it goes
+ * through /api/membership/requests, which checks the plan.
  */
 
 type Request = {
@@ -54,11 +55,16 @@ export function RequestsBoard() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  const [failed, setFailed] = useState(false);
+
   const load = useCallback(async () => {
+    setFailed(false);
     const r = await fetch("/api/membership/requests", { cache: "no-store", credentials: "same-origin" })
       .then((res) => res.json())
       .catch(() => null);
-    setRequests(r?.ok ? r.requests : []);
+    // A failed read says so: an empty board would read as "nobody asked yet".
+    if (r?.ok) setRequests(r.requests);
+    else setFailed(true);
   }, []);
 
   useEffect(() => {
@@ -73,6 +79,12 @@ export function RequestsBoard() {
     setRequests((all) => all?.map(flip) ?? all);
     const r = await post({ action: req.voted ? "unvote" : "vote", id: req.id });
     if (!r.ok) setRequests((all) => all?.map((x) => (x.id === req.id ? req : x)) ?? all);
+  };
+
+  const remove = async (req: Request) => {
+    setRequests((all) => all?.filter((x) => x.id !== req.id) ?? all);
+    const r = await post({ action: "delete", id: req.id });
+    if (!r.ok) load();
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -138,7 +150,18 @@ export function RequestsBoard() {
         </p>
       </form>
 
-      {requests === null ? (
+      {failed ? (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--hairline-strong)] bg-white p-5">
+          <p className="text-[1rem]">The requests didn&rsquo;t load.</p>
+          <button
+            type="button"
+            onClick={load}
+            className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+          >
+            Try again
+          </button>
+        </div>
+      ) : requests === null ? (
         <div className="h-24" aria-busy="true" />
       ) : requests.length === 0 ? (
         <p className={`text-[1rem] ${soft}`}>Nothing asked yet. Be the first.</p>
@@ -177,7 +200,24 @@ export function RequestsBoard() {
                 {r.details ? (
                   <p className={`mt-1 whitespace-pre-line text-[0.92rem] leading-[1.45] ${soft}`}>{r.details}</p>
                 ) : null}
-                {r.yours ? <p className={`mt-1 text-[0.82rem] ${soft}`}>Yours</p> : null}
+                {r.yours ? (
+                  <p className={`mt-1 text-[0.82rem] ${soft}`}>
+                    Yours
+                    {r.status === "open" ? (
+                      <>
+                        <span aria-hidden> · </span>
+                        <button
+                          type="button"
+                          onClick={() => remove(r)}
+                          aria-label={`Remove your request ${r.title}`}
+                          className="underline underline-offset-2 hover:text-[var(--ink)]"
+                        >
+                          Remove
+                        </button>
+                      </>
+                    ) : null}
+                  </p>
+                ) : null}
               </div>
             </li>
           ))}

@@ -60,10 +60,19 @@ export async function POST(request: Request) {
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (limited(`ip:${ip}`, 6) || limited(`to:${email}`, 3)) return json({ ok: false, error: "too-many" }, 429, cookies);
+  // The same cap, counted in the database: the map above is one server's
+  // memory, and a new server starts it empty.
+  const db = adminClient();
+  const { count } = await db
+    .from("inquiries")
+    .select("id", { count: "exact", head: true })
+    .eq("email", email)
+    .gte("created_at", new Date(Date.now() - WINDOW_MS).toISOString());
+  if ((count ?? 0) >= 3) return json({ ok: false, error: "too-many" }, 429, cookies);
 
   const name = text(body.name, 120) || null;
   const budget = text(body.budget, 120) || null;
-  const { error } = await adminClient()
+  const { error } = await db
     .from("inquiries")
     .insert({ kind, member_id: member?.id ?? null, email, name, body: message, budget });
   if (error) {

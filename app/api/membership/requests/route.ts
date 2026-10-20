@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { accountsConfigured, adminClient, currentMember } from "@/lib/account";
+import { notifyTobia } from "@/lib/membership/notify";
 import { membershipOf } from "@/lib/membership/server";
 import { hasPerk } from "@/lib/membership/tiers";
 
@@ -8,9 +10,11 @@ import { hasPerk } from "@/lib/membership/tiers";
  *   GET                                       the requests, most votes first
  *   POST { action: "create", title, details } ask for a skill (3 every 30 days)
  *   POST { action: "vote" | "unvote", id }    one vote per member per request
+ *   POST { action: "delete", id }             take back their own, while open
  *
- * Tobia moves a request along (open → planned → building → shipped, or
- * declined) by editing its status in the database; the board shows it.
+ * Tobia gets an email for every new request. He moves one along (open →
+ * planned → building → shipped, or declined) by editing its status in the
+ * database, or takes it down by deleting the row; the board shows it.
  */
 
 export const dynamic = "force-dynamic";
@@ -95,7 +99,36 @@ export async function POST(request: Request) {
     if (error || !data) return json({ ok: false, error: "failed" }, 500, g.cookies);
     // Asking for it is a vote for it.
     await db.from("skill_votes").insert({ request_id: data.id, member_id: g.member.id });
+    // Every Ultimate member sees it, so Tobia sees it too, as it lands
+    // (after the answer, so the member isn't kept waiting on Gmail).
+    const email = g.member.email;
+    after(() => notifyTobia(
+      `Skill request: ${title}`,
+      [
+        `From: ${email}`,
+        "",
+        title,
+        details,
+        "",
+        `Every Ultimate member sees this on the board. To take it down, delete row ${data.id} in skill_requests (Supabase); its votes go with it.`,
+      ].join("\n"),
+      email,
+    ));
     return json({ ok: true, id: data.id }, 200, g.cookies);
+  }
+
+  if (body.action === "delete") {
+    const id = Number(body.id);
+    if (!Number.isSafeInteger(id) || id < 1) return json({ ok: false, error: "bad-request" }, 400, g.cookies);
+    // Only their own, and only while Tobia hasn't picked it up.
+    const { error } = await db
+      .from("skill_requests")
+      .delete()
+      .eq("id", id)
+      .eq("member_id", g.member.id)
+      .eq("status", "open");
+    if (error) return json({ ok: false, error: "failed" }, 500, g.cookies);
+    return json({ ok: true }, 200, g.cookies);
   }
 
   if (body.action === "vote" || body.action === "unvote") {

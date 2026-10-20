@@ -80,6 +80,7 @@ export function MemberPanel({
   const top = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const [perks, setPerks] = useState<Perks | null>(null);
+  const [perksState, setPerksState] = useState<"loading" | "ready" | "failed" | "signed-out">("loading");
   const [joined, setJoined] = useState<string | null>(null);
   const [billingError, setBillingError] = useState(false);
   const [active, setActive] = useState<SectionId>("overview");
@@ -97,16 +98,34 @@ export function MemberPanel({
     };
     fromHash();
     window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
+
+  // The plan's links and training. One quiet second try, then the section
+  // says it didn't load (never "soon", which would be a wrong promise).
+  useEffect(() => {
+    if (perksState !== "loading") return;
     let live = true;
-    fetch("/api/membership/perks", { cache: "no-store", credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((b: Perks & { ok?: boolean }) => live && b.ok && setPerks(b))
-      .catch(() => {});
+    const once = () =>
+      fetch("/api/membership/perks", { cache: "no-store", credentials: "same-origin" }).then(async (r) => {
+        const b = (await r.json().catch(() => ({}))) as Perks & { ok?: boolean };
+        if (r.status === 401) return "signed-out" as const;
+        if (!r.ok || !b.ok) throw new Error(`perks ${r.status}`);
+        return b;
+      });
+    once()
+      .catch(() => new Promise((res) => setTimeout(res, 1500)).then(once))
+      .then((b) => {
+        if (!live) return;
+        if (b === "signed-out") return setPerksState("signed-out");
+        setPerks(b);
+        setPerksState("ready");
+      })
+      .catch(() => live && setPerksState("failed"));
     return () => {
       live = false;
-      window.removeEventListener("hashchange", fromHash);
     };
-  }, []);
+  }, [perksState]);
 
   // A new section starts at its top, and the phone's strip keeps its pill in view.
   const first = useRef(true);
@@ -128,6 +147,12 @@ export function MemberPanel({
 
   const section = sectionById(active);
   const unlock = needs(section, tier);
+  // Sections drawn from /api/membership/perks; the rest work without it.
+  const fromPerks = !unlock && ["skills", "training", "live", "telegram", "calls", "network"].includes(active);
+  const notLoaded =
+    perksState === "failed" || perksState === "signed-out" ? (
+      <LoadFailed signedOut={perksState === "signed-out"} onRetry={() => setPerksState("loading")} />
+    ) : null;
 
   return (
     <div ref={top} className="flex flex-col gap-10">
@@ -207,8 +232,13 @@ export function MemberPanel({
         <div className="min-w-0">
           {unlock ? (
             <Locked section={section} tier={tier} unlock={unlock} />
+          ) : fromPerks && notLoaded ? (
+            notLoaded
           ) : active === "overview" ? (
-            <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} />
+            <>
+              {notLoaded ? <div className="mb-8">{notLoaded}</div> : null}
+              <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} />
+            </>
           ) : active === "skills" ? (
             <SkillsSection ids={ids} tier={tier} library={library} owned={owned} />
           ) : active === "training" ? (
@@ -230,6 +260,24 @@ export function MemberPanel({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The plan's links didn't arrive: say so, and one button to ask again. */
+function LoadFailed({ signedOut, onRetry }: { signedOut: boolean; onRetry: () => void }) {
+  return (
+    <div role="alert" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--hairline-strong)] bg-white p-6">
+      <p className="text-[1rem] leading-[1.5]">
+        {signedOut ? "You were signed out. Sign in again to see your plan." : "Part of your dashboard didn't load. Your plan is fine."}
+      </p>
+      <button
+        type="button"
+        onClick={signedOut ? () => window.location.reload() : onRetry}
+        className="flex-none rounded-full bg-[var(--ink)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+      >
+        {signedOut ? "Sign in" : "Try again"}
+      </button>
     </div>
   );
 }

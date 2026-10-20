@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { PlanBadge } from "@/components/membership/plan-badge";
-import { planName } from "@/lib/membership/tiers";
 import { HandNote } from "@/components/ui/hand-note";
 import { MATERIAL_GRID, folderHref } from "./material-data";
+import { MembersDoor } from "./members-door";
 import { Specimen } from "./specimens";
 import type { MaterialFolder } from "./material-types";
 
@@ -100,11 +100,17 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
 
         {specimen}
 
-        <p className="mt-auto font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {folder.members
-            ? `Available only for ${folder.members.map(planName).join(" and ")} members`
-            : folder.soon}
-        </p>
+        {folder.members ? (
+          /* A member whose plan opens it gets the way in instead. */
+          <MembersDoor
+            members={folder.members}
+            className="mt-auto font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]"
+          />
+        ) : (
+          <p className="mt-auto font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+            {folder.soon}
+          </p>
+        )}
       </li>
     );
   }
