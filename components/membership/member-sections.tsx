@@ -68,18 +68,20 @@ export type Section = {
   perk?: Perk;
   /** What it is, in one line: the locked view and the overview's locked tile say this. */
   about: string;
+  /** Picks this section's line out of a plan's `includes`, so the locked view can lead with it. */
+  match?: RegExp;
 };
 
 export const SECTIONS: Section[] = [
   { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
   { id: "skills", name: "Skills", icon: Package, about: "Every skill your plan includes, and every one you bought." },
-  { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources." },
-  { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month." },
-  { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram." },
-  { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me." },
-  { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, billed separately." },
-  { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship." },
-  { id: "requests", name: "Requests", icon: ListChecks, perk: "requests", about: "Request new skills and vote on the roadmap." },
+  { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
+  { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
+  { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
+  { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me.", match: /1-on-1/ },
+  { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, billed separately.", match: /custom skills/i },
+  { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship.", match: /network/i },
+  { id: "requests", name: "Requests", icon: ListChecks, perk: "requests", about: "Request new skills and vote on the roadmap.", match: /roadmap/i },
   { id: "billing", name: "Plan & billing", icon: CreditCard, about: "Your plan, your card and your invoices." },
 ];
 
@@ -122,36 +124,48 @@ export function SectionHead({ id, title, line }: { id: string; title: string; li
 }
 
 /* ------------------------------------------------------------------ *
- * LOCKED: what it is, which plan opens it, and that plan's button.
+ * LOCKED: says plainly it isn't in their plan, then what the plan that
+ * opens it gives them (this section's line first, nothing they already
+ * have), and the one button to upgrade.
  * ------------------------------------------------------------------ */
 export function Locked({ section, tier, unlock }: { section: Section; tier: Tier; unlock: PaidTier }) {
   const ids = useId();
   const plan = PLANS[unlock];
   const look = LOOK[unlock];
   const Icon = section.icon;
+  // Not "All free skills and guides" to a free account, nor "Everything in Pro" to Pro.
+  const already = (item: string) => item === "All free skills and guides" || (tier === "pro" && item === "Everything in Pro");
+  const items = plan.includes.filter((item) => !already(item));
+  const lead = section.match ? items.find((item) => section.match!.test(item)) : undefined;
+  const list = lead ? [lead, ...items.filter((item) => item !== lead)] : items;
   return (
     <section aria-labelledby={`${ids}-h`} className={`plan-card relative isolate overflow-clip rounded-[2rem] p-7 md:p-10 ${look.card}`} data-tier={unlock}>
       <div className="flex items-center gap-3">
         <Icon aria-hidden className="h-6 w-6" />
-        <PlanBadge tier={unlock} className="px-2.5 py-1 text-[0.75rem] ring-1 ring-inset ring-[rgba(255,255,255,0.5)]" />
+        <span className={`flex items-center gap-1.5 text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>
+          <Lock aria-hidden className="h-3.5 w-3.5" />
+          Not in your plan
+        </span>
       </div>
-      <h2 id={`${ids}-h`} className="mt-6 font-serif text-[clamp(2.2rem,5vw,3rem)] leading-[0.95] tracking-[-0.035em]">
-        {section.name}
+      <h2 id={`${ids}-h`} className="mt-6 max-w-[42rem] font-serif text-[clamp(2.1rem,5vw,3rem)] leading-[0.98] tracking-[-0.035em]">
+        {section.name} {/s$/.test(section.name) ? "aren\u2019t" : "isn\u2019t"} in your plan <em>yet</em>.
       </h2>
       <p className={`mt-4 max-w-[34rem] text-[1.1rem] leading-[1.5] ${look.soft}`}>
         {section.about} Available only for {unlock === "pro" ? "Pro and Ultimate" : "Ultimate"} members.
       </p>
-      <p className={`mt-8 text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>{plan.name} also opens</p>
+      <p className={`mt-8 flex items-center gap-2 text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>
+        With <PlanBadge tier={unlock} className="px-2.5 py-0.5 normal-case tracking-normal ring-1 ring-inset ring-[rgba(255,255,255,0.5)]" /> you get
+      </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-        {plan.includes.map((item) => (
+        {list.map((item) => (
           <li key={item} className="flex gap-2.5 text-[0.95rem] leading-[1.4]">
             <Check aria-hidden className={`mt-[0.15rem] h-4 w-4 flex-none ${look.check}`} />
-            <span className={look.soft}>{item}</span>
+            <span className={item === lead ? "font-medium" : look.soft}>{item}</span>
           </li>
         ))}
       </ul>
       <div className="mt-9 max-w-[22rem]">
-        <JoinButton tier={unlock} label={tier === "free" ? `Join ${plan.name}` : `Switch to ${plan.name}`} />
+        <JoinButton tier={unlock} label={`Upgrade to ${plan.name}`} />
       </div>
     </section>
   );
