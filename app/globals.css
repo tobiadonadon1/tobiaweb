@@ -3153,3 +3153,297 @@ html:has(.dd-page) body { background-color: #ffffff; }
   .plan-card::before,
   .plan-card::after { animation: none; }
 }
+
+/* ------------------------------------------------------------------ *
+ * VIDEO MACHINE (video-machine-page.tsx, video-machine-intro.tsx).
+ *
+ * THE OPENING (about 5.5 s): a busy editing app builds itself cut by cut,
+ * then is pulled into one text field; a sentence types itself, a render bar
+ * fills, and a frame of the real launch video opens out to fill the screen
+ * before the curtain lifts. ON THE PAGE: the hero rises in after it, a
+ * playhead sweeps the 20-skill timeline, and the clips cut in as it scrolls
+ * into view. Reduced motion: the sentence alone, then a fade.
+ * ------------------------------------------------------------------ */
+.vd-page {
+  --vd-out: cubic-bezier(0.7, 0, 0.2, 1);
+  --vd-snap: cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.vd-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  background: #0f1012;
+  color: #fff;
+  animation: vd-curtain 650ms var(--vd-out) 5.3s forwards;
+}
+.vd-intro[data-done] { animation: vd-curtain 420ms var(--vd-out) forwards; }
+@keyframes vd-curtain {
+  to { transform: translateY(-100%); visibility: hidden; pointer-events: none; }
+}
+body:has(.vd-intro) [data-site-nav] { animation: adp-nav-in 400ms ease-out 5.6s backwards; }
+body:has(.vd-intro[data-done]) [data-site-nav] { animation: adp-nav-in 300ms ease-out backwards; }
+
+/* 1. The app. */
+.vd-app {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  padding: clamp(0.6rem, 1.6vw, 1.2rem);
+  transform-origin: 50% 50%;
+  animation: vd-suck 560ms cubic-bezier(0.6, 0, 0.9, 0.4) 1.8s forwards;
+}
+@keyframes vd-suck {
+  to { transform: scale(0.03); opacity: 0; filter: blur(6px); }
+}
+.vd-app__menu {
+  display: flex;
+  gap: clamp(0.7rem, 2vw, 1.5rem);
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+.vd-app__tc {
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #ff5a1f;
+}
+.vd-app__body {
+  display: grid;
+  grid-template-columns: 1fr 2.4fr 1fr;
+  gap: 0.6rem;
+  min-height: 0;
+}
+.vd-app__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.8rem;
+  border-radius: 0.6rem;
+  background: #1b1c20;
+  overflow: hidden;
+}
+.vd-app__row { display: block; height: 0.5rem; border-radius: 3px; background: rgba(255, 255, 255, 0.12); }
+.vd-app__knob { display: block; height: 0.35rem; border-radius: 3px; background: rgba(255, 255, 255, 0.08); }
+.vd-app__knob > span { display: block; height: 100%; border-radius: inherit; background: #2f5bff; }
+.vd-app__viewer {
+  display: grid;
+  place-items: center;
+  border-radius: 0.6rem;
+  background: #000;
+  overflow: hidden;
+}
+.vd-app__frame {
+  width: 86%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.3rem;
+  background: linear-gradient(135deg, #ff5a1f, #a970ff);
+  animation: vd-flick 1.6s steps(1) infinite;
+}
+@keyframes vd-flick {
+  0% { background: linear-gradient(135deg, #ff5a1f, #a970ff); }
+  25% { background: linear-gradient(135deg, #2f5bff, #19b47d); }
+  50% { background: linear-gradient(135deg, #ffd23f, #ff5a1f); }
+  75% { background: linear-gradient(135deg, #141518, #2f5bff); }
+}
+.vd-app__timeline {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  background: #17181b;
+}
+.vd-app__track { display: grid; grid-template-columns: 2rem 1fr; align-items: center; gap: 0.4rem; }
+.vd-app__name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+.vd-app__lane {
+  display: grid;
+  grid-template-columns: repeat(48, minmax(0, 1fr));
+  gap: 2px;
+  height: clamp(1.1rem, 3.2vh, 1.9rem);
+}
+.vd-app__clip {
+  border-radius: 3px;
+  transform-origin: left center;
+  animation: vd-cut 240ms var(--vd-snap) calc(var(--n) * 55ms + 120ms) both;
+}
+@keyframes vd-cut {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.vd-app__playhead {
+  position: absolute;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  width: 2px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  animation: vd-sweep 1.8s linear forwards;
+}
+@keyframes vd-sweep {
+  from { left: 3rem; }
+  to { left: 72%; }
+}
+
+/* 2–4. The sentence, the render, the film. */
+.vd-ask {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: 0 1rem;
+  opacity: 0;
+  animation: vd-in 260ms ease-out 2.2s forwards, vd-out 300ms ease-in 4.75s forwards;
+}
+.vd-ask__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.9em 1.2em;
+  border-radius: 999px;
+  background: #fff;
+  color: #16171b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: clamp(0.72rem, 3.1vw, 1.5rem);
+  font-weight: 600;
+  box-shadow: 0 30px 80px -30px rgba(255, 90, 31, 0.55);
+}
+.vd-ask__prompt { color: #ff5a1f; }
+.vd-ask__text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: vd-typing 1.25s steps(var(--chars)) 2.45s forwards;
+}
+@keyframes vd-typing {
+  to { width: calc(var(--chars) * 1ch); }
+}
+.vd-ask__caret {
+  width: 0.12em;
+  height: 1.15em;
+  background: #ff5a1f;
+  animation: vd-blink 0.7s steps(1) infinite;
+}
+@keyframes vd-blink { 50% { opacity: 0; } }
+.vd-ask__render {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: min(26rem, 80vw);
+  opacity: 0;
+  animation: vd-in 200ms ease-out 3.75s forwards;
+}
+.vd-ask__bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+.vd-ask__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #19b47d;
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: vd-fill 800ms cubic-bezier(0.4, 0, 0.2, 1) 3.85s forwards;
+}
+@keyframes vd-fill { to { transform: scaleX(1); } }
+.vd-ask__label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+.vd-film {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  clip-path: inset(42% 34% round 1rem);
+  animation: vd-open 560ms var(--vd-out) 4.7s forwards;
+}
+@keyframes vd-open {
+  0% { opacity: 1; clip-path: inset(42% 34% round 1rem); }
+  100% { opacity: 1; clip-path: inset(0 0 round 0); }
+}
+@keyframes vd-in { to { opacity: 1; } }
+@keyframes vd-out { to { opacity: 0; } }
+
+/* The hero rises in as the curtain lifts (at once if it was skipped). */
+.vd-rise { animation: vd-rise 650ms var(--vd-snap) calc(5.55s + var(--i) * 90ms) both; }
+html[data-vd-intro="done"] .vd-rise { animation-delay: calc(var(--i) * 90ms); }
+@keyframes vd-rise {
+  from { opacity: 0; transform: translateY(1.4rem); }
+  to { opacity: 1; transform: none; }
+}
+
+/* THE 20-SKILL TIMELINE. Two clips a row on phones; on wider screens each
+   clip takes its own width out of twelve, like an edit. */
+.vd-clip { grid-column: span 1; }
+@media (min-width: 640px) {
+  .vd-clip { grid-column: span var(--w) / span var(--w); }
+}
+.vd-tl__head {
+  position: absolute;
+  top: -0.3rem;
+  bottom: -0.3rem;
+  left: 0;
+  width: 2px;
+  background: #ff5a1f;
+  pointer-events: none;
+}
+.vd-tl__head::before {
+  content: "";
+  position: absolute;
+  top: -0.2rem;
+  left: -5px;
+  border: 6px solid transparent;
+  border-top: 8px solid #ff5a1f;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vd-tl__head { animation: vd-scan 9s linear infinite; }
+}
+@keyframes vd-scan {
+  from { left: 0; }
+  to { left: 100%; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vd-tl .vd-clip {
+      transform-origin: left center;
+      animation: vd-cut both var(--vd-snap);
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vd-app { display: none; }
+  .vd-ask { opacity: 1; animation: vd-out 300ms ease-in 2.4s forwards; }
+  .vd-ask__text { width: auto; animation: none; }
+  .vd-ask__render, .vd-film, .vd-app__frame, .vd-ask__caret { display: none; animation: none; }
+  .vd-intro { animation: vd-curtain-fade 400ms ease-out 2.6s forwards; }
+  .vd-intro[data-done] { animation: vd-curtain-fade 300ms ease-out forwards; }
+  .vd-rise { animation: adp-fade 400ms ease-out 2.6s both; }
+  html[data-vd-intro="done"] .vd-rise { animation-delay: 0s; }
+}
+@keyframes vd-curtain-fade {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}

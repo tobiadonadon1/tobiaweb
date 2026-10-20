@@ -865,6 +865,31 @@ function ViralMachine() {
 }
 
 /**
+ * VIDEO MACHINE — an edit cut from paper: an ink viewer with a vermilion
+ * play wedge on it, and three torn tracks below in the page's colours
+ * (talking head, from scratch, motion), offset like clips on a timeline, with
+ * an ink playhead standing across them. The colours are the page's own
+ * (product/video-machine-bits.tsx).
+ */
+function VideoMachine() {
+  return (
+    <>
+      <Cut d={CARD} x={98} y={22} s={1.02} sy={0.82} fill={SHADE} />
+      <Cut d={CARD} x={92} y={16} s={1.02} sy={0.82} fill={INK} />
+      <Cut d={WEDGE} x={178} y={40} s={0.54} fill={SHADE} />
+      <Cut d={WEDGE} x={172} y={34} s={0.54} fill="#FF5A1F" />
+      <Cut d={BAR} x={40} y={174} s={0.62} sy={1.2} fill="#FF5A1F" />
+      <Cut d={BAR} x={222} y={174} s={0.44} sy={1.2} fill="#FF8A5C" />
+      <Cut d={BAR} x={76} y={222} s={0.5} sy={1.2} fill="#2F5BFF" />
+      <Cut d={BAR} x={228} y={222} s={0.5} sy={1.2} fill="#FFD23F" />
+      <Cut d={BAR} x={30} y={270} s={0.4} sy={1.2} fill="#A970FF" />
+      <Cut d={BAR} x={150} y={270} s={0.72} sy={1.2} fill="#19B47D" />
+      <Cut d={CARD} x={206} y={158} s={0.03} sy={1.0} fill={INK} />
+    </>
+  );
+}
+
+/**
  * APP DESIGNER PRO — two phones, cut from paper, side by side: an iPhone and
  * an Android, the same app on both. Each holds one decision (a disc, a bar),
  * and a pink wedge in front is the play button: the screens move now. The
@@ -988,6 +1013,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "app-launcher": AppLauncher,
   "copycat-detective": CopycatDetective,
   "duo-designer": DuoDesigner,
+  "video-machine": VideoMachine,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

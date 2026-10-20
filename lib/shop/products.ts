@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-machine";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -919,6 +919,59 @@ export const DUO_DESIGNER: Product = {
   },
 };
 
+export const VIDEO_MACHINE: Product = {
+  id: "video-machine",
+  name: "Video Machine",
+  description:
+    "Your video editor inside Claude Code: 20 skills that turn a clip, a link or an idea into a finished video, with moving titles, reel captions, smooth cuts and sound.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/video-machine",
+  file: {
+    sealed: "video-machine.zip.enc",
+    filename: "video-machine.zip",
+    // The skills ship scripts (.sh, .mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Video Machine turns Claude Code into your video editor. Give it a video of you talking, your product's link, an article or a folder of AI clips, and it makes the finished video: moving titles, reel captions, launch promos, explainers and cuts that flow like one camera move. 20 skills, one install, free.",
+    kicker: "Skill · for Claude Code",
+    line: "Your video editor, inside Claude Code.",
+    proof: "Titles · captions · launches · explainers",
+  },
+  contents: [
+    ["install.mjs", "installs all 20 skills: the six in this folder, and the fourteen HyperFrames skills fresh from HeyGen"],
+    ["skills/", "motion doctrine, cut-on-the-curve transitions, seam craft, caption overlay, ffmpeg editing, titling"],
+    ["workspace/", "the ffmpeg editing scripts, title-card presets and fonts"],
+    ["START HERE.txt", "the three steps"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. Claude installs the 20 video skills in about a minute.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code and type hi.",
+    after: [
+      "From then on, ask Claude for the video you want in any Claude Code session: \"make a 9:16 reel from video.mp4 with titles and captions\", \"a 30-second launch video for my site\", or \"an explainer from this article\".",
+      "It plans the story, builds the video, renders it to MP4 on your computer and shows you the result. Say what to change and it changes it.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code with a paid Claude plan and Node.js 18 or newer. The ffmpeg editing also needs ffmpeg; Claude offers to install it.",
+    next: [
+      ["Right after install", "Claude offers to make your first video. Have a clip, a link or an idea ready."],
+      ["Every video", "A plan first, then the build, then a render you can watch and change."],
+      ["Your AI clips", "Say \"cut these clips into one vertical video\" and it edits them into one film."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -934,6 +987,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "viral-machine": VIRAL_MACHINE,
   "web-designer-pro": WEB_DESIGNER_PRO,
   "duo-designer": DUO_DESIGNER,
+  "video-machine": VIDEO_MACHINE,
 };
 
 export function productById(id: unknown): Product | undefined {
