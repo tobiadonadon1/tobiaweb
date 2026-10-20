@@ -72,6 +72,7 @@ const VIDEOS_FOLDER: MaterialFolder = {
   lede: "Written first, filmed second.",
   locked: true,
   soon: "Six written. None filmed.",
+  members: ["pro", "ultimate"],
   intro: [
     "None of these exist yet, and every row says so. What is here is the notes each will be cut from, which are worth reading on their own.",
   ],

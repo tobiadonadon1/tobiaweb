@@ -1,0 +1,431 @@
+"use client";
+
+import { useId, useState } from "react";
+import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowUpRight,
+  CalendarClock,
+  Check,
+  CreditCard,
+  Download,
+  LayoutGrid,
+  ListChecks,
+  LoaderCircle,
+  Lock,
+  Package,
+  PlayCircle,
+  Radio,
+  Send,
+  Users,
+  WandSparkles,
+} from "lucide-react";
+import { hasPerk, planName, PLANS, type PaidTier, type Perk, type Tier } from "@/lib/membership/tiers";
+import type { Product } from "@/lib/shop/products";
+import { JoinButton } from "./join-plans";
+import { LOOK } from "./plan-cards";
+import { PlanBadge } from "./plan-badge";
+
+/**
+ * THE DASHBOARD'S SECTIONS (member-panel.tsx draws the frame around them).
+ *
+ * One section per thing a plan opens, so every perk has one place to live
+ * and one name: the sidebar, the overview's tiles and the section itself all
+ * read SECTIONS. A section the plan doesn't reach still exists, drawn locked
+ * with the pill of the plan that opens it and that plan's one-click button,
+ * so a member always sees the whole map, and what the next plan adds.
+ *
+ * Which plan opens what comes from lib/membership/tiers.ts (`hasPerk`), and
+ * every private link comes from /api/membership/perks, which checks the plan
+ * on the server: nothing private is in this file.
+ */
+
+export type SectionId =
+  | "overview"
+  | "skills"
+  | "training"
+  | "live"
+  | "telegram"
+  | "calls"
+  | "custom"
+  | "network"
+  | "requests"
+  | "billing";
+
+export type Perks = {
+  tier: Tier;
+  perks: Perk[];
+  links: Partial<Record<Perk, string | null>>;
+  training: { id: string; title: string; summary: string | null; kind: string; url: string; tier: string }[];
+  owned: string[];
+};
+
+export type Section = {
+  id: SectionId;
+  name: string;
+  icon: LucideIcon;
+  /** The perk that opens it; none means every account has it. */
+  perk?: Perk;
+  /** What it is, in one line: the locked view and the overview's locked tile say this. */
+  about: string;
+};
+
+export const SECTIONS: Section[] = [
+  { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
+  { id: "skills", name: "Skills", icon: Package, about: "Every skill your plan includes, and every one you bought." },
+  { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources." },
+  { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month." },
+  { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram." },
+  { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me." },
+  { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, billed separately." },
+  { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship." },
+  { id: "requests", name: "Requests", icon: ListChecks, perk: "requests", about: "Request new skills and vote on the roadmap." },
+  { id: "billing", name: "Plan & billing", icon: CreditCard, about: "Your plan, your card and your invoices." },
+];
+
+/** The sidebar's groups, in order. "Ultimate" is labelled with its pill. */
+export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
+  { label: null, ids: ["overview"] },
+  { label: "Library", ids: ["skills", "training"] },
+  { label: "With me", ids: ["live", "telegram"] },
+  { label: "Ultimate", ids: ["calls", "custom", "network", "requests"] },
+  { label: "Account", ids: ["billing"] },
+];
+
+export const sectionById = (id: SectionId) => SECTIONS.find((s) => s.id === id)!;
+export const isSectionId = (v: string): v is SectionId => SECTIONS.some((s) => s.id === v);
+
+/** The plan that opens a section: null when this tier already has it. */
+export function needs(section: Section, tier: Tier): PaidTier | null {
+  if (!section.perk || hasPerk(tier, section.perk)) return null;
+  return hasPerk("pro", section.perk) ? "pro" : "ultimate";
+}
+
+export const soft = "text-[color:rgba(11,31,58,0.68)]";
+export const h2 = "font-serif text-[1.9rem] leading-none tracking-[-0.03em]";
+export const card = "rounded-2xl border border-[var(--hairline-strong)] bg-white";
+export const quiet =
+  "rounded text-[0.95rem] text-[color:rgba(11,31,58,0.7)] underline underline-offset-4 hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
+const inkButton =
+  "inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
+
+/** A section's title and its one line. */
+export function SectionHead({ id, title, line }: { id: string; title: string; line: string }) {
+  return (
+    <header>
+      <h2 id={id} className={h2}>
+        {title}
+      </h2>
+      <p className={`mt-3 max-w-[38rem] text-[1rem] leading-[1.5] ${soft}`}>{line}</p>
+    </header>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * LOCKED: what it is, which plan opens it, and that plan's button.
+ * ------------------------------------------------------------------ */
+export function Locked({ section, tier, unlock }: { section: Section; tier: Tier; unlock: PaidTier }) {
+  const ids = useId();
+  const plan = PLANS[unlock];
+  const look = LOOK[unlock];
+  const Icon = section.icon;
+  return (
+    <section aria-labelledby={`${ids}-h`} className={`plan-card relative isolate overflow-clip rounded-[2rem] p-7 md:p-10 ${look.card}`} data-tier={unlock}>
+      <div className="flex items-center gap-3">
+        <Icon aria-hidden className="h-6 w-6" />
+        <PlanBadge tier={unlock} className="px-2.5 py-1 text-[0.75rem] ring-1 ring-inset ring-[rgba(255,255,255,0.5)]" />
+      </div>
+      <h2 id={`${ids}-h`} className="mt-6 font-serif text-[clamp(2.2rem,5vw,3rem)] leading-[0.95] tracking-[-0.035em]">
+        {section.name}
+      </h2>
+      <p className={`mt-4 max-w-[34rem] text-[1.1rem] leading-[1.5] ${look.soft}`}>
+        {section.about} Available only for {unlock === "pro" ? "Pro and Ultimate" : "Ultimate"} members.
+      </p>
+      <p className={`mt-8 text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>{plan.name} also opens</p>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {plan.includes.map((item) => (
+          <li key={item} className="flex gap-2.5 text-[0.95rem] leading-[1.4]">
+            <Check aria-hidden className={`mt-[0.15rem] h-4 w-4 flex-none ${look.check}`} />
+            <span className={look.soft}>{item}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-9 max-w-[22rem]">
+        <JoinButton tier={unlock} label={tier === "free" ? `Join ${plan.name}` : `Switch to ${plan.name}`} />
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * A PRIVATE LINK: the Q&A, Telegram, the call, the network.
+ * ------------------------------------------------------------------ */
+function LinkCard({
+  icon: Icon,
+  url,
+  label,
+  pending,
+  children,
+}: {
+  icon: LucideIcon;
+  url: string | null | undefined;
+  label: string;
+  /** What the card says while the link isn't set up yet. */
+  pending: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className={`${card} mt-7 flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8`}>
+      <div className="flex items-start gap-4">
+        <span className="grid h-12 w-12 flex-none place-items-center rounded-full bg-[rgba(11,31,58,0.06)]">
+          <Icon aria-hidden className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          {children}
+          {url ? null : <p className={`text-[0.98rem] leading-[1.5] ${soft}`}>{pending}</p>}
+        </div>
+      </div>
+      {url ? (
+        <a href={url} target="_blank" rel="noopener noreferrer" className={`${inkButton} flex-none`}>
+          {label}
+          <ArrowUpRight aria-hidden className="h-4 w-4" />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+export function LiveSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  const s = sectionById("live");
+  return (
+    <section aria-labelledby={`${ids}-live`}>
+      <SectionHead id={`${ids}-live`} title="Live group Q&A" line="Twice a month, live with me and the other members. Bring what you're working on and what you're stuck on." />
+      <LinkCard icon={s.icon} url={perks?.links.qa} label="Join the Q&A" pending="The link to the sessions lands here before the first one.">
+        {perks?.links.qa ? <p className="text-[1.05rem] font-medium">Every session uses this link.</p> : null}
+      </LinkCard>
+      {perks?.links.workshop ? (
+        <LinkCard icon={PlayCircle} url={perks.links.workshop} label="Join the workshop" pending="">
+          <p className="text-[1.05rem] font-medium">The live workshop</p>
+        </LinkCard>
+      ) : null}
+    </section>
+  );
+}
+
+export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  return (
+    <section aria-labelledby={`${ids}-telegram`}>
+      <SectionHead id={`${ids}-telegram`} title="Direct messaging" line="Message me on Telegram, for anything you're stuck on. I answer myself." />
+      <LinkCard icon={Send} url={perks?.links.telegram} label="Message me on Telegram" pending="Your Telegram link lands here soon.">
+        {perks?.links.telegram ? <p className="text-[1.05rem] font-medium">Opens a chat with me.</p> : null}
+      </LinkCard>
+    </section>
+  );
+}
+
+export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  return (
+    <section aria-labelledby={`${ids}-calls`}>
+      <SectionHead id={`${ids}-calls`} title="Your 1-on-1 call" line="A private call with me, about your product. Pick a time that works for you." />
+      <LinkCard icon={CalendarClock} url={perks?.links.calls} label="Book your call" pending="Booking opens here soon.">
+        {perks?.links.calls ? <p className="text-[1.05rem] font-medium">Opens my calendar.</p> : null}
+      </LinkCard>
+    </section>
+  );
+}
+
+export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  return (
+    <section aria-labelledby={`${ids}-network`}>
+      <SectionHead id={`${ids}-network`} title="The network" line="A private network of builders who ship. Show what you're making, find the people to make it with." />
+      <LinkCard icon={Users} url={perks?.links.network} label="Open the network" pending="The network opens here soon.">
+        {perks?.links.network ? <p className="text-[1.05rem] font-medium">Members only.</p> : null}
+      </LinkCard>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * SKILLS AND TRAINING.
+ * ------------------------------------------------------------------ */
+export function SkillsSection({
+  ids,
+  tier,
+  library,
+  owned,
+}: {
+  ids: string;
+  tier: Tier;
+  library: Product[];
+  owned: Set<string>;
+}) {
+  const paid = tier !== "free";
+  return (
+    <section aria-labelledby={`${ids}-skills`}>
+      <SectionHead
+        id={`${ids}-skills`}
+        title="Your skills"
+        line={paid ? "Every skill your plan includes, and every one you bought. Download any of them, as often as you like." : "Every skill you bought. Free skills are one click from their own page."}
+      />
+      {library.length ? (
+        <ul className="mt-7 grid gap-3 sm:grid-cols-2">
+          {library.map((p) => (
+            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
+              <div className="min-w-0">
+                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+                  {p.name}
+                </Link>
+                <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
+              </div>
+              <a
+                href={`/api/download?product=${p.id}&member=1`}
+                className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+              >
+                <Download aria-hidden className="h-4 w-4" />
+                Download
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>Nothing here yet. The skills you buy land here.</p>
+      )}
+      <p className="mt-6">
+        <Link href="/projects/construct/material/skills" className={quiet}>
+          Browse every skill
+        </Link>
+      </p>
+    </section>
+  );
+}
+
+export function TrainingSection({ ids, tier, perks }: { ids: string; tier: Tier; perks: Perks | null }) {
+  return (
+    <section aria-labelledby={`${ids}-training`}>
+      <SectionHead
+        id={`${ids}-training`}
+        title="Training"
+        line={tier === "pro" ? "Selected training videos and resources." : "The complete training library: every video and every file."}
+      />
+      {perks?.training.length ? (
+        <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
+          {perks.training.map((t) => (
+            <li key={t.id}>
+              <a
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
+              >
+                <span className="min-w-0">
+                  <span className="block text-[1.02rem] font-medium">{t.title}</span>
+                  {t.summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
+                </span>
+                <span className={`flex flex-none items-center gap-1.5 text-[0.85rem] capitalize ${soft}`}>
+                  {t.kind}
+                  <ArrowUpRight aria-hidden className="h-4 w-4" />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>
+          {perks ? "The first videos and files land here soon." : "Loading…"}
+        </p>
+      )}
+      {tier === "pro" ? (
+        <p className={`mt-5 flex flex-wrap items-center gap-2 text-[0.95rem] ${soft}`}>
+          <PlanBadge tier="ultimate" /> opens the complete library.
+          <a href="#billing" className={quiet}>
+            See Ultimate
+          </a>
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * CUSTOM SKILLS: a note to Tobia (/api/membership/inquire), for a quote.
+ * ------------------------------------------------------------------ */
+export function CustomSection() {
+  const ids = useId();
+  const [state, setState] = useState<"idle" | "busy" | "sent">("idle");
+  const [error, setError] = useState("");
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (state === "busy") return;
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+    setState("busy");
+    setError("");
+    const r = (await fetch("/api/membership/inquire", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...data, kind: "commission" }),
+    })
+      .then((res) => res.json())
+      .catch(() => ({}))) as { ok?: boolean; error?: string };
+    if (r.ok) return setState("sent");
+    setState("idle");
+    setError(
+      r.error === "too-short"
+        ? "Tell me a little more: what it should do, and for whom."
+        : r.error === "too-many"
+          ? "That's a few already. I'll answer those first."
+          : "It didn't send. Try again in a minute.",
+    );
+  };
+
+  const field =
+    "w-full rounded-xl border border-[var(--hairline-strong)] bg-white px-4 py-3 text-[1rem] text-[var(--ink)] outline-none transition-colors focus:border-[color:rgba(11,31,58,0.55)]";
+
+  return (
+    <section aria-labelledby={`${ids}-h`}>
+      <SectionHead
+        id={`${ids}-h`}
+        title="Custom skills"
+        line="A skill built to your spec, for you and your work. Billed separately: tell me what you need and I'll reply with a quote."
+      />
+      {state === "sent" ? (
+        <p role="status" className={`${card} mt-7 p-6 text-[1.02rem]`}>
+          Sent. I&rsquo;ll reply from my own inbox.
+        </p>
+      ) : (
+        <form onSubmit={submit} className={`${card} mt-7 flex flex-col gap-4 p-6 md:p-8`} noValidate>
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+          <div>
+            <label htmlFor={`${ids}-body`} className={`mb-1.5 block text-[0.92rem] ${soft}`}>
+              What should it do?
+            </label>
+            <textarea id={`${ids}-body`} name="body" required rows={5} maxLength={4000} className={`${field} resize-y`} />
+          </div>
+          <div>
+            <label htmlFor={`${ids}-budget`} className={`mb-1.5 block text-[0.92rem] ${soft}`}>
+              Budget (optional)
+            </label>
+            <input id={`${ids}-budget`} name="budget" maxLength={120} className={field} />
+          </div>
+          <p role="alert" className="min-h-[1.3em] text-[0.95rem] text-[var(--accent-clay-text)]">
+            {error}
+          </p>
+          <button type="submit" disabled={state === "busy"} className={`${inkButton} -mt-2 self-start`}>
+            {state === "busy" ? <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" /> : null}
+            Send it to me
+          </button>
+        </form>
+      )}
+    </section>
+  );
+}
+
+/** The lock mark beside a section the plan doesn't reach. */
+export function LockMark({ tier }: { tier: PaidTier }) {
+  return (
+    <span className="ml-auto flex items-center gap-1" title={`Opens with ${planName(tier)}`}>
+      <Lock aria-hidden className="h-3.5 w-3.5 opacity-55" />
+      <span className="sr-only">Opens with {planName(tier)}</span>
+    </span>
+  );
+}

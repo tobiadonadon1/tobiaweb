@@ -1,57 +1,60 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Check, Download, LoaderCircle } from "lucide-react";
-import { JOIN_HREF } from "@/components/account/links";
+import { ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
-import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type PaidTier, type Perk, type Tier } from "@/lib/membership/tiers";
+import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type PaidTier, type Tier } from "@/lib/membership/tiers";
+import { PRODUCTS } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { FREE_PLAN, LOOK, PLAN_BUTTON, UniversalMail } from "./plan-cards";
-import { PRODUCTS } from "@/lib/shop/products";
+import { PlanBadge } from "./plan-badge";
 import { RequestsBoard } from "./requests-board";
+import {
+  CallsSection,
+  CustomSection,
+  GROUPS,
+  h2,
+  isSectionId,
+  LiveSection,
+  Locked,
+  LockMark,
+  needs,
+  NetworkSection,
+  quiet,
+  SECTIONS,
+  sectionById,
+  SkillsSection,
+  soft,
+  TelegramSection,
+  TrainingSection,
+  type Perks,
+  type Section,
+  type SectionId,
+} from "./member-sections";
 
 /**
- * THE ACCOUNT PAGE, SIGNED IN.
+ * THE ACCOUNT PAGE, SIGNED IN: THE DASHBOARD.
  *
- *   who           the address, sign out, back to where they were
- *   the plan      a card in the plan's gradient: which one, when it renews
- *                 (or ends), Manage billing, and everything it includes
- *   go further    the plans above theirs, each one click from Stripe
- *                 (Checkout, or for a member the portal's "confirm the new
- *                 plan"); Universal is an email to Tobia
- *   your skills   every paid skill the plan includes, and every one they
- *                 bought, each one a download
- *   your line     the private links the plan opens (Telegram, Q&A, workshop,
- *                 calls, network), or "coming soon" when one isn't set yet
- *   training      the videos and files their tier reaches
- *   Ultimate      the requests board and the commission form
+ * A sidebar of sections (a strip of pills on a phone) and one section at a
+ * time beside it. The sections and what opens them are in member-sections.tsx:
+ *
+ *   Overview         the plan, then a tile for every section with its next step
+ *   Library          Skills, Training
+ *   With me          Live Q&A, Telegram
+ *   Ultimate         1-on-1 call, Custom skills, Network, Requests
+ *   Account          Plan & billing: the plan card, Stripe's billing portal,
+ *                    and the plans above theirs, each one click away
+ *
+ * The section is the URL's hash (#training, #billing...), so a link can open
+ * one, and Back walks through the sections like pages. A section the plan
+ * doesn't reach is drawn locked, with the pill of the plan that opens it.
  *
  * The links and training come from /api/membership/perks, which checks the
  * plan on the server; nothing private is in this file or the page.
  */
 
-type Perks = {
-  tier: Tier;
-  perks: Perk[];
-  links: Partial<Record<Perk, string | null>>;
-  training: { id: string; title: string; summary: string | null; kind: string; url: string; tier: string }[];
-  owned: string[];
-};
-
-const LINK_NAMES: [Perk, string, string][] = [
-  ["telegram", "Message me on Telegram", "Direct, for anything you're stuck on."],
-  ["qa", "Live group Q&A", "Every two months. Bring questions."],
-  ["workshop", "Live workshop", "Every two months. We build something together."],
-  ["calls", "Book a 1-on-1 call", "Just you and me."],
-  ["network", "The network", "Members who ship, in one place."],
-];
-
-const soft = "text-[color:rgba(11,31,58,0.68)]";
-const h2 = "font-serif text-[1.9rem] leading-none tracking-[-0.03em]";
-const card = "rounded-2xl border border-[var(--hairline-strong)] bg-white";
-const quiet =
-  "rounded text-[0.95rem] text-[color:rgba(11,31,58,0.7)] underline underline-offset-4 hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
+const soft2 = "text-[color:rgba(11,31,58,0.6)]";
 
 const date = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : null;
@@ -74,50 +77,67 @@ export function MemberPanel({
   onSignOut: () => void;
 }) {
   const ids = useId();
+  const top = useRef<HTMLDivElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
   const [perks, setPerks] = useState<Perks | null>(null);
   const [joined, setJoined] = useState<string | null>(null);
   const [billingError, setBillingError] = useState(false);
-  const [opening, setOpening] = useState(false);
+  const [active, setActive] = useState<SectionId>("overview");
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     // Read once: these only exist after a redirect from a membership route.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJoined(q.get("joined"));
-    setBillingError(q.get("billing") === "error");
+    const failed = q.get("billing") === "error";
+    setBillingError(failed);
+    const fromHash = () => {
+      const h = window.location.hash.slice(1);
+      setActive(isSectionId(h) ? h : failed && !h ? "billing" : "overview");
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
     let live = true;
     fetch("/api/membership/perks", { cache: "no-store", credentials: "same-origin" })
       .then((r) => r.json())
       .then((b: Perks & { ok?: boolean }) => live && b.ok && setPerks(b))
       .catch(() => {});
-    const reset = (e: PageTransitionEvent) => e.persisted && setOpening(false);
-    window.addEventListener("pageshow", reset);
     return () => {
       live = false;
-      window.removeEventListener("pageshow", reset);
+      window.removeEventListener("hashchange", fromHash);
     };
   }, []);
 
-  const tier = member.tier;
-  const paid = tier !== "free";
-  const sub = member.subscription;
-  const look = LOOK[tier];
-  const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
-  const price = planPrice(tier);
-  const upgrades = SELF_SERVE.filter((t) => higher(t, tier) === t && t !== tier);
+  // A new section starts at its top, and the phone's strip keeps its pill in view.
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    const box = top.current?.getBoundingClientRect();
+    if (box && box.top < 0) window.scrollTo({ top: window.scrollY + box.top - 96 });
+    strip.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [active]);
 
+  const tier = member.tier;
   const owned = new Set(perks?.owned ?? []);
   const library = Object.values(PRODUCTS).filter(
     (p) => !p.free && (owned.has(p.id) || offer(p, tier).kind === "included"),
   );
 
+  const section = sectionById(active);
+  const unlock = needs(section, tier);
+
   return (
-    <div className="flex flex-col gap-16">
+    <div ref={top} className="flex flex-col gap-10">
       {/* WHO */}
       <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
         <div className="min-w-0">
-          <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${soft}`}>Your account</p>
-          <h1 id={`${ids}-h`} className="mt-3 font-serif text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.98] tracking-[-0.035em]">
+          <p className={`flex items-center gap-2 text-[0.85rem] uppercase tracking-[0.14em] ${soft}`}>
+            Your dashboard <PlanBadge tier={tier} className="normal-case tracking-normal" />
+          </p>
+          <h1 className="mt-3 font-serif text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.98] tracking-[-0.035em]">
             Welcome <em>back</em>.
           </h1>
           <p className={`mt-4 break-all text-[1.05rem] ${soft}`}>
@@ -138,15 +158,12 @@ export function MemberPanel({
       </header>
 
       {joined ? (
-        <p
-          role="status"
-          className="-mt-6 rounded-2xl bg-[var(--ink)] px-6 py-5 text-[1.05rem] leading-[1.5] text-[var(--paper)]"
-        >
-          {paid ? (
+        <p role="status" className="rounded-2xl bg-[var(--ink)] px-6 py-5 text-[1.05rem] leading-[1.5] text-[var(--paper)]">
+          {tier !== "free" ? (
             <>
               <span className="font-serif text-[1.5rem] tracking-[-0.02em]">Welcome to {planName(tier)}.</span>
               <br />
-              Everything below is open now. A receipt is on its way to your inbox.
+              Everything in your plan is open now. A receipt is on its way to your inbox.
             </>
           ) : (
             "Your payment went through. Your plan shows up here in a few seconds: refresh if it hasn't."
@@ -154,9 +171,234 @@ export function MemberPanel({
         </p>
       ) : null}
 
-      {/* THE PLAN: a membership card in the plan's own gradient */}
-      <section aria-labelledby={`${ids}-plan`} className={`overflow-hidden rounded-[2rem] p-7 md:p-10 ${look.card}`}>
-        <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-12">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[13.5rem_minmax(0,1fr)] md:gap-12">
+        {/* THE SECTIONS: a sidebar, or on a phone a strip of pills */}
+        <nav aria-label="Dashboard" className="min-w-0 md:sticky md:top-28 md:self-start">
+          <div ref={strip} className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:hidden">
+            {SECTIONS.map((s) => (
+              <NavPill key={s.id} section={s} tier={tier} active={active === s.id} />
+            ))}
+          </div>
+          <div className="hidden flex-col gap-6 md:flex">
+            {GROUPS.map((g) => (
+              <div key={g.label ?? "top"}>
+                {g.label ? (
+                  <p className={`mb-2 flex items-center gap-2 px-3 text-[0.72rem] uppercase tracking-[0.14em] ${soft2}`}>
+                    {g.label === "Ultimate" && tier !== "ultimate" && tier !== "universal" ? (
+                      <PlanBadge tier="ultimate" className="normal-case tracking-normal" />
+                    ) : (
+                      g.label
+                    )}
+                  </p>
+                ) : null}
+                <ul className="flex flex-col gap-0.5">
+                  {g.ids.map((id) => (
+                    <li key={id}>
+                      <NavRow section={sectionById(id)} tier={tier} active={active === id} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </nav>
+
+        {/* THE SECTION */}
+        <div className="min-w-0">
+          {unlock ? (
+            <Locked section={section} tier={tier} unlock={unlock} />
+          ) : active === "overview" ? (
+            <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} />
+          ) : active === "skills" ? (
+            <SkillsSection ids={ids} tier={tier} library={library} owned={owned} />
+          ) : active === "training" ? (
+            <TrainingSection ids={ids} tier={tier} perks={perks} />
+          ) : active === "live" ? (
+            <LiveSection ids={ids} perks={perks} />
+          ) : active === "telegram" ? (
+            <TelegramSection ids={ids} perks={perks} />
+          ) : active === "calls" ? (
+            <CallsSection ids={ids} perks={perks} />
+          ) : active === "custom" ? (
+            <CustomSection />
+          ) : active === "network" ? (
+            <NetworkSection ids={ids} perks={perks} />
+          ) : active === "requests" ? (
+            <RequestsBoard />
+          ) : (
+            <Billing ids={ids} member={member} billingError={billingError} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const rowBase =
+  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.98rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--ink)]";
+
+function NavRow({ section, tier, active }: { section: Section; tier: Tier; active: boolean }) {
+  const Icon = section.icon;
+  const lock = needs(section, tier);
+  return (
+    <a
+      href={`#${section.id}`}
+      aria-current={active ? "page" : undefined}
+      className={`${rowBase} ${
+        active ? "bg-[var(--ink)] text-[var(--paper)]" : `hover:bg-[rgba(11,31,58,0.06)] ${lock ? soft2 : "text-[var(--ink)]"}`
+      }`}
+    >
+      <Icon aria-hidden className="h-[1.1rem] w-[1.1rem] flex-none" />
+      {section.name}
+      {lock ? <LockMark tier={lock} /> : null}
+    </a>
+  );
+}
+
+function NavPill({ section, tier, active }: { section: Section; tier: Tier; active: boolean }) {
+  const Icon = section.icon;
+  const lock = needs(section, tier);
+  return (
+    <a
+      href={`#${section.id}`}
+      aria-current={active ? "page" : undefined}
+      className={`flex flex-none items-center gap-2 rounded-full border px-4 py-2.5 text-[0.95rem] ${
+        active
+          ? "border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]"
+          : `border-[var(--hairline-strong)] bg-white ${lock ? soft2 : "text-[var(--ink)]"}`
+      }`}
+    >
+      <Icon aria-hidden className="h-4 w-4" />
+      {section.name}
+      {lock ? <LockMark tier={lock} /> : null}
+    </a>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * OVERVIEW: the plan, then every section as a tile with its next step.
+ * ------------------------------------------------------------------ */
+function Overview({
+  ids,
+  member,
+  perks,
+  libraryCount,
+}: {
+  ids: string;
+  member: NonNullable<MemberInfo>;
+  perks: Perks | null;
+  libraryCount: number;
+}) {
+  const tier = member.tier;
+  const look = LOOK[tier];
+  const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
+  const sub = member.subscription;
+  const links = perks?.links ?? {};
+  const soon = perks ? "Lands here soon" : "…";
+
+  const status: Partial<Record<SectionId, string>> = {
+    skills: libraryCount ? `${libraryCount} ready to download` : tier === "free" ? "The skills you buy land here" : "Your skills land here",
+    training: perks?.training.length
+      ? perks.training.length === 1
+        ? "1 video or file"
+        : `${perks.training.length} videos and files`
+      : "The first videos land here soon",
+    live: links.qa ? "Twice a month · Join from here" : "Twice a month · The link lands here",
+    telegram: links.telegram ? "Message me directly" : soon,
+    calls: links.calls ? "Book your call" : soon,
+    custom: "Ask for a quote",
+    network: links.network ? "Open the network" : soon,
+    requests: "Ask for skills, vote on what's next",
+  };
+
+  const tiles = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing");
+  const nextUp = SELF_SERVE.find((t) => higher(t, tier) === t && t !== tier);
+
+  return (
+    <section aria-labelledby={`${ids}-over`} className="flex flex-col gap-8">
+      {/* the plan, small, in its own gradient */}
+      <div className={`plan-card relative isolate flex flex-wrap items-end justify-between gap-6 overflow-clip rounded-[2rem] p-7 md:p-9 ${look.card}`} data-tier={tier}>
+        <div>
+          <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>Your plan</p>
+          <h2 id={`${ids}-over`} className="mt-2 font-serif text-[clamp(2.6rem,6vw,3.6rem)] leading-[0.9] tracking-[-0.04em]">
+            {plan.name}
+          </h2>
+          <p className={`mt-3 text-[1rem] leading-[1.5] ${look.soft}`}>
+            {sub ? statusLine(sub) : tier === "free" ? plan.line : "Set up with me directly."}
+          </p>
+        </div>
+        <div className="flex-none">
+          <a href="#billing" className={`${PLAN_BUTTON} px-7 ${look.button}`}>
+            Plan &amp; billing
+            <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        </div>
+      </div>
+
+      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {tiles.map((s) => {
+          const Icon = s.icon;
+          const lock = needs(s, tier);
+          return (
+            <li key={s.id}>
+              <a
+                href={`#${s.id}`}
+                className={`group flex h-full flex-col rounded-2xl border p-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] ${
+                  lock
+                    ? "border-dashed border-[var(--hairline-strong)] bg-transparent hover:border-[rgba(11,31,58,0.4)]"
+                    : "border-[var(--hairline-strong)] bg-white hover:border-[var(--ink)]"
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
+                  {lock ? <PlanBadge tier={lock} /> : <ArrowRight aria-hidden className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />}
+                </span>
+                <span className={`mt-4 text-[1.05rem] font-medium ${lock ? soft : ""}`}>{s.name}</span>
+                <span className={`mt-1 text-[0.9rem] leading-[1.45] ${soft}`}>{lock ? s.about : status[s.id]}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+
+      {nextUp ? (
+        <p className={`flex flex-wrap items-center gap-2 text-[0.98rem] ${soft}`}>
+          <PlanBadge tier={nextUp} />
+          {nextUp === "pro"
+            ? "opens every premium skill, training, the live Q&A and Telegram."
+            : "adds the 1-on-1 call, custom skills, the network and the roadmap."}
+          <a href="#billing" className={quiet}>
+            See {planName(nextUp)}
+          </a>
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * PLAN & BILLING: the membership card, Stripe's portal, the plans above.
+ * ------------------------------------------------------------------ */
+function Billing({ ids, member, billingError }: { ids: string; member: NonNullable<MemberInfo>; billingError: boolean }) {
+  const [opening, setOpening] = useState(false);
+  useEffect(() => {
+    const reset = (e: PageTransitionEvent) => e.persisted && setOpening(false);
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
+
+  const tier = member.tier;
+  const paid = tier !== "free";
+  const sub = member.subscription;
+  const look = LOOK[tier];
+  const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
+  const price = planPrice(tier);
+  const upgrades = SELF_SERVE.filter((t) => higher(t, tier) === t && t !== tier);
+
+  return (
+    <div className="flex flex-col gap-14">
+      <section aria-labelledby={`${ids}-plan`} className={`plan-card relative isolate overflow-clip rounded-[2rem] p-7 md:p-10 ${look.card}`} data-tier={tier}>
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-12">
           <div className="flex flex-col">
             <p className={`text-[0.85rem] uppercase tracking-[0.14em] ${look.soft}`}>Your plan</p>
             <h2 id={`${ids}-plan`} className="mt-3 font-serif text-[clamp(3rem,8vw,4.4rem)] leading-[0.9] tracking-[-0.04em]">
@@ -171,11 +413,7 @@ export function MemberPanel({
             </p>
             {sub ? (
               <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)} className="mt-auto pt-8">
-                <button
-                  type="submit"
-                  disabled={opening}
-                  className={`${PLAN_BUTTON} w-auto px-6 ${look.button}`}
-                >
+                <button type="submit" disabled={opening} className={`${PLAN_BUTTON} w-auto px-6 ${look.button}`}>
                   {opening ? <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" /> : null}
                   Manage billing
                 </button>
@@ -221,7 +459,7 @@ export function MemberPanel({
               Switch in one click. You only pay the difference for the rest of the month.
             </p>
           ) : null}
-          <div className={`mt-7 grid gap-5 ${upgrades.length ? "md:grid-cols-2 xl:grid-cols-3" : "md:max-w-[26rem]"}`}>
+          <div className={`mt-7 grid gap-5 ${upgrades.length ? "lg:grid-cols-2" : "md:max-w-[26rem]"}`}>
             {upgrades.map((t) => (
               <UpgradeCard key={t} tier={t}>
                 <JoinButton tier={t} label={paid ? `Switch to ${PLANS[t].name}` : `Join ${PLANS[t].name}`} />
@@ -232,126 +470,6 @@ export function MemberPanel({
             </UpgradeCard>
           </div>
         </section>
-      ) : null}
-
-      {/* YOUR SKILLS */}
-      {library.length ? (
-        <section aria-labelledby={`${ids}-skills`}>
-          <h2 id={`${ids}-skills`} className={h2}>
-            Your skills
-          </h2>
-          <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-            {paid ? "Every one your plan includes, and every one you bought." : "The ones you bought."}
-          </p>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {library.map((p) => (
-              <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
-                <div className="min-w-0">
-                  <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
-                    {p.name}
-                  </Link>
-                  <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
-                </div>
-                <a
-                  href={`/api/download?product=${p.id}&member=1`}
-                  className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-                >
-                  <Download aria-hidden className="h-4 w-4" />
-                  Download
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {/* YOUR LINE TO ME */}
-      {paid && perks ? (
-        <section aria-labelledby={`${ids}-line`}>
-          <h2 id={`${ids}-line`} className={h2}>
-            Your line to me
-          </h2>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {LINK_NAMES.filter(([perk]) => perk in perks.links).map(([perk, name, line]) => {
-              const url = perks.links[perk];
-              const inner = (
-                <>
-                  <span className="flex items-center justify-between gap-3 text-[1.02rem] font-medium">
-                    {name}
-                    {url ? <ArrowUpRight aria-hidden className="h-4 w-4 flex-none" /> : null}
-                  </span>
-                  <span className={`mt-1 block text-[0.9rem] leading-[1.45] ${soft}`}>{url ? line : "Coming soon."}</span>
-                </>
-              );
-              return (
-                <li key={perk}>
-                  {url ? (
-                    <a
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`${card} block h-full p-5 transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]`}
-                    >
-                      {inner}
-                    </a>
-                  ) : (
-                    <div className={`${card} h-full p-5 opacity-70`}>{inner}</div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
-
-      {/* TRAINING */}
-      {paid && perks ? (
-        <section aria-labelledby={`${ids}-training`}>
-          <h2 id={`${ids}-training`} className={h2}>
-            Training
-          </h2>
-          {perks.training.length ? (
-            <ul className={`${card} mt-6 divide-y divide-[var(--hairline)]`}>
-              {perks.training.map((t) => (
-                <li key={t.id}>
-                  <a
-                    href={t.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
-                  >
-                    <span className="min-w-0">
-                      <span className="block text-[1.02rem] font-medium">{t.title}</span>
-                      {t.summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
-                    </span>
-                    <span className={`flex flex-none items-center gap-1.5 text-[0.85rem] capitalize ${soft}`}>
-                      {t.kind}
-                      <ArrowUpRight aria-hidden className="h-4 w-4" />
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>The first videos and files land here soon.</p>
-          )}
-          {tier === "pro" ? (
-            <p className={`mt-4 text-[0.92rem] ${soft}`}>
-              Ultimate opens all of it.{" "}
-              <Link href={`${JOIN_HREF}#ultimate`} className={quiet}>
-                See Ultimate
-              </Link>
-            </p>
-          ) : null}
-        </section>
-      ) : null}
-
-      {/* ULTIMATE: REQUESTS AND COMMISSIONS */}
-      {perks?.perks.includes("requests") ? (
-        <>
-          <RequestsBoard />
-          <Commission />
-        </>
       ) : null}
     </div>
   );
@@ -385,82 +503,5 @@ function UpgradeCard({ tier, children }: { tier: PaidTier; children: React.React
       </ul>
       <div className="mt-auto pt-7">{children}</div>
     </article>
-  );
-}
-
-/** A skill built for them, paid separately: a note to Tobia (/api/membership/inquire). */
-function Commission() {
-  const ids = useId();
-  const [state, setState] = useState<"idle" | "busy" | "sent">("idle");
-  const [error, setError] = useState("");
-
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (state === "busy") return;
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    setState("busy");
-    setError("");
-    const r = (await fetch("/api/membership/inquire", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...data, kind: "commission" }),
-    })
-      .then((res) => res.json())
-      .catch(() => ({}))) as { ok?: boolean; error?: string };
-    if (r.ok) return setState("sent");
-    setState("idle");
-    setError(
-      r.error === "too-short"
-        ? "Tell me a little more: what it should do, and for whom."
-        : r.error === "too-many"
-          ? "That's a few already. I'll answer those first."
-          : "It didn't send. Try again in a minute.",
-    );
-  };
-
-  const field =
-    "w-full rounded-xl border border-[var(--hairline-strong)] bg-white px-4 py-3 text-[1rem] text-[var(--ink)] outline-none transition-colors focus:border-[color:rgba(11,31,58,0.55)]";
-
-  return (
-    <section aria-labelledby={`${ids}-h`}>
-      <h2 id={`${ids}-h`} className={h2}>
-        Commission a skill
-      </h2>
-      <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-        A skill built for you and your work. Priced separately: tell me what you need and I&rsquo;ll reply with a quote.
-      </p>
-      {state === "sent" ? (
-        <p role="status" className={`${card} mt-6 p-5 text-[1.02rem]`}>
-          Sent. I&rsquo;ll reply from my own inbox.
-        </p>
-      ) : (
-        <form onSubmit={submit} className="mt-6 flex flex-col gap-4" noValidate>
-          <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
-          <div>
-            <label htmlFor={`${ids}-body`} className={`mb-1.5 block text-[0.92rem] ${soft}`}>
-              What should it do?
-            </label>
-            <textarea id={`${ids}-body`} name="body" required rows={4} maxLength={4000} className={`${field} resize-y`} />
-          </div>
-          <div>
-            <label htmlFor={`${ids}-budget`} className={`mb-1.5 block text-[0.92rem] ${soft}`}>
-              Budget (optional)
-            </label>
-            <input id={`${ids}-budget`} name="budget" maxLength={120} className={field} />
-          </div>
-          <p role="alert" className="min-h-[1.3em] text-[0.95rem] text-[var(--accent-clay-text)]">
-            {error}
-          </p>
-          <button
-            type="submit"
-            disabled={state === "busy"}
-            className="-mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-          >
-            {state === "busy" ? <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" /> : null}
-            Send it to me
-          </button>
-        </form>
-      )}
-    </section>
   );
 }

@@ -12,7 +12,8 @@ import { useMember } from "./use-member";
  * the mirror of the Back chip in the top left, with the same size and border,
  * stepping aside when the footer opens. Signed out, it opens the account page
  * on its first step (pick a plan, or the Sign in tab next to it); signed in,
- * it carries the member's plan as a badge (PlanBadge).
+ * it carries the member's plan as a badge (PlanBadge), and for a paid plan
+ * it says "Dashboard", since that is what the page is for them.
  *
  * Desktop and tablet only: on a phone the nav runs to the right edge, so
  * there the way in sits under each email form instead (FreeClaim and the
@@ -39,7 +40,7 @@ export function AccountChip() {
       ].join(" ")}
     >
       <UserRound aria-hidden className="h-4 w-4" />
-      Account
+      {member && member.tier !== "free" ? "Dashboard" : "Account"}
       {member ? <PlanBadge tier={member.tier} className="-my-1 -mr-1.5" /> : null}
     </Link>
   );

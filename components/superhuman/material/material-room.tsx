@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
+import { PlanBadge } from "@/components/membership/plan-badge";
+import { planName } from "@/lib/membership/tiers";
 import { HandNote } from "@/components/ui/hand-note";
 import { MATERIAL_GRID, folderHref } from "./material-data";
 import { Specimen } from "./specimens";
@@ -81,16 +83,27 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
       >
         <div className="flex items-start justify-between gap-4">
           {label}
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--hairline)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[color:rgba(11,31,58,0.5)]" />
-            Not open
-          </span>
+          {folder.members ? (
+            /* Members only: the plans' own pills, where "Not open" was. */
+            <span className="flex shrink-0 items-center gap-1.5">
+              {folder.members.map((t) => (
+                <PlanBadge key={t} tier={t} className="px-2.5 py-1 text-[0.72rem]" />
+              ))}
+            </span>
+          ) : (
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--hairline)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[color:rgba(11,31,58,0.5)]" />
+              Not open
+            </span>
+          )}
         </div>
 
         {specimen}
 
         <p className="mt-auto font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {folder.soon}
+          {folder.members
+            ? `Available only for ${folder.members.map(planName).join(" and ")} members`
+            : folder.soon}
         </p>
       </li>
     );

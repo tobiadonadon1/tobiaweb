@@ -176,6 +176,12 @@ export type MaterialFolder = {
    */
   locked?: boolean;
   soon?: string;
+  /**
+   * MEMBERS ONLY. The plans that open this folder. The room's cell then says
+   * so with their pills where "Not open" was, and "Available only for …"
+   * where `soon` was.
+   */
+  members?: ("pro" | "ultimate")[];
   /** One sentence at the top of the folder's own page. */
   lede: string;
   /** Two short paragraphs. What is in here and how to use it. */

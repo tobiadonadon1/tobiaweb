@@ -110,8 +110,9 @@ const startable = (t: unknown): t is Tier => isTier(t) && (t === "free" || SELF_
 function PlanPicker({ id, onPick }: { id: string; onPick: (tier: Tier) => void }) {
   return (
     <>
-      <header className="mx-auto mb-12 max-w-[40rem] text-center">
-        <h1 id={id} className="font-serif text-[clamp(2.4rem,8vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
+      <header className="mx-auto mb-12 max-w-[48rem] text-center">
+        {/* One line at every width: the size follows the screen instead of wrapping. */}
+        <h1 id={id} className="whitespace-nowrap font-serif text-[clamp(1.6rem,6.6vw,3.4rem)] leading-[0.98] tracking-[-0.035em]">
           Choose your Construct <em>plan</em>
         </h1>
         <p className="mt-5 text-pretty text-[1.1rem] leading-[1.55] text-[color:rgba(11,31,58,0.72)]">
@@ -265,7 +266,7 @@ export function AccountForms() {
 
   if (member) {
     return (
-      <section className="mx-auto max-w-[64rem]">
+      <section className="mx-auto max-w-[72rem]">
         <MemberPanel member={member} next={next} onSignOut={signOut} />
       </section>
     );
