@@ -865,13 +865,13 @@ function ViralMachine() {
 }
 
 /**
- * VIDEO MACHINE — an edit cut from paper: an ink viewer with a vermilion
+ * VIDEO EDITOR — an edit cut from paper: an ink viewer with a vermilion
  * play wedge on it, and three torn tracks below in the page's colours
  * (talking head, from scratch, motion), offset like clips on a timeline, with
  * an ink playhead standing across them. The colours are the page's own
- * (product/video-machine-bits.tsx).
+ * (product/video-editor-bits.tsx).
  */
-function VideoMachine() {
+function VideoEditor() {
   return (
     <>
       <Cut d={CARD} x={98} y={22} s={1.02} sy={0.82} fill={SHADE} />
@@ -1013,7 +1013,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "app-launcher": AppLauncher,
   "copycat-detective": CopycatDetective,
   "duo-designer": DuoDesigner,
-  "video-machine": VideoMachine,
+  "video-editor": VideoEditor,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

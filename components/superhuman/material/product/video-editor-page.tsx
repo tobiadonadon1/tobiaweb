@@ -1,16 +1,16 @@
 import Image from "next/image";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
-import { VIDEO_MACHINE as PRODUCT } from "@/lib/shop/products";
+import { VIDEO_EDITOR as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
 import { StickyBuy } from "./sticky-buy";
-import { SIX } from "./video-machine-bits";
-import { ClipCompare } from "./video-machine-compare";
-import { VideoLoader } from "./video-machine-loader";
+import { SIX } from "./video-editor-bits";
+import { ClipCompare } from "./video-editor-compare";
+import { VideoLoader } from "./video-editor-loader";
 
 /**
- * VIDEO MACHINE: 21 video skills packed into one AI editor for Claude Code.
+ * VIDEO EDITOR: 21 video skills packed into one AI editor for Claude Code.
  *
  * VIRAL MACHINE'S FORMAT (Tobia's call): an opening, the name and the button,
  * what's inside, what it does, the proof, and the close. Given away for an
@@ -27,7 +27,7 @@ import { VideoLoader } from "./video-machine-loader";
  * Claude made it on the word.
  *
  * EVERY VIDEO ON THE PAGE IS REAL: rendered with this pack from the one
- * sentence printed next to it (public/shop/video-machine/). Nothing drawn
+ * sentence printed next to it (public/shop/video-editor/). Nothing drawn
  * pretends to be a result.
  */
 
@@ -35,7 +35,7 @@ const HERO_ID = "buy";
 const CLOSE_ID = "vd-close";
 const BUTTON = "bg-[#16171B] text-white shadow-[0_18px_40px_-18px_rgba(22,23,27,0.7)] hover:bg-black";
 const MUTED = "text-[color:rgba(11,31,58,0.62)]";
-const DIR = "/shop/video-machine";
+const DIR = "/shop/video-editor";
 
 /** THE OPENING: his raw iPhone clip, and the pack's edit of it. */
 const TALK = {
@@ -50,10 +50,10 @@ const PLAN = { src: `${DIR}/storyboard.mp4`, poster: `${DIR}/storyboard.jpg`, ra
 
 /** The four things he said on camera, and what Claude did with each. */
 const MOMENTS = [
-  { id: "zoom", at: "0:06", said: "Zoom into closer.", did: "It pushed in on my face, then eased back out." },
-  { id: "italic", at: "0:10", said: "Big text, italics.", did: "The words came up in italics, one by one, across the top where I pointed." },
-  { id: "warm", at: "0:13", said: "Warmer, lighter, into my face.", did: "A soft, warm light on my face, kept to the end." },
-  { id: "captions", at: "0:29", said: "Just comment the word editing.", did: "Captions all the way through, and that word as the call to action." },
+  { id: "zoom", chip: "Zoom in", tint: "linear-gradient(150deg, #FFE6D6, #FFC2A3)", at: "0:06", said: "Zoom into closer.", did: "It pushed in on my face, then eased back out." },
+  { id: "italic", chip: "Italic title", tint: "linear-gradient(150deg, #FFF4CC, #FFD86B)", at: "0:10", said: "Big text, italics.", did: "The words came up in italics, one by one, across the top where I pointed." },
+  { id: "warm", chip: "Warmer light", tint: "linear-gradient(150deg, #FFE0EC, #FFB0CB)", at: "0:13", said: "Warmer, lighter, into my face.", did: "A soft, warm light on my face, kept to the end." },
+  { id: "captions", chip: "Captions", tint: "linear-gradient(150deg, #E0E8FF, #A9BEFF)", at: "0:29", said: "Just comment the word editing.", did: "Captions all the way through, and that word as the call to action." },
 ] as const;
 
 /** Hides the loader before first paint when it already played this visit. */
@@ -156,7 +156,7 @@ function Said({ children, dark = false }: { children: React.ReactNode; dark?: bo
 
 /* ------------------------------------------------------------------ */
 
-export function VideoMachinePage() {
+export function VideoEditorPage() {
   return (
     <main className="vd-page relative overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
@@ -166,13 +166,16 @@ export function VideoMachinePage() {
 
       {/* 1. THE NAME, THE PROMISE, THE BUTTON, AND THE BEFORE AND AFTER. */}
       <section aria-labelledby="vd-title" className="relative">
-        <div className="mx-auto grid max-w-[76rem] grid-cols-1 items-center gap-14 px-5 pb-24 pt-28 sm:px-8 md:pt-32 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-16 lg:pt-28">
+        <div className="mx-auto grid max-w-[76rem] grid-cols-1 items-center gap-14 px-5 pb-20 pt-28 sm:px-8 md:pt-32 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-12 lg:pt-24">
           <div className="flex flex-col items-center text-center">
             <p className="vd-rise flex flex-wrap items-center justify-center gap-2" style={{ "--i": 0 } as React.CSSProperties}>
               <span className="rounded-full bg-[#16171B] px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-white">
-                Video Machine
+                Video Editor
               </span>
-              <span className="rounded-full border border-[var(--hairline)] bg-white px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em]">
+              <span
+                className="rounded-full px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-[#3a1400]"
+                style={{ background: "linear-gradient(120deg, #FFD86B, #FFB38A 55%, #FF9FC0)" }}
+              >
                 Free for Claude Code
               </span>
             </p>
@@ -190,10 +193,22 @@ export function VideoMachinePage() {
               <span className="block">One prompt, and your video is edited.</span>
               <span className="block font-bold text-[var(--ink)]">This one had none: I just said it.</span>
             </p>
-            <div id="claim" className="vd-rise mt-9 flex w-full justify-center scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
+            <ul
+              className="vd-rise mt-8 grid w-full max-w-[34rem] list-none grid-cols-2 gap-2 p-0 sm:grid-cols-4"
+              style={{ "--i": 3 } as React.CSSProperties}
+              aria-label="What Claude heard in the clip, and did"
+            >
+              {MOMENTS.map((m) => (
+                <li key={m.id} className="rounded-2xl px-3.5 py-3 text-left text-[#0b1f3a]" style={{ background: m.tint }}>
+                  <span className="block font-mono text-[0.72rem] font-semibold opacity-60">{m.at}</span>
+                  <span className="mt-0.5 block text-[0.95rem] font-extrabold leading-tight tracking-[-0.02em]">{m.chip}</span>
+                </li>
+              ))}
+            </ul>
+            <div id="claim" className="vd-rise mt-8 flex w-full justify-center scroll-mt-28" style={{ "--i": 4 } as React.CSSProperties}>
               <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" />
             </div>
-            <p className={`vd-rise mt-4 text-[0.9rem] font-medium ${MUTED}`} style={{ "--i": 4 } as React.CSSProperties}>
+            <p className={`vd-rise mt-4 text-[0.9rem] font-medium ${MUTED}`} style={{ "--i": 5 } as React.CSSProperties}>
               21 video skills in one · Runs on your computer
             </p>
             <div id={HERO_ID} aria-hidden className="h-px" />
@@ -201,7 +216,12 @@ export function VideoMachinePage() {
 
           {/* The proof, straight away: the same clip, raw and edited. */}
           <figure className="vd-rise mx-auto w-full max-w-[24rem]" style={{ "--i": 2 } as React.CSSProperties}>
-            <ClipCompare {...TALK} />
+            <div className="relative">
+              <div className="vd-halo pointer-events-none absolute -inset-8 rounded-[3rem] opacity-60 blur-3xl" aria-hidden />
+              <div className="vd-halo relative rounded-[1.95rem] p-[5px]">
+                <ClipCompare {...TALK} />
+              </div>
+            </div>
             <figcaption className={`mt-4 text-pretty text-center text-[0.95rem] leading-[1.5] ${MUTED}`}>
               My raw iPhone clip, and Claude&rsquo;s edit. Drag to compare.
             </figcaption>
@@ -299,9 +319,9 @@ export function VideoMachinePage() {
           </h2>
           <ul className="mt-12 grid list-none grid-cols-1 gap-3 p-0 md:grid-cols-3 md:gap-4">
             {[
-              { who: "An editor", lines: ["Paid per video", "Days of back and forth", "Booked when you need them most"], strike: true },
+              { who: "Hiring an editor", lines: ["Paid per video", "Days of back and forth", "Booked when you need them most"], strike: true },
               { who: "Editing software", lines: ["A subscription every month", "Weeks to learn", "Hours on a timeline per video"], strike: true },
-              { who: "Video Machine", lines: ["Free", "One sentence per video", "You approve the plan first"], strike: false },
+              { who: "Video Editor", lines: ["Free", "One sentence per video", "You approve the plan first"], strike: false },
             ].map((col) => (
               <li
                 key={col.who}
@@ -363,7 +383,7 @@ export function VideoMachinePage() {
             <a href="https://github.com/heygen-com/hyperframes" className="underline decoration-1 underline-offset-2" rel="noopener">
               HyperFrames
             </a>
-            , HeyGen&rsquo;s open-source video engine: fourteen are theirs, seven are Video Machine&rsquo;s own.
+            , HeyGen&rsquo;s open-source video engine: fourteen are theirs, seven are this pack&rsquo;s own.
           </p>
         </div>
       </section>
@@ -373,7 +393,7 @@ export function VideoMachinePage() {
         <div className="mx-auto max-w-[76rem] px-4 py-24 sm:px-8 md:py-32">
           <p className="text-center">
             <span className="inline-block rounded-full bg-white px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-[#16171B]">
-              Made with Video Machine
+              Made with Video Editor
             </span>
           </p>
           <h2

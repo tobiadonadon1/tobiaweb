@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-machine";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -919,18 +919,18 @@ export const DUO_DESIGNER: Product = {
   },
 };
 
-export const VIDEO_MACHINE: Product = {
-  id: "video-machine",
-  name: "Video Machine",
+export const VIDEO_EDITOR: Product = {
+  id: "video-editor",
+  name: "Video Editor",
   description:
     "Your video editor inside Claude Code: 21 skills that turn a clip, a link or an idea into a finished video, with moving titles, reel captions, smooth cuts and sound. It shows you the plan before it edits.",
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
-  href: "/projects/construct/material/skills/video-machine",
+  href: "/projects/construct/material/skills/video-editor",
   file: {
-    sealed: "video-machine.zip.enc",
-    filename: "video-machine.zip",
+    sealed: "video-editor.zip.enc",
+    filename: "video-editor.zip",
     // The skills ship scripts (.sh, .mjs, .js), and Gmail refuses those zips.
     attach: false,
   },
@@ -938,7 +938,7 @@ export const VIDEO_MACHINE: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Video Machine turns Claude Code into your video editor. Give it a video of you talking, your product's link, an article or a folder of AI clips, and it makes the finished video: moving titles, reel captions, launch promos, explainers and cuts that flow like one camera move. Before it edits your footage, it shows you the plan scene by scene. 21 skills, one install, free.",
+      "Video Editor puts a video editor inside Claude Code. Give it a video of you talking, your product's link, an article or a folder of AI clips, and it makes the finished video: moving titles, reel captions, launch promos, explainers and cuts that flow like one camera move. Before it edits your footage, it shows you the plan scene by scene. 21 skills, one install, free.",
     kicker: "Skill · for Claude Code",
     line: "Your video editor, inside Claude Code.",
     proof: "Titles · captions · launches · explainers",
@@ -987,7 +987,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "viral-machine": VIRAL_MACHINE,
   "web-designer-pro": WEB_DESIGNER_PRO,
   "duo-designer": DUO_DESIGNER,
-  "video-machine": VIDEO_MACHINE,
+  "video-editor": VIDEO_EDITOR,
 };
 
 export function productById(id: unknown): Product | undefined {

@@ -58,8 +58,8 @@ const WDP_ZIP = Buffer.from("PK\u0003\u0004 the website and component design ski
 writeFileSync(path.join(cwd, "private", "web-designer-pro.zip.enc"), seal(WDP_ZIP, parseKey(fileKey)));
 const DUO_ZIP = Buffer.from("PK\u0003\u0004 the iphone duo design skill " + "d".repeat(3900));
 writeFileSync(path.join(cwd, "private", "duo-designer.zip.enc"), seal(DUO_ZIP, parseKey(fileKey)));
-const VIDEO_ZIP = Buffer.from("PK\u0003\u0004 the video editing skills " + "v".repeat(3900));
-writeFileSync(path.join(cwd, "private", "video-machine.zip.enc"), seal(VIDEO_ZIP, parseKey(fileKey)));
+const EDITOR_ZIP = Buffer.from("PK\u0003\u0004 the video editing skills " + "v".repeat(3900));
+writeFileSync(path.join(cwd, "private", "video-editor.zip.enc"), seal(EDITOR_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -546,7 +546,7 @@ test("free: Duo Designer opens the fourth row, sent as a link for an email, at o
   assert.equal(skills.find((e) => e.slug === "duo-designer")?.product, "duo-designer");
   // The tenth card: the rack is three wide, so it starts the fourth row.
   assert.equal(skills.findIndex((e) => e.slug === "duo-designer"), 9);
-  assert.equal(skills.at(-1)?.slug, "video-machine", "Video Machine follows it on the fourth row");
+  assert.equal(skills.at(-1)?.slug, "video-editor", "Video Editor follows it on the fourth row");
   assert.equal(DUO_DESIGNER.free, true);
   assert.equal(DUO_DESIGNER.accountOnly, undefined, "an email is enough, no account needed");
   assert.equal(forSale(DUO_DESIGNER), false);
@@ -934,7 +934,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["viral-machine"].bytes, VIRAL_ZIP.length);
   assert.equal(body.files["web-designer-pro"].bytes, WDP_ZIP.length);
   assert.equal(body.files["duo-designer"].bytes, DUO_ZIP.length);
-  assert.equal(body.files["video-machine"].bytes, VIDEO_ZIP.length);
+  assert.equal(body.files["video-editor"].bytes, EDITOR_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

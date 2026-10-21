@@ -3155,7 +3155,7 @@ html:has(.dd-page) body { background-color: #ffffff; }
 }
 
 /* ------------------------------------------------------------------ *
- * VIDEO MACHINE (video-machine-page.tsx, -loader.tsx, -compare.tsx).
+ * VIDEO EDITOR (video-editor-page.tsx, -loader.tsx, -compare.tsx).
  *
  * Clean, by Tobia's call: no motion graphics. THE LOADER (about 4 s): one
  * sentence rises in, gives way to a second, and the paper lifts on the page.
@@ -3293,3 +3293,5 @@ body:has(.vd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
     radial-gradient(50% 40% at 50% 0%, rgba(18, 56, 255, 0.35), transparent 70%),
     #111216;
 }
+/* The hero's colour: a ring and a soft halo around the before and after. */
+.vd-halo { background: linear-gradient(150deg, #1238ff 0%, #7aa2ff 30%, #ffc2a3 65%, #ff9fc0 100%); }

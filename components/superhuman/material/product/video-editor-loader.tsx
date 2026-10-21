@@ -9,10 +9,10 @@ import { useEffect, useState } from "react";
  * another that comes up easily and sells it. Then the page, which opens on
  * his clip raw and edited.
  *
- * CSS alone runs it (globals.css, VIDEO MACHINE), so it plays from the first
+ * CSS alone runs it (globals.css, VIDEO EDITOR), so it plays from the first
  * paint and lifts by itself after about four seconds. Script only steps it
  * aside on any scroll, key or tap. It plays once a visit: the page's inline
- * script hides it on the way back (video-machine-page.tsx). Reduced motion
+ * script hides it on the way back (video-editor-page.tsx). Reduced motion
  * skips it. Decoration over a page that is already there, so it is hidden
  * from assistive tech.
  */

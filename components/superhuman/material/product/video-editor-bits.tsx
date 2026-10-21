@@ -1,5 +1,5 @@
 /**
- * VIDEO MACHINE'S SIX: what the AI editor does.
+ * VIDEO EDITOR'S SIX: what the AI editor does.
  *
  * NO MASCOTS. Tobia's calls (2026-10-20, 2026-10-21): this is an editor, not a
  * Grok bot; clean, but not all white, and few words. So each job is a title,

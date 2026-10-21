@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
  *
  * Tobia's call (2026-10-21): the opening was motion graphics; show the video
  * instead, and how it changes. So the hero is his raw iPhone clip and the edit
- * Video Machine made of it, stacked and playing in sync. On load the divider
+ * Video Editor made of it, stacked and playing in sync. On load the divider
  * sweeps across once, from the raw clip to the edit, and stops halfway; after
  * that it is the viewer's to drag (or arrow-key: it is a range input).
  *

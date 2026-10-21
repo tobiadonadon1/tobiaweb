@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
       { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
       /* Viral Machine went free and moved to Skills on its launch day. */
       { source: "/projects/construct/material/setups/viral-machine", destination: "/projects/construct/material/skills/viral-machine", statusCode: 301 },
+      /* Video Machine was renamed Video Editor the day after it launched. */
+      { source: "/projects/construct/material/skills/video-machine", destination: "/projects/construct/material/skills/video-editor", statusCode: 301 },
       { source: "/projects/superhuman", destination: "/projects/construct", statusCode: 301 },
       { source: "/projects/superhuman/", destination: "/projects/construct", statusCode: 301 },
       { source: "/projects/superhuman/materials", destination: "/projects/construct/material", statusCode: 301 },

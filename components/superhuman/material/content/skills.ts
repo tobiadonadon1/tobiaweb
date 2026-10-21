@@ -345,11 +345,11 @@ export const SKILLS: MaterialEntry[] = [
    *
    * A video editor inside Claude Code: 21 skills that make reels, launch
    * videos and explainers, given away for an email like Viral Machine
-   * (video-machine-page.tsx). The second card of the fourth row.
+   * (video-editor-page.tsx). The second card of the fourth row.
    * ---------------------------------------------------------------- */
   {
-    slug: "video-machine",
-    title: "Video Machine",
+    slug: "video-editor",
+    title: "Video Editor",
     kind: "skill",
     summary: "Your video editor inside Claude Code: a clip, a link or an idea in, a finished video out.",
     // Minutes from the download to the first video.
@@ -358,6 +358,6 @@ export const SKILLS: MaterialEntry[] = [
     when: "You need reels, launch videos or explainers, and don't want to learn an editing app or pay an editor.",
     level: "Anyone",
     body: [],
-    product: "video-machine",
+    product: "video-editor",
   },
 ];
