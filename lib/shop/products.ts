@@ -923,7 +923,7 @@ export const VIDEO_MACHINE: Product = {
   id: "video-machine",
   name: "Video Machine",
   description:
-    "Your video editor inside Claude Code: 20 skills that turn a clip, a link or an idea into a finished video, with moving titles, reel captions, smooth cuts and sound.",
+    "Your video editor inside Claude Code: 21 skills that turn a clip, a link or an idea into a finished video, with moving titles, reel captions, smooth cuts and sound. It shows you the plan before it edits.",
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
@@ -938,21 +938,21 @@ export const VIDEO_MACHINE: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Video Machine turns Claude Code into your video editor. Give it a video of you talking, your product's link, an article or a folder of AI clips, and it makes the finished video: moving titles, reel captions, launch promos, explainers and cuts that flow like one camera move. 20 skills, one install, free.",
+      "Video Machine turns Claude Code into your video editor. Give it a video of you talking, your product's link, an article or a folder of AI clips, and it makes the finished video: moving titles, reel captions, launch promos, explainers and cuts that flow like one camera move. Before it edits your footage, it shows you the plan scene by scene. 21 skills, one install, free.",
     kicker: "Skill · for Claude Code",
     line: "Your video editor, inside Claude Code.",
     proof: "Titles · captions · launches · explainers",
   },
   contents: [
-    ["install.mjs", "installs all 20 skills: the six in this folder, and the fourteen HyperFrames skills fresh from HeyGen"],
-    ["skills/", "motion doctrine, cut-on-the-curve transitions, seam craft, caption overlay, ffmpeg editing, titling"],
+    ["install.mjs", "installs all 21 skills: the seven in this folder, and the fourteen HyperFrames skills fresh from HeyGen"],
+    ["skills/", "the storyboard you approve before it edits, motion doctrine, cut-on-the-curve transitions, seam craft, caption overlay, ffmpeg editing, titling"],
     ["workspace/", "the ffmpeg editing scripts, title-card presets and fonts"],
     ["START HERE.txt", "the three steps"],
   ],
   steps: [
     "Unzip the folder.",
     "Open a terminal in the folder and type claude",
-    "Type hi. Claude installs the 20 video skills in about a minute.",
+    "Type hi. Claude installs the 21 video skills in about a minute.",
   ],
   email: {
     preheader: "Your download link is inside. Unzip it, open it in Claude Code and type hi.",

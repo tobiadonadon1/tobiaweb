@@ -3279,3 +3279,17 @@ body:has(.vd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
   :root:has(.vd-load) { --vd-wait: 0s; }
   .vd-rise { animation: adp-fade 400ms ease-out both; }
 }
+
+/* The page's colour: a warm band behind the four moments, the storyboard's
+   own cobalt, and a blue glow under the results. */
+.vd-warm { background: linear-gradient(180deg, var(--paper) 0%, #fdebdc 40%, #fbe3d6 70%, var(--paper) 100%); }
+.vd-blue {
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(120, 170, 255, 0.45), transparent 70%),
+    linear-gradient(160deg, #1238ff 0%, #0a1fa8 100%);
+}
+.vd-night {
+  background:
+    radial-gradient(50% 40% at 50% 0%, rgba(18, 56, 255, 0.35), transparent 70%),
+    #111216;
+}

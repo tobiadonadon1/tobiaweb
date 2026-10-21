@@ -10,7 +10,7 @@ import { ClipCompare } from "./video-machine-compare";
 import { VideoLoader } from "./video-machine-loader";
 
 /**
- * VIDEO MACHINE: 20 video skills packed into one AI editor for Claude Code.
+ * VIDEO MACHINE: 21 video skills packed into one AI editor for Claude Code.
  *
  * VIRAL MACHINE'S FORMAT (Tobia's call): an opening, the name and the button,
  * what's inside, what it does, the proof, and the close. Given away for an
@@ -45,10 +45,13 @@ const TALK = {
   afterPoster: `${DIR}/talk-after.jpg`,
 };
 
+/** The storyboard review page, recorded in use on the clip above. */
+const PLAN = { src: `${DIR}/storyboard.mp4`, poster: `${DIR}/storyboard.jpg`, ratio: "16 / 10" };
+
 /** The four things he said on camera, and what Claude did with each. */
 const MOMENTS = [
   { id: "zoom", at: "0:06", said: "Zoom into closer.", did: "It pushed in on my face, then eased back out." },
-  { id: "italic", at: "0:10", said: "Big text, italics.", did: "The words came up in italics, one by one, as I said them." },
+  { id: "italic", at: "0:10", said: "Big text, italics.", did: "The words came up in italics, one by one, across the top where I pointed." },
   { id: "warm", at: "0:13", said: "Warmer, lighter, into my face.", did: "A soft, warm light on my face, kept to the end." },
   { id: "captions", at: "0:29", said: "Just comment the word editing.", did: "Captions all the way through, and that word as the call to action." },
 ] as const;
@@ -94,7 +97,7 @@ const STEPS: React.ReactNode[] = [
   <>Leave your email. The download link is in your inbox a minute later.</>,
   <>
     Unzip it, open a terminal in the folder, type <code className="font-semibold text-[var(--ink)]">claude</code>, then{" "}
-    <q className="font-semibold text-[var(--ink)]">hi</q>. It installs all 20 skills.
+    <q className="font-semibold text-[var(--ink)]">hi</q>. It installs all 21 skills.
   </>,
   <>Say what the video is for. Watch the render. Say what to change.</>,
 ];
@@ -191,7 +194,7 @@ export function VideoMachinePage() {
               <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" />
             </div>
             <p className={`vd-rise mt-4 text-[0.9rem] font-medium ${MUTED}`} style={{ "--i": 4 } as React.CSSProperties}>
-              20 video skills in one · Runs on your computer
+              21 video skills in one · Runs on your computer
             </p>
             <div id={HERO_ID} aria-hidden className="h-px" />
           </div>
@@ -207,17 +210,16 @@ export function VideoMachinePage() {
       </section>
 
       {/* 2. NO PROMPT: what he said on camera, and what Claude did with it. */}
-      <section aria-labelledby="vd-said" className="relative">
-        <div className="mx-auto max-w-[76rem] px-4 pb-24 pt-4 sm:px-8 md:pb-32">
+      <section aria-labelledby="vd-said" className="vd-warm relative">
+        <div className="mx-auto max-w-[76rem] px-4 py-24 sm:px-8 md:py-32">
           <h2
             id="vd-said"
             className="mx-auto max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
           >
             I didn&rsquo;t type a prompt. I just said it.
           </h2>
-          <p className={`mx-auto mt-5 max-w-[44ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
-            Claude listened to the clip, found every edit I asked for and made each one on the word. About 12 minutes. No
-            editor, no timeline.
+          <p className={`mx-auto mt-5 max-w-[40ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
+            Claude heard every edit and made it on the word. 12 minutes, no timeline.
           </p>
           <ol className="mt-12 grid list-none grid-cols-2 gap-x-4 gap-y-10 p-0 md:mt-16 lg:grid-cols-4 lg:gap-x-6">
             {MOMENTS.map((m) => (
@@ -245,9 +247,50 @@ export function VideoMachinePage() {
         </div>
       </section>
 
-      {/* 3. EDITOR VS SOFTWARE VS THIS. */}
+      {/* 3. THE STORYBOARD: the plan, scene by scene, before a frame is touched. A
+          real screen recording of the pack's review page on the clip above. */}
+      <section aria-labelledby="vd-plan" className="vd-blue relative overflow-hidden text-white">
+        <div className="relative mx-auto max-w-[76rem] px-4 py-24 sm:px-8 md:py-32">
+          <p className="text-center">
+            <span className="inline-block rounded-full bg-white/15 px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] backdrop-blur-md">
+              Before it edits
+            </span>
+          </p>
+          <h2
+            id="vd-plan"
+            className="mx-auto mt-6 max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
+          >
+            It shows you the plan first.
+          </h2>
+          <p className="mx-auto mt-5 max-w-[40ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] text-white/75">
+            Every scene, what it will do and why. Change anything, approve, and it edits.
+          </p>
+          <figure className="mx-auto mt-12 max-w-[64rem] md:mt-16">
+            <div className="overflow-hidden rounded-[1.4rem] bg-[#0a1fa8] shadow-[0_50px_100px_-40px_rgba(0,8,60,0.8)] ring-1 ring-white/20">
+              <div className="flex items-center gap-1.5 bg-white/10 px-4 py-3" aria-hidden>
+                <span className="size-2.5 rounded-full bg-white/35" />
+                <span className="size-2.5 rounded-full bg-white/35" />
+                <span className="size-2.5 rounded-full bg-white/35" />
+              </div>
+              <Film src={PLAN.src} poster={PLAN.poster} ratio={PLAN.ratio} />
+            </div>
+          </figure>
+          <ol className="mx-auto mt-10 grid max-w-[64rem] list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
+            {["It splits your video into scenes", "You edit the plan, or add a note", "Approve, and it edits"].map((t, i) => (
+              <li key={t} className="flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-4 text-[1.02rem] font-semibold backdrop-blur-md">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-[0.85rem] font-extrabold text-[#1238ff]">
+                  {i + 1}
+                </span>
+                {t}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 4. EDITOR VS SOFTWARE VS THIS. */}
       <section aria-labelledby="vd-instead" className="relative">
-        <div className="mx-auto max-w-[72rem] px-4 pb-24 sm:px-8 md:pb-32">
+        <div className="mx-auto max-w-[72rem] px-4 py-24 sm:px-8 md:py-32">
           <h2
             id="vd-instead"
             className="mx-auto max-w-[16ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
@@ -258,11 +301,11 @@ export function VideoMachinePage() {
             {[
               { who: "An editor", lines: ["Paid per video", "Days of back and forth", "Booked when you need them most"], strike: true },
               { who: "Editing software", lines: ["A subscription every month", "Weeks to learn", "Hours on a timeline per video"], strike: true },
-              { who: "Video Machine", lines: ["Free", "One sentence per video", "Change it by saying so"], strike: false },
+              { who: "Video Machine", lines: ["Free", "One sentence per video", "You approve the plan first"], strike: false },
             ].map((col) => (
               <li
                 key={col.who}
-                className={`rounded-[1.6rem] p-6 sm:p-7 ${col.strike ? "border border-[var(--hairline)] bg-white" : "bg-[#16171B] text-white"}`}
+                className={`rounded-[1.6rem] p-6 sm:p-7 ${col.strike ? "border border-[var(--hairline)] bg-white/70" : "vd-blue text-white shadow-[0_30px_60px_-30px_rgba(18,56,255,0.7)]"}`}
               >
                 <p className={`text-[1.5rem] font-extrabold tracking-[-0.03em] ${col.strike ? "text-black/40" : ""}`}>{col.who}</p>
                 <ul className="mt-4 list-none space-y-2.5 p-0">
@@ -270,7 +313,7 @@ export function VideoMachinePage() {
                     <li key={l} className="flex items-center gap-3 text-[1.08rem] font-semibold">
                       <span
                         className={`grid size-5 shrink-0 place-items-center rounded-full text-[0.7rem] font-black ${
-                          col.strike ? "bg-black/[0.07] text-black/40" : "bg-[#19B47D] text-[#032417]"
+                          col.strike ? "bg-black/[0.07] text-black/40" : "bg-white text-[#1238ff]"
                         }`}
                         aria-hidden
                       >
@@ -286,7 +329,7 @@ export function VideoMachinePage() {
         </div>
       </section>
 
-      {/* 4. WHAT ELSE IT DOES: the six, each with the sentence you'd type. */}
+      {/* 5. WHAT ELSE IT DOES: the six, each with the sentence you'd type. */}
       <section aria-labelledby="vd-does" className="relative">
         <div className="mx-auto max-w-[76rem] px-4 pb-24 sm:px-8 md:pb-32">
           <h2
@@ -296,37 +339,37 @@ export function VideoMachinePage() {
             Everything an editor does.
           </h2>
           <p className={`mx-auto mt-5 max-w-[40ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
-            Talking or typing, the whole interface is a sentence. Here are six.
+            One sentence each.
           </p>
           <ul className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 sm:gap-5 md:mt-16 lg:grid-cols-3">
             {SIX.map((s) => (
-              <li key={s.key} className="flex flex-col rounded-[1.6rem] border border-[var(--hairline)] bg-white p-7 sm:p-8">
-                <p className={`text-[0.95rem] font-bold ${MUTED}`}>{s.sticker}</p>
-                <h3 className="mt-3 text-balance text-[clamp(1.6rem,2.8vw,2rem)] font-extrabold leading-[1.05] tracking-[-0.04em]">
+              <li
+                key={s.key}
+                className={`flex min-h-[15rem] flex-col rounded-[1.6rem] p-7 sm:p-8 ${"dark" in s ? "text-white" : "text-[#0b1f3a]"}`}
+                style={{ background: s.tint }}
+              >
+                <p className="text-[0.95rem] font-bold opacity-70">{s.sticker}</p>
+                <h3 className="mt-3 flex-1 text-balance text-[clamp(1.6rem,2.8vw,2rem)] font-extrabold leading-[1.05] tracking-[-0.04em]">
                   {s.title}
                 </h3>
-                <p className={`mt-4 flex-1 text-pretty text-[1.02rem] font-medium leading-[1.5] ${MUTED}`}>{s.text}</p>
                 <div className="mt-6">
-                  <Said>{s.say}</Said>
+                  <Said dark={"dark" in s}>{s.say}</Said>
                 </div>
               </li>
             ))}
           </ul>
           <p className={`mx-auto mt-10 max-w-[60ch] text-balance text-center text-[0.95rem] leading-[1.55] ${MUTED}`}>
-            20 skills inside: talking-head edits, reel captions, launch videos, explainers, motion graphics, camera moves,
-            title cards, colour grades, music and sound, AI clips cut into one film, and the engine that renders them.
-            Built on{" "}
+            21 skills inside, from the storyboard to the render. Built on{" "}
             <a href="https://github.com/heygen-com/hyperframes" className="underline decoration-1 underline-offset-2" rel="noopener">
               HyperFrames
             </a>
-            , HeyGen&rsquo;s open-source video engine: fourteen of the skills are theirs, installed fresh at setup. Six are
-            Video Machine&rsquo;s own.
+            , HeyGen&rsquo;s open-source video engine: fourteen are theirs, seven are Video Machine&rsquo;s own.
           </p>
         </div>
       </section>
 
-      {/* 5. THE RESULTS: real renders, each with the sentence that made it. */}
-      <section aria-labelledby="vd-made" className="relative bg-[#141518] text-white">
+      {/* 6. THE RESULTS: real renders, each with the sentence that made it. */}
+      <section aria-labelledby="vd-made" className="vd-night relative text-white">
         <div className="mx-auto max-w-[76rem] px-4 py-24 sm:px-8 md:py-32">
           <p className="text-center">
             <span className="inline-block rounded-full bg-white px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-[#16171B]">
@@ -340,8 +383,7 @@ export function VideoMachinePage() {
             One prompt in. These out.
           </h2>
           <p className="mx-auto mt-5 max-w-[44ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] text-white/65">
-            Claude made each of these with the pack, from the sentence under it: it planned the video, built it, checked its
-            own frames and rendered it. Nobody opened an editor.
+            Each one made by Claude with the pack, from the sentence under it.
           </p>
           <ul className="mt-14 grid list-none grid-cols-1 gap-5 p-0 md:grid-cols-[1fr_1fr] lg:gap-6">
             {RESULTS.map((r, i) => (
@@ -366,7 +408,7 @@ export function VideoMachinePage() {
         </div>
       </section>
 
-      {/* 6. THE CLOSE. */}
+      {/* 7. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="vd-close-title" className="scroll-mt-28">
         <div className="mx-auto max-w-[72rem] px-5 pb-28 pt-20 sm:px-8 md:pb-36 md:pt-28">
           <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
@@ -377,10 +419,8 @@ export function VideoMachinePage() {
               >
                 Your next video is one sentence away.
               </h2>
-              <p className="mt-6 max-w-[38ch] text-pretty text-[1.15rem] font-medium leading-[1.5] text-[color:rgba(11,31,58,0.72)]">
-                20 skills that would take an editor years to learn, packed into one AI editor that lives in Claude Code and
-                works on your computer. Your reels, your launches, your explainers: you say what each one is for, it does the
-                rest.
+              <p className="mt-6 max-w-[34ch] text-pretty text-[1.15rem] font-medium leading-[1.5] text-[color:rgba(11,31,58,0.72)]">
+                Reels, launches, explainers. Say what each one is for; it does the rest.
               </p>
             </div>
             <div className="self-end">

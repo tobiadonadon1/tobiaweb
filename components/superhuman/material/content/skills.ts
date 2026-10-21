@@ -343,7 +343,7 @@ export const SKILLS: MaterialEntry[] = [
   /* ---------------------------------------------------------------- *
    * 11
    *
-   * A video editor inside Claude Code: 20 skills that make reels, launch
+   * A video editor inside Claude Code: 21 skills that make reels, launch
    * videos and explainers, given away for an email like Viral Machine
    * (video-machine-page.tsx). The second card of the fourth row.
    * ---------------------------------------------------------------- */
