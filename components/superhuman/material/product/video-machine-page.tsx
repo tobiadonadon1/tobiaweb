@@ -1,11 +1,13 @@
+import Image from "next/image";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
 import { VIDEO_MACHINE as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
 import { StickyBuy } from "./sticky-buy";
-import { VideoIntro } from "./video-machine-intro";
-import { C, SIX, TRACKS } from "./video-machine-bits";
+import { SIX } from "./video-machine-bits";
+import { ClipCompare } from "./video-machine-compare";
+import { VideoLoader } from "./video-machine-loader";
 
 /**
  * VIDEO MACHINE: 20 video skills packed into one AI editor for Claude Code.
@@ -16,9 +18,13 @@ import { C, SIX, TRACKS } from "./video-machine-bits";
  * address lands in the leads sheet.
  *
  * THE MOOD, in his words: "these are 20 skills packaged into one. That is
- * basically an AI editor. Never hire an editor or use software again." So the
- * page speaks the edit suite's own language (an app collapsing into one
- * sentence, the skills as clips on a timeline, a render bar) and no mascots.
+ * basically an AI editor. Never hire an editor or use software again." No
+ * mascots and no graphics (his calls, 2026-10-20 and -21): the page is clean,
+ * and it sells with a video. Two sentences open it ("It has never been
+ * easier to run your personal brand. You can now edit videos with Claude
+ * Code."), then his own raw clip against the edit the pack made of it. The
+ * hook is his: that clip got no prompt. He said each edit on camera, and
+ * Claude made it on the word.
  *
  * EVERY VIDEO ON THE PAGE IS REAL: rendered with this pack from the one
  * sentence printed next to it (public/shop/video-machine/). Nothing drawn
@@ -30,6 +36,25 @@ const CLOSE_ID = "vd-close";
 const BUTTON = "bg-[#16171B] text-white shadow-[0_18px_40px_-18px_rgba(22,23,27,0.7)] hover:bg-black";
 const MUTED = "text-[color:rgba(11,31,58,0.62)]";
 const DIR = "/shop/video-machine";
+
+/** THE OPENING: his raw iPhone clip, and the pack's edit of it. */
+const TALK = {
+  before: `${DIR}/talk-before.mp4`,
+  after: `${DIR}/talk-after.mp4`,
+  beforePoster: `${DIR}/talk-before.jpg`,
+  afterPoster: `${DIR}/talk-after.jpg`,
+};
+
+/** The four things he said on camera, and what Claude did with each. */
+const MOMENTS = [
+  { id: "zoom", at: "0:06", said: "Zoom into closer.", did: "It pushed in on my face, then eased back out." },
+  { id: "italic", at: "0:10", said: "Big text, italics.", did: "The words came up in italics, one by one, as I said them." },
+  { id: "warm", at: "0:13", said: "Warmer, lighter, into my face.", did: "A soft, warm light on my face, kept to the end." },
+  { id: "captions", at: "0:29", said: "Just comment the word editing.", did: "Captions all the way through, and that word as the call to action." },
+] as const;
+
+/** Hides the loader before first paint when it already played this visit. */
+const SEEN = `try{if(sessionStorage.getItem("vd-seen")){var s=document.createElement("style");s.textContent=".vd-load{display:none}:root{--vd-wait:0s!important}";document.head.appendChild(s)}sessionStorage.setItem("vd-seen","1")}catch(e){}`;
 
 /**
  * THE RESULTS: each made by the pack from the sentence beside it. `minutes`
@@ -129,126 +154,96 @@ function Said({ children, dark = false }: { children: React.ReactNode; dark?: bo
 /* ------------------------------------------------------------------ */
 
 export function VideoMachinePage() {
-  const launch = RESULTS[0];
   return (
     <main className="vd-page relative overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <VideoIntro poster={launch.poster} />
+      <script dangerouslySetInnerHTML={{ __html: SEEN }} />
+      <VideoLoader />
       <BackLink href={folderHref("skills")} label="Skills" />
 
-      {/* 1. THE NAME, THE PROMISE, THE BUTTON, AND A REAL RENDER. */}
+      {/* 1. THE NAME, THE PROMISE, THE BUTTON, AND THE BEFORE AND AFTER. */}
       <section aria-labelledby="vd-title" className="relative">
-        <div className="mx-auto flex max-w-[72rem] flex-col items-center px-5 pb-20 pt-28 text-center sm:px-8 md:pt-32">
-          <p className="vd-rise flex flex-wrap items-center justify-center gap-2" style={{ "--i": 0 } as React.CSSProperties}>
-            <span className="rounded-full bg-[#16171B] px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-white">
-              20 skills · 1 AI editor
-            </span>
-            <span className="rounded-full border border-[var(--hairline)] bg-white px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em]">
-              for Claude Code
-            </span>
-          </p>
-          <h1
-            id="vd-title"
-            className="vd-rise mt-8 text-balance text-[clamp(3.4rem,11vw,9rem)] font-extrabold leading-[0.88] tracking-[-0.055em]"
-            style={{ "--i": 1 } as React.CSSProperties}
-          >
-            Video Machine
-          </h1>
-          <p
-            className="vd-rise mt-7 text-center text-[1.08rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.78)] sm:text-[1.3rem] md:text-[1.45rem]"
-            style={{ "--i": 2 } as React.CSSProperties}
-          >
-            <span className="block">20 video skills, packed into one AI editor.</span>
-            <span className="block font-bold text-[var(--ink)]">Never hire an editor or open editing software again.</span>
-          </p>
-          <div id="claim" className="vd-rise mt-9 flex w-full justify-center scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
-            <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" />
-          </div>
-          <div id={HERO_ID} aria-hidden className="h-px" />
-
-          {/* The proof, straight away: a real render, and the sentence that made it. */}
-          <figure className="vd-rise mt-14 w-full max-w-[60rem] md:mt-16" style={{ "--i": 4 } as React.CSSProperties}>
-            <div className="overflow-hidden rounded-[1.6rem] border-[6px] border-[#16171B] bg-[#16171B] shadow-[0_40px_80px_-40px_rgba(11,31,58,0.6)]">
-              <Film src={launch.src} poster={launch.poster} ratio={launch.ratio} />
-              <div className="flex items-center gap-3 px-3 pb-1 pt-3 text-left text-white">
-                <span className="vd-done grid size-6 shrink-0 place-items-center rounded-full bg-[#19B47D] text-[0.8rem] font-black text-[#032417]" aria-hidden>
-                  ✓
-                </span>
-                <span className="min-w-0 flex-1 truncate font-mono text-[0.85rem] text-white/80 sm:text-[0.92rem]">
-                  &gt; {launch.say}
-                </span>
-              </div>
+        <div className="mx-auto grid max-w-[76rem] grid-cols-1 items-center gap-14 px-5 pb-24 pt-28 sm:px-8 md:pt-32 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-16 lg:pt-28">
+          <div className="flex flex-col items-center text-center">
+            <p className="vd-rise flex flex-wrap items-center justify-center gap-2" style={{ "--i": 0 } as React.CSSProperties}>
+              <span className="rounded-full bg-[#16171B] px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] text-white">
+                Video Machine
+              </span>
+              <span className="rounded-full border border-[var(--hairline)] bg-white px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em]">
+                Free for Claude Code
+              </span>
+            </p>
+            <h1
+              id="vd-title"
+              className="vd-rise mt-8 max-w-[12ch] text-balance text-[clamp(3rem,8.4vw,6.4rem)] font-extrabold leading-[0.9] tracking-[-0.055em]"
+              style={{ "--i": 1 } as React.CSSProperties}
+            >
+              Edit videos with Claude Code.
+            </h1>
+            <p
+              className="vd-rise mt-7 max-w-[36ch] text-balance text-center text-[1.08rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.75)] sm:text-[1.25rem]"
+              style={{ "--i": 2 } as React.CSSProperties}
+            >
+              One prompt, and it cuts, zooms, titles, colours and captions.{" "}
+              <span className="font-bold text-[var(--ink)]">
+                This video didn&rsquo;t even get one: I said the edits out loud while filming, and Claude made them.
+              </span>
+            </p>
+            <div id="claim" className="vd-rise mt-9 flex w-full justify-center scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
+              <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" />
             </div>
-            <figcaption className={`mt-4 text-center text-[0.95rem] leading-[1.5] ${MUTED}`}>
-              Not a mockup. Video Machine made this from the one sentence under it.
+            <p className={`vd-rise mt-4 text-[0.9rem] font-medium ${MUTED}`} style={{ "--i": 4 } as React.CSSProperties}>
+              20 video skills in one · Runs on your computer
+            </p>
+            <div id={HERO_ID} aria-hidden className="h-px" />
+          </div>
+
+          {/* The proof, straight away: the same clip, raw and edited. */}
+          <figure className="vd-rise mx-auto w-full max-w-[24rem]" style={{ "--i": 2 } as React.CSSProperties}>
+            <ClipCompare {...TALK} />
+            <figcaption className={`mt-4 text-pretty text-center text-[0.95rem] leading-[1.5] ${MUTED}`}>
+              My raw iPhone clip, and Claude&rsquo;s edit. Drag to compare.
             </figcaption>
           </figure>
         </div>
       </section>
 
-      {/* 2. WHAT'S IN THE BOX: the 20 skills as clips on a timeline. */}
-      <section aria-labelledby="vd-inside" className="relative">
-        <div className="mx-auto max-w-[72rem] px-4 pb-24 pt-4 sm:px-8 md:pb-32">
+      {/* 2. NO PROMPT: what he said on camera, and what Claude did with it. */}
+      <section aria-labelledby="vd-said" className="relative">
+        <div className="mx-auto max-w-[76rem] px-4 pb-24 pt-4 sm:px-8 md:pb-32">
           <h2
-            id="vd-inside"
-            className="mx-auto max-w-[15ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
+            id="vd-said"
+            className="mx-auto max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
           >
-            20 skills on one timeline.
+            I didn&rsquo;t type a prompt. I just said it.
           </h2>
-          <p className={`mx-auto mt-5 max-w-[46ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
-            A whole edit suite, packed into one install. You never pick between them: say what the video is for, and Claude
-            reaches for the right ones.
+          <p className={`mx-auto mt-5 max-w-[44ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
+            Claude listened to the clip, found every edit I asked for and made each one on the word. About 12 minutes. No
+            editor, no timeline.
           </p>
-          <div className="vd-tl mt-12 overflow-hidden rounded-[1.6rem] bg-[#141518] p-3 text-white shadow-[0_40px_80px_-44px_rgba(11,31,58,0.7)] sm:p-4">
-            <div className="flex items-center justify-between px-2 pb-3 font-mono text-[0.78rem] text-white/45">
-              <span>video-machine · 20 skills</span>
-              <span className="tabular-nums">00:00:00:00</span>
-            </div>
-            <div className="relative space-y-2">
-              {TRACKS.map((t) => {
-                const c = C[t.key];
-                return (
-                  <div key={t.id} className="grid grid-cols-[4.2rem_1fr] items-stretch gap-2 sm:grid-cols-[8.5rem_1fr]">
-                    <div className="flex flex-col justify-center rounded-lg bg-white/[0.06] px-2.5 py-2">
-                      <span className="font-mono text-[0.75rem] text-white/45">{t.id}</span>
-                      <span className="hidden text-[0.88rem] font-bold leading-tight sm:block">{t.name}</span>
-                    </div>
-                    <ul className="grid list-none grid-cols-2 gap-1.5 p-0 sm:grid-cols-12">
-                      {t.clips.map(([name, w], i) => (
-                        <li
-                          key={name}
-                          className="vd-clip flex min-h-[3.1rem] items-end rounded-lg px-2.5 py-2 text-[0.82rem] font-bold leading-[1.15] sm:text-[0.88rem]"
-                          style={
-                            {
-                              "--w": w,
-                              "--i": i,
-                              background: i % 2 ? `color-mix(in srgb, ${c.bg} 78%, white)` : c.bg,
-                              color: c.fg,
-                            } as React.CSSProperties
-                          }
-                        >
-                          {name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-              <span className="vd-tl__head" aria-hidden />
-            </div>
-          </div>
-          <p className={`mx-auto mt-6 max-w-[52ch] text-balance text-center text-[0.95rem] leading-[1.5] ${MUTED}`}>
-            Music, sound effects, logos, voiceover and colour grades too: it finds them, or makes them, and keeps them for the
-            next video.
-          </p>
-          <p className={`mx-auto mt-3 max-w-[56ch] text-balance text-center text-[0.85rem] leading-[1.5] ${MUTED}`}>
-            Built on{" "}
-            <a href="https://github.com/heygen-com/hyperframes" className="underline decoration-1 underline-offset-2" rel="noopener">
-              HyperFrames
-            </a>
-            , HeyGen&rsquo;s open-source video engine: fourteen of the skills are theirs, installed fresh at setup. Six are
-            Video Machine&rsquo;s own.
-          </p>
+          <ol className="mt-12 grid list-none grid-cols-2 gap-x-4 gap-y-10 p-0 md:mt-16 lg:grid-cols-4 lg:gap-x-6">
+            {MOMENTS.map((m) => (
+              <li key={m.id} className="flex flex-col">
+                <div className="relative overflow-hidden rounded-[1.2rem] bg-[#0f1012]">
+                  <Image
+                    src={`${DIR}/talk-${m.id}.jpg`}
+                    alt=""
+                    width={540}
+                    height={960}
+                    sizes="(min-width: 1024px) 17rem, 50vw"
+                    className="block aspect-[9/16] h-auto w-full object-cover"
+                  />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[0.75rem] font-semibold text-white backdrop-blur-md">
+                    {m.at}
+                  </span>
+                </div>
+                <p className="mt-4 text-pretty text-[1.1rem] font-bold leading-[1.3] tracking-[-0.01em] sm:text-[1.2rem]">
+                  &ldquo;{m.said}&rdquo;
+                </p>
+                <p className={`mt-1.5 text-pretty text-[0.98rem] leading-[1.45] ${MUTED}`}>{m.did}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
@@ -293,7 +288,7 @@ export function VideoMachinePage() {
         </div>
       </section>
 
-      {/* 4. WHAT IT DOES: the six, each with the sentence you'd type. */}
+      {/* 4. WHAT ELSE IT DOES: the six, each with the sentence you'd type. */}
       <section aria-labelledby="vd-does" className="relative">
         <div className="mx-auto max-w-[76rem] px-4 pb-24 sm:px-8 md:pb-32">
           <h2
@@ -303,22 +298,32 @@ export function VideoMachinePage() {
             Everything an editor does.
           </h2>
           <p className={`mx-auto mt-5 max-w-[40ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] ${MUTED}`}>
-            The whole interface is a sentence. Here are six.
+            Talking or typing, the whole interface is a sentence. Here are six.
           </p>
           <ul className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 sm:gap-5 md:mt-16 lg:grid-cols-3">
             {SIX.map((s) => (
-              <li key={s.key} className="flex flex-col rounded-[2rem] p-7 sm:p-8" style={{ background: s.bg, color: s.fg }}>
-                <p className="text-[0.95rem] font-bold opacity-75">{s.sticker}</p>
-                <h3 className="mt-3 text-balance text-[clamp(1.8rem,3.2vw,2.3rem)] font-extrabold leading-[1] tracking-[-0.04em]">
+              <li key={s.key} className="flex flex-col rounded-[1.6rem] border border-[var(--hairline)] bg-white p-7 sm:p-8">
+                <p className={`text-[0.95rem] font-bold ${MUTED}`}>{s.sticker}</p>
+                <h3 className="mt-3 text-balance text-[clamp(1.6rem,2.8vw,2rem)] font-extrabold leading-[1.05] tracking-[-0.04em]">
                   {s.title}
                 </h3>
-                <p className="mt-4 flex-1 text-pretty text-[1.04rem] font-medium leading-[1.5] opacity-90">{s.text}</p>
+                <p className={`mt-4 flex-1 text-pretty text-[1.02rem] font-medium leading-[1.5] ${MUTED}`}>{s.text}</p>
                 <div className="mt-6">
-                  <Said dark={s.key === "montage"}>{s.say}</Said>
+                  <Said>{s.say}</Said>
                 </div>
               </li>
             ))}
           </ul>
+          <p className={`mx-auto mt-10 max-w-[60ch] text-balance text-center text-[0.95rem] leading-[1.55] ${MUTED}`}>
+            20 skills inside: talking-head edits, reel captions, launch videos, explainers, motion graphics, camera moves,
+            title cards, colour grades, music and sound, AI clips cut into one film, and the engine that renders them.
+            Built on{" "}
+            <a href="https://github.com/heygen-com/hyperframes" className="underline decoration-1 underline-offset-2" rel="noopener">
+              HyperFrames
+            </a>
+            , HeyGen&rsquo;s open-source video engine: fourteen of the skills are theirs, installed fresh at setup. Six are
+            Video Machine&rsquo;s own.
+          </p>
         </div>
       </section>
 
@@ -334,7 +339,7 @@ export function VideoMachinePage() {
             id="vd-made"
             className="mx-auto mt-6 max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
           >
-            One sentence in. These out.
+            One prompt in. These out.
           </h2>
           <p className="mx-auto mt-5 max-w-[44ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] text-white/65">
             Claude made each of these with the pack, from the sentence under it: it planned the video, built it, checked its
@@ -372,7 +377,7 @@ export function VideoMachinePage() {
                 id="vd-close-title"
                 className="max-w-[13ch] text-balance text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
               >
-                Fire the timeline.
+                Your next video is one sentence away.
               </h2>
               <p className="mt-6 max-w-[38ch] text-pretty text-[1.15rem] font-medium leading-[1.5] text-[color:rgba(11,31,58,0.72)]">
                 20 skills that would take an editor years to learn, packed into one AI editor that lives in Claude Code and
