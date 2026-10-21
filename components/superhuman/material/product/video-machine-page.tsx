@@ -181,13 +181,11 @@ export function VideoMachinePage() {
               Edit videos with Claude Code.
             </h1>
             <p
-              className="vd-rise mt-7 max-w-[36ch] text-balance text-center text-[1.08rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.75)] sm:text-[1.25rem]"
+              className="vd-rise mt-7 text-balance text-center text-[1.08rem] font-medium leading-[1.45] text-[color:rgba(11,31,58,0.75)] sm:text-[1.25rem]"
               style={{ "--i": 2 } as React.CSSProperties}
             >
-              One prompt, and it cuts, zooms, titles, colours and captions.{" "}
-              <span className="font-bold text-[var(--ink)]">
-                This video didn&rsquo;t even get one: I said the edits out loud while filming, and Claude made them.
-              </span>
+              <span className="block">One prompt, and your video is edited.</span>
+              <span className="block font-bold text-[var(--ink)]">This one had none: I just said it.</span>
             </p>
             <div id="claim" className="vd-rise mt-9 flex w-full justify-center scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
               <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ink" />
