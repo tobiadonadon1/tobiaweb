@@ -86,6 +86,12 @@ export type ShelfItem = {
 
 export type ShelfFamily = {
   id: ShelfId;
+  /**
+   * A members' family: the membership perk that opens it (lib/membership/
+   * tiers.ts). Closed to everyone else; for a plan that has it, the card
+   * opens the family's section of the dashboard and the lock comes off.
+   */
+  perk?: "masterclass" | "design";
   name: string;
   tier: ShelfTier;
   /**
@@ -183,10 +189,11 @@ export const SHELF: ShelfFamily[] = [
   },
   {
     id: "masterclass",
+    perk: "masterclass",
     name: "Masterclass",
     tier: "locked",
     open: false,
-    tag: "Locked",
+    tag: "Pro & Ultimate",
     line: "Ten minutes, one advanced move. None of it is on YouTube.",
     status: "Not open yet.",
     spineRay: 7,
@@ -194,13 +201,14 @@ export const SHELF: ShelfFamily[] = [
   },
   {
     id: "design",
+    perk: "design",
     name: "Design",
     tier: "paid",
     open: false,
     // Was "Templates", which is a category rather than a state, and the line
     // under it already says templates. The chip's whole job is to say whether
     // the door opens.
-    tag: "Locked",
+    tag: "Pro & Ultimate",
     line: "Website templates you can ship as they are.",
     status: "First set in build.",
     spineRay: 6,

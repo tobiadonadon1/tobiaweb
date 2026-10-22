@@ -4,6 +4,7 @@ import { Specimen } from "./material/specimens";
 import { HandNote } from "@/components/ui/hand-note";
 import { Reveal } from "./reveal";
 import { ShelfLockedCard } from "./shelf-locked-card";
+import { MembersShelfNote, ShelfMemberCard } from "./shelf-member-card";
 import { SHELF, shelfHref, type ShelfFamily } from "./shelf-data";
 import { SECTION_LABELS } from "./sections";
 
@@ -48,7 +49,10 @@ import { SECTION_LABELS } from "./sections";
  * one and the closed one differ by a link, a CTA and a chip, and that is not
  * enough to justify two copies of a heading.
  */
-function CardText({ family }: { family: ShelfFamily }) {
+function CardText({ family, unlocked = false }: { family: ShelfFamily; unlocked?: boolean }) {
+  // A members' family drawn for a member who has it: no lock, and a way in.
+  const shut = !family.open && !unlocked;
+  const cta = unlocked ? "Open in your dashboard" : family.cta;
   return (
     <>
       {/* A CHIP ONLY WHERE IT CHANGES WHAT YOU CAN DO. There were three once,
@@ -58,7 +62,7 @@ function CardText({ family }: { family: ShelfFamily }) {
         <h3 className="font-serif text-[clamp(1.5rem,2.6vw,1.95rem)] leading-none tracking-[-0.03em] text-[var(--paper)]">
           {family.name}
         </h3>
-        {!family.open ? (
+        {shut ? (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(207,233,238,0.34)] px-2.5 py-1 font-mono text-[0.64rem] uppercase leading-none tracking-[0.14em] text-[color:rgba(214,238,244,0.72)]">
             <Lock aria-hidden className="h-3 w-3" />
             {family.tag}
@@ -74,9 +78,9 @@ function CardText({ family }: { family: ShelfFamily }) {
           unequal sentences still line their doors up. */}
       <span aria-hidden className="grow" />
 
-      {family.cta ? (
+      {cta ? (
         <span className="mt-7 inline-flex items-center gap-1.5 text-[0.95rem] text-[color:rgba(214,238,244,0.78)] transition-colors duration-[600ms] ease-out group-hover:text-[var(--paper)]">
-          {family.cta}
+          {cta}
           <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </span>
       ) : null}
@@ -109,6 +113,17 @@ function Family({ family, index }: { family: ShelfFamily; index: number }) {
             {mark}
             <CardText family={family} />
           </Link>
+        ) : family.perk ? (
+          <>
+            {family.perk === "masterclass" ? <MembersShelfNote phone /> : null}
+            <ShelfMemberCard
+              id={family.id}
+              perk={family.perk}
+              mark={mark}
+              locked={<CardText family={family} />}
+              open={<CardText family={family} unlocked />}
+            />
+          </>
         ) : (
           <ShelfLockedCard mark={mark} body={<CardText family={family} />} />
         )}
@@ -149,14 +164,22 @@ export function SuperhumanShelf() {
               needs telling which one opens before scrolling past two that do
               not. "Free to open", not "free": one setup inside costs €5, and
               the material room says so on its own face. */}
-          <HandNote
-            gesture="down"
-            label="free to open"
-            color="var(--m-gold, #e8a41f)"
-            size={84}
-            className="mt-8 flex flex-col items-start gap-0.5 md:mt-12 md:w-1/3"
-            labelClassName="-rotate-2"
-          />
+          {/* Masterclass and Design are for Pro and Ultimate, so the two
+              columns beside it get a hand of their own, forking down to
+              both (shelf-member-card.tsx). */}
+          <div className="mt-8 grid grid-cols-1 items-end gap-x-12 md:mt-12 md:grid-cols-3">
+            <HandNote
+              gesture="down"
+              label="free to open"
+              color="var(--m-gold, #e8a41f)"
+              size={84}
+              className="flex flex-col items-start gap-0.5"
+              labelClassName="-rotate-2"
+            />
+            <div className="md:col-span-2">
+              <MembersShelfNote />
+            </div>
+          </div>
 
           <ul className="mt-4 grid list-none grid-cols-1 gap-x-12 gap-y-16 md:mt-4 md:grid-cols-3 md:gap-y-20">
             {SHELF.map((family, i) => (

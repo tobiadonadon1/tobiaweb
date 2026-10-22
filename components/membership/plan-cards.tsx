@@ -29,7 +29,9 @@ export const FREE_PLAN = {
   line: "The essentials to get started. Create an account and unlock the entire free library.",
   includes: [
     "All free skills and guides, installed in one click",
-    "Purchase premium and unique skills individually",
+    "A dashboard that keeps every skill you take, to download again any time",
+    "Premium skills one at a time, from €5",
+    "New free skills as they ship",
     "Optional updates and insights from Tobi",
   ],
 };

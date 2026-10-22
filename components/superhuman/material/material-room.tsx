@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
-import { PlanBadge } from "@/components/membership/plan-badge";
+import { planName, type Tier } from "@/lib/membership/tiers";
 import { HandNote } from "@/components/ui/hand-note";
 import { MATERIAL_GRID, folderHref } from "./material-data";
 import { MembersDoor } from "./members-door";
@@ -41,6 +41,14 @@ import type { MaterialFolder } from "./material-types";
  * Nothing here has state. It is the junction between the shelf and the
  * reading, and a junction should be quick.
  */
+
+/** Each plan's dot on a members-only chip: its colour from PlanBadge, as a point. */
+const DOT: Record<Tier, string> = {
+  free: "bg-[color:rgba(11,31,58,0.5)]",
+  pro: "bg-[#d9502f]",
+  ultimate: "bg-[#0b1f3a] ring-1 ring-[rgba(240,165,143,0.8)]",
+  universal: "bg-[#ec8a35]",
+};
 
 function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
   const label = (
@@ -84,10 +92,16 @@ function Cell({ folder, index }: { folder: MaterialFolder; index: number }) {
         <div className="flex items-start justify-between gap-4">
           {label}
           {folder.members ? (
-            /* Members only: the plans' own pills, where "Not open" was. */
-            <span className="flex shrink-0 items-center gap-1.5">
-              {folder.members.map((t) => (
-                <PlanBadge key={t} tier={t} className="px-2.5 py-1 text-[0.72rem]" />
+            /* Members only: the same hairline chip as "Not open", in the
+               page's own mono, with each plan's colour as its dot. The
+               gradient pills belong to the plans pages, not to this grid. */
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[var(--hairline)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
+              {folder.members.map((t, i) => (
+                <span key={t} className="inline-flex items-center gap-1.5">
+                  {i > 0 ? <span aria-hidden className="-ml-0.5 mr-0.5 opacity-50">&amp;</span> : null}
+                  <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${DOT[t]}`} />
+                  {planName(t)}
+                </span>
               ))}
             </span>
           ) : (

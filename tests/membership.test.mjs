@@ -59,7 +59,12 @@ test("perks: Free opens none of the paid ones, Ultimate opens everything Pro doe
   for (const perk of ["premium-skills", "training", "qa", "telegram", "calls", "requests", "commission"]) {
     assert.equal(hasPerk("free", perk), false, perk);
   }
-  for (const perk of ["premium-skills", "training", "qa", "workshop", "telegram"]) assert.ok(hasPerk("pro", perk), perk);
+  for (const perk of ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram"]) {
+    assert.ok(hasPerk("pro", perk), perk);
+    assert.ok(hasPerk("ultimate", perk), perk);
+    assert.ok(hasPerk("universal", perk), perk);
+  }
+  for (const perk of ["masterclass", "design"]) assert.equal(hasPerk("free", perk), false, perk);
   for (const perk of ["calls", "network", "commission", "requests", "exclusive-skills"]) {
     assert.equal(hasPerk("pro", perk), false, perk);
     assert.ok(hasPerk("ultimate", perk), perk);

@@ -46,11 +46,14 @@ const SHAKE_MS = 620;
 export function ShelfLockedCard({
   mark,
   body,
+  flash: words = "Now locked",
 }: {
   /** The family's drawing. Rendered on the server, shaken here. */
   mark: ReactNode;
   /** Name, chip and line. Shared with the open card, so there is one copy. */
   body: ReactNode;
+  /** What the flash says. A members' family says who it is for. */
+  flash?: string;
 }) {
   const markRef = useRef<HTMLSpanElement>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -103,7 +106,7 @@ export function ShelfLockedCard({
         >
           {flash ? (
             <span className="shelf-lock-flash inline-flex items-center rounded-full border border-[rgba(240,112,92,0.45)] bg-[rgba(8,20,38,0.92)] px-4 py-1.5 font-hand text-[1.2rem] leading-none text-[#f0705c]">
-              Now locked
+              {words}
             </span>
           ) : null}
         </span>

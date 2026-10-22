@@ -7,7 +7,8 @@ import { hasPerk, perksOf, trainingReach, type Perk } from "@/lib/membership/tie
  *
  * Everything a member's plan opens, and only that: the private links (the
  * Telegram line, the network, the live sessions, the 1-on-1 booking page),
- * the training they can reach, and what they bought. The links live in
+ * the training they can reach (with the Masterclass lessons and the Design
+ * templates, which are training rows on their own shelf), and what they bought. The links live in
  * environment variables and the training in the database, never in the
  * public repository, so the only way to them is through this check.
  *
@@ -41,21 +42,37 @@ export async function GET(request: Request) {
     if (hasPerk(tier, perk)) links[perk] = process.env[env] || null;
   }
 
-  let training: { id: string; title: string; summary: string | null; kind: string; url: string; tier: string }[] = [];
+  // Rows above the plan (an Ultimate-only lesson, seen by Pro) come back
+  // with no url and `locked`, so the dashboard can show what Ultimate adds
+  // without ever handing the link out.
+  let training: {
+    id: string;
+    title: string;
+    summary: string | null;
+    kind: string;
+    url: string | null;
+    tier: string;
+    shelf: string;
+    locked: boolean;
+  }[] = [];
   const reach = trainingReach(tier);
   if (reach.length && accountsConfigured()) {
-    const { data, error } = await adminClient()
-      .from("training")
-      .select("id, title, summary, kind, url, tier")
-      .eq("published", true)
-      .in("tier", reach)
-      .order("sort");
+    // `shelf` sorts rows into Training, Masterclass and Design. Before its
+    // migration runs, every row reads as training.
+    const read = (columns: string) =>
+      adminClient().from("training").select(columns).eq("published", true).in("tier", ["pro", "ultimate"]).order("sort");
+    let { data, error } = await read("id, title, summary, kind, url, tier, shelf");
+    if (error && /shelf/.test(error.message)) ({ data, error } = await read("id, title, summary, kind, url, tier"));
     // Said as a failure, so the dashboard offers "Try again" rather than "soon".
     if (error) {
       console.error("[membership] could not read training", error);
       return new Response(JSON.stringify({ ok: false, error: "failed" }), { status: 500, headers });
     }
-    training = data ?? [];
+    type Row = { id: string; title: string; summary: string | null; kind: string; url: string; tier: "pro" | "ultimate"; shelf?: string };
+    training = ((data ?? []) as unknown as Row[]).map((row) => {
+      const open = reach.includes(row.tier);
+      return { ...row, url: open ? row.url : null, shelf: row.shelf ?? "training", locked: !open };
+    });
   }
 
   const owned = await ownedProducts(member);

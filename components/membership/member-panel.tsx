@@ -24,10 +24,10 @@ import {
   quiet,
   SECTIONS,
   sectionById,
+  ShelfSection,
   SkillsSection,
   soft,
   TelegramSection,
-  TrainingSection,
   type Perks,
   type Section,
   type SectionId,
@@ -40,7 +40,7 @@ import {
  * time beside it. The sections and what opens them are in member-sections.tsx:
  *
  *   Overview         the plan, then a tile for every section with its next step
- *   Library          Skills, Training
+ *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
  *   With me          Live Q&A, Telegram
  *   Ultimate         1-on-1 call, Custom skills, Network, Requests
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
@@ -148,7 +148,7 @@ export function MemberPanel({
   const section = sectionById(active);
   const unlock = needs(section, tier);
   // Sections drawn from /api/membership/perks; the rest work without it.
-  const fromPerks = !unlock && ["skills", "training", "live", "telegram", "calls", "network"].includes(active);
+  const fromPerks = !unlock && ["skills", "masterclass", "design", "training", "live", "telegram", "calls", "network"].includes(active);
   const notLoaded =
     perksState === "failed" || perksState === "signed-out" ? (
       <LoadFailed signedOut={perksState === "signed-out"} onRetry={() => setPerksState("loading")} />
@@ -240,9 +240,9 @@ export function MemberPanel({
               <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} />
             </>
           ) : active === "skills" ? (
-            <SkillsSection ids={ids} tier={tier} library={library} owned={owned} />
-          ) : active === "training" ? (
-            <TrainingSection ids={ids} tier={tier} perks={perks} />
+            <SkillsSection ids={ids} tier={tier} owned={owned} />
+          ) : active === "masterclass" || active === "design" || active === "training" ? (
+            <ShelfSection ids={ids} shelf={active} tier={tier} perks={perks} />
           ) : active === "live" ? (
             <LiveSection ids={ids} perks={perks} />
           ) : active === "telegram" ? (
@@ -344,12 +344,18 @@ function Overview({
   const links = perks?.links ?? {};
   const soon = perks ? "Lands here soon" : "…";
 
+  const count = (shelf: string) => (perks?.training ?? []).filter((t) => t.shelf === shelf && !t.locked).length;
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const freeCount = Object.values(PRODUCTS).filter((p) => p.free).length;
   const status: Partial<Record<SectionId, string>> = {
-    skills: libraryCount ? `${libraryCount} ready to download` : tier === "free" ? "The skills you buy land here" : "Your skills land here",
-    training: perks?.training.length
-      ? perks.training.length === 1
-        ? "1 video or file"
-        : `${perks.training.length} videos and files`
+    skills:
+      tier === "free"
+        ? `${freeCount} free, one click each${libraryCount ? ` · ${libraryCount} bought` : ""}`
+        : `${libraryCount} premium ready · ${freeCount} free`,
+    masterclass: count("masterclass") ? plural(count("masterclass"), "lesson", "lessons") : "The first lessons land here",
+    design: count("design") ? plural(count("design"), "template", "templates") : "The first templates land here",
+    training: count("training")
+      ? plural(count("training"), "video or file", "videos and files")
       : "The first videos land here soon",
     live: links.qa ? "Twice a month · Join from here" : "Twice a month · The link lands here",
     telegram: links.telegram ? "Message me directly" : soon,
@@ -372,7 +378,7 @@ function Overview({
             {plan.name}
           </h2>
           <p className={`mt-3 text-[1rem] leading-[1.5] ${look.soft}`}>
-            {sub ? statusLine(sub) : tier === "free" ? plan.line : "Set up with me directly."}
+            {member.granted ? "Given to you by Tobi." : sub ? statusLine(sub) : tier === "free" ? plan.line : "Set up with me directly."}
           </p>
         </div>
         <div className="flex-none">
@@ -414,7 +420,7 @@ function Overview({
         <p className={`flex flex-wrap items-center gap-2 text-[0.98rem] ${soft}`}>
           <PlanBadge tier={nextUp} />
           {nextUp === "pro"
-            ? "opens every premium skill, training, the live Q&A and Telegram."
+            ? "opens every premium skill, Masterclass, Design, training, the live Q&A and Telegram."
             : "adds the 1-on-1 call, custom skills, the network and the roadmap."}
           <a href="#billing" className={quiet}>
             See {planName(nextUp)}
@@ -458,7 +464,7 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
               <span className={look.soft}>{tier === "free" ? "forever" : price.per}</span>
             </p>
             <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>
-              {sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}
+              {member.granted ? "Given to you by Tobi. Nothing to pay." : sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}
             </p>
             {sub ? (
               <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)} className="mt-auto pt-8">

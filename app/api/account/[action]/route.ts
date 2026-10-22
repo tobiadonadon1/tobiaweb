@@ -19,7 +19,7 @@ import { isSubscribed, setMailing, subscribe } from "@/lib/newsletter";
  *   forgot  { email }                  emails a reset code
  *   reset   { email, code, password }  sets the new password and signs in
  *   signout                            clears the session
- *   me      (GET)                      { member: { email, tier, subscription, newsletter } | null }
+ *   me      (GET)                      { member: { email, tier, granted, subscription, newsletter } | null }
  *
  * Every answer is { ok, error? } with one of a few plain error codes the page
  * turns into a sentence. The session lives in httpOnly cookies set here
@@ -72,8 +72,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ acti
   const { member, cookies } = await currentMember(request);
   if (!member) return reply({ ok: true, member: null }, 200, cookies);
   const newsletter = isSubscribed(member.email);
-  const { tier, subscription } = await membershipOf(member);
-  return reply({ ok: true, member: { email: member.email, tier, subscription, newsletter: await newsletter } }, 200, cookies);
+  const { tier, granted, subscription } = await membershipOf(member);
+  return reply({ ok: true, member: { email: member.email, tier, granted, subscription, newsletter: await newsletter } }, 200, cookies);
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ action: string }> }) {

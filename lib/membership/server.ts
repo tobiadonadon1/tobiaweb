@@ -17,6 +17,11 @@ import { higher, isTier, PLANS, type PaidTier, type Tier } from "./tiers";
  * and only rows of the server's own mode count, so a test subscription made
  * on a laptop never unlocks anything on the real site.
  *
+ * A GRANT (members.granted_tier) is a plan Tobia gave by hand, with no
+ * Stripe behind it: scripts/grant-tier.mjs sets it. The higher of the grant
+ * and the subscription wins, and the subscription is still reported, so a
+ * member who pays can always reach their billing.
+ *
  * Never throws to a page: anything wrong reads as "free", and is logged.
  */
 
@@ -28,6 +33,8 @@ const customerColumn = () => (liveMode() ? "stripe_customer_id" : "stripe_test_c
 
 export type Membership = {
   tier: Tier;
+  /** The tier comes from a grant, not a subscription. */
+  granted: boolean;
   /** The subscription behind the tier, for the account page. */
   subscription: {
     id: string;
@@ -38,17 +45,31 @@ export type Membership = {
   } | null;
 };
 
-const FREE: Membership = { tier: "free", subscription: null };
+const FREE: Membership = { tier: "free", granted: false, subscription: null };
+
+/** The plan Tobia gave this member by hand, if any. Before the column exists it reads as none. */
+async function grantOf(member: Member): Promise<PaidTier | null> {
+  const { data, error } = await adminClient().from("members").select("granted_tier").eq("id", member.id).maybeSingle();
+  if (error) {
+    console.error("[membership] could not read the grant", error.message);
+    return null;
+  }
+  const g = (data as { granted_tier?: string | null } | null)?.granted_tier;
+  return isTier(g) && g !== "free" ? g : null;
+}
 
 export async function membershipOf(member: Member | null): Promise<Membership> {
   if (!member || !accountsConfigured()) return FREE;
   try {
-    const { data, error } = await adminClient()
-      .from("subscriptions")
-      .select("id, tier, status, current_period_end, cancel_at_period_end")
-      .eq("member_id", member.id)
-      .eq("livemode", liveMode())
-      .in("status", ACCESS);
+    const [{ data, error }, grant] = await Promise.all([
+      adminClient()
+        .from("subscriptions")
+        .select("id, tier, status, current_period_end, cancel_at_period_end")
+        .eq("member_id", member.id)
+        .eq("livemode", liveMode())
+        .in("status", ACCESS),
+      grantOf(member),
+    ]);
     if (error) throw error;
     let best: Membership = FREE;
     for (const row of data ?? []) {
@@ -56,6 +77,7 @@ export async function membershipOf(member: Member | null): Promise<Membership> {
       if (best.subscription && higher(best.tier, row.tier) === best.tier) continue;
       best = {
         tier: row.tier,
+        granted: false,
         subscription: {
           id: row.id,
           tier: row.tier,
@@ -65,6 +87,7 @@ export async function membershipOf(member: Member | null): Promise<Membership> {
         },
       };
     }
+    if (grant && higher(grant, best.tier) === grant && grant !== best.tier) best = { ...best, tier: grant, granted: true };
     return best;
   } catch (err) {
     console.error("[membership] could not read the tier", err);

@@ -9,7 +9,9 @@ import {
   Check,
   CreditCard,
   Download,
+  GraduationCap,
   LayoutGrid,
+  LayoutTemplate,
   ListChecks,
   LoaderCircle,
   Lock,
@@ -20,8 +22,9 @@ import {
   Users,
   WandSparkles,
 } from "lucide-react";
-import { hasPerk, planName, PLANS, type PaidTier, type Perk, type Tier } from "@/lib/membership/tiers";
-import type { Product } from "@/lib/shop/products";
+import { startDownload } from "@/components/account/use-member";
+import { hasPerk, money, offer, planName, PLANS, type PaidTier, type Perk, type Tier } from "@/lib/membership/tiers";
+import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { LOOK } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
@@ -43,6 +46,8 @@ import { PlanBadge } from "./plan-badge";
 export type SectionId =
   | "overview"
   | "skills"
+  | "masterclass"
+  | "design"
   | "training"
   | "live"
   | "telegram"
@@ -56,7 +61,8 @@ export type Perks = {
   tier: Tier;
   perks: Perk[];
   links: Partial<Record<Perk, string | null>>;
-  training: { id: string; title: string; summary: string | null; kind: string; url: string; tier: string }[];
+  /** Training, Masterclass and Design rows. A `locked` row is above the plan: no url, shown as what the next plan adds. */
+  training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean }[];
   owned: string[];
 };
 
@@ -74,7 +80,9 @@ export type Section = {
 
 export const SECTIONS: Section[] = [
   { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
-  { id: "skills", name: "Skills", icon: Package, about: "Every skill your plan includes, and every one you bought." },
+  { id: "skills", name: "Skills", icon: Package, about: "Every skill, paid and free, ready to download." },
+  { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "Short lessons, one advanced move each. None of it is on YouTube.", match: /Masterclass/ },
+  { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Website templates you can ship as they are.", match: /^Design/ },
   { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
   { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
@@ -88,7 +96,7 @@ export const SECTIONS: Section[] = [
 /** The sidebar's groups, in order. "Ultimate" is labelled with its pill. */
 export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
   { label: null, ids: ["overview"] },
-  { label: "Library", ids: ["skills", "training"] },
+  { label: "Library", ids: ["skills", "masterclass", "design", "training"] },
   { label: "With me", ids: ["live", "telegram"] },
   { label: "Ultimate", ids: ["calls", "custom", "network", "requests"] },
   { label: "Account", ids: ["billing"] },
@@ -260,103 +268,321 @@ export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | nul
 }
 
 /* ------------------------------------------------------------------ *
- * SKILLS AND TRAINING.
+ * SKILLS: two tabs, Paid and Free, and every skill in one of them. A
+ * free account is never shown an empty page: the Free tab downloads in
+ * one click, and the Paid tab says what each one costs and what Pro
+ * includes. A member sees what their plan includes first.
  * ------------------------------------------------------------------ */
-export function SkillsSection({
-  ids,
-  tier,
-  library,
-  owned,
-}: {
-  ids: string;
-  tier: Tier;
-  library: Product[];
-  owned: Set<string>;
-}) {
-  const paid = tier !== "free";
+type SkillTab = "paid" | "free";
+
+const pill =
+  "inline-flex flex-none items-center gap-2 rounded-full px-4 py-2 text-[0.92rem] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
+const inkPill = `${pill} bg-[var(--ink)] text-[var(--paper)]`;
+const linePill = `${pill} border border-[var(--hairline-strong)] bg-white text-[var(--ink)] hover:border-[var(--ink)]`;
+
+export function SkillsSection({ ids, tier, owned }: { ids: string; tier: Tier; owned: Set<string> }) {
+  const all = Object.values(PRODUCTS);
+  const ready = (p: Product) => owned.has(p.id) || offer(p, tier).kind === "included";
+  // What's theirs first, then by price.
+  const paid = all.filter((p) => !p.free).sort((a, b) => Number(ready(b)) - Number(ready(a)) || a.priceCents - b.priceCents);
+  const free = all.filter((p) => p.free);
+  const [tab, setTab] = useState<SkillTab>(tier === "free" ? "free" : "paid");
+
+  const tabs: { id: SkillTab; label: string; count: number }[] = [
+    { id: "paid", label: "Paid", count: paid.length },
+    { id: "free", label: "Free", count: free.length },
+  ];
+  const onKey = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    e.preventDefault();
+    const next = tab === "paid" ? "free" : "paid";
+    setTab(next);
+    document.getElementById(`${ids}-tab-${next}`)?.focus();
+  };
+
   return (
     <section aria-labelledby={`${ids}-skills`}>
       <SectionHead
         id={`${ids}-skills`}
-        title="Your skills"
-        line={paid ? "Every skill your plan includes, and every one you bought. Download any of them, as often as you like." : "Every skill you bought. Free skills are one click from their own page."}
+        title="Skills"
+        line={
+          tier === "free"
+            ? "Every free skill downloads in one click. Premium ones are a small price each, or all included with Pro."
+            : `Every premium skill comes with ${planName(tier)}. Download any of them, as often as you like.`
+        }
       />
-      {library.length ? (
-        <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-          {library.map((p) => (
-            <li key={p.id} className={`${card} flex items-center justify-between gap-4 px-5 py-4`}>
-              <div className="min-w-0">
-                <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
-                  {p.name}
-                </Link>
-                <p className={`text-[0.88rem] ${soft}`}>{owned.has(p.id) ? "Bought" : `In ${planName(tier)}`}</p>
-              </div>
-              <a
-                href={`/api/download?product=${p.id}&member=1`}
-                className="inline-flex flex-none items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2 text-[0.92rem] text-[var(--paper)] transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-              >
-                <Download aria-hidden className="h-4 w-4" />
-                Download
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>Nothing here yet. The skills you buy land here.</p>
-      )}
+
+      <div role="tablist" aria-label="Skills" onKeyDown={onKey} className="mt-7 inline-flex gap-1 rounded-full border border-[var(--hairline-strong)] bg-white p-1">
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            id={`${ids}-tab-${t.id}`}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            aria-controls={`${ids}-panel`}
+            tabIndex={tab === t.id ? 0 : -1}
+            onClick={() => setTab(t.id)}
+            className={`flex items-center gap-2 rounded-full px-5 py-2 text-[0.98rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] ${
+              tab === t.id ? "bg-[var(--ink)] text-[var(--paper)]" : "text-[color:rgba(11,31,58,0.72)] hover:text-[var(--ink)]"
+            }`}
+          >
+            {t.label}
+            <span className={`text-[0.82rem] tabular-nums ${tab === t.id ? "opacity-70" : "opacity-60"}`}>{t.count}</span>
+          </button>
+        ))}
+      </div>
+
+      <div id={`${ids}-panel`} role="tabpanel" aria-labelledby={`${ids}-tab-${tab}`} className="mt-6">
+        {tab === "paid" ? (
+          <>
+            {tier === "free" ? <ProValue paid={paid} /> : null}
+            <ul className="grid gap-3">
+              {paid.map((p) => (
+                <SkillRow key={p.id} product={p} note={paidNote(p, tier, owned)}>
+                  <PaidAction product={p} tier={tier} ready={ready(p)} />
+                </SkillRow>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <ul className="grid gap-3">
+            {free.map((p) => (
+              <SkillRow key={p.id} product={p} note={p.share.kicker}>
+                <FreeDownload product={p} />
+              </SkillRow>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <p className="mt-6">
-        <Link href="/projects/construct/material/skills" className={quiet}>
-          Browse every skill
+        <Link href="/projects/construct/material" className={quiet}>
+          Browse all the material
         </Link>
       </p>
     </section>
   );
 }
 
-export function TrainingSection({ ids, tier, perks }: { ids: string; tier: Tier; perks: Perks | null }) {
+/** What the row says under its name: why it's theirs, or what it costs them. */
+function paidNote(p: Product, tier: Tier, owned: Set<string>) {
+  if (owned.has(p.id)) return "Bought";
+  const deal = offer(p, tier);
+  if (deal.kind === "included") return `Included in ${planName(tier)}`;
+  if (deal.kind === "locked") return `${planName(deal.needs)} only`;
+  // A free account: the plan that would include it.
+  if (offer(p, "pro").kind === "included") return "Included in Pro";
+  return deal.kind === "buy" && deal.priceCents < deal.fullCents ? "Member price" : "One-time purchase";
+}
+
+/** The Paid tab's first card for a free account: the sum, honestly, against Pro. */
+function ProValue({ paid }: { paid: Product[] }) {
+  const inPro = paid.filter((p) => offer(p, "pro").kind === "included");
+  if (inPro.length < 2) return null;
+  const sum = inPro.reduce((n, p) => n + p.priceCents, 0);
+  const look = LOOK.pro;
   return (
-    <section aria-labelledby={`${ids}-training`}>
-      <SectionHead
-        id={`${ids}-training`}
-        title="Training"
-        line={tier === "pro" ? "Selected training videos and resources." : "The complete training library: every video and every file."}
-      />
-      {perks?.training.length ? (
+    <div className={`plan-card relative isolate mb-5 flex flex-wrap items-center justify-between gap-5 overflow-clip rounded-[1.6rem] p-6 md:p-7 ${look.card}`} data-tier="pro">
+      <div className="min-w-0 max-w-[30rem]">
+        <p className="font-serif text-[1.55rem] leading-[1.1] tracking-[-0.02em]">
+          All {inPro.length} premium skills, <em>included</em> with Pro.
+        </p>
+        <p className={`mt-2 text-[0.95rem] leading-[1.45] ${look.soft}`}>
+          {`One by one they come to ${money(sum, inPro[0].currency)}. Pro is ${money(PLANS.pro.priceCents, PLANS.pro.currency)} a month, with Masterclass, Design, the live Q&A and Telegram.`}
+        </p>
+      </div>
+      <div className="w-full sm:w-auto sm:min-w-[14rem]">
+        <JoinButton tier="pro" label="Upgrade to Pro" />
+      </div>
+    </div>
+  );
+}
+
+function SkillRow({ product: p, note, children }: { product: Product; note: string; children: React.ReactNode }) {
+  return (
+    <li className={`${card} flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between`}>
+      <div className="min-w-0">
+        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+            {p.name}
+          </Link>
+          <span className={`font-mono text-[0.68rem] uppercase tracking-[0.12em] ${soft}`}>{note}</span>
+        </p>
+        <p className={`mt-1 text-[0.92rem] leading-[1.45] ${soft}`}>{p.share.line}</p>
+      </div>
+      <div className="flex flex-none items-center gap-2">{children}</div>
+    </li>
+  );
+}
+
+function PaidAction({ product: p, tier, ready }: { product: Product; tier: Tier; ready: boolean }) {
+  if (ready) {
+    return (
+      <a href={`/api/download?product=${p.id}&member=1`} className={inkPill}>
+        <Download aria-hidden className="h-4 w-4" />
+        Download
+      </a>
+    );
+  }
+  const deal = offer(p, tier);
+  if (deal.kind === "locked") {
+    return (
+      <a href="#billing" className={linePill}>
+        <Lock aria-hidden className="h-3.5 w-3.5" />
+        See {planName(deal.needs)}
+      </a>
+    );
+  }
+  if (deal.kind !== "buy") return null;
+  return (
+    <Link href={`${p.href}#buy`} className={inkPill}>
+      Buy
+      <span className="tabular-nums">
+        {deal.priceCents < deal.fullCents ? (
+          <>
+            <s className="mr-1 opacity-60">{money(deal.fullCents, p.currency)}</s>
+            {money(deal.priceCents, p.currency)}
+          </>
+        ) : (
+          money(deal.priceCents, p.currency)
+        )}
+      </span>
+    </Link>
+  );
+}
+
+/** A free skill, signed in: /api/free hands back the download, no email. */
+function FreeDownload({ product: p }: { product: Product }) {
+  const [state, setState] = useState<"idle" | "busy" | "done" | "failed">("idle");
+  const take = async () => {
+    if (state === "busy") return;
+    setState("busy");
+    const r = (await fetch("/api/free", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ product: p.id }),
+    })
+      .then((res) => res.json())
+      .catch(() => ({}))) as { ok?: boolean; download?: string };
+    if (r.ok && r.download) {
+      startDownload(r.download);
+      setState("done");
+    } else setState("failed");
+  };
+  return (
+    <>
+      {state === "failed" ? (
+        <span role="alert" className="text-[0.88rem] text-[var(--accent-clay-text)]">
+          Didn&rsquo;t start.
+        </span>
+      ) : null}
+      <button type="button" onClick={take} disabled={state === "busy"} className={`${state === "done" ? linePill : inkPill} disabled:opacity-70`}>
+        {state === "busy" ? (
+          <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+        ) : state === "done" ? (
+          <Check aria-hidden className="h-4 w-4" />
+        ) : (
+          <Download aria-hidden className="h-4 w-4" />
+        )}
+        {state === "done" ? "Downloaded" : state === "failed" ? "Try again" : "Download"}
+      </button>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * TRAINING, MASTERCLASS, DESIGN: rows from /api/membership/perks, each
+ * on its own shelf. A row above the plan is listed, locked, with the
+ * plan that opens it: the server never sent its link.
+ * ------------------------------------------------------------------ */
+const SHELVES = {
+  training: { title: "Training", empty: "The first videos and files land here soon." },
+  masterclass: { title: "Masterclass", empty: "The first lessons land here as they're filmed." },
+  design: { title: "Design", empty: "The first templates land here as they're finished." },
+} as const;
+
+export function ShelfSection({
+  ids,
+  shelf,
+  tier,
+  perks,
+}: {
+  ids: string;
+  shelf: keyof typeof SHELVES;
+  tier: Tier;
+  perks: Perks | null;
+}) {
+  const s = SHELVES[shelf];
+  const rows = (perks?.training ?? []).filter((t) => t.shelf === shelf);
+  const anyLocked = rows.some((t) => t.locked);
+  const line =
+    shelf === "training"
+      ? tier === "pro"
+        ? "Selected training videos and resources."
+        : "The complete training library: every video and every file."
+      : shelf === "masterclass"
+        ? "Short lessons, one advanced move each. None of it is on YouTube."
+        : "Website templates you can ship as they are.";
+  return (
+    <section aria-labelledby={`${ids}-${shelf}`}>
+      <SectionHead id={`${ids}-${shelf}`} title={s.title} line={line} />
+      {rows.length ? (
         <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
-          {perks.training.map((t) => (
+          {rows.map((t) => (
             <li key={t.id}>
-              <a
-                href={t.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
-              >
-                <span className="min-w-0">
-                  <span className="block text-[1.02rem] font-medium">{t.title}</span>
-                  {t.summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
-                </span>
-                <span className={`flex flex-none items-center gap-1.5 text-[0.85rem] capitalize ${soft}`}>
-                  {t.kind}
-                  <ArrowUpRight aria-hidden className="h-4 w-4" />
-                </span>
-              </a>
+              {t.url ? (
+                <a
+                  href={t.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
+                >
+                  <RowText title={t.title} summary={t.summary} />
+                  <span className={`flex flex-none items-center gap-1.5 text-[0.85rem] capitalize ${soft}`}>
+                    {t.kind}
+                    <ArrowUpRight aria-hidden className="h-4 w-4" />
+                  </span>
+                </a>
+              ) : (
+                <a
+                  href="#billing"
+                  className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
+                >
+                  <span className="opacity-60">
+                    <RowText title={t.title} summary={t.summary} />
+                  </span>
+                  <span className="flex flex-none items-center gap-2">
+                    <Lock aria-hidden className="h-3.5 w-3.5 opacity-55" />
+                    <PlanBadge tier="ultimate" />
+                    <span className="sr-only">Opens with Ultimate</span>
+                  </span>
+                </a>
+              )}
             </li>
           ))}
         </ul>
       ) : (
-        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>
-          {perks ? "The first videos and files land here soon." : "Loading…"}
-        </p>
+        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>{perks ? s.empty : "Loading…"}</p>
       )}
-      {tier === "pro" ? (
+      {tier === "pro" && (anyLocked || shelf === "training") ? (
         <p className={`mt-5 flex flex-wrap items-center gap-2 text-[0.95rem] ${soft}`}>
-          <PlanBadge tier="ultimate" /> opens the complete library.
+          <PlanBadge tier="ultimate" /> {shelf === "training" ? "opens the complete library." : "opens the locked ones too."}
           <a href="#billing" className={quiet}>
             See Ultimate
           </a>
         </p>
       ) : null}
     </section>
+  );
+}
+
+function RowText({ title, summary }: { title: string; summary: string | null }) {
+  return (
+    <span className="min-w-0">
+      <span className="block text-[1.02rem] font-medium">{title}</span>
+      {summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{summary}</span> : null}
+    </span>
   );
 }
 

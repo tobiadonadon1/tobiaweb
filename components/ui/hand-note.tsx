@@ -41,6 +41,9 @@ const GESTURES: Record<string, string> = {
   /** A short hook to the right, for pointing across at a card. */
   right:
     "M20 52 C 62 40, 96 60, 116 96 C 132 126, 150 142, 182 140",
+  /** Falls away down and to the left; flipped, to the right. Two make a fork. */
+  fork:
+    "M156 10 C 124 30, 74 58, 62 108 C 56 136, 57 160, 58 180",
 };
 
 /** The arrow head, drawn in the same two strokes as the tail. */
@@ -48,6 +51,7 @@ const HEADS: Record<string, string> = {
   down: "M86 158 L100 178 L116 160",
   circle: "M84 78 L96 66 L110 74",
   right: "M166 126 L184 141 L166 154",
+  fork: "M44 164 L58 182 L72 165",
 };
 
 export function HandNote({

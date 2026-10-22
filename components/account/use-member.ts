@@ -13,6 +13,8 @@ export type MemberInfo = {
   email: string;
   /** Their plan: "free" without a membership (lib/membership/tiers.ts). */
   tier: Tier;
+  /** The plan was given by Tobia (no Stripe subscription behind it). */
+  granted?: boolean;
   subscription: { tier: PaidTier; status: string; renews: string | null; cancelAtPeriodEnd: boolean } | null;
   /** Said yes to the newsletter box (lib/newsletter.ts), so it isn't shown to them. */
   newsletter?: boolean;

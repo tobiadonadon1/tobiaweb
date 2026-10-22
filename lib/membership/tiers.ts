@@ -9,8 +9,8 @@
  *
  *   Free       free skills; premium and unique skills are bought
  *   Pro        + premium skills included, unique skills a little cheaper,
- *              some of the training, the bi-monthly Q&A and workshop,
- *              Telegram DMs
+ *              some of the training, the Masterclass and Design shelves,
+ *              the bi-monthly Q&A and workshop, Telegram DMs
  *   Ultimate   + unique skills much cheaper (some free), Ultimate-only
  *              skills, all the training, 1-on-1 calls,
  *              commissions, the network, requests and voting
@@ -37,6 +37,8 @@ export type Perk =
   | "premium-skills" // premium skills included
   | "exclusive-skills" // Ultimate-only skills
   | "training" // the training library (how much: `trainingReach`)
+  | "masterclass" // the shelf's Masterclass: short advanced lessons
+  | "design" // the shelf's Design: website templates
   | "qa" // bi-monthly live group Q&A
   | "workshop" // bi-monthly live workshop
   | "calls" // 1-on-1 calls
@@ -47,9 +49,9 @@ export type Perk =
 
 const PERKS: Record<Tier, Perk[]> = {
   free: [],
-  pro: ["premium-skills", "training", "qa", "workshop", "telegram"],
-  ultimate: ["premium-skills", "exclusive-skills", "training", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
-  universal: ["premium-skills", "exclusive-skills", "training", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
+  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram"],
+  ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
+  universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
 };
 
 export const hasPerk = (tier: Tier, perk: Perk) => PERKS[tier].includes(perk);
@@ -86,6 +88,8 @@ export const PLANS: Record<PaidTier, Plan> = {
       "All free skills and guides",
       "Every premium skill, included",
       "Unique skills at member pricing",
+      "Masterclass: short lessons on one advanced move",
+      "Design: website templates you ship as they are",
       "Selected training videos and resources",
       "Live group Q&A, twice a month",
       "Direct messaging with me on Telegram",
