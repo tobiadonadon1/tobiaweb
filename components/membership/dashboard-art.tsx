@@ -49,6 +49,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "web-designer-pro": { a: "#eef39a", b: "#fbfbe7", added: "2026-10-16" },
   "duo-designer": { a: "#bfe3d6", b: "#eef8f3", added: "2026-10-19" },
   "video-editor": { a: "#ffc9a8", b: "#f2eeff", added: "2026-10-21" },
+  "motion-designer": { a: "#ffb08c", b: "#fff1e8", added: "2026-10-23" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

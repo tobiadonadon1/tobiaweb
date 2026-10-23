@@ -52,7 +52,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -157,8 +157,22 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt";
-  const t = tone === "cobalt"
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember";
+  // "ember": Motion Designer's orange field, black type, a black button, a white field.
+  const t = tone === "ember"
+    ? {
+        ink: "text-[#111111]",
+        soft: "text-[rgba(17,17,17,0.78)]",
+        ask: "text-[rgba(17,17,17,0.88)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(60,15,0,0.55)] focus-within:border-[#111111]",
+        input: "text-[#111111] placeholder:text-[rgba(17,17,17,0.45)]",
+        ring: "focus-visible:outline-[#111111]",
+        check: "bg-[#111111] text-white",
+        error: "text-[#2a0700] font-semibold",
+        button: "bg-[#111111] text-white hover:bg-black",
+        box: ["#111111", "#ffffff", "rgba(17,17,17,0.6)"],
+      }
+    : tone === "cobalt"
     ? {
         ink: "text-white",
         soft: "text-[rgba(255,255,255,0.78)]",

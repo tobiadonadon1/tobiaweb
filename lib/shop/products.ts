@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -972,6 +972,58 @@ export const VIDEO_EDITOR: Product = {
   },
 };
 
+export const MOTION_DESIGNER: Product = {
+  id: "motion-designer",
+  name: "Motion Designer",
+  description:
+    "Motion graphics from one sentence, made by Claude Code or Codex: it picks the style, writes the words, composes the soundtrack and shows you a storyboard that plays before it renders.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/motion-designer",
+  file: {
+    sealed: "motion-designer.zip.enc",
+    filename: "motion-designer.zip",
+    // It ships scripts (.mjs, .js), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Motion Designer makes motion graphics videos from one sentence. Say what the video is for and it picks one of seven styles, writes the words, composes its own soundtrack and puts your screens on a real iPhone, MacBook or Studio Display. Then it opens a storyboard that plays the real video: change anything with a tap, approve, and the MP4 renders in about a minute. Free, for Claude Code and Codex.",
+    kicker: "Skill · for Claude Code & Codex",
+    line: "Motion graphics from one sentence.",
+    proof: "7 styles · a storyboard first · its own soundtrack",
+  },
+  contents: [
+    ["install.mjs", "installs the skill for Claude Code, Codex or both, then makes a two-second test video"],
+    ["motion-designer/", "the skill: seven styles, the storyboard, the soundtrack, the iPhone, MacBook, Studio Display and iPad frames, 24 fonts"],
+    ["START HERE.txt", "the three steps"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude (or codex)",
+    "Type hi. It installs in about a minute and makes a test video.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code or Codex and type hi.",
+    after: [
+      "From then on, ask for the video you want in any session: \"a 20-second launch video for my app\", \"animate these three numbers for LinkedIn\", or \"a teaser for my site, vertical for TikTok\".",
+      "It shows you the storyboard in your browser first. Change anything, press Approve, and the MP4 renders on your computer in about a minute.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), Node.js 22 or newer and ffmpeg; the installer tells you if one is missing. Mac, Windows or Linux.",
+    next: [
+      ["Right after install", "It offers to make your first video. A sentence is enough; a link to your site is better."],
+      ["Every video", "A storyboard that plays first, then the render, then one-sentence changes."],
+      ["Your screens", "Drop screenshots or a screen recording in and it puts them on a real iPhone, MacBook or Studio Display."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -988,6 +1040,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "web-designer-pro": WEB_DESIGNER_PRO,
   "duo-designer": DUO_DESIGNER,
   "video-editor": VIDEO_EDITOR,
+  "motion-designer": MOTION_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

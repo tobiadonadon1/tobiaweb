@@ -989,6 +989,37 @@ function DuoDesigner() {
   );
 }
 
+/**
+ * MOTION DESIGNER — a storyboard cut from paper: three frames in a row, each
+ * holding one move (a line of type, a disc, a play wedge) in the page's
+ * colours, and below them a timeline of clips cut on the beat with an ink
+ * playhead standing across it. The orange is the page's own
+ * (product/motion-designer-page.tsx).
+ */
+function MotionDesigner() {
+  return (
+    <>
+      <Cut d={CARD} x={30} y={66} s={0.56} sy={0.44} fill={SHADE} />
+      <Cut d={CARD} x={24} y={60} s={0.56} sy={0.44} fill={INK} />
+      <Cut d={BAR} x={38} y={80} s={0.27} sy={0.95} fill="#faf8f2" opacity={0.95} />
+      <Cut d={BAR} x={38} y={104} s={0.17} sy={0.95} fill="#FF5A1F" />
+      <Cut d={CARD} x={150} y={54} s={0.56} sy={0.44} fill={SHADE} />
+      <Cut d={CARD} x={144} y={48} s={0.56} sy={0.44} fill="#FF5A1F" />
+      <Cut d={DISC} x={182} y={56} s={0.33} fill="#E7F04F" />
+      <Cut d={CARD} x={270} y={66} s={0.56} sy={0.44} fill={SHADE} />
+      <Cut d={CARD} x={264} y={60} s={0.56} sy={0.44} fill="#1F3AD6" />
+      <Cut d={WEDGE} x={306} y={70} s={0.36} fill="#faf8f2" opacity={0.95} />
+      <Cut d={BAR} x={30} y={214} s={1.22} sy={1.5} fill={SHADE} />
+      <Cut d={BAR} x={40} y={212} s={0.22} sy={1.1} fill="#FF5A1F" />
+      <Cut d={BAR} x={110} y={212} s={0.3} sy={1.1} fill={INK} />
+      <Cut d={BAR} x={204} y={212} s={0.2} sy={1.1} fill="#1F3AD6" />
+      <Cut d={BAR} x={266} y={212} s={0.34} sy={1.1} fill="#E7F04F" />
+      <Cut d={CARD} x={196} y={178} s={0.03} sy={0.76} fill={INK} />
+      <Cut d={DISC} x={190} y={170} s={0.1} fill={INK} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1014,6 +1045,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "copycat-detective": CopycatDetective,
   "duo-designer": DuoDesigner,
   "video-editor": VideoEditor,
+  "motion-designer": MotionDesigner,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

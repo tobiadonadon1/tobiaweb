@@ -23,9 +23,8 @@ import type { MaterialEntry } from "../material-types";
  * The `body` here is the skill's own page. It is the argument for the skill
  * plus how to install it, and it never repeats the summary that got you here.
  *
- * Motion Director is the one that brings its own machinery: a render engine
- * it installs on first run. So its folder is bigger, its page shows what it
- * makes, and it carries its own install steps instead of the skills path.
+ * The skills that bring their own machinery (a renderer, fonts, a sound
+ * engine) are given away for an email and get their own product page.
  */
 
 /** Where a skill's bundle and its raw instructions live. One place. */
@@ -164,67 +163,25 @@ export const SKILLS: MaterialEntry[] = [
   },
   /* ---------------------------------------------------------------- *
    * 04
+   *
+   * Motion graphics from one sentence, given away for an email
+   * (motion-designer-page.tsx). It took the place of Motion Director on
+   * 2026-10-23 (Tobia's call: one motion skill, not two that sound alike);
+   * the old URL redirects here (next.config.ts) and the old zip stays put
+   * for links already sent.
    * ---------------------------------------------------------------- */
   {
-    slug: "motion-director",
-    title: "Motion Director",
+    slug: "motion-designer",
+    title: "Motion Designer",
     kind: "skill",
-    summary: "Turns any idea into a finished short video with its own original soundtrack.",
-    // Minutes to a finished video, which is what matters here.
+    summary: "Motion graphics from one sentence: it picks the style, writes the words and scores it.",
+    // Minutes from the download to the first video.
     minutes: 10,
     status: "ready",
-    when: "You need a video for a launch, a post or an idea, and you have ten minutes, not a video team.",
+    when: "You need a launch video, a promo or an animated explainer, and you don't want to learn After Effects or hire someone.",
     level: "Anyone",
-    body: [
-      {
-        type: "p",
-        text: "Type what the video is about and answer two quick rounds of questions. About ten minutes later, a finished 10 to 20 second MP4 with music written for it is on your Desktop, ready to post.",
-      },
-      {
-        type: "reel",
-        caption: "Four videos Motion Director made, one in each look. Tap one for sound.",
-        items: [
-          { src: "/construct/reel/motion-director/explainer.mp4", poster: "/construct/reel/motion-director/explainer.jpg", label: "Motion-graphics explainer", aspect: "16/9" },
-          { src: "/construct/reel/motion-director/kinetic.mp4", poster: "/construct/reel/motion-director/kinetic.jpg", label: "Kinetic typography", aspect: "9/16" },
-          { src: "/construct/reel/motion-director/neon.mp4", poster: "/construct/reel/motion-director/neon.jpg", label: "Neon, cinematic", aspect: "9/16" },
-          { src: "/construct/reel/motion-director/ink.mp4", poster: "/construct/reel/motion-director/ink.jpg", label: "Hand-drawn ink", aspect: "1/1" },
-        ],
-      },
-      { type: "h", text: "What you get" },
-      {
-        type: "list",
-        items: [
-          "A video that looks like a studio made it. Claude gives your idea a twist, designs and animates every frame, and checks its own work frame by frame before you see it.",
-          "A soundtrack nobody else has. The music is composed from scratch for your video and cut to the picture, so every hit lands on a beat.",
-          "Four looks: bold kinetic typography, a clean motion-graphics explainer, neon and cinematic, or hand-drawn ink. Vertical for X, TikTok, Reels and Shorts, or landscape, square and 4:5, as a crisp 1080p MP4.",
-          "Yours to use, commercially too. There is no stock footage, no licensed music, no watermark and no editing app.",
-          "A project you can open. The picture and the music of every video are plain code in a small folder, so you can tweak it, reuse it, and see exactly how it was made.",
-        ],
-      },
-      { type: "h", text: "How it works" },
-      {
-        type: "steps",
-        items: [
-          "Download it, unzip it, open it in Claude Code and type hi. It installs itself in about two minutes.",
-          "Tell Claude what the video is about, then pick where it's going, how long, and a look.",
-          "Claude writes it, animates it, scores it and checks it. The MP4 lands in a folder on your Desktop.",
-        ],
-      },
-      {
-        type: "p",
-        text: "Want a change? Say \"faster\", \"change the headline\" or \"make a square version\" and it renders again.",
-      },
-      {
-        type: "watch",
-        text: "You need a Mac, Claude Code with a paid Claude plan, and Node.js 18 or newer. Windows and Linux should work but haven't been tested yet. Everything renders on your own computer and nothing is uploaded.",
-      },
-    ],
-    install: [
-      "Unzip the folder.",
-      "Open a terminal in the folder and type claude",
-      "Type hi. Claude installs it and checks it works, in about two minutes.",
-    ],
-    link: { label: "Download Motion Director", href: bundle("motion-director"), download: true },
+    body: [],
+    product: "motion-designer",
   },
   /* ---------------------------------------------------------------- *
    * 05

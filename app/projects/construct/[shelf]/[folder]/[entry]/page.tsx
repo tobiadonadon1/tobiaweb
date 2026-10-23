@@ -16,6 +16,7 @@ import { WebDesignerProPage } from "@/components/superhuman/material/product/web
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { DuoDesignerPage } from "@/components/superhuman/material/product/duo-designer-page";
 import { VideoEditorPage } from "@/components/superhuman/material/product/video-editor-page";
+import { MotionDesignerPage } from "@/components/superhuman/material/product/motion-designer-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -164,4 +165,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "web-designer-pro": WebDesignerProPage,
   "duo-designer": DuoDesignerPage,
   "video-editor": VideoEditorPage,
+  "motion-designer": MotionDesignerPage,
 };

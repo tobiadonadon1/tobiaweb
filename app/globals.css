@@ -3314,3 +3314,87 @@ body:has(.vd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
 @media (prefers-reduced-motion: reduce) {
   .little-man-wave { animation: none; }
 }
+
+/* ======================================================================
+ * MOTION DESIGNER (motion-designer-page.tsx, motion-designer-intro.tsx).
+ * Web Designer Pro's poster page in the skill's own orange. The opening is
+ * one of the skill's Kinetic videos (three beats on a timeline); the hero's
+ * content rises once it has slid away, and at once when it's skipped.
+ * ====================================================================== */
+.mdx-page { --mdx-wait: 2.15s; }
+.mdx-skip .mdx-page { --mdx-wait: 0s; }
+.mdx-in { animation: mdx-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--mdx-wait) + var(--i, 0) * 0.09s); }
+@keyframes mdx-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* the opening */
+.mdx-intro { position: fixed; inset: 0; z-index: 90; overflow: hidden; background: #111; color: #ECEAE3; animation: mdx-out 0.5s cubic-bezier(0.7, 0, 0.2, 1) 2.1s both; }
+.mdx-skip .mdx-intro { animation: mdx-fade 0.22s ease both; }
+@keyframes mdx-out { to { transform: translateY(-100%); } }
+@keyframes mdx-fade { to { opacity: 0; } }
+.mdx-intro__frame { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; animation: mdx-beat 0.66s steps(1, end) forwards; }
+.mdx-intro__frame--0 { background: #111; color: #ECEAE3; animation-delay: 0.12s; }
+.mdx-intro__frame--1 { background: #FF5A1F; color: #111; animation-delay: 0.78s; }
+.mdx-intro__frame--2 { background: #E7F04F; color: #111; animation-delay: 1.44s; animation-duration: 1.2s; }
+@keyframes mdx-beat { 0% { opacity: 1; } 100% { opacity: 1; } }
+.mdx-intro__frame--0, .mdx-intro__frame--1 { animation-name: mdx-beat-out; }
+@keyframes mdx-beat-out { 0%, 99% { opacity: 1; } 100% { opacity: 0; } }
+.mdx-intro__word {
+  font-family: var(--mdx-archivo), system-ui, sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.85;
+  font-size: clamp(2.6rem, 12.5vw, 13rem); font-variation-settings: "wdth" 112;
+  animation: mdx-slam 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: inherit;
+}
+@keyframes mdx-slam { from { transform: scale(1.7) translateY(4%); opacity: 0; filter: blur(6px); } 40% { opacity: 1; filter: blur(0); } to { transform: none; opacity: 1; } }
+.mdx-intro__tc { position: absolute; right: clamp(1.25rem, 3vw, 2.5rem); top: clamp(1.25rem, 3vw, 2.25rem); font-family: var(--mdx-mono), ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; }
+.mdx-intro__hud { position: absolute; left: clamp(1.25rem, 3vw, 2.5rem); top: clamp(1.25rem, 3vw, 2.25rem); z-index: 2; display: flex; flex-direction: column; gap: 0.35rem;
+  font-family: var(--mdx-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #ECEAE3; mix-blend-mode: difference; }
+.mdx-intro__track { position: absolute; left: clamp(1.25rem, 3vw, 2.5rem); right: clamp(1.25rem, 3vw, 2.5rem); bottom: clamp(1.25rem, 4vw, 2.75rem); z-index: 2; height: 14px; display: flex; gap: 4px; mix-blend-mode: difference; }
+.mdx-intro__track i { flex: 1; border-radius: 3px; background: #ECEAE3; transform-origin: 0 50%; transform: scaleX(0); animation: mdx-fill 0.66s linear both; }
+.mdx-intro__track i:nth-child(1) { animation-delay: 0.12s; }
+.mdx-intro__track i:nth-child(2) { animation-delay: 0.78s; }
+.mdx-intro__track i:nth-child(3) { animation-delay: 1.44s; }
+@keyframes mdx-fill { to { transform: scaleX(1); } }
+.mdx-intro__track b { position: absolute; top: -10px; bottom: -10px; width: 3px; border-radius: 2px; background: #ECEAE3; left: 0; animation: mdx-head 1.98s linear 0.12s both; }
+@keyframes mdx-head { to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) {
+  .mdx-intro { display: none; }
+  .mdx-page { --mdx-wait: 0s; }
+  .mdx-in { animation: none; }
+}
+
+/* the poster */
+.mdx-hero { color: #111; }
+/* phones: a narrower cut of the face, so DESIGNER. fits the width */
+.mdx-title { font-size: clamp(3.4rem, 19.5vw, 9.5rem); font-variation-settings: "wdth" 72; }
+.mdx-screen { position: relative; z-index: 15; margin: 1.5rem 0 0; }
+.mdx-pins { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.mdx-pin { display: inline-flex; align-items: center; gap: 0.55rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); padding: 0.45rem 0.9rem 0.45rem 0.45rem; font-size: 0.92rem; font-weight: 600; color: #111;
+  box-shadow: 0 10px 24px -16px rgba(60, 15, 0, 0.6); }
+.mdx-pin__dot { display: grid; place-items: center; width: 1.45rem; height: 1.45rem; border-radius: 999px; background: #111; color: #fff; font-family: var(--mdx-mono), ui-monospace, monospace; font-size: 0.85rem; font-weight: 700; }
+@media (min-width: 640px) and (max-aspect-ratio: 1/1) {
+  .mdx-title { font-size: min(21vw, 14rem); }
+}
+@media (min-width: 768px) and (min-aspect-ratio: 1/1) {
+  .mdx-hero { --mdx-t: clamp(6rem, min(14.6vw, 27svh), 21rem); }
+  .mdx-title { font-size: var(--mdx-t); font-variation-settings: "wdth" 100; }
+  /* the Studio Display stands in front of the name, like Pro's portrait: sized so its top only reaches
+     the lower fifth of DESIGNER. at any screen size (title = 2 lines at 0.8 line height, under ~9rem) */
+  .mdx-screen { position: absolute; right: 3%; bottom: 3.5svh; margin: 0; width: min(41vw, calc((96.5svh - 9rem - 1.44 * var(--mdx-t)) / 0.749)); }
+  .mdx-hero .mdx-pins { margin-top: 1.4rem; }
+  .mdx-bottom { max-width: 46%; }
+}
+
+/* sound on the films */
+.mdx-sound { position: absolute; right: 0.6rem; bottom: 0.6rem; z-index: 2; display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 999px; padding: 0.4rem 0.75rem;
+  background: rgba(10, 10, 10, 0.62); color: #fff; font-family: var(--mdx-mono), ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); transition: background 0.15s; }
+.mdx-sound:hover { background: rgba(10, 10, 10, 0.85); }
+.mdx-sound[aria-pressed="true"] { background: #FF5A1F; color: #111; }
+.mdx-sound:focus-visible, .mdx-listen:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.mdx-sound--screen { right: 0.9rem; bottom: 0.9rem; }
+.mdx-listen { display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 999px; padding: 0.7rem 1.2rem; background: #fff; color: #111; font-weight: 700; font-size: 0.98rem; }
+.mdx-listen[aria-pressed="true"] { background: #E7F04F; }
+/* the site's nav waits for the opening, like Web Designer Pro's */
+@keyframes mdx-nav-in { from { opacity: 0; visibility: hidden; } }
+body:has(.mdx-intro) [data-site-nav] { animation: mdx-nav-in 350ms ease-out 2.45s backwards; }
+html.mdx-skip body:has(.mdx-intro) [data-site-nav] { animation: none; }
+@media (prefers-reduced-motion: reduce) { body:has(.mdx-intro) [data-site-nav] { animation: none; } }

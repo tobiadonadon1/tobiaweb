@@ -60,6 +60,8 @@ const DUO_ZIP = Buffer.from("PK\u0003\u0004 the iphone duo design skill " + "d".
 writeFileSync(path.join(cwd, "private", "duo-designer.zip.enc"), seal(DUO_ZIP, parseKey(fileKey)));
 const EDITOR_ZIP = Buffer.from("PK\u0003\u0004 the video editing skills " + "v".repeat(3900));
 writeFileSync(path.join(cwd, "private", "video-editor.zip.enc"), seal(EDITOR_ZIP, parseKey(fileKey)));
+const MOTION_ZIP = Buffer.from("PK\u0003\u0004 the motion graphics skill " + "m".repeat(3900));
+writeFileSync(path.join(cwd, "private", "motion-designer.zip.enc"), seal(MOTION_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -94,7 +96,7 @@ const { GET: download } = await import("../app/api/download/route.ts");
 const { POST: checkout } = await import("../app/api/checkout/route.ts");
 const { GET: health } = await import("../app/api/shop/health/route.ts");
 const { POST: claim } = await import("../app/api/free/route.ts");
-const { THE_98C_TRADE, LAUNCHR, productById } = await import("../lib/shop/products.ts");
+const { THE_98C_TRADE, LAUNCHR, productById, forSale } = await import("../lib/shop/products.ts");
 
 const ORIGIN = "http://localhost:3000";
 const signer = new Stripe("sk_test_mock").webhooks;
@@ -189,11 +191,18 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(THE_98C_TRADE.priceCents, 500);
   assert.equal(THE_98C_TRADE.priceLabel, "€5");
   assert.equal(THE_98C_TRADE.currency, "eur");
-  // Motion Director is free: a download, never a product.
-  const md = FOLDER_BY_ID.skills.entries.find((e) => e.slug === "motion-director");
-  assert.equal(md?.product, undefined);
-  assert.equal(md?.link?.download, true);
+  // Motion Designer took Motion Director's card: free for an email, its own page, no Stripe.
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "motion-director"), undefined);
   assert.equal(productById("motion-director"), undefined);
+  const mdz = productById("motion-designer");
+  assert.equal(mdz.href, entryHref("skills", "motion-designer"));
+  assert.equal(FOLDER_BY_ID.skills.entries.findIndex((e) => e.slug === "motion-designer"), 3, "in Motion Director's place, the fourth card");
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "motion-designer")?.product, "motion-designer");
+  assert.equal(mdz.free, true);
+  assert.equal(forSale(mdz), false);
+  assert.equal(mdz.stripeProductId, "none");
+  // It ships scripts (.mjs), and Gmail refuses a zip that holds them.
+  assert.equal(mdz.file.attach, false);
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
@@ -935,6 +944,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["web-designer-pro"].bytes, WDP_ZIP.length);
   assert.equal(body.files["duo-designer"].bytes, DUO_ZIP.length);
   assert.equal(body.files["video-editor"].bytes, EDITOR_ZIP.length);
+  assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));
