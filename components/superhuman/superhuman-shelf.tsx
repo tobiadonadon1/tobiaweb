@@ -38,8 +38,9 @@ import { SECTION_LABELS } from "./sections";
  * beat after the words and land slightly turned, because cut paper is put down
  * by a hand and a hand does not put it down square.
  *
- * ONLY ONE OF THE THREE IS A LINK. Material opens; Masterclass and Design are
- * buttons that shake and say "Now locked" (see shelf-locked-card.tsx). The
+ * Material and Design are links (Design's library is open to play with; its
+ * code is for members). Masterclass is a button that shakes and says "Now
+ * locked" (see shelf-locked-card.tsx) until your plan opens it. The
  * branch is on `family.open`, never on `tier`, because "paid" and "locked" are
  * both closed doors and this file should not have to know the difference.
  */
@@ -52,7 +53,8 @@ import { SECTION_LABELS } from "./sections";
 function CardText({ family, unlocked = false }: { family: ShelfFamily; unlocked?: boolean }) {
   // A members' family drawn for a member who has it: no lock, and a way in.
   const shut = !family.open && !unlocked;
-  const cta = unlocked ? "Open in your dashboard" : family.cta;
+  // Design opens its own library page for everyone; Masterclass opens the dashboard.
+  const cta = family.perk === "design" ? family.cta : unlocked ? "Open in your dashboard" : family.cta;
   return (
     <>
       {/* A CHIP ONLY WHERE IT CHANGES WHAT YOU CAN DO. There were three once,
@@ -64,7 +66,7 @@ function CardText({ family, unlocked = false }: { family: ShelfFamily; unlocked?
         </h3>
         {shut ? (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(207,233,238,0.34)] px-2.5 py-1 font-mono text-[0.64rem] uppercase leading-none tracking-[0.14em] text-[color:rgba(214,238,244,0.72)]">
-            <Lock aria-hidden className="h-3 w-3" />
+            {family.perk === "design" ? null : <Lock aria-hidden className="h-3 w-3" />}
             {family.tag}
           </span>
         ) : null}

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The Design library's previews: minified output of scripts/design-build.mjs.
+    "components/design-library/compiled/**",
   ]),
 ]);
 

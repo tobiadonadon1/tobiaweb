@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowUpRight,
@@ -83,7 +84,7 @@ export const SECTIONS: Section[] = [
   { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
   { id: "skills", name: "Skills", icon: Package, about: "Every skill, paid and free, ready to download." },
   { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "In-depth lessons, 10 to 20 minutes each. Made for members, never on YouTube.", match: /Masterclass/ },
-  { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Website templates you can ship as they are.", match: /^Design/ },
+  { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Interactive components you copy into your site.", match: /^Design/ },
   { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
   { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
@@ -524,6 +525,12 @@ const SHELVES = {
   design: { title: "Design", item: "Template", open: "Open" },
 } as const;
 
+// The library's blocks only load when Design is opened.
+const DesignDashboardShelf = dynamic(() => import("@/components/design-library/dashboard-shelf"), {
+  ssr: false,
+  loading: () => <div className="mt-7 aspect-[3/1] rounded-[2rem] bg-[rgba(11,31,58,0.04)]" />,
+});
+
 export function ShelfSection({
   ids,
   shelf,
@@ -538,29 +545,43 @@ export function ShelfSection({
   wasNew: (row: Perks["training"][number]) => boolean;
 }) {
   const s = SHELVES[shelf];
-  const rows = (perks?.training ?? []).filter((t) => t.shelf === shelf);
-  const anyLocked = rows.some((t) => t.locked);
+  const all = (perks?.training ?? []).filter((t) => t.shelf === shelf);
+  // Training sheets (one-page PDFs) are drawn as pages; everything else is a row.
+  const sheets = all.filter((t) => t.kind === "sheet");
+  const rows = all.filter((t) => t.kind !== "sheet");
+  const anyLocked = all.some((t) => t.locked);
   const line =
     shelf === "training"
       ? tier === "pro"
-        ? "Selected training videos and resources."
-        : "The complete training library: every video and every file."
+        ? "Selected training: one-page sheets to keep next to your screen, and videos."
+        : "The complete training library: every sheet, every video and every file."
       : shelf === "masterclass"
         ? "In-depth lessons, 10 to 20 minutes each, on what I'd teach a friend building their first product. Made for members, never on YouTube."
-        : "Website templates you can ship as they are.";
+        : "Interactive components to copy into your site: play with them, take the code, or hand one to Claude.";
   return (
     <section aria-labelledby={`${ids}-${shelf}`}>
       <SectionHead id={`${ids}-${shelf}`} title={s.title} line={line} />
+      {shelf === "design" ? <DesignDashboardShelf /> : null}
       {!perks ? (
-        <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
-      ) : rows.length ? (
-        <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
-          {rows.map((t, i) => (
-            <ShelfRow key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
-          ))}
-        </ul>
+        shelf === "design" ? null : <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
       ) : (
-        <ComingSoon shelf={shelf} />
+        <>
+          {sheets.length ? (
+            <ul className="mt-7 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+              {sheets.map((t) => (
+                <SheetCard key={t.id} row={t} fresh={wasNew(t)} />
+              ))}
+            </ul>
+          ) : null}
+          {rows.length ? (
+            <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
+              {rows.map((t, i) => (
+                <ShelfRow key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
+              ))}
+            </ul>
+          ) : null}
+          {!all.length && shelf !== "design" ? <ComingSoon shelf={shelf} /> : null}
+        </>
       )}
       {tier === "pro" && (anyLocked || shelf === "training") ? (
         <p className={`mt-6 flex flex-wrap items-center gap-2 text-[0.95rem] ${soft}`}>
@@ -571,6 +592,60 @@ export function ShelfSection({
         </p>
       ) : null}
     </section>
+  );
+}
+
+/**
+ * A TRAINING SHEET: a small picture of the page, its title, and the way in
+ * (it opens as a PDF in a new tab). Above the plan, the picture is dimmed
+ * and the way in is the plan that opens it.
+ */
+function SheetCard({ row: t, fresh }: { row: Perks["training"][number]; fresh: boolean }) {
+  const id = t.id.replace(/^sheet-/, "");
+  const body = (
+    <>
+      <span className="relative block overflow-hidden rounded-[0.9rem] border border-[var(--hairline)] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.05),0_14px_30px_-18px_rgba(11,31,58,0.35)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-[-0.6deg]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={t.locked ? `/training/${id}-locked.webp` : `/api/membership/file?id=${id}&picture=1`}
+          alt=""
+          loading="lazy"
+          className={`block aspect-[210/279] w-full object-cover object-top ${t.locked ? "opacity-50" : ""}`}
+        />
+        {t.locked ? (
+          <span className="absolute inset-0 grid place-items-center">
+            <span className="flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1.5 shadow-sm">
+              <Lock aria-hidden className="h-3.5 w-3.5 opacity-60" />
+              <PlanBadge tier="ultimate" />
+            </span>
+          </span>
+        ) : null}
+      </span>
+      <span className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="text-[0.98rem] font-medium leading-[1.3]">{t.title}</span>
+        {fresh && !t.locked ? <NewChip /> : null}
+      </span>
+      {t.summary ? <span className={`mt-1 block text-[0.88rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
+      <span className={`mt-2 inline-flex items-center gap-1 text-[0.88rem] ${t.locked ? soft : "text-[var(--ink)]"}`}>
+        {t.locked ? "Opens with Ultimate" : "Open the PDF"}
+        {t.locked ? null : <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />}
+      </span>
+    </>
+  );
+  const cls =
+    "group block rounded-[1rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]";
+  return (
+    <li>
+      {t.url ? (
+        <a href={t.url} target="_blank" rel="noopener noreferrer" className={cls}>
+          {body}
+        </a>
+      ) : (
+        <a href="#billing" className={cls}>
+          {body}
+        </a>
+      )}
+    </li>
   );
 }
 

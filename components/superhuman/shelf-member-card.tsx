@@ -13,7 +13,8 @@ import { ShelfLockedCard } from "./shelf-locked-card";
  *
  * Everyone else gets the locked card that shakes its head. A member whose
  * plan opens it gets a plain door into that section of their dashboard, and
- * the lock comes off the title (the server passes both bodies, so the words
+ * the lock comes off the title. Design is the exception: its card always
+ * opens the library page, where anyone can play and members copy (the server passes both bodies, so the words
  * stay in one place: superhuman-shelf.tsx). Until the member is known the
  * card stays locked, which is what most visitors will see anyway.
  *
@@ -34,7 +35,21 @@ export function ShelfMemberCard({
   open: ReactNode;
 }) {
   const member = useMember();
-  if (member && hasPerk(member.tier, perk)) {
+  const unlocked = Boolean(member && hasPerk(member.tier, perk));
+  // Design is a library anyone can walk into and play with (the code is
+  // what the plan opens, on the page itself), so its card is always a door.
+  if (perk === "design") {
+    return (
+      <Link
+        href="/projects/construct/design"
+        className="group flex h-full flex-col rounded-sm p-2 text-[var(--paper)] transition-colors duration-[600ms] ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--paper)]"
+      >
+        {mark}
+        {unlocked ? open : locked}
+      </Link>
+    );
+  }
+  if (unlocked) {
     return (
       <Link
         href={`${ACCOUNT_HREF}#${id}`}

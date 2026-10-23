@@ -9,7 +9,7 @@ import { SuperhumanCompass } from "@/components/superhuman/superhuman-compass";
 import { SHELF, shelfHref } from "@/components/superhuman/shelf-data";
 import { SECTION_ORDER } from "@/components/superhuman/sections";
 const DESCRIPTION =
-  "Free skills, guides and ready-made setups for working with AI and code. Masterclasses and website templates next. Plus a little one to one work.";
+  "Free skills, guides and ready-made setups for working with AI and code. A library of interactive components, masterclasses next. Plus a little one to one work.";
 
 export const metadata: Metadata = {
   title: "Construct",

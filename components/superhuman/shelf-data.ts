@@ -205,12 +205,14 @@ export const SHELF: ShelfFamily[] = [
     name: "Design",
     tier: "paid",
     open: false,
-    // Was "Templates", which is a category rather than a state, and the line
-    // under it already says templates. The chip's whole job is to say whether
-    // the door opens.
-    tag: "Pro & Ultimate",
-    line: "Website templates you can ship as they are.",
-    status: "First set in build.",
+    // The door opens for everyone (the library is there to play with); the
+    // chip says so, with no lock. The code is what the plan opens, on the page.
+    tag: "Free to play",
+    line: "Interactive components to play with here and copy into your site.",
+    status: "Open: play with every component; Pro and Ultimate copy the code.",
+    // Not an open family (it has no [shelf] page), but its card is a door:
+    // to the library at /projects/construct/design (shelf-member-card.tsx).
+    cta: "Open the library",
     spineRay: 6,
     dividerRay: 5,
   },

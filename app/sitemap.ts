@@ -23,12 +23,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE}/projects/mynd`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE}/projects/construct`, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE}/projects/construct/design`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE}/projects/book`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE}/lab/gallery`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
-  // Open families only. Masterclass and Design have no page, so publishing
-  // their URLs would be advertising two 404s.
+  // Open families only. Masterclass has no page, so publishing its URL
+  // would be advertising a 404. (Design's library is listed above.)
   const shelf: MetadataRoute.Sitemap = OPEN_SHELF_IDS.map((id) => ({
     url: `${SITE}${shelfHref(id)}`,
     changeFrequency: "monthly",

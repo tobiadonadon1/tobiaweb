@@ -1,6 +1,7 @@
 import { accountsConfigured, adminClient, currentMember } from "@/lib/account";
 import { membershipOf, ownedProducts } from "@/lib/membership/server";
 import { hasPerk, perksOf, trainingReach, type Perk } from "@/lib/membership/tiers";
+import { SHEETS } from "@/lib/training/sheets";
 
 /**
  * GET /api/membership/perks
@@ -75,6 +76,26 @@ export async function GET(request: Request) {
       const open = reach.includes(row.tier);
       return { ...row, url: open ? row.url : null, shelf: row.shelf ?? "training", locked: !open, added: created_at };
     });
+  }
+
+  // The training sheets live in the code, not the database (lib/training/sheets.ts):
+  // first on the Training shelf, behind the same plan check.
+  if (reach.length) {
+    const sheets = SHEETS.map((s) => {
+      const open = reach.includes(s.tier);
+      return {
+        id: `sheet-${s.id}`,
+        title: s.title,
+        summary: s.summary,
+        kind: "sheet",
+        url: open ? `/api/membership/file?id=${s.id}` : null,
+        tier: s.tier,
+        shelf: "training",
+        locked: !open,
+        added: `${s.added}T12:00:00Z`,
+      };
+    });
+    training = [...sheets, ...training];
   }
 
   const owned = await ownedProducts(member);

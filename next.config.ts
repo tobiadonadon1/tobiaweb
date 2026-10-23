@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
     // Copycat Detective reads video frames with the ffmpeg binary that
     // ffmpeg-static downloads at install; it's spawned by path, so list it.
     "/api/copycat/check": ["./node_modules/ffmpeg-static/ffmpeg"],
+    // The Design library's sealed sources and the training sheets (lib/design/files.ts, lib/training).
+    "/api/design/source": ["./private/design/**/*"],
+    "/api/membership/file": ["./private/training/**/*"],
   },
   // Required at runtime from node_modules (it resolves its binary's path).
   serverExternalPackages: ["ffmpeg-static"],
@@ -65,14 +68,13 @@ const nextConfig: NextConfig = {
       { source: "/construct/tester", destination: "/projects/construct/material/skills", statusCode: 301 },
       { source: "/projects/construct/ship-check", destination: "/projects/construct/material/skills", statusCode: 301 },
       { source: "/construct/ship-check", destination: "/projects/construct/material/skills", statusCode: 301 },
-      /* Masterclass and Design lost their pages: both were a lede, an empty
-         state and an email field, and both are now a card on the shelf that
-         says "Now locked" when you click it. Anything already indexed lands on
-         the shelf itself rather than on a 404. */
+      /* Masterclass lost its page: it was a lede, an empty state and an
+         email field, and is now a card on the shelf that says "Now locked"
+         when you click it. Anything already indexed lands on the shelf
+         rather than on a 404. Design has a page again: the library. */
       { source: "/projects/construct/masterclass", destination: "/projects/construct#shelf", statusCode: 301 },
-      { source: "/projects/construct/design", destination: "/projects/construct#shelf", statusCode: 301 },
       { source: "/construct/masterclass", destination: "/projects/construct#shelf", statusCode: 301 },
-      { source: "/construct/design", destination: "/projects/construct#shelf", statusCode: 301 },
+      { source: "/construct/design", destination: "/projects/construct/design", statusCode: 301 },
       /* The-sweep absorbed Tester and Ship check. */
       { source: "/projects/construct/the-sweep", destination: "/projects/construct/material/skills/code-reviewer", statusCode: 301 },
       { source: "/construct/the-sweep", destination: "/projects/construct/material/skills/code-reviewer", statusCode: 301 },
