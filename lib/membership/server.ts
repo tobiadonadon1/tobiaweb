@@ -249,20 +249,27 @@ let portalConfig: string | null | undefined;
  * (metadata construct=membership); without it, Stripe's default is used.
  *
  * With `change`, the portal opens straight on "confirm your new plan" for
- * that subscription and price (one click to switch), and comes back to
- * `change.done` once it's confirmed.
+ * that subscription and price (one click to switch, up or down), and comes
+ * back to `change.done` once it's confirmed. Without a price it opens on
+ * "cancel your plan" instead: the way down to Free, at the end of the period.
  */
 export async function portalSession(
   customer: string,
   returnUrl: string,
-  change?: { subscription: string; price: string; done: string },
+  change?: { subscription: string; price?: string; done: string },
 ) {
   if (portalConfig === undefined) {
     const list = await stripe().billingPortal.configurations.list({ active: true, limit: 100 });
     portalConfig = list.data.find((c) => c.metadata?.construct === "membership")?.id ?? null;
   }
   let flow: Stripe.BillingPortal.SessionCreateParams.FlowData | undefined;
-  if (change) {
+  if (change && !change.price) {
+    flow = {
+      type: "subscription_cancel",
+      subscription_cancel: { subscription: change.subscription },
+      after_completion: { type: "redirect", redirect: { return_url: change.done } },
+    };
+  } else if (change?.price) {
     const sub = await stripe().subscriptions.retrieve(change.subscription);
     const item = sub.items.data[0];
     if (item && item.price.id !== change.price) {

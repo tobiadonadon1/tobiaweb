@@ -4,10 +4,10 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
-import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type PaidTier, type Tier } from "@/lib/membership/tiers";
+import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { PRODUCTS } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
-import { FREE_PLAN, LOOK, PLAN_BUTTON, UniversalMail } from "./plan-cards";
+import { FREE_PLAN, LOOK, PLAN_BUTTON, TIERS, UniversalMail } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
 import { RequestsBoard } from "./requests-board";
 import {
@@ -44,7 +44,7 @@ import {
  *   With me          Live Q&A, Telegram
  *   Ultimate         1-on-1 call, Custom skills, Network, Requests
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
- *                    and the plans above theirs, each one click away
+ *                    and every other plan, up or down, each one click away
  *
  * The section is the URL's hash (#training, #billing...), so a link can open
  * one, and Back walks through the sections like pages. A section the plan
@@ -383,8 +383,8 @@ function Overview({
         </div>
         <div className="flex-none">
           <a href="#billing" className={`${PLAN_BUTTON} px-7 ${look.button}`}>
-            {/* Universal has nothing above it, so there it stays the billing door. */}
-            {tier === "universal" ? "Plan & billing" : "Upgrade"}
+            {/* Free has only a way up; a member can go either way. */}
+            {tier === "free" ? "Upgrade" : "Change plan"}
             <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         </div>
@@ -448,7 +448,7 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
   const look = LOOK[tier];
   const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
   const price = planPrice(tier);
-  const upgrades = SELF_SERVE.filter((t) => higher(t, tier) === t && t !== tier);
+  const others = TIERS.filter((t) => t !== tier);
 
   return (
     <div className="flex flex-col gap-14">
@@ -497,47 +497,102 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
         </div>
       </section>
 
-      {/* UPGRADE: one click to Stripe (or, for a member, straight to "confirm the new plan") */}
-      {tier !== "universal" ? (
-        <section aria-labelledby={`${ids}-up`}>
-          <h2 id={`${ids}-up`} className={h2}>
-            {upgrades.length ? (
-              <>
-                Go <em>further</em>
-              </>
-            ) : (
-              "Want us to build it with you?"
-            )}
-          </h2>
-          {upgrades.length && paid ? (
-            <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-              Switch in one click. You only pay the difference for the rest of the month.
-            </p>
-          ) : null}
-          <div className={`mt-7 grid gap-5 ${upgrades.length ? "lg:grid-cols-2" : "md:max-w-[26rem]"}`}>
-            {upgrades.map((t) => (
-              <UpgradeCard key={t} tier={t}>
-                <JoinButton tier={t} label={paid ? `Switch to ${PLANS[t].name}` : `Join ${PLANS[t].name}`} />
-              </UpgradeCard>
-            ))}
-            <UpgradeCard tier="universal">
-              <UniversalMail />
-            </UpgradeCard>
-          </div>
-        </section>
-      ) : null}
+      {/* CHANGE PLAN: every other plan, in order, each with its one way in (see `Change`). */}
+      <section aria-labelledby={`${ids}-up`}>
+        <h2 id={`${ids}-up`} className={h2}>
+          {tier === "free" ? (
+            <>
+              Go <em>further</em>
+            </>
+          ) : (
+            <>
+              Change <em>plan</em>
+            </>
+          )}
+        </h2>
+        {sub && !member.granted ? (
+          <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
+            Up or down, any time. Moving up, you pay only the difference this month. Moving down, the unused part comes off
+            your next invoice. Your free skills and anything you bought stay yours on every plan.
+          </p>
+        ) : member.granted ? (
+          <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
+            Your plan is a gift, so there&rsquo;s nothing to cancel or move down from. Anything above it you can join as usual.
+          </p>
+        ) : null}
+        <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {others.map((t) => (
+            <PlanOption key={t} tier={t} up={higher(t, tier) === t}>
+              <Change to={t} member={member} />
+            </PlanOption>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
-/** A plan above theirs, small: name, price, what it adds, and its one button. */
-function UpgradeCard({ tier, children }: { tier: PaidTier; children: React.ReactNode }) {
+const CHANGE_MAILTO =
+  "mailto:tobia@donadon.com?subject=" +
+  encodeURIComponent("Construct: changing my plan") +
+  "&body=" +
+  encodeURIComponent("Hi Tobia,\n\nI'd like to change my Construct plan to: \n\nThanks,\n");
+
+/**
+ * THE ONE WAY INTO ANOTHER PLAN, for whoever is looking:
+ *
+ *   Universal                  an email to Tobia, from any plan
+ *   paying, to another plan    Stripe's "confirm your new plan" (prorated), up or down
+ *   paying, to Free            Stripe's "cancel your plan": open to the period's end
+ *   Free, to a paid plan       Stripe Checkout
+ *   a gift, to a plan above    Checkout too (the higher of the two wins)
+ *   a gift, to a plan below    nothing to do: it's inside what they have
+ *   set up by hand             an email to Tobia
+ */
+function Change({ to, member }: { to: Tier; member: NonNullable<MemberInfo> }) {
+  const [opening, setOpening] = useState(false);
+  const tier = member.tier;
+  const sub = member.subscription;
+  const up = higher(to, tier) === to;
+  const note = (text: string) => <p className={`text-[0.95rem] leading-[1.45] ${LOOK[to].soft}`}>{text}</p>;
+
+  if (to === "universal") return <UniversalMail />;
+  if (member.granted && !up) return note("Included in the plan Tobi gave you.");
+  if (to === "free") {
+    if (!sub) return note("Write to me and I'll move you.");
+    if (sub.cancelAtPeriodEnd) return note(date(sub.renews) ? `You move to Free on ${date(sub.renews)}.` : "You move to Free at the end of this month.");
+    return (
+      <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)}>
+        <input type="hidden" name="to" value="free" />
+        <button type="submit" disabled={opening} className={`${PLAN_BUTTON} ${LOOK.free.button}`}>
+          {opening ? <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" /> : null}
+          Move to Free
+        </button>
+        <p className={`mt-3 text-[0.88rem] leading-[1.45] ${LOOK.free.soft}`}>
+          {date(sub.renews) ? `${planName(tier)} stays open until ${date(sub.renews)}.` : `${planName(tier)} stays open to the end of the month.`}
+        </p>
+      </form>
+    );
+  }
+  if (sub || tier === "free" || (member.granted && up)) {
+    return <JoinButton tier={to} label={sub ? `${up ? "Switch" : "Move"} to ${PLANS[to].name}` : `Join ${PLANS[to].name}`} />;
+  }
+  return (
+    <a href={CHANGE_MAILTO} className={`${PLAN_BUTTON} ${LOOK[to].button}`}>
+      Write to me
+    </a>
+  );
+}
+
+/** Another plan, small: up or down, name, price, what it opens, and its one way in. */
+function PlanOption({ tier, up, children }: { tier: Tier; up: boolean; children: React.ReactNode }) {
   const look = LOOK[tier];
-  const plan = PLANS[tier];
+  const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
   const price = planPrice(tier);
   return (
     <article className={`flex flex-col overflow-hidden rounded-[1.6rem] p-6 ${look.card}`}>
-      <div className="flex items-baseline justify-between gap-3">
+      <p className={`text-[0.78rem] uppercase tracking-[0.14em] ${look.soft}`}>{up ? "Upgrade" : "Downgrade"}</p>
+      <div className="mt-2 flex items-baseline justify-between gap-3">
         <h3 className="font-serif text-[1.8rem] leading-none tracking-[-0.03em]">{plan.name}</h3>
         <p className="flex items-baseline gap-1">
           <span className="text-[1.3rem] font-medium">{price.amount}</span>
