@@ -27,6 +27,7 @@ import { hasPerk, money, offer, planName, PLANS, type PaidTier, type Perk, type 
 import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { LOOK } from "./plan-cards";
+import { ago, ComingSoon, MarkStage, SHELF_LOOK, SKILL_LOOK, stageStyle, Sticker } from "./dashboard-art";
 import { PlanBadge } from "./plan-badge";
 
 /**
@@ -62,7 +63,7 @@ export type Perks = {
   perks: Perk[];
   links: Partial<Record<Perk, string | null>>;
   /** Training, Masterclass and Design rows. A `locked` row is above the plan: no url, shown as what the next plan adds. */
-  training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean }[];
+  training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean; added: string }[];
   owned: string[];
 };
 
@@ -81,7 +82,7 @@ export type Section = {
 export const SECTIONS: Section[] = [
   { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
   { id: "skills", name: "Skills", icon: Package, about: "Every skill, paid and free, ready to download." },
-  { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "Short lessons, one advanced move each. None of it is on YouTube.", match: /Masterclass/ },
+  { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "In-depth lessons, 10 to 20 minutes each. Made for members, never on YouTube.", match: /Masterclass/ },
   { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Website templates you can ship as they are.", match: /^Design/ },
   { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
@@ -280,12 +281,24 @@ const pill =
 const inkPill = `${pill} bg-[var(--ink)] text-[var(--paper)]`;
 const linePill = `${pill} border border-[var(--hairline-strong)] bg-white text-[var(--ink)] hover:border-[var(--ink)]`;
 
-export function SkillsSection({ ids, tier, owned }: { ids: string; tier: Tier; owned: Set<string> }) {
+export function SkillsSection({
+  ids,
+  tier,
+  owned,
+  wasNew,
+}: {
+  ids: string;
+  tier: Tier;
+  owned: Set<string>;
+  /** Went up since this section was last opened (dashboard-art.tsx `useSeen`). */
+  wasNew: (p: Product) => boolean;
+}) {
   const all = Object.values(PRODUCTS);
   const ready = (p: Product) => owned.has(p.id) || offer(p, tier).kind === "included";
   // What's theirs first, then by price.
   const paid = all.filter((p) => !p.free).sort((a, b) => Number(ready(b)) - Number(ready(a)) || a.priceCents - b.priceCents);
-  const free = all.filter((p) => p.free);
+  // Newest first: what just went up is what a member came to see.
+  const free = all.filter((p) => p.free).sort((a, b) => SKILL_LOOK[b.id].added.localeCompare(SKILL_LOOK[a.id].added));
   const [tab, setTab] = useState<SkillTab>(tier === "free" ? "free" : "paid");
 
   const tabs: { id: SkillTab; label: string; count: number }[] = [
@@ -337,20 +350,20 @@ export function SkillsSection({ ids, tier, owned }: { ids: string; tier: Tier; o
         {tab === "paid" ? (
           <>
             {tier === "free" ? <ProValue paid={paid} /> : null}
-            <ul className="grid gap-3">
+            <ul className={grid}>
               {paid.map((p) => (
-                <SkillRow key={p.id} product={p} note={paidNote(p, tier, owned)}>
+                <SkillCard key={p.id} product={p} note={paidNote(p, tier, owned)} fresh={wasNew(p)} yours={ready(p)}>
                   <PaidAction product={p} tier={tier} ready={ready(p)} />
-                </SkillRow>
+                </SkillCard>
               ))}
             </ul>
           </>
         ) : (
-          <ul className="grid gap-3">
+          <ul className={grid}>
             {free.map((p) => (
-              <SkillRow key={p.id} product={p} note={p.share.kicker}>
+              <SkillCard key={p.id} product={p} note={p.share.kicker} fresh={wasNew(p)}>
                 <FreeDownload product={p} />
-              </SkillRow>
+              </SkillCard>
             ))}
           </ul>
         )}
@@ -399,19 +412,47 @@ function ProValue({ paid }: { paid: Product[] }) {
   );
 }
 
-function SkillRow({ product: p, note, children }: { product: Product; note: string; children: React.ReactNode }) {
+const grid = "grid gap-5 sm:grid-cols-2 2xl:grid-cols-3";
+
+/**
+ * A SKILL, AS A CARD: its cut-paper mark on its own colour, then its name,
+ * what it does and the one button. The stage links to the skill's page, the
+ * button does the thing (download, buy, see the plan).
+ */
+function SkillCard({
+  product: p,
+  note,
+  fresh,
+  yours = false,
+  children,
+}: {
+  product: Product;
+  note: string;
+  fresh: boolean;
+  yours?: boolean;
+  children: React.ReactNode;
+}) {
+  const when = fresh ? ago(SKILL_LOOK[p.id].added) : null;
   return (
-    <li className={`${card} flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between`}>
-      <div className="min-w-0">
-        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+    <li className="group flex flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1">
+      <Link href={p.href} aria-label={`${p.name}: open its page`} className="block focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--ink)]">
+        <MarkStage look={SKILL_LOOK[p.id]} mark={p.id} instance="dash" className="aspect-[16/10]">
+          {fresh ? <Sticker tone="clay">New</Sticker> : yours ? <Sticker tone="ink">Yours</Sticker> : null}
+        </MarkStage>
+      </Link>
+      <div className="flex flex-1 flex-col p-5 md:p-6">
+        <p className={`font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
+          {note}
+          {when ? <span className="text-[var(--accent-clay-text)]"> · {when}</span> : null}
+        </p>
+        <h3 className="mt-2 font-serif text-[1.45rem] leading-[1.05] tracking-[-0.02em]">
+          <Link href={p.href} className="hover:underline hover:decoration-1 hover:underline-offset-4">
             {p.name}
           </Link>
-          <span className={`font-mono text-[0.68rem] uppercase tracking-[0.12em] ${soft}`}>{note}</span>
-        </p>
-        <p className={`mt-1 text-[0.92rem] leading-[1.45] ${soft}`}>{p.share.line}</p>
+        </h3>
+        <p className={`mt-2 text-[0.93rem] leading-[1.45] ${soft}`}>{p.share.line}</p>
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">{children}</div>
       </div>
-      <div className="flex flex-none items-center gap-2">{children}</div>
     </li>
   );
 }
@@ -497,9 +538,9 @@ function FreeDownload({ product: p }: { product: Product }) {
  * plan that opens it: the server never sent its link.
  * ------------------------------------------------------------------ */
 const SHELVES = {
-  training: { title: "Training", empty: "The first videos and files land here soon." },
-  masterclass: { title: "Masterclass", empty: "The first lessons land here as they're filmed." },
-  design: { title: "Design", empty: "The first templates land here as they're finished." },
+  training: { title: "Training", item: "Video", open: "Watch" },
+  masterclass: { title: "Masterclass", item: "Lesson", open: "Watch" },
+  design: { title: "Design", item: "Template", open: "Open" },
 } as const;
 
 export function ShelfSection({
@@ -507,11 +548,13 @@ export function ShelfSection({
   shelf,
   tier,
   perks,
+  wasNew,
 }: {
   ids: string;
   shelf: keyof typeof SHELVES;
   tier: Tier;
   perks: Perks | null;
+  wasNew: (row: Perks["training"][number]) => boolean;
 }) {
   const s = SHELVES[shelf];
   const rows = (perks?.training ?? []).filter((t) => t.shelf === shelf);
@@ -522,51 +565,24 @@ export function ShelfSection({
         ? "Selected training videos and resources."
         : "The complete training library: every video and every file."
       : shelf === "masterclass"
-        ? "Short lessons, one advanced move each. None of it is on YouTube."
+        ? "In-depth lessons, 10 to 20 minutes each, on what I'd teach a friend building their first product. Made for members, never on YouTube."
         : "Website templates you can ship as they are.";
   return (
     <section aria-labelledby={`${ids}-${shelf}`}>
       <SectionHead id={`${ids}-${shelf}`} title={s.title} line={line} />
-      {rows.length ? (
-        <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
-          {rows.map((t) => (
-            <li key={t.id}>
-              {t.url ? (
-                <a
-                  href={t.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
-                >
-                  <RowText title={t.title} summary={t.summary} />
-                  <span className={`flex flex-none items-center gap-1.5 text-[0.85rem] capitalize ${soft}`}>
-                    {t.kind}
-                    <ArrowUpRight aria-hidden className="h-4 w-4" />
-                  </span>
-                </a>
-              ) : (
-                <a
-                  href="#billing"
-                  className="flex items-start justify-between gap-4 px-5 py-4 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
-                >
-                  <span className="opacity-60">
-                    <RowText title={t.title} summary={t.summary} />
-                  </span>
-                  <span className="flex flex-none items-center gap-2">
-                    <Lock aria-hidden className="h-3.5 w-3.5 opacity-55" />
-                    <PlanBadge tier="ultimate" />
-                    <span className="sr-only">Opens with Ultimate</span>
-                  </span>
-                </a>
-              )}
-            </li>
+      {!perks ? (
+        <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
+      ) : rows.length ? (
+        <ul className={`mt-7 ${grid}`}>
+          {rows.map((t, i) => (
+            <ShelfCard key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
           ))}
         </ul>
       ) : (
-        <p className={`${card} mt-7 p-6 text-[1rem] leading-[1.5] ${soft}`}>{perks ? s.empty : "Loading…"}</p>
+        <ComingSoon shelf={shelf} />
       )}
       {tier === "pro" && (anyLocked || shelf === "training") ? (
-        <p className={`mt-5 flex flex-wrap items-center gap-2 text-[0.95rem] ${soft}`}>
+        <p className={`mt-6 flex flex-wrap items-center gap-2 text-[0.95rem] ${soft}`}>
           <PlanBadge tier="ultimate" /> {shelf === "training" ? "opens the complete library." : "opens the locked ones too."}
           <a href="#billing" className={quiet}>
             See Ultimate
@@ -577,12 +593,57 @@ export function ShelfSection({
   );
 }
 
-function RowText({ title, summary }: { title: string; summary: string | null }) {
+/**
+ * A LESSON OR A TEMPLATE: its number, big, on the shelf's colour (each one
+ * leans its glow a little differently, so a row of them isn't one card
+ * repeated), then the title and the way in. A locked one shows what it is
+ * and the plan that opens it; the server never sent its link.
+ */
+function ShelfCard({ row: t, n, shelf, fresh }: { row: Perks["training"][number]; n: number; shelf: keyof typeof SHELVES; fresh: boolean }) {
+  const s = SHELVES[shelf];
+  const look = SHELF_LOOK[shelf];
+  const tilt = [12, 88, 50, 20, 80][n % 5];
+  const Glyph = shelf === "design" ? LayoutTemplate : PlayCircle;
+  const body = (
+    <>
+      <div
+        className="relative flex aspect-[16/10] items-end justify-between overflow-hidden p-5"
+        style={stageStyle(look, `${tilt}% 0%`)}
+      >
+        <span className={`font-serif text-[4.2rem] leading-[0.8] tracking-[-0.05em] ${t.locked ? "opacity-30" : ""}`}>{String(n).padStart(2, "0")}</span>
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-white/80 shadow-[0_6px_18px_-8px_rgba(11,31,58,0.45)] transition-transform duration-300 group-hover:scale-110">
+          {t.locked ? <Lock aria-hidden className="h-4 w-4" /> : <Glyph aria-hidden className="h-5 w-5" />}
+        </span>
+        {fresh && !t.locked ? <Sticker tone="clay">New</Sticker> : null}
+      </div>
+      <div className="flex flex-1 flex-col p-5 md:p-6">
+        <p className={`flex items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
+          {s.item} {String(n).padStart(2, "0")}
+          {t.locked ? <PlanBadge tier="ultimate" className="normal-case tracking-normal" /> : null}
+        </p>
+        <h3 className={`mt-2 font-serif text-[1.4rem] leading-[1.08] tracking-[-0.02em] ${t.locked ? "opacity-60" : ""}`}>{t.title}</h3>
+        {t.summary ? <p className={`mt-2 text-[0.93rem] leading-[1.45] ${soft}`}>{t.summary}</p> : null}
+        <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[0.95rem] font-medium">
+          {t.locked ? "Opens with Ultimate" : s.open}
+          <ArrowUpRight aria-hidden className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </span>
+      </div>
+    </>
+  );
+  const shell =
+    "group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
   return (
-    <span className="min-w-0">
-      <span className="block text-[1.02rem] font-medium">{title}</span>
-      {summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{summary}</span> : null}
-    </span>
+    <li>
+      {t.url ? (
+        <a href={t.url} target="_blank" rel="noopener noreferrer" className={shell}>
+          {body}
+        </a>
+      ) : (
+        <a href="#billing" className={shell}>
+          {body}
+        </a>
+      )}
+    </li>
   );
 }
 

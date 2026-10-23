@@ -54,6 +54,8 @@ export async function GET(request: Request) {
     tier: string;
     shelf: string;
     locked: boolean;
+    /** When it went up, so the dashboard can say "new". */
+    added: string;
   }[] = [];
   const reach = trainingReach(tier);
   if (reach.length && accountsConfigured()) {
@@ -61,17 +63,17 @@ export async function GET(request: Request) {
     // migration runs, every row reads as training.
     const read = (columns: string) =>
       adminClient().from("training").select(columns).eq("published", true).in("tier", ["pro", "ultimate"]).order("sort");
-    let { data, error } = await read("id, title, summary, kind, url, tier, shelf");
-    if (error && /shelf/.test(error.message)) ({ data, error } = await read("id, title, summary, kind, url, tier"));
+    let { data, error } = await read("id, title, summary, kind, url, tier, shelf, created_at");
+    if (error && /shelf/.test(error.message)) ({ data, error } = await read("id, title, summary, kind, url, tier, created_at"));
     // Said as a failure, so the dashboard offers "Try again" rather than "soon".
     if (error) {
       console.error("[membership] could not read training", error);
       return new Response(JSON.stringify({ ok: false, error: "failed" }), { status: 500, headers });
     }
-    type Row = { id: string; title: string; summary: string | null; kind: string; url: string; tier: "pro" | "ultimate"; shelf?: string };
-    training = ((data ?? []) as unknown as Row[]).map((row) => {
+    type Row = { id: string; title: string; summary: string | null; kind: string; url: string; tier: "pro" | "ultimate"; shelf?: string; created_at: string };
+    training = ((data ?? []) as unknown as Row[]).map(({ created_at, ...row }) => {
       const open = reach.includes(row.tier);
-      return { ...row, url: open ? row.url : null, shelf: row.shelf ?? "training", locked: !open };
+      return { ...row, url: open ? row.url : null, shelf: row.shelf ?? "training", locked: !open, added: created_at };
     });
   }
 

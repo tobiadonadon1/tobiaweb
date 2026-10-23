@@ -2,10 +2,11 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, LoaderCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
 import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { PRODUCTS } from "@/lib/shop/products";
+import { ago, LittleMan, MarkStage, SHELF_LOOK, SKILL_LOOK, stageStyle, Sticker, useSeen, type Look } from "./dashboard-art";
 import { JoinButton } from "./join-plans";
 import { FREE_PLAN, LOOK, PLAN_BUTTON, TIERS, UniversalMail } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
@@ -39,7 +40,8 @@ import {
  * A sidebar of sections (a strip of pills on a phone) and one section at a
  * time beside it. The sections and what opens them are in member-sections.tsx:
  *
- *   Overview         the plan, then a tile for every section with its next step
+ *   Overview         the plan, what's new since the last visit, then a tile
+ *                    for every section (the library's with their marks)
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
  *   With me          Live Q&A, Telegram
  *   Ultimate         1-on-1 call, Custom skills, Network, Requests
@@ -145,6 +147,21 @@ export function MemberPanel({
     (p) => !p.free && (owned.has(p.id) || offer(p, tier).kind === "included"),
   );
 
+  // What's new, per section: the sidebar pings with `fresh`, the stickers
+  // and the overview's "New for you" read `wasNew` (see dashboard-art.tsx).
+  const { fresh, wasNew, markSeen } = useSeen(member.email);
+  useEffect(() => {
+    if (active === "skills" || ((active === "masterclass" || active === "design" || active === "training") && perks)) markSeen(active);
+  }, [active, perks, markSeen]);
+  const rows = (perks?.training ?? []).filter((t) => !t.locked);
+  const newCount: Partial<Record<SectionId, number>> = {
+    skills: Object.values(PRODUCTS).filter((p) => fresh("skills", SKILL_LOOK[p.id].added)).length,
+  };
+  for (const shelf of ["masterclass", "design", "training"] as const) {
+    newCount[shelf] = rows.filter((t) => t.shelf === shelf && fresh(shelf, t.added)).length;
+  }
+  const news = whatsNew(rows, wasNew);
+
   const section = sectionById(active);
   const unlock = needs(section, tier);
   // Sections drawn from /api/membership/perks; the rest work without it.
@@ -201,7 +218,7 @@ export function MemberPanel({
         <nav aria-label="Dashboard" className="min-w-0 md:sticky md:top-28 md:self-start">
           <div ref={strip} className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:hidden">
             {SECTIONS.map((s) => (
-              <NavPill key={s.id} section={s} tier={tier} active={active === s.id} />
+              <NavPill key={s.id} section={s} tier={tier} active={active === s.id} fresh={newCount[s.id] ?? 0} />
             ))}
           </div>
           <div className="hidden flex-col gap-6 md:flex">
@@ -214,12 +231,19 @@ export function MemberPanel({
                     ) : (
                       g.label
                     )}
+                    {/* Something new on these shelves: the little man waves from the label. */}
+                    {g.ids.some((id) => newCount[id]) ? (
+                      <span className="ml-auto flex items-end gap-1 normal-case tracking-normal">
+                        <span className="-rotate-6 font-hand text-[1.05rem] leading-none text-[var(--accent-clay)]">new!</span>
+                        <LittleMan pose="wave" className="h-6 w-auto" />
+                      </span>
+                    ) : null}
                   </p>
                 ) : null}
                 <ul className="flex flex-col gap-0.5">
                   {g.ids.map((id) => (
                     <li key={id}>
-                      <NavRow section={sectionById(id)} tier={tier} active={active === id} />
+                      <NavRow section={sectionById(id)} tier={tier} active={active === id} fresh={newCount[id] ?? 0} />
                     </li>
                   ))}
                 </ul>
@@ -228,8 +252,17 @@ export function MemberPanel({
           </div>
         </nav>
 
-        {/* THE SECTION */}
+        {/* THE SECTION, with the way back to the overview above it. */}
         <div className="min-w-0">
+          {active !== "overview" ? (
+            <a
+              href="#overview"
+              className="group mb-7 inline-flex items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-white py-2 pl-3 pr-4 text-[0.92rem] transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+            >
+              <ArrowLeft aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
+              Overview
+            </a>
+          ) : null}
           {unlock ? (
             <Locked section={section} tier={tier} unlock={unlock} />
           ) : fromPerks && notLoaded ? (
@@ -237,12 +270,12 @@ export function MemberPanel({
           ) : active === "overview" ? (
             <>
               {notLoaded ? <div className="mb-8">{notLoaded}</div> : null}
-              <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} />
+              <Overview ids={ids} member={member} perks={perks} libraryCount={library.length} news={news} newCount={newCount} />
             </>
           ) : active === "skills" ? (
-            <SkillsSection ids={ids} tier={tier} owned={owned} />
+            <SkillsSection ids={ids} tier={tier} owned={owned} wasNew={(p) => wasNew("skills", SKILL_LOOK[p.id].added)} />
           ) : active === "masterclass" || active === "design" || active === "training" ? (
-            <ShelfSection ids={ids} shelf={active} tier={tier} perks={perks} />
+            <ShelfSection ids={ids} shelf={active} tier={tier} perks={perks} wasNew={(t) => wasNew(t.shelf, t.added)} />
           ) : active === "live" ? (
             <LiveSection ids={ids} perks={perks} />
           ) : active === "telegram" ? (
@@ -285,7 +318,21 @@ function LoadFailed({ signedOut, onRetry }: { signedOut: boolean; onRetry: () =>
 const rowBase =
   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.98rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--ink)]";
 
-function NavRow({ section, tier, active }: { section: Section; tier: Tier; active: boolean }) {
+/** "2 new" beside a section with something added since it was last opened. */
+function NewPing({ n, active }: { n: number; active: boolean }) {
+  if (!n) return null;
+  return (
+    <span
+      className={`ml-auto rounded-full px-2 py-0.5 text-[0.72rem] font-medium tabular-nums leading-[1.4] ${
+        active ? "bg-[var(--paper)] text-[var(--ink)]" : "bg-[var(--accent-clay)] text-white"
+      }`}
+    >
+      {n} new
+    </span>
+  );
+}
+
+function NavRow({ section, tier, active, fresh }: { section: Section; tier: Tier; active: boolean; fresh: number }) {
   const Icon = section.icon;
   const lock = needs(section, tier);
   return (
@@ -298,12 +345,12 @@ function NavRow({ section, tier, active }: { section: Section; tier: Tier; activ
     >
       <Icon aria-hidden className="h-[1.1rem] w-[1.1rem] flex-none" />
       {section.name}
-      {lock ? <LockMark tier={lock} /> : null}
+      {lock ? <LockMark tier={lock} /> : <NewPing n={fresh} active={active} />}
     </a>
   );
 }
 
-function NavPill({ section, tier, active }: { section: Section; tier: Tier; active: boolean }) {
+function NavPill({ section, tier, active, fresh }: { section: Section; tier: Tier; active: boolean; fresh: number }) {
   const Icon = section.icon;
   const lock = needs(section, tier);
   return (
@@ -318,24 +365,62 @@ function NavPill({ section, tier, active }: { section: Section; tier: Tier; acti
     >
       <Icon aria-hidden className="h-4 w-4" />
       {section.name}
-      {lock ? <LockMark tier={lock} /> : null}
+      {lock ? <LockMark tier={lock} /> : <NewPing n={fresh} active={active} />}
     </a>
   );
 }
 
 /* ------------------------------------------------------------------ *
- * OVERVIEW: the plan, then every section as a tile with its next step.
+ * WHAT'S NEW: skills, lessons, templates and videos that went up since
+ * their section was last opened, newest first. Nothing new: the latest
+ * skills anyway, so the overview always has something to open.
  * ------------------------------------------------------------------ */
+/** A skill shows its mark; a lesson, template or video its number on the shelf (`n`). */
+type NewItem = { key: string; label: string; title: string; line: string | null; href: string; added: string; look: Look; mark?: string; n?: number };
+
+function whatsNew(rows: Perks["training"], wasNew: (section: string, iso: string) => boolean): { items: NewItem[]; fresh: boolean } {
+  const skills: NewItem[] = Object.values(PRODUCTS).map((p) => ({
+    key: p.id,
+    label: p.free ? "Free skill" : "Skill",
+    title: p.name,
+    line: p.share.line,
+    href: "#skills",
+    added: SKILL_LOOK[p.id].added,
+    look: SKILL_LOOK[p.id],
+    mark: p.id,
+  }));
+  const label = { masterclass: "Masterclass", design: "Design", training: "Training" } as Record<string, string>;
+  const shelves: NewItem[] = rows.map((t) => {
+    const shelf = (t.shelf in SHELF_LOOK ? t.shelf : "training") as keyof typeof SHELF_LOOK;
+    const n = rows.filter((r) => r.shelf === t.shelf).indexOf(t) + 1;
+    return { key: t.id, label: label[shelf], title: t.title, line: t.summary, href: `#${shelf}`, added: t.added, look: SHELF_LOOK[shelf], n };
+  });
+  const all = [...shelves, ...skills].sort((a, b) => b.added.localeCompare(a.added));
+  const isNew = (i: NewItem) => wasNew(i.href.slice(1), i.added);
+  const fresh = all.filter(isNew);
+  return fresh.length ? { items: fresh.slice(0, 3), fresh: true } : { items: skills.sort((a, b) => b.added.localeCompare(a.added)).slice(0, 3), fresh: false };
+}
+
+/* ------------------------------------------------------------------ *
+ * OVERVIEW: the plan, what's new, then every section: the library's four
+ * as big tiles with their marks, the rest as small ones with their step.
+ * ------------------------------------------------------------------ */
+const LIBRARY = ["skills", "masterclass", "design", "training"] as const;
+
 function Overview({
   ids,
   member,
   perks,
   libraryCount,
+  news,
+  newCount,
 }: {
   ids: string;
   member: NonNullable<MemberInfo>;
   perks: Perks | null;
   libraryCount: number;
+  news: { items: NewItem[]; fresh: boolean };
+  newCount: Partial<Record<SectionId, number>>;
 }) {
   const tier = member.tier;
   const look = LOOK[tier];
@@ -352,11 +437,9 @@ function Overview({
       tier === "free"
         ? `${freeCount} free, one click each${libraryCount ? ` · ${libraryCount} bought` : ""}`
         : `${libraryCount} premium ready · ${freeCount} free`,
-    masterclass: count("masterclass") ? plural(count("masterclass"), "lesson", "lessons") : "The first lessons land here",
-    design: count("design") ? plural(count("design"), "template", "templates") : "The first templates land here",
-    training: count("training")
-      ? plural(count("training"), "video or file", "videos and files")
-      : "The first videos land here soon",
+    masterclass: count("masterclass") ? plural(count("masterclass"), "lesson", "lessons") : "Coming shortly · being filmed now",
+    design: count("design") ? plural(count("design"), "template", "templates") : "Coming shortly · on my desk now",
+    training: count("training") ? plural(count("training"), "video or file", "videos and files") : "Coming shortly",
     live: links.qa ? "Twice a month · Join from here" : "Twice a month · The link lands here",
     telegram: links.telegram ? "Message me directly" : soon,
     calls: links.calls ? "Book your call" : soon,
@@ -365,11 +448,11 @@ function Overview({
     requests: "Ask for skills, vote on what's next",
   };
 
-  const tiles = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing");
+  const rest = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing" && !(LIBRARY as readonly string[]).includes(s.id));
   const nextUp = SELF_SERVE.find((t) => higher(t, tier) === t && t !== tier);
 
   return (
-    <section aria-labelledby={`${ids}-over`} className="flex flex-col gap-8">
+    <section aria-labelledby={`${ids}-over`} className="flex flex-col gap-12">
       {/* the plan, small, in its own gradient */}
       <div className={`plan-card relative isolate flex flex-wrap items-end justify-between gap-6 overflow-clip rounded-[2rem] p-7 md:p-9 ${look.card}`} data-tier={tier}>
         <div>
@@ -390,8 +473,100 @@ function Overview({
         </div>
       </div>
 
+      {/* WHAT'S NEW, or the latest: the first thing worth opening. */}
+      <div>
+        <div className="flex items-end gap-3">
+          <LittleMan pose="wave" className="h-11 w-auto flex-none" />
+          <h3 className={h2}>
+            {news.fresh ? (
+              <>
+                New <em>for you</em>
+              </>
+            ) : (
+              <>
+                Latest <em>on the shelf</em>
+              </>
+            )}
+          </h3>
+        </div>
+        <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {news.items.map((item) => (
+            <li key={item.key}>
+              <a
+                href={item.href}
+                className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+              >
+                {item.mark ? (
+                  <MarkStage look={item.look} mark={item.mark} instance="new" className="aspect-[16/9]">
+                    {news.fresh ? <Sticker tone="clay">New</Sticker> : null}
+                  </MarkStage>
+                ) : (
+                  <span className="relative flex aspect-[16/9] items-end p-5" style={stageStyle(item.look, `${[12, 88, 50][(item.n ?? 1) % 3]}% 0%`)}>
+                    <span className="font-serif text-[4rem] leading-[0.8] tracking-[-0.05em]">{String(item.n ?? 1).padStart(2, "0")}</span>
+                    {news.fresh ? <Sticker tone="clay">New</Sticker> : null}
+                  </span>
+                )}
+                <span className="flex flex-1 flex-col p-5">
+                  <span className={`font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
+                    {item.label}
+                    {ago(item.added) ? ` · ${ago(item.added)}` : ""}
+                  </span>
+                  <span className="mt-2 font-serif text-[1.35rem] leading-[1.08] tracking-[-0.02em]">{item.title}</span>
+                  {item.line ? <span className={`mt-1.5 line-clamp-2 text-[0.92rem] leading-[1.45] ${soft}`}>{item.line}</span> : null}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* THE LIBRARY: four tiles with their marks. */}
+      <div>
+        <h3 className={h2}>
+          Your <em>library</em>
+        </h3>
+        <ul className="mt-6 grid gap-5 sm:grid-cols-2">
+          {LIBRARY.map((id) => {
+            const s = sectionById(id);
+            const lock = needs(s, tier);
+            const n = newCount[id] ?? 0;
+            return (
+              <li key={id}>
+                <a
+                  href={`#${id}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                >
+                  <MarkStage
+                    look={SHELF_LOOK[id]}
+                    mark={SHELF_LOOK[id].mark}
+                    instance="tile"
+                    className="aspect-[2/1]"
+                    markClassName={lock ? "opacity-35 grayscale" : ""}
+                  >
+                    {n && !lock ? <Sticker tone="clay">{n} new</Sticker> : null}
+                    {lock ? (
+                      <span className="absolute right-3 top-3">
+                        <PlanBadge tier={lock} />
+                      </span>
+                    ) : null}
+                  </MarkStage>
+                  <span className="flex items-center justify-between gap-4 p-5">
+                    <span className="min-w-0">
+                      <span className="block font-serif text-[1.45rem] leading-none tracking-[-0.02em]">{s.name}</span>
+                      <span className={`mt-1.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{lock ? s.about : status[id]}</span>
+                    </span>
+                    <ArrowRight aria-hidden className="h-5 w-5 flex-none opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* WITH ME, and Ultimate's: small tiles with their next step. */}
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {tiles.map((s) => {
+        {rest.map((s) => {
           const Icon = s.icon;
           const lock = needs(s, tier);
           return (
@@ -405,7 +580,9 @@ function Overview({
                 }`}
               >
                 <span className="flex items-center justify-between gap-3">
-                  <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
+                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${lock ? "bg-[rgba(11,31,58,0.05)]" : "bg-[var(--accent-clay-soft)] text-[var(--accent-clay-text)]"}`}>
+                    <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
+                  </span>
                   {lock ? <PlanBadge tier={lock} /> : <ArrowRight aria-hidden className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />}
                 </span>
                 <span className={`mt-4 text-[1.05rem] font-medium ${lock ? soft : ""}`}>{s.name}</span>

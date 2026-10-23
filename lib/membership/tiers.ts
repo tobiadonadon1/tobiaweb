@@ -37,7 +37,7 @@ export type Perk =
   | "premium-skills" // premium skills included
   | "exclusive-skills" // Ultimate-only skills
   | "training" // the training library (how much: `trainingReach`)
-  | "masterclass" // the shelf's Masterclass: short advanced lessons
+  | "masterclass" // the shelf's Masterclass: in-depth video lessons
   | "design" // the shelf's Design: website templates
   | "qa" // bi-monthly live group Q&A
   | "workshop" // bi-monthly live workshop
@@ -88,7 +88,7 @@ export const PLANS: Record<PaidTier, Plan> = {
       "All free skills and guides",
       "Every premium skill, included",
       "Unique skills at member pricing",
-      "Masterclass: short lessons on one advanced move",
+      "Masterclass: in-depth video lessons, 10 to 20 minutes, never on YouTube",
       "Design: website templates you ship as they are",
       "Selected training videos and resources",
       "Live group Q&A, twice a month",

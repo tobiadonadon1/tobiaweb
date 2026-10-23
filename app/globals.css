@@ -3295,3 +3295,22 @@ body:has(.vd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
 }
 /* The hero's colour: a ring and a soft halo around the before and after. */
 .vd-halo { background: linear-gradient(150deg, #1238ff 0%, #7aa2ff 30%, #ffc2a3 65%, #ff9fc0 100%); }
+
+/* ------------------------------------------------------------------ *
+ * THE LITTLE MAN WAVES (components/membership/dashboard-art.tsx): a
+ * couple of quick waves, then a rest, from the shoulder.
+ * ------------------------------------------------------------------ */
+.little-man-wave {
+  transform-box: view-box;
+  transform-origin: 15px 14px;
+  animation: little-man-wave 2.4s ease-in-out infinite;
+}
+@keyframes little-man-wave {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  65% { transform: rotate(-22deg); }
+  75% { transform: rotate(8deg); }
+  85% { transform: rotate(-18deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .little-man-wave { animation: none; }
+}

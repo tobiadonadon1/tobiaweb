@@ -194,7 +194,7 @@ export const SHELF: ShelfFamily[] = [
     tier: "locked",
     open: false,
     tag: "Pro & Ultimate",
-    line: "Ten minutes, one advanced move. None of it is on YouTube.",
+    line: "In-depth lessons, 10 to 20 minutes each. Never on YouTube.",
     status: "Not open yet.",
     spineRay: 7,
     dividerRay: 1,
