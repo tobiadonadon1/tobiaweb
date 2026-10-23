@@ -57,6 +57,8 @@ export async function GET(request: Request) {
     locked: boolean;
     /** When it went up, so the dashboard can say "new". */
     added: string;
+    /** Training sheets only: the row it sits in. */
+    group?: string;
   }[] = [];
   const reach = trainingReach(tier);
   if (reach.length && accountsConfigured()) {
@@ -88,6 +90,7 @@ export async function GET(request: Request) {
         title: s.title,
         summary: s.summary,
         kind: "sheet",
+        group: s.group,
         url: open ? `/api/membership/file?id=${s.id}` : null,
         tier: s.tier,
         shelf: "training",

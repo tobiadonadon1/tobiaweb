@@ -64,7 +64,7 @@ export type Perks = {
   perks: Perk[];
   links: Partial<Record<Perk, string | null>>;
   /** Training, Masterclass and Design rows. A `locked` row is above the plan: no url, shown as what the next plan adds. */
-  training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean; added: string }[];
+  training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean; added: string; group?: string }[];
   owned: string[];
 };
 
@@ -553,11 +553,11 @@ export function ShelfSection({
   const line =
     shelf === "training"
       ? tier === "pro"
-        ? "Selected training: one-page sheets to keep next to your screen, and videos."
-        : "The complete training library: every sheet, every video and every file."
+        ? "One-page sheets to keep next to your screen."
+        : "Every sheet, every video, every file."
       : shelf === "masterclass"
         ? "In-depth lessons, 10 to 20 minutes each, on what I'd teach a friend building their first product. Made for members, never on YouTube."
-        : "Interactive components to copy into your site: play with them, take the code, or hand one to Claude.";
+        : "Interactive components. Pick one, take its code.";
   return (
     <section aria-labelledby={`${ids}-${shelf}`}>
       <SectionHead id={`${ids}-${shelf}`} title={s.title} line={line} />
@@ -566,13 +566,24 @@ export function ShelfSection({
         shelf === "design" ? null : <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
       ) : (
         <>
-          {sheets.length ? (
-            <ul className="mt-7 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-              {sheets.map((t) => (
-                <SheetCard key={t.id} row={t} fresh={wasNew(t)} />
-              ))}
-            </ul>
-          ) : null}
+          {(
+            [
+              ["skills", "Your skills"],
+              ["claude", "Claude Code"],
+            ] as const
+          ).map(([group, name]) => {
+            const list = sheets.filter((t) => (t.group ?? "claude") === group);
+            return list.length ? (
+              <div key={group} className="mt-8">
+                <h3 className={`text-[0.8rem] uppercase tracking-[0.12em] ${soft}`}>{name}</h3>
+                <ul className="mt-3 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-5">
+                  {list.map((t) => (
+                    <SheetCard key={t.id} row={t} fresh={wasNew(t)} />
+                  ))}
+                </ul>
+              </div>
+            ) : null;
+          })}
           {rows.length ? (
             <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
               {rows.map((t, i) => (
@@ -604,7 +615,7 @@ function SheetCard({ row: t, fresh }: { row: Perks["training"][number]; fresh: b
   const id = t.id.replace(/^sheet-/, "");
   const body = (
     <>
-      <span className="relative block overflow-hidden rounded-[0.9rem] border border-[var(--hairline)] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.05),0_14px_30px_-18px_rgba(11,31,58,0.35)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:rotate-[-0.6deg]">
+      <span className="relative block overflow-hidden rounded-[0.6rem] border border-[var(--hairline)] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.05),0_10px_22px_-14px_rgba(11,31,58,0.35)] transition-transform duration-300 group-hover:-translate-y-1">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={t.locked ? `/training/${id}-locked.webp` : `/api/membership/file?id=${id}&picture=1`}
@@ -614,34 +625,29 @@ function SheetCard({ row: t, fresh }: { row: Perks["training"][number]; fresh: b
         />
         {t.locked ? (
           <span className="absolute inset-0 grid place-items-center">
-            <span className="flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1.5 shadow-sm">
-              <Lock aria-hidden className="h-3.5 w-3.5 opacity-60" />
+            <span className="flex items-center gap-1 rounded-full bg-white px-2 py-1 shadow-sm">
+              <Lock aria-hidden className="h-3 w-3 opacity-60" />
               <PlanBadge tier="ultimate" />
             </span>
           </span>
         ) : null}
       </span>
-      <span className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span className="text-[0.98rem] font-medium leading-[1.3]">{t.title}</span>
+      <span className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+        <span className="text-[0.88rem] font-medium leading-[1.3]">{t.title}</span>
         {fresh && !t.locked ? <NewChip /> : null}
-      </span>
-      {t.summary ? <span className={`mt-1 block text-[0.88rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
-      <span className={`mt-2 inline-flex items-center gap-1 text-[0.88rem] ${t.locked ? soft : "text-[var(--ink)]"}`}>
-        {t.locked ? "Opens with Ultimate" : "Open the PDF"}
-        {t.locked ? null : <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />}
       </span>
     </>
   );
   const cls =
-    "group block rounded-[1rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]";
+    "group block rounded-[0.7rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]";
   return (
     <li>
       {t.url ? (
-        <a href={t.url} target="_blank" rel="noopener noreferrer" className={cls}>
+        <a href={t.url} target="_blank" rel="noopener noreferrer" className={cls} aria-label={`${t.title} (PDF)`}>
           {body}
         </a>
       ) : (
-        <a href="#billing" className={cls}>
+        <a href="#billing" className={cls} aria-label={`${t.title}: opens with Ultimate`}>
           {body}
         </a>
       )}

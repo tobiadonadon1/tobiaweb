@@ -40,13 +40,13 @@ test("design: Pro and up open the library; Free gets only the blocks marked free
   assert.ok(free.length >= 1 && free.length < slugs.length / 2, "a few free blocks, not most of them");
 });
 
-test("design: every block has its preview, its sealed source, and is in the zip's folder", () => {
+test("design: every block has its preview and its sealed source, and there is no whole-library download", () => {
   assert.ok(slugs.length >= 20);
   for (const slug of slugs) {
     assert.ok(existsSync(path.join(root, "components/design-library/compiled", `${slug}.js`)), `${slug}: no compiled preview`);
     assert.ok(existsSync(path.join(root, "private/design", `${slug}.tsx.enc`)), `${slug}: no sealed source`);
   }
-  assert.ok(existsSync(path.join(root, "private/design/construct-design.zip.enc")));
+  assert.ok(!existsSync(path.join(root, "private/design/construct-design.zip.enc")), "members take one block at a time");
   // Nothing sealed that the site no longer lists.
   for (const f of readdirSync(path.join(root, "private/design")))
     if (f.endsWith(".tsx.enc")) assert.ok(slugs.includes(f.replace(".tsx.enc", "")), `${f}: sealed but not listed`);
@@ -70,7 +70,8 @@ test("design: the sealed sources open with the key", { skip: !rawKey && "no SHOP
 });
 
 test("training: every sheet is sealed, with a sealed picture and a blurred public one", () => {
-  assert.ok(SHEETS.length >= 7);
+  assert.ok(SHEETS.length >= 12);
+  assert.ok(SHEETS.filter((s) => s.group === "skills").length >= 5, "a sheet for each main skill");
   assert.equal(new Set(SHEETS.map((s) => s.id)).size, SHEETS.length, "sheet ids are unique");
   for (const s of SHEETS) {
     assert.ok(["pro", "ultimate"].includes(s.tier), `${s.id}: tier`);

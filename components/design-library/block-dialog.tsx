@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { ArrowRight, Box, Check, ChevronLeft, ChevronRight, Code2, Copy, Download, Link2, Lock, Sparkles, X } from "lucide-react";
 import { JOIN_HREF } from "@/components/account/links";
-import { PlanBadge } from "@/components/membership/plan-badge";
 import { accountHref, canCopy, downloadFile, type Access } from "./access";
 import type { Block, Control } from "./catalog.generated";
 import { highlight } from "./highlight";
@@ -51,16 +51,10 @@ export function BlockDialog({
   onClose: () => void;
   onStep: (dir: 1 | -1) => void;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    if (block && !d.open) d.showModal();
-    if (!block && d.open) d.close();
-  }, [block]);
-
-  // The page behind stays put while a block is open (a modal dialog doesn't stop the wheel on its own).
+  const panel = useRef<HTMLDivElement>(null);
   const isOpen = Boolean(block);
+
+  // The page behind stays put while a block is open.
   useEffect(() => {
     if (!isOpen) return;
     const html = document.documentElement;
@@ -71,22 +65,52 @@ export function BlockDialog({
     };
   }, [isOpen]);
 
-  return (
-    <dialog
-      ref={ref}
-      aria-label={block?.title}
-      onCancel={(e) => {
+  // Esc closes (unless the block used Esc itself), and Tab stays inside.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !e.defaultPrevented) {
         e.preventDefault();
         onClose();
-      }}
-      onClick={(e) => {
-        // A click on the backdrop (the dialog element itself) closes it.
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="m-auto h-[min(46rem,calc(100svh-2rem))] w-[min(76rem,calc(100vw-2rem))] max-h-none max-w-none overflow-visible overscroll-contain bg-transparent p-0 text-[var(--ink)] backdrop:bg-[rgba(250,248,242,0.72)] backdrop:backdrop-blur-[10px] max-md:h-[100svh] max-md:w-screen"
-    >
-      {block ? <Detail key={block.slug} block={block} access={access} onClose={onClose} onStep={onStep} /> : null}
-    </dialog>
+        return;
+      }
+      const box = panel.current;
+      if (e.key !== "Tab" || !box) return;
+      const stops = [...box.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])')].filter(
+        (el) => el.getClientRects().length > 0,
+      );
+      if (!stops.length) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      if (!box.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
+  if (!block || typeof document === "undefined") return null;
+  // At the root of the page (a portal), so no stacking context on the way
+  // can put the nav above it. Not a <dialog>: a modal one lives in the browser's top layer, above the
+  // site's own cursor (components/ui/custom-cursor.tsx, z-100), and the real
+  // cursor is hidden site-wide, so inside it you'd have no pointer at all.
+  // This sits at z-90: over the page and the nav, under the cursor.
+  return createPortal(
+    <div role="dialog" aria-modal="true" aria-label={block.title} className="fixed inset-0 z-[90] flex items-center justify-center text-[#141414]">
+      <div aria-hidden className="absolute inset-0 bg-[rgba(255,255,255,0.8)] backdrop-blur-[10px]" onClick={onClose} />
+      <div ref={panel} className="relative h-[min(46rem,calc(100svh-2rem))] w-[min(76rem,calc(100vw-2rem))] max-md:h-[100svh] max-md:w-screen">
+        <Detail key={block.slug} block={block} access={access} onClose={onClose} onStep={onStep} />
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -137,9 +161,9 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
       {/* The stage: the block, or its code. */}
       <section
         className="relative min-h-[17rem] overflow-hidden rounded-[28px] max-md:rounded-none"
-        style={{ background: tab === "preview" ? ground : "#fbfaf7", color: b.dark && tab === "preview" ? "#f4f1ea" : "var(--ink)" }}
+        style={{ background: tab === "preview" ? ground : "#fafafa", color: b.dark && tab === "preview" ? "#f4f4f2" : "#141414" }}
       >
-        <div className="absolute left-3 top-3 z-10 flex rounded-full bg-[rgba(11,31,58,0.07)] p-1 backdrop-blur" role="tablist" aria-label="Show">
+        <div className="absolute left-3 top-3 z-10 flex rounded-full bg-[rgba(20,20,20,0.07)] p-1 backdrop-blur" role="tablist" aria-label="Show">
           {(
             [
               ["preview", "Preview", Box],
@@ -155,8 +179,8 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
               onKeyDown={(e) => {
                 if (e.key === "ArrowLeft" || e.key === "ArrowRight") setTab(tab === "preview" ? "code" : "preview");
               }}
-              className={`flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[0.88rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)] ${
-                tab === id ? "bg-white text-[var(--ink)] shadow-[0_1px_2px_rgba(11,31,58,0.12)]" : b.dark && tab === "preview" ? "text-white/75" : "text-[color:rgba(11,31,58,0.65)]"
+              className={`flex h-9 items-center gap-1.5 rounded-full px-3.5 text-[0.88rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#141414] ${
+                tab === id ? "bg-white text-[#141414] shadow-[0_1px_2px_rgba(20,20,20,0.12)]" : b.dark && tab === "preview" ? "text-white/75" : "text-[color:rgba(20,20,20,0.65)]"
               }`}
             >
               <Icon aria-hidden className="h-4 w-4" />
@@ -169,7 +193,7 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className={`absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full md:hidden ${b.dark && tab === "preview" ? "bg-white/12 text-white" : "bg-white/85 text-[var(--ink)] shadow-[0_1px_2px_rgba(11,31,58,0.1)]"}`}
+          className={`absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full md:hidden ${b.dark && tab === "preview" ? "bg-white/12 text-white" : "bg-white/85 text-[#141414] shadow-[0_1px_2px_rgba(20,20,20,0.1)]"}`}
         >
           <X aria-hidden className="h-5 w-5" />
         </button>
@@ -187,11 +211,10 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
       {/* What it is, its knobs, and the ways to take it. The head and the
           buttons stay put while the middle scrolls, so on a phone the way
           out and the way in are always on screen. */}
-      <aside className="flex min-h-0 flex-col overflow-y-auto overscroll-contain rounded-[28px] border border-[var(--hairline)] bg-white max-md:max-h-[54svh] max-md:rounded-none max-md:border-x-0 max-md:border-b-0">
+      <aside className="flex min-h-0 flex-col overflow-y-auto overscroll-contain rounded-[28px] border border-[rgba(20,20,20,0.08)] bg-white max-md:max-h-[54svh] max-md:rounded-none max-md:border-x-0 max-md:border-b-0">
         <div className="sticky top-0 z-10 flex items-center justify-between bg-white px-6 pb-1 pt-4 max-md:px-5">
-          <span className="text-[0.85rem] text-[color:rgba(11,31,58,0.55)]">
-            {b.category}
-            {b.free ? " · Free" : ""}
+          <span className="text-[0.85rem] text-[color:rgba(20,20,20,0.5)]">
+            {b.category} · {b.lines} lines{b.free ? " · Free" : ""}
           </span>
           <div className="-mr-2 flex items-center gap-0.5">
             <IconButton label="Previous block" onClick={() => onStep(-1)}>
@@ -199,6 +222,9 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
             </IconButton>
             <IconButton label="Next block" onClick={() => onStep(1)}>
               <ChevronRight aria-hidden className="h-4 w-4" />
+            </IconButton>
+            <IconButton label="Copy a link to this block" onClick={() => void navigator.clipboard.writeText(window.location.href).catch(() => {})}>
+              <Link2 aria-hidden className="h-4 w-4" />
             </IconButton>
             <span className="max-md:hidden">
               <IconButton label="Close" onClick={onClose}>
@@ -209,8 +235,7 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
         </div>
         <div className="px-6 max-md:px-5">
           <h2 className="mt-1 text-[1.6rem] font-medium leading-[1.1] tracking-[-0.02em]">{b.title}</h2>
-          <p className="mt-3 text-pretty text-[0.98rem] leading-[1.55] text-[color:rgba(11,31,58,0.75)]">{b.description}</p>
-          <p className="mt-3 text-[0.85rem] text-[color:rgba(11,31,58,0.55)]">One file · {b.lines} lines · React only, nothing to install</p>
+          <p className="mt-3 text-pretty text-[0.98rem] leading-[1.55] text-[color:rgba(20,20,20,0.75)]">{b.description}</p>
 
           {b.controls.length ? (
             <div className="mt-6 grid gap-3">
@@ -228,7 +253,7 @@ function Detail({ block: b, access, onClose, onStep }: { block: Block; access: A
             </div>
           ) : null}
           {allowed && Object.keys(props).length ? (
-            <pre className="mt-4 overflow-x-auto rounded-xl bg-[#fbfaf7] px-3.5 py-3 font-mono text-[0.78rem] leading-[1.6]" aria-label="Use it with these settings">
+            <pre className="mt-4 overflow-x-auto rounded-xl bg-[#fafafa] px-3.5 py-3 font-mono text-[0.78rem] leading-[1.6]" aria-label="Use it with these settings">
               <code>{highlight(usage)}</code>
             </pre>
           ) : null}
@@ -253,7 +278,7 @@ function usageOf(b: Block, props: Record<string, unknown>) {
 function CodePane({ block: b, allowed, source, onLoad }: { block: Block; allowed: boolean; source: Source; onLoad: () => Promise<string | null> }) {
   if (allowed && source.state === "ok" && source.text) return <Code text={source.text} name={`${b.slug}.tsx`} />;
   if (allowed && (source.state === "idle" || source.state === "loading"))
-    return <p className="absolute inset-0 grid place-items-center text-[0.95rem] text-[color:rgba(11,31,58,0.55)]">Opening the code…</p>;
+    return <p className="absolute inset-0 grid place-items-center text-[0.95rem] text-[color:rgba(20,20,20,0.55)]">Opening the code…</p>;
 
   // Not open to this visitor (or it didn't load): the trick at its heart, and the
   // reason the rest is locked. The way in is the panel's button, said once.
@@ -270,18 +295,14 @@ function CodePane({ block: b, allowed, source, onLoad }: { block: Block; allowed
         <div className="max-w-[34rem]">
           <p className="flex items-center gap-2 text-[1.02rem] font-medium">
             <Lock aria-hidden className="h-4 w-4" />
-            {b.free ? "Free with an account" : "The full code comes with Pro and Ultimate"}
+            {b.free ? "Free with an account" : "The code comes with Pro"}
           </p>
-          <p className="mt-2 text-[0.95rem] leading-[1.55] text-[color:rgba(11,31,58,0.7)]">
-            {b.free
-              ? `All ${b.lines} lines, one file, React only. Any account can copy it.`
-              : `All ${b.lines} lines, one file, React only, with every other component in the library and new ones as they land.`}
-          </p>
+
         </div>
       )}
       {b.howItWorks ? (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[var(--hairline)] bg-white">
-          <p className="border-b border-[var(--hairline)] px-4 py-3 text-[0.88rem] font-medium">How it works</p>
+        <div className="mt-6 overflow-hidden rounded-2xl border border-[rgba(20,20,20,0.08)] bg-white">
+          <p className="border-b border-[rgba(20,20,20,0.08)] px-4 py-3 text-[0.88rem] font-medium">How it works</p>
           <pre className="overflow-x-auto p-4 font-mono text-[0.82rem] leading-[1.65]">
             <code>{highlight(b.howItWorks)}</code>
           </pre>
@@ -295,9 +316,9 @@ function Code({ text, name }: { text: string; name: string }) {
   const lines = text.replace(/\n$/, "").split("\n").length;
   return (
     <div className="absolute inset-0 overflow-auto overscroll-contain pt-14">
-      <p className="absolute right-4 top-4 font-mono text-[0.8rem] text-[color:rgba(11,31,58,0.5)] max-md:right-16">{name}</p>
+      <p className="absolute right-4 top-4 font-mono text-[0.8rem] text-[color:rgba(20,20,20,0.5)] max-md:right-16">{name}</p>
       <div className="flex min-w-max font-mono text-[0.82rem] leading-[1.7]">
-        <pre aria-hidden className="sticky left-0 select-none bg-[#fbfaf7] py-4 pl-5 pr-4 text-right text-[color:rgba(11,31,58,0.3)]">
+        <pre aria-hidden className="sticky left-0 select-none bg-[#fafafa] py-4 pl-5 pr-4 text-right text-[color:rgba(20,20,20,0.3)]">
           {Array.from({ length: lines }, (_, i) => i + 1).join("\n")}
         </pre>
         <pre className="py-4 pr-8">
@@ -315,10 +336,10 @@ function ControlRow({ control: c, value, onChange }: { control: Control; value: 
     const v = typeof value === "number" ? value : (c.default ?? Math.round((c.min + c.max) / 2 / c.step) * c.step);
     const pct = ((v - c.min) / (c.max - c.min)) * 100;
     return (
-      <label className="relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-[rgba(11,31,58,0.05)] px-3.5 text-[0.92rem] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--ink)]">
-        <span aria-hidden className="absolute inset-y-0 left-0 bg-[rgba(11,31,58,0.08)]" style={{ width: `${pct}%` }} />
+      <label className="relative flex h-11 items-center justify-between overflow-hidden rounded-xl bg-[rgba(20,20,20,0.05)] px-3.5 text-[0.92rem] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[#141414]">
+        <span aria-hidden className="absolute inset-y-0 left-0 bg-[rgba(20,20,20,0.08)]" style={{ width: `${pct}%` }} />
         <span className="relative">{c.label}</span>
-        <span className="relative tabular-nums text-[color:rgba(11,31,58,0.6)]">
+        <span className="relative tabular-nums text-[color:rgba(20,20,20,0.6)]">
           {v}
           {c.unit ? ` ${c.unit}` : ""}
         </span>
@@ -353,7 +374,7 @@ function ControlRow({ control: c, value, onChange }: { control: Control; value: 
         role="radiogroup"
         aria-label={c.label}
         onKeyDown={onKey}
-        className={c.type === "swatch" ? "flex gap-2" : "flex flex-wrap justify-end rounded-full bg-[rgba(11,31,58,0.05)] p-1"}
+        className={c.type === "swatch" ? "flex gap-2" : "flex flex-wrap justify-end rounded-full bg-[rgba(20,20,20,0.05)] p-1"}
       >
         {c.options.map(([label, v], i) => {
           const on = i === index;
@@ -367,7 +388,7 @@ function ControlRow({ control: c, value, onChange }: { control: Control; value: 
               aria-label={label}
               title={label}
               onClick={() => onChange(v)}
-              className={`h-8 w-8 rounded-full ring-offset-2 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)] ${on ? "ring-2 ring-[var(--ink)]" : "ring-1 ring-[rgba(11,31,58,0.12)]"}`}
+              className={`h-8 w-8 rounded-full ring-offset-2 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#141414] ${on ? "ring-2 ring-[#141414]" : "ring-1 ring-[rgba(20,20,20,0.12)]"}`}
               style={{ background: String(v) }}
             />
           ) : (
@@ -378,7 +399,7 @@ function ControlRow({ control: c, value, onChange }: { control: Control; value: 
               aria-checked={on}
               tabIndex={on ? 0 : -1}
               onClick={() => onChange(v)}
-              className={`h-8 rounded-full px-3 text-[0.85rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)] ${on ? "bg-white shadow-[0_1px_2px_rgba(11,31,58,0.12)]" : "text-[color:rgba(11,31,58,0.6)]"}`}
+              className={`h-8 rounded-full px-3 text-[0.85rem] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#141414] ${on ? "bg-white shadow-[0_1px_2px_rgba(20,20,20,0.12)]" : "text-[color:rgba(20,20,20,0.6)]"}`}
             >
               {label}
             </button>
@@ -392,9 +413,9 @@ function ControlRow({ control: c, value, onChange }: { control: Control; value: 
 /* ------------------------------------------------------- take it */
 
 const BIG =
-  "group flex h-12 w-full items-center justify-center gap-2 rounded-full text-[0.98rem] font-medium transition-[transform,background-color] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] disabled:opacity-60";
-const SOLID = `${BIG} bg-[var(--ink)] text-[var(--paper)] hover:bg-[#13305a]`;
-const SOFT = `${BIG} border border-[var(--hairline-strong)] bg-white hover:bg-[rgba(11,31,58,0.03)]`;
+  "group flex h-12 w-full items-center justify-center gap-2 rounded-full text-[0.98rem] font-medium transition-[transform,background-color] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#141414] disabled:opacity-60";
+const SOLID = `${BIG} bg-[#141414] text-[#fff] hover:bg-[#2c2c2c]`;
+const SOFT = `${BIG} border border-[rgba(20,20,20,0.16)] bg-white hover:bg-[rgba(20,20,20,0.03)]`;
 
 function Take({
   block: b,
@@ -413,7 +434,7 @@ function Take({
   usage: string;
   tuned: boolean;
 }) {
-  const [done, setDone] = useState<"" | "code" | "prompt" | "link" | "file">("");
+  const [done, setDone] = useState<"" | "code" | "prompt" | "file">("");
   const [fileFailed, setFileFailed] = useState(false);
   const flash = (what: typeof done) => {
     setDone(what);
@@ -425,18 +446,11 @@ function Take({
     await navigator.clipboard.writeText(what === "code" ? text : prompt(b, text, tuned ? usage : null)).catch(() => {});
     flash(what);
   };
-  const share = async () => {
-    await navigator.clipboard.writeText(window.location.href).catch(() => {});
-    flash("link");
-  };
 
   if (access === "loading") return <div className="h-[7.5rem]" aria-hidden />;
   if (!allowed)
     return (
-      <div className="grid gap-3">
-        <WayIn block={b} access={access} />
-        <ShareLink done={done === "link"} onClick={share} />
-      </div>
+      <WayIn block={b} access={access} />
     );
 
   const busy = source.state === "loading";
@@ -480,19 +494,8 @@ function Take({
         </p>
       ) : source.state === "failed" || fileFailed ? (
         <p className="text-[0.88rem] text-[var(--accent-clay-text)]">{"That didn't load. Try again in a moment."}</p>
-      ) : (
-        <ShareLink done={done === "link"} onClick={share} />
-      )}
+      ) : null}
     </div>
-  );
-}
-
-function ShareLink({ done, onClick }: { done: boolean; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} className="mt-1 flex items-center justify-center gap-1.5 text-[0.88rem] text-[color:rgba(11,31,58,0.6)] hover:text-[var(--ink)]">
-      {done ? <Check aria-hidden className="h-3.5 w-3.5" /> : <Link2 aria-hidden className="h-3.5 w-3.5" />}
-      {done ? "Link copied" : "Copy a link to this block"}
-    </button>
   );
 }
 
@@ -505,7 +508,7 @@ function WayIn({ block: b, access }: { block: Block; access: Access }) {
           Create a free account
           <ArrowRight aria-hidden className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
-        <Link href={accountHref("signin", b.slug)} className="text-center text-[0.88rem] text-[color:rgba(11,31,58,0.6)] underline underline-offset-4 hover:text-[var(--ink)]">
+        <Link href={accountHref("signin", b.slug)} className="text-center text-[0.88rem] text-[color:rgba(20,20,20,0.6)] underline underline-offset-4 hover:text-[#141414]">
           I have an account
         </Link>
       </div>
@@ -516,14 +519,11 @@ function WayIn({ block: b, access }: { block: Block; access: Access }) {
         Get the code with Pro
         <ArrowRight aria-hidden className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </Link>
-      <p className="flex flex-wrap items-center justify-center gap-1.5 text-center text-[0.85rem] text-[color:rgba(11,31,58,0.6)]">
-        <PlanBadge tier="pro" /> or <PlanBadge tier="ultimate" /> open every component.
-        {access === "guest" ? (
-          <Link href={accountHref("signin", b.slug)} className="underline underline-offset-4 hover:text-[var(--ink)]">
-            Sign in
-          </Link>
-        ) : null}
-      </p>
+      {access === "guest" ? (
+        <Link href={accountHref("signin", b.slug)} className="text-center text-[0.88rem] text-[color:rgba(20,20,20,0.55)] underline underline-offset-4 hover:text-[#141414]">
+          Sign in
+        </Link>
+      ) : null}
     </div>
   );
 }
@@ -535,7 +535,7 @@ function IconButton({ label, onClick, children }: { label: string; onClick: () =
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="grid h-9 w-9 place-items-center rounded-full text-[color:rgba(11,31,58,0.65)] transition-colors hover:bg-[rgba(11,31,58,0.06)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--ink)]"
+      className="grid h-9 w-9 place-items-center rounded-full text-[color:rgba(20,20,20,0.65)] transition-colors hover:bg-[rgba(20,20,20,0.06)] hover:text-[#141414] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#141414]"
     >
       {children}
     </button>

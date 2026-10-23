@@ -3,8 +3,12 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { Block } from "./catalog.generated";
 
-/** The card behind a block: its own ground, or the library's warm grey (a deep one for dark blocks). */
-export const groundOf = (b: Block) => b.ground ?? (b.dark ? "#15171c" : "#efebe3");
+/**
+ * The card behind a block. One neutral grey for every light block, so the
+ * library reads as one set and the blocks bring the colour; a dark block
+ * keeps the deep ground it was drawn for.
+ */
+export const groundOf = (b: Block) => (b.dark ? (b.ground ?? "#141414") : "#f1f1f0");
 
 /**
  * A BLOCK'S STAGE: the block is laid out in a box of the size it was

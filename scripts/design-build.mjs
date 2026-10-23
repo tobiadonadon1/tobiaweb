@@ -17,17 +17,16 @@
  *   components/design-library/compiled/<slug>.js   minified, for the live preview
  *   private/design/<slug>.tsx.enc                   the source, sealed (SHOP_FILE_KEY)
  *
- * and, for the whole library, private/design/construct-design.zip.enc (every
- * source and a README, the "Download all") and
- * components/design-library/catalog.generated.ts, which the page reads.
+ * and, for the whole library, components/design-library/catalog.generated.ts
+ * and manifest.generated.ts, which the page and the API read. There is no
+ * whole-library download: members take one block at a time.
  *
  * A source is only re-sealed when it changed (the catalog keeps its hash), so
  * a rebuild doesn't rewrite every sealed file. Set DESIGN_SRC to build from
  * another folder.
  */
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, copyFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import * as esbuild from "esbuild";
@@ -229,95 +228,11 @@ for (const f of readdirSync(COMPILED)) if (!blocks.some((b) => `${b.slug}.js` ==
 for (const f of readdirSync(SEALED))
   if (f.endsWith(".tsx.enc") && !blocks.some((b) => `${b.slug}.tsx.enc` === f)) rmSync(path.join(SEALED, f));
 
-// Newest and most loved first: the grid, the catalog and the zip all use this order.
+// Most loved first, then newest: the grid and the catalog use this order.
 const order = [...blocks].sort((a, b) => b.order - a.order || b.added.localeCompare(a.added) || a.title.localeCompare(b.title));
 
-// Download all: every source and a README, zipped (when anything changed).
-const zipPath = path.join(SEALED, "construct-design.zip.enc");
-if (changed || !existsSync(zipPath) || before.size !== blocks.length || process.argv.includes("--zip")) {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "construct-design-"));
-  const folder = path.join(dir, "construct-design");
-  mkdirSync(path.join(folder, "components"), { recursive: true });
-  for (const b of blocks) copyFileSync(path.join(SRC, `${b.slug}.tsx`), path.join(folder, "components", `${b.slug}.tsx`));
-  const list = order.map((b) => `- **${b.title}** (${b.category}), \`components/${b.slug}.tsx\`, exports \`${b.component}\`: ${b.description}`);
-  // The zip is also a Claude Code skill: unzipped into ~/.claude/skills/, Claude
-  // knows every component and reaches for the right one on its own.
-  writeFileSync(
-    path.join(folder, "SKILL.md"),
-    [
-      "---",
-      "name: construct-design",
-      `description: Tobia Donadon's Construct design library, ${blocks.length} interactive React components with real motion (${order
-        .slice(0, 8)
-        .map((b) => b.title.toLowerCase())
-        .join(", ")} and more). Use when building or polishing a React UI and a button, toggle, slider, input, list or loader should feel crafted, or when the user asks for one of these components by name.`,
-      "---",
-      "",
-      "# Construct · Design library",
-      "",
-      "Each component is one self-contained file in `components/`: React only, its CSS inside it,",
-      "strict TypeScript, keyboard and reduced motion handled. The comment at the top of each file",
-      "lists its props and defaults.",
-      "",
-      "## How to use one",
-      "",
-      "1. Pick the component that fits from the list below. If none fits, say so; don't force one.",
-      "2. Copy its file into the project's UI folder (e.g. `components/ui/`). Keep it one file.",
-      "3. Read its header comment for the props. Set the colour props to the project's theme colours.",
-      "   The components use `font-family: inherit`, so they take the project's font.",
-      "4. Keep the motion and timing as they are: that's the point of the component.",
-      "5. Remove the demo auto-reset where the header comment says it's there for the demo.",
-      "6. Check it builds, typechecks, works with the keyboard and respects reduced motion.",
-      "",
-      "## The components",
-      "",
-      ...list,
-      "",
-    ].join("\n"),
-  );
-  writeFileSync(
-    path.join(folder, "README.md"),
-    [
-      "# Construct · Design library",
-      "",
-      `${blocks.length} interactive React components by Tobia Donadon, for members of Construct (Pro and Ultimate).`,
-      "",
-      "Each file in components/ is one component: React only, no other dependencies, its CSS inside it.",
-      "Copy a file into your project and import it:",
-      "",
-      "```tsx",
-      'import HoldToConfirm from "@/components/ui/hold-to-confirm";',
-      "",
-      '<HoldToConfirm label="Delete project" onConfirm={() => remove()} />',
-      "```",
-      "",
-      "Every file starts with a comment that lists its props. Works with React 18 and 19,",
-      'Next.js (the files start with "use client"), Vite and Remix.',
-      "",
-      "## Use it as a Claude Code skill",
-      "",
-      "Unzip this folder into ~/.claude/skills/ (so you have ~/.claude/skills/construct-design/SKILL.md).",
-      'Claude then knows every component here. Ask for one by name ("add the hold to confirm button")',
-      "or describe what you need, or type /construct-design.",
-      "",
-      "## What's inside",
-      "",
-      ...list,
-      "",
-      "Use them in your own projects and your clients' projects. Please don't resell or",
-      "republish the library itself.",
-      "",
-      "Newest version: https://www.tobiadonadon.com/projects/construct/design",
-      "",
-    ].join("\n"),
-  );
-  const zipFile = path.join(dir, "construct-design.zip");
-  execFileSync("zip", ["-qrX", zipFile, "construct-design"], { cwd: dir });
-  const plain = readFileSync(zipFile);
-  writeFileSync(zipPath, seal(plain, key));
-  rmSync(dir, { recursive: true, force: true });
-  console.log(`Sealed the full library zip (${plain.length.toLocaleString()} bytes).`);
-}
+// One block at a time: there is no whole-library download any more.
+rmSync(path.join(SEALED, "construct-design.zip.enc"), { force: true });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const entry = ({ compiled, source, ...b }) => b;

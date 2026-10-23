@@ -25,7 +25,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
  */
 export default function DesignPage() {
   return (
-    <main className="paper-bg relative min-h-screen overflow-x-clip text-[var(--ink)]">
+    <main className="relative min-h-screen overflow-x-clip bg-white text-[#141414]">
       <BackLink href="/projects/construct" label="Construct" />
       <div className="mx-auto w-full max-w-[88rem] px-5 pb-28 pt-28 md:px-8 md:pt-32">
         <DesignLibrary />

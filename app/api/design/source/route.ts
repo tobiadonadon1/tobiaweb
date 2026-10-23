@@ -7,7 +7,9 @@ import { hasPerk } from "@/lib/membership/tiers";
 /**
  * GET /api/design/source?slug=<block>              { ok, source, filename }
  * GET /api/design/source?slug=<block>&download=1   the .tsx file
- * GET /api/design/source?all=1                     every block, zipped
+ *
+ * One block at a time, on purpose: members hand-pick what they take; there
+ * is no "everything at once".
  *
  * The readable code of the Design library. Anyone can play with a block on
  * the page (the preview is compiled and minified); its source is handed out
@@ -15,7 +17,6 @@ import { hasPerk } from "@/lib/membership/tiers";
  *
  *   a block marked free     any signed-in account, Free included
  *   every other block       Pro and up (the `design` perk)
- *   the whole library zip   Pro and up
  *
  * Refusals are JSON the page reads to say the right thing: "sign-in" (no
  * account yet) or "plan" (an account whose plan doesn't open it).
@@ -26,7 +27,6 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const slug = params.get("slug") ?? "";
-  const all = params.get("all") === "1";
   const block = Object.hasOwn(DESIGN_MANIFEST, slug) ? DESIGN_MANIFEST[slug] : null;
 
   const { member, cookies } = await currentMember(request);
@@ -37,19 +37,13 @@ export async function GET(request: Request) {
     return new Response(JSON.stringify({ ok: false, error }), { status, headers });
   };
 
-  if (!all && !block) return refuse(404, "not-found");
+  if (!block) return refuse(404, "not-found");
   if (!member) return refuse(401, "sign-in");
   const { tier } = await membershipOf(member);
-  const open = hasPerk(tier, "design") || (!all && block?.free);
+  const open = hasPerk(tier, "design") || block.free;
   if (!open) return refuse(403, "plan");
 
   try {
-    if (all) {
-      const zip = await designFile("construct-design.zip");
-      headers.set("content-type", "application/zip");
-      headers.set("content-disposition", 'attachment; filename="construct-design.zip"');
-      return new Response(new Uint8Array(zip), { headers });
-    }
     const source = (await designFile(`${slug}.tsx`)).toString("utf8");
     const filename = `${slug}.tsx`;
     if (params.get("download") === "1") {
