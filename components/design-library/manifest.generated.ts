@@ -5,9 +5,34 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "Five app ideas to sort. Drag the top card and it tilts with your hand while a Keep or Skip stamp fades in; throw or flick it off, or let go and it springs back. The card behind rises to meet you. Out of cards? Shuffle again.",
     "free": false
   },
+  "magnify-dock": {
+    "title": "Dock",
+    "description": "A desktop dock that swells under your pointer. Click an app and it bounces open.",
+    "free": false
+  },
+  "rolling-counter": {
+    "title": "Rolling counter",
+    "description": "An odometer number. Drag, scroll or flick it and each digit rolls on its own reel.",
+    "free": false
+  },
+  "pay-button": {
+    "title": "Pay button",
+    "description": "A checkout button. Press it: a ring spins, closes into a check, and the button floods green.",
+    "free": false
+  },
   "member-card": {
     "title": "Member card",
     "description": "A membership card that turns toward your pointer like a real card in the light: it tilts in 3D, a glare slides across it, and the cut-paper shapes float at their own depths, shifting against the words as it moves.",
+    "free": false
+  },
+  "particle-word": {
+    "title": "Particles",
+    "description": "A word made of particles. Run through it and they part; click and it explodes and rebuilds.",
+    "free": false
+  },
+  "stacked-bars": {
+    "title": "Stacked bars",
+    "description": "A week of traffic. Point at a day for its split, at a source to isolate it.",
     "free": false
   },
   "range-dial": {
@@ -15,9 +40,19 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "A thermostat knob. Turn it by dragging around it, scrolling, or with the arrow keys; the tick ring lights up to the value and the digits roll. Flick it and it keeps turning, then settles on a half degree. At the ends it gives, then pushes back.",
     "free": false
   },
+  "phone-island": {
+    "title": "Island",
+    "description": "The pill at the top of a phone. Press it to open the live activity.",
+    "free": false
+  },
   "envelope": {
     "title": "Envelope",
     "description": "A paper envelope that opens when you point at it: the flap folds back in 3D, showing its lining, and the letter rises out with a small overshoot and a signature that draws itself. Tap on a phone; Tab to it on a keyboard.",
+    "free": false
+  },
+  "dot-globe": {
+    "title": "Dot globe",
+    "description": "The world in dots. Grab it, spin it, let it coast.",
     "free": false
   },
   "before-after": {
@@ -25,14 +60,54 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "A pencil sketch and the finished cut-paper piece under one divider. Drag the handle, click anywhere to glide there, or flick it and it coasts. The Before and After tags step aside as the divider reaches them.",
     "free": false
   },
+  "card-fan": {
+    "title": "Card fan",
+    "description": "A stack of bank cards. Press to fan them out, press one to bring it to the front.",
+    "free": false
+  },
+  "command-menu": {
+    "title": "Command menu",
+    "description": "A ⌘K palette. Type to filter, arrows to move, Enter to run.",
+    "free": false
+  },
   "hold-to-confirm": {
     "title": "Hold to confirm",
     "description": "A button for things you can't undo. Hold it and colour pours in from the left; let go early and it drains back out twice as fast. When it fills, it turns into a check.",
     "free": true
   },
+  "eye-follow": {
+    "title": "Eyes",
+    "description": "A little character whose eyes follow your pointer. Press it and it squints.",
+    "free": false
+  },
+  "profile-card": {
+    "title": "Profile card",
+    "description": "Point at a handle and the profile springs out. Follow ticks the count up.",
+    "free": false
+  },
+  "goo-blobs": {
+    "title": "Metaballs",
+    "description": "Liquid blobs that merge. One follows your pointer and melts into the rest.",
+    "free": false
+  },
   "paper-loader": {
     "title": "Paper loader",
     "description": "Four pieces of hand-cut paper shuffled like a deck: the top one lifts, tumbles off, gets re-cut into a new shape mid-air and tucks under the pile while the rest step up. Pure CSS, endless.",
+    "free": false
+  },
+  "receipt": {
+    "title": "Receipt",
+    "description": "A receipt printing line by line. Press Print and the old one tears off.",
+    "free": false
+  },
+  "split-panes": {
+    "title": "Split view",
+    "description": "An editor with three panes. Drag the dividers; pull the sidebar small and it snaps shut.",
+    "free": false
+  },
+  "price-switch": {
+    "title": "Price switch",
+    "description": "Monthly or yearly: every digit of the price rolls to the new one.",
     "free": false
   },
   "prompt-input": {
@@ -40,9 +115,24 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "An AI chat box. Example prompts roll through the placeholder, the field grows smoothly as you type and the send button fills in. Press Enter and your words lift away while a stop button spins.",
     "free": false
   },
+  "file-folder": {
+    "title": "Folder",
+    "description": "A desktop folder. Point at it and the files rise and fan out.",
+    "free": false
+  },
+  "assignee-picker": {
+    "title": "Assignees",
+    "description": "Assign a task. Picked avatars fly from the list into the stack.",
+    "free": false
+  },
   "like-burst": {
     "title": "Like burst",
     "description": "A like button with a count. Like it and the heart squashes, pops and fills, cut-paper scraps fly out, and the count rolls up like an odometer. Unlike it and it all goes back quietly.",
+    "free": false
+  },
+  "picker-wheel": {
+    "title": "Picker wheel",
+    "description": "An alarm time picker: three 3D drums you flick and they settle.",
     "free": false
   },
   "swipe-to-pay": {
@@ -50,10 +140,20 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "Drag the knob to pay. The track fills behind it and the label fades; let go early and it springs back with your speed, or flick it home. At the end it spins for a beat, draws a check and turns green.",
     "free": false
   },
+  "app-sidebar": {
+    "title": "Sidebar",
+    "description": "An app sidebar that folds into a rail of icons.",
+    "free": false
+  },
   "segmented-control": {
     "title": "Segmented control",
     "description": "Day, Week, Month, Year. The pill springs to your pick, front edge first, and the label under it turns bold exactly where the pill covers it, without the layout moving a pixel. Arrow keys work.",
     "free": true
+  },
+  "sparkline-scrub": {
+    "title": "Price chart",
+    "description": "A price chart. Move along it and the price and date follow your pointer.",
+    "free": false
   },
   "stretch-switch": {
     "title": "Stretch switch",
