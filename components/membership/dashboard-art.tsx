@@ -57,6 +57,8 @@ export const SHELF_LOOK = {
   masterclass: { mark: "family-masterclass", a: "#b7c6ff", b: "#edf0ff" },
   design: { mark: "family-design", a: "#ffbca6", b: "#fff0ea" },
   training: { mark: "videos", a: "#b6e0c8", b: "#edf7f1" },
+  live: { mark: "family-masterclass", a: "#ffc2b4", b: "#fff1ec" },
+  network: { mark: "way-side-by-side", a: "#c9d3ff", b: "#eff2ff" },
 } as const;
 
 /** `at` moves the glow, so a row of cards on one colour doesn't repeat itself. */
@@ -139,6 +141,7 @@ const COMING = {
   masterclass: "The first lessons are being filmed now, and they land here before anywhere else.",
   design: "The first templates are on my desk now, and they land here before anywhere else.",
   training: "The first videos and files are being made now, and they land here first.",
+  network: "The network is being put together now, and members get in before anyone else.",
 } as const;
 
 export function ComingSoon({ shelf }: { shelf: keyof typeof COMING }) {
@@ -158,6 +161,60 @@ export function ComingSoon({ shelf }: { shelf: keyof typeof COMING }) {
         <span className="block -rotate-2 font-hand text-[1.7rem] leading-none text-[var(--accent-clay)]">Tobi</span>
         <span className="mt-4 block max-w-[30rem] text-[0.98rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)]">{COMING[shelf]}</span>
       </figcaption>
+    </figure>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * THE NEXT LIVE Q&A: the Coming Soon card, with a counter instead of the
+ * quote. Sessions are every other Friday from QA_FIRST, so the date rolls
+ * on by itself; the YouTube link (MEMBERS_QA_URL) appears when it's set.
+ * ------------------------------------------------------------------ */
+const QA_FIRST = "2026-11-06";
+const DAY = 24 * 3600 * 1000;
+
+/** The next session on or after today, and how many days away it is. */
+export function nextQa(now = new Date()) {
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const first = Date.parse(QA_FIRST);
+  const steps = Math.max(0, Math.ceil((today - first) / (14 * DAY)));
+  const at = new Date(first + steps * 14 * DAY);
+  return { at, days: Math.round((at.getTime() - today) / DAY) };
+}
+
+export const qaDate = (at: Date, month: "long" | "short" = "long") =>
+  at.toLocaleDateString("en-GB", { weekday: month === "long" ? "long" : "short", day: "numeric", month, timeZone: "UTC" });
+
+export function QaCountdown({ url }: { url?: string | null }) {
+  const [next, setNext] = useState<ReturnType<typeof nextQa> | null>(null);
+  // Today is the viewer's today, so it's read in the browser.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setNext(nextQa()), []);
+  const look = SHELF_LOOK.live;
+  const days = next?.days ?? 14;
+  const counter = days === 0 ? "Today" : days === 1 ? "Tomorrow" : days % 7 === 0 ? `${days / 7} ${days === 7 ? "week" : "weeks"}` : `${days} days`;
+  return (
+    <figure className="relative isolate mt-7 overflow-hidden rounded-[2rem] p-7 md:p-11" style={stageStyle(look)}>
+      <LittleMan pose="cheer" className="h-14 w-auto" />
+      <p className="mt-6 text-[0.85rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.6)]">The next one</p>
+      <p className="mt-2 font-serif text-[clamp(2.6rem,7vw,4.5rem)] leading-[0.95] tracking-[-0.04em]">
+        {days > 1 ? <span className="text-[0.55em] tracking-[-0.03em]">in </span> : null}
+        <em>{counter}</em>
+      </p>
+      <p className="mt-3 font-serif text-[clamp(1.3rem,2.6vw,1.7rem)] leading-[1.15] tracking-[-0.02em]">{next ? qaDate(next.at) : "\u00a0"}</p>
+      <figcaption className="mt-6 max-w-[30rem] text-[0.98rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)]">
+        Live on YouTube, with me and the other members. {url ? "Every session uses this link." : "The link appears here closer to the date."}
+      </figcaption>
+      {url ? (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+        >
+          Join on YouTube
+        </a>
+      ) : null}
     </figure>
   );
 }

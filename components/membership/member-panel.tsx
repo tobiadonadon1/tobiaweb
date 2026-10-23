@@ -6,17 +6,17 @@ import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
 import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { PRODUCTS } from "@/lib/shop/products";
-import { ago, LittleMan, SHELF_LOOK, SKILL_LOOK, Thumb, useSeen, type Look } from "./dashboard-art";
+import { ago, LittleMan, nextQa, qaDate, SHELF_LOOK, SKILL_LOOK, Thumb, useSeen, type Look } from "./dashboard-art";
 import { JoinButton } from "./join-plans";
 import { FREE_PLAN, LOOK, PLAN_BUTTON, TIERS, UniversalMail } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
-import { RequestsBoard } from "./requests-board";
 import {
   CallsSection,
   CustomSection,
   GROUPS,
   h2,
   isSectionId,
+  MOVED,
   LiveSection,
   Locked,
   LockMark,
@@ -43,8 +43,8 @@ import {
  *   Overview         the plan, what's new since the last visit (small), then
  *                    a tile for every section with its next step
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
- *   With me          Live Q&A, Telegram
- *   Ultimate         1-on-1 call, Custom skills, Network, Requests
+ *   With me          Live Q&A, Direct messaging (Telegram)
+ *   Ultimate         1-on-1 call (Calendly), Custom skills & ideas (with the requests board), Network
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
  *                    and every other plan, up or down, each one click away
  *
@@ -96,7 +96,8 @@ export function MemberPanel({
     setBillingError(failed);
     const fromHash = () => {
       const h = window.location.hash.slice(1);
-      setActive(isSectionId(h) ? h : failed && !h ? "billing" : "overview");
+      const id = MOVED[h] ?? h;
+      setActive(isSectionId(id) ? id : failed && !h ? "billing" : "overview");
     };
     fromHash();
     window.addEventListener("hashchange", fromHash);
@@ -286,8 +287,6 @@ export function MemberPanel({
             <CustomSection />
           ) : active === "network" ? (
             <NetworkSection ids={ids} perks={perks} />
-          ) : active === "requests" ? (
-            <RequestsBoard />
           ) : (
             <Billing ids={ids} member={member} billingError={billingError} />
           )}
@@ -438,12 +437,11 @@ function Overview({
     masterclass: count("masterclass") ? plural(count("masterclass"), "lesson", "lessons") : "Coming shortly · being filmed now",
     design: count("design") ? plural(count("design"), "template", "templates") : "Coming shortly · on my desk now",
     training: count("training") ? plural(count("training"), "video or file", "videos and files") : "Coming shortly",
-    live: links.qa ? "Twice a month · Join from here" : "Twice a month · The link lands here",
+    live: `Next: ${qaDate(nextQa().at, "short")} · on YouTube`,
     telegram: links.telegram ? "Message me directly" : soon,
-    calls: links.calls ? "Book your call" : soon,
-    custom: "Ask for a quote",
-    network: links.network ? "Open the network" : soon,
-    requests: "Ask for skills, vote on what's next",
+    calls: links.calls ? "Book on Calendly" : soon,
+    custom: "Ask for a skill, vote on what's next",
+    network: links.network ? "Open the network" : "Coming soon",
   };
 
   const tiles = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing");

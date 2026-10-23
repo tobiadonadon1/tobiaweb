@@ -13,7 +13,6 @@ import {
   GraduationCap,
   LayoutGrid,
   LayoutTemplate,
-  ListChecks,
   LoaderCircle,
   Lock,
   Package,
@@ -28,7 +27,8 @@ import { hasPerk, money, offer, planName, PLANS, type PaidTier, type Perk, type 
 import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { LOOK } from "./plan-cards";
-import { ago, ComingSoon, NewChip, SHELF_LOOK, SKILL_LOOK, Thumb } from "./dashboard-art";
+import { ago, ComingSoon, NewChip, QaCountdown, SHELF_LOOK, SKILL_LOOK, Thumb } from "./dashboard-art";
+import { RequestsBoard } from "./requests-board";
 import { PlanBadge } from "./plan-badge";
 
 /**
@@ -56,7 +56,6 @@ export type SectionId =
   | "calls"
   | "custom"
   | "network"
-  | "requests"
   | "billing";
 
 export type Perks = {
@@ -87,11 +86,10 @@ export const SECTIONS: Section[] = [
   { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Interactive components you copy into your site.", match: /^Design/ },
   { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
-  { id: "telegram", name: "Telegram", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
+  { id: "telegram", name: "Direct messaging", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
   { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me.", match: /1-on-1/ },
-  { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, billed separately.", match: /custom skills/i },
+  { id: "custom", name: "Custom skills & ideas", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, and a say in what I build next.", match: /custom skills/i },
   { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship.", match: /network/i },
-  { id: "requests", name: "Requests", icon: ListChecks, perk: "requests", about: "Request new skills and vote on the roadmap.", match: /roadmap/i },
   { id: "billing", name: "Plan & billing", icon: CreditCard, about: "Your plan, your card and your invoices." },
 ];
 
@@ -100,12 +98,14 @@ export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
   { label: null, ids: ["overview"] },
   { label: "Library", ids: ["skills", "masterclass", "design", "training"] },
   { label: "With me", ids: ["live", "telegram"] },
-  { label: "Ultimate", ids: ["calls", "custom", "network", "requests"] },
+  { label: "Ultimate", ids: ["calls", "custom", "network"] },
   { label: "Account", ids: ["billing"] },
 ];
 
 export const sectionById = (id: SectionId) => SECTIONS.find((s) => s.id === id)!;
 export const isSectionId = (v: string): v is SectionId => SECTIONS.some((s) => s.id === v);
+/** Old links: the requests board now lives under Custom skills. */
+export const MOVED: Record<string, SectionId> = { requests: "custom" };
 
 /** The plan that opens a section: null when this tier already has it. */
 export function needs(section: Section, tier: Tier): PaidTier | null {
@@ -220,13 +220,10 @@ function LinkCard({
 }
 
 export function LiveSection({ ids, perks }: { ids: string; perks: Perks | null }) {
-  const s = sectionById("live");
   return (
     <section aria-labelledby={`${ids}-live`}>
       <SectionHead id={`${ids}-live`} title="Live group Q&A" line="Twice a month, live with me and the other members. Bring what you're working on and what you're stuck on." />
-      <LinkCard icon={s.icon} url={perks?.links.qa} label="Join the Q&A" pending="The link to the sessions lands here before the first one.">
-        {perks?.links.qa ? <p className="text-[1.05rem] font-medium">Every session uses this link.</p> : null}
-      </LinkCard>
+      <QaCountdown url={perks?.links.qa} />
       {perks?.links.workshop ? (
         <LinkCard icon={PlayCircle} url={perks.links.workshop} label="Join the workshop" pending="">
           <p className="text-[1.05rem] font-medium">The live workshop</p>
@@ -251,8 +248,8 @@ export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null 
   return (
     <section aria-labelledby={`${ids}-calls`}>
       <SectionHead id={`${ids}-calls`} title="Your 1-on-1 call" line="A private call with me, about your product. Pick a time that works for you." />
-      <LinkCard icon={CalendarClock} url={perks?.links.calls} label="Book your call" pending="Booking opens here soon.">
-        {perks?.links.calls ? <p className="text-[1.05rem] font-medium">Opens my calendar.</p> : null}
+      <LinkCard icon={CalendarClock} url={perks?.links.calls} label="Book on Calendly" pending="My Calendly lands here soon.">
+        {perks?.links.calls ? <p className="text-[1.05rem] font-medium">Opens my Calendly: pick any open slot.</p> : null}
       </LinkCard>
     </section>
   );
@@ -262,9 +259,13 @@ export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | nul
   return (
     <section aria-labelledby={`${ids}-network`}>
       <SectionHead id={`${ids}-network`} title="The network" line="A private network of builders who ship. Show what you're making, find the people to make it with." />
-      <LinkCard icon={Users} url={perks?.links.network} label="Open the network" pending="The network opens here soon.">
-        {perks?.links.network ? <p className="text-[1.05rem] font-medium">Members only.</p> : null}
-      </LinkCard>
+      {perks?.links.network ? (
+        <LinkCard icon={Users} url={perks.links.network} label="Open the network" pending="">
+          <p className="text-[1.05rem] font-medium">Members only.</p>
+        </LinkCard>
+      ) : (
+        <ComingSoon shelf="network" />
+      )}
     </section>
   );
 }
@@ -701,7 +702,9 @@ function ShelfRow({ row: t, n, shelf, fresh }: { row: Perks["training"][number];
 }
 
 /* ------------------------------------------------------------------ *
- * CUSTOM SKILLS: a note to Tobia (/api/membership/inquire), for a quote.
+ * CUSTOM SKILLS & IDEAS: a note to Tobia (/api/membership/inquire) for a
+ * skill built for them, and under it the requests board, where members ask
+ * for things they'd like to see and vote on each other's.
  * ------------------------------------------------------------------ */
 export function CustomSection() {
   const ids = useId();
@@ -739,8 +742,8 @@ export function CustomSection() {
     <section aria-labelledby={`${ids}-h`}>
       <SectionHead
         id={`${ids}-h`}
-        title="Custom skills"
-        line="A skill built to your spec, for you and your work. Billed separately: tell me what you need and I'll reply with a quote."
+        title="Custom skills, or things you'd like to see"
+        line="A skill built to your spec, for you and your work: tell me what you need and I'll reply with a quote. Or ask for something for everyone, below."
       />
       {state === "sent" ? (
         <p role="status" className={`${card} mt-7 p-6 text-[1.02rem]`}>
@@ -755,12 +758,6 @@ export function CustomSection() {
             </label>
             <textarea id={`${ids}-body`} name="body" required rows={5} maxLength={4000} className={`${field} resize-y`} />
           </div>
-          <div>
-            <label htmlFor={`${ids}-budget`} className={`mb-1.5 block text-[0.92rem] ${soft}`}>
-              Budget (optional)
-            </label>
-            <input id={`${ids}-budget`} name="budget" maxLength={120} className={field} />
-          </div>
           <p role="alert" className="min-h-[1.3em] text-[0.95rem] text-[var(--accent-clay-text)]">
             {error}
           </p>
@@ -770,6 +767,9 @@ export function CustomSection() {
           </button>
         </form>
       )}
+      <div className="mt-14">
+        <RequestsBoard />
+      </div>
     </section>
   );
 }
