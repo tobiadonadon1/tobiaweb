@@ -14,9 +14,11 @@ import type { ProductId } from "@/lib/shop/products";
  * look:
  *
  *   THE MARKS. Every skill has a cut-paper drawing (material/specimens.tsx),
- *   the one it wears on the shelf. In the dashboard it sits on a STAGE: two
- *   soft colours picked against the mark (a blue mark on peach, a saffron
- *   one on blue), the way Atoms gives every habit its own colour.
+ *   the one it wears on the shelf. In the dashboard it is a small picture at
+ *   the start of the skill's row (`Thumb`), on two soft colours picked
+ *   against the mark (a blue mark on peach, a saffron one on blue). Big
+ *   picture cards were tried and were too strong: "it's okay how they were,
+ *   I just would have changed the emoji."
  *
  *   THE LITTLE MAN. The logo's figure, who walks the cards on the home page
  *   (sections/why-me-mascot.tsx), drawn here standing still. He waves from
@@ -62,43 +64,44 @@ export const stageStyle = ({ a, b }: Look, at = "12% 0%"): React.CSSProperties =
   background: `radial-gradient(85% 110% at ${at}, ${a} 0%, transparent 72%), linear-gradient(165deg, ${b} 0%, #fbf8f2 100%)`,
 });
 
-/** A coloured stage with a mark on it. `instance` keeps grain filters apart when a mark is drawn twice. */
-export function MarkStage({
+/**
+ * A SMALL PICTURE at the start of a row: the skill's mark on its colour, or
+ * a lesson's number on its shelf's. Small on purpose ("nothing as strong"):
+ * it tells the rows apart, the list stays a list.
+ */
+export function Thumb({
   look,
   mark,
+  n,
   instance,
-  className = "",
-  markClassName = "",
-  children,
+  className = "h-14 w-14",
 }: {
   look: Look;
-  mark: string;
+  mark?: string;
+  n?: number;
   instance: string;
   className?: string;
-  markClassName?: string;
-  children?: React.ReactNode;
 }) {
   return (
-    <div className={`relative overflow-hidden ${className}`} style={stageStyle(look)}>
-      <Specimen
-        id={mark}
-        instance={instance}
-        className={`absolute left-1/2 top-1/2 h-[78%] w-auto max-w-[82%] -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 ease-out group-hover:-translate-y-[54%] group-hover:-rotate-[1.5deg] ${markClassName}`}
-      />
-      {children}
-    </div>
+    <span
+      aria-hidden
+      className={`relative grid flex-none place-items-center overflow-hidden rounded-xl ring-1 ring-inset ring-[rgba(11,31,58,0.06)] ${className}`}
+      style={stageStyle(look)}
+    >
+      {mark ? (
+        <Specimen id={mark} instance={instance} className="h-[88%] w-[88%]" />
+      ) : (
+        <span className="font-serif text-[1.25rem] leading-none tracking-[-0.03em]">{String(n ?? 1).padStart(2, "0")}</span>
+      )}
+    </span>
   );
 }
 
-/** A sticker on a stage's corner: "New", "Yours". Cut slightly crooked, like the marks. */
-export function Sticker({ tone, children }: { tone: "clay" | "ink"; children: React.ReactNode }) {
+/** "New", beside a row's kicker. */
+export function NewChip() {
   return (
-    <span
-      className={`absolute left-3 top-3 -rotate-[5deg] rounded-full px-2.5 py-1 font-mono text-[0.66rem] uppercase leading-none tracking-[0.14em] shadow-[0_2px_0_rgba(11,31,58,0.12)] ${
-        tone === "clay" ? "bg-[var(--accent-clay)] text-white" : "bg-[var(--ink)] text-[var(--paper)]"
-      }`}
-    >
-      {children}
+    <span className="rounded-full bg-[var(--accent-clay)] px-1.5 py-[0.2rem] font-mono text-[0.6rem] uppercase leading-none tracking-[0.12em] text-white">
+      New
     </span>
   );
 }

@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
 import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { PRODUCTS } from "@/lib/shop/products";
-import { ago, LittleMan, MarkStage, SHELF_LOOK, SKILL_LOOK, stageStyle, Sticker, useSeen, type Look } from "./dashboard-art";
+import { ago, LittleMan, SHELF_LOOK, SKILL_LOOK, Thumb, useSeen, type Look } from "./dashboard-art";
 import { JoinButton } from "./join-plans";
 import { FREE_PLAN, LOOK, PLAN_BUTTON, TIERS, UniversalMail } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
@@ -40,8 +40,8 @@ import {
  * A sidebar of sections (a strip of pills on a phone) and one section at a
  * time beside it. The sections and what opens them are in member-sections.tsx:
  *
- *   Overview         the plan, what's new since the last visit, then a tile
- *                    for every section (the library's with their marks)
+ *   Overview         the plan, what's new since the last visit (small), then
+ *                    a tile for every section with its next step
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
  *   With me          Live Q&A, Telegram
  *   Ultimate         1-on-1 call, Custom skills, Network, Requests
@@ -402,11 +402,9 @@ function whatsNew(rows: Perks["training"], wasNew: (section: string, iso: string
 }
 
 /* ------------------------------------------------------------------ *
- * OVERVIEW: the plan, what's new, then every section: the library's four
- * as big tiles with their marks, the rest as small ones with their step.
+ * OVERVIEW: the plan, what's new, then every section as a tile with its
+ * next step (and how many new things are in it).
  * ------------------------------------------------------------------ */
-const LIBRARY = ["skills", "masterclass", "design", "training"] as const;
-
 function Overview({
   ids,
   member,
@@ -448,11 +446,11 @@ function Overview({
     requests: "Ask for skills, vote on what's next",
   };
 
-  const rest = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing" && !(LIBRARY as readonly string[]).includes(s.id));
+  const tiles = SECTIONS.filter((s) => s.id !== "overview" && s.id !== "billing");
   const nextUp = SELF_SERVE.find((t) => higher(t, tier) === t && t !== tier);
 
   return (
-    <section aria-labelledby={`${ids}-over`} className="flex flex-col gap-12">
+    <section aria-labelledby={`${ids}-over`} className="flex flex-col gap-10">
       {/* the plan, small, in its own gradient */}
       <div className={`plan-card relative isolate flex flex-wrap items-end justify-between gap-6 overflow-clip rounded-[2rem] p-7 md:p-9 ${look.card}`} data-tier={tier}>
         <div>
@@ -473,46 +471,34 @@ function Overview({
         </div>
       </div>
 
-      {/* WHAT'S NEW, or the latest: the first thing worth opening. */}
+      {/* WHAT'S NEW, or the latest: small, one line each, above the map. */}
       <div>
-        <div className="flex items-end gap-3">
-          <LittleMan pose="wave" className="h-11 w-auto flex-none" />
-          <h3 className={h2}>
-            {news.fresh ? (
-              <>
-                New <em>for you</em>
-              </>
-            ) : (
-              <>
-                Latest <em>on the shelf</em>
-              </>
-            )}
-          </h3>
-        </div>
-        <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <h3 className="flex items-end gap-2 font-serif text-[1.35rem] leading-none tracking-[-0.02em]">
+          <LittleMan pose="wave" className="h-7 w-auto flex-none" />
+          {news.fresh ? (
+            <span>
+              New <em>for you</em>
+            </span>
+          ) : (
+            <span>
+              Latest <em>on the shelf</em>
+            </span>
+          )}
+        </h3>
+        <ul className="mt-4 grid gap-3 md:grid-cols-3">
           {news.items.map((item) => (
             <li key={item.key}>
               <a
                 href={item.href}
-                className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+                className="flex h-full items-center gap-3 rounded-2xl border border-[var(--hairline-strong)] bg-white p-3 transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
               >
-                {item.mark ? (
-                  <MarkStage look={item.look} mark={item.mark} instance="new" className="aspect-[16/9]">
-                    {news.fresh ? <Sticker tone="clay">New</Sticker> : null}
-                  </MarkStage>
-                ) : (
-                  <span className="relative flex aspect-[16/9] items-end p-5" style={stageStyle(item.look, `${[12, 88, 50][(item.n ?? 1) % 3]}% 0%`)}>
-                    <span className="font-serif text-[4rem] leading-[0.8] tracking-[-0.05em]">{String(item.n ?? 1).padStart(2, "0")}</span>
-                    {news.fresh ? <Sticker tone="clay">New</Sticker> : null}
-                  </span>
-                )}
-                <span className="flex flex-1 flex-col p-5">
-                  <span className={`font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
+                <Thumb look={item.look} mark={item.mark} n={item.n} instance="new" className="h-12 w-12" />
+                <span className="min-w-0">
+                  <span className={`block font-mono text-[0.62rem] uppercase tracking-[0.12em] ${soft}`}>
                     {item.label}
                     {ago(item.added) ? ` · ${ago(item.added)}` : ""}
                   </span>
-                  <span className="mt-2 font-serif text-[1.35rem] leading-[1.08] tracking-[-0.02em]">{item.title}</span>
-                  {item.line ? <span className={`mt-1.5 line-clamp-2 text-[0.92rem] leading-[1.45] ${soft}`}>{item.line}</span> : null}
+                  <span className="mt-1 block truncate text-[0.98rem] font-medium">{item.title}</span>
                 </span>
               </a>
             </li>
@@ -520,55 +506,11 @@ function Overview({
         </ul>
       </div>
 
-      {/* THE LIBRARY: four tiles with their marks. */}
-      <div>
-        <h3 className={h2}>
-          Your <em>library</em>
-        </h3>
-        <ul className="mt-6 grid gap-5 sm:grid-cols-2">
-          {LIBRARY.map((id) => {
-            const s = sectionById(id);
-            const lock = needs(s, tier);
-            const n = newCount[id] ?? 0;
-            return (
-              <li key={id}>
-                <a
-                  href={`#${id}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-                >
-                  <MarkStage
-                    look={SHELF_LOOK[id]}
-                    mark={SHELF_LOOK[id].mark}
-                    instance="tile"
-                    className="aspect-[2/1]"
-                    markClassName={lock ? "opacity-35 grayscale" : ""}
-                  >
-                    {n && !lock ? <Sticker tone="clay">{n} new</Sticker> : null}
-                    {lock ? (
-                      <span className="absolute right-3 top-3">
-                        <PlanBadge tier={lock} />
-                      </span>
-                    ) : null}
-                  </MarkStage>
-                  <span className="flex items-center justify-between gap-4 p-5">
-                    <span className="min-w-0">
-                      <span className="block font-serif text-[1.45rem] leading-none tracking-[-0.02em]">{s.name}</span>
-                      <span className={`mt-1.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{lock ? s.about : status[id]}</span>
-                    </span>
-                    <ArrowRight aria-hidden className="h-5 w-5 flex-none opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />
-                  </span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {/* WITH ME, and Ultimate's: small tiles with their next step. */}
       <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {rest.map((s) => {
+        {tiles.map((s) => {
           const Icon = s.icon;
           const lock = needs(s, tier);
+          const n = newCount[s.id] ?? 0;
           return (
             <li key={s.id}>
               <a
@@ -580,10 +522,14 @@ function Overview({
                 }`}
               >
                 <span className="flex items-center justify-between gap-3">
-                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${lock ? "bg-[rgba(11,31,58,0.05)]" : "bg-[var(--accent-clay-soft)] text-[var(--accent-clay-text)]"}`}>
-                    <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
-                  </span>
-                  {lock ? <PlanBadge tier={lock} /> : <ArrowRight aria-hidden className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />}
+                  <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
+                  {lock ? (
+                    <PlanBadge tier={lock} />
+                  ) : n ? (
+                    <span className="rounded-full bg-[var(--accent-clay)] px-2 py-0.5 text-[0.72rem] font-medium text-white">{n} new</span>
+                  ) : (
+                    <ArrowRight aria-hidden className="h-4 w-4 opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100" />
+                  )}
                 </span>
                 <span className={`mt-4 text-[1.05rem] font-medium ${lock ? soft : ""}`}>{s.name}</span>
                 <span className={`mt-1 text-[0.9rem] leading-[1.45] ${soft}`}>{lock ? s.about : status[s.id]}</span>

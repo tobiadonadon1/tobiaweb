@@ -27,7 +27,7 @@ import { hasPerk, money, offer, planName, PLANS, type PaidTier, type Perk, type 
 import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { LOOK } from "./plan-cards";
-import { ago, ComingSoon, MarkStage, SHELF_LOOK, SKILL_LOOK, stageStyle, Sticker } from "./dashboard-art";
+import { ago, ComingSoon, NewChip, SHELF_LOOK, SKILL_LOOK, Thumb } from "./dashboard-art";
 import { PlanBadge } from "./plan-badge";
 
 /**
@@ -352,18 +352,18 @@ export function SkillsSection({
             {tier === "free" ? <ProValue paid={paid} /> : null}
             <ul className={grid}>
               {paid.map((p) => (
-                <SkillCard key={p.id} product={p} note={paidNote(p, tier, owned)} fresh={wasNew(p)} yours={ready(p)}>
+                <SkillRow key={p.id} product={p} note={paidNote(p, tier, owned)} fresh={wasNew(p)}>
                   <PaidAction product={p} tier={tier} ready={ready(p)} />
-                </SkillCard>
+                </SkillRow>
               ))}
             </ul>
           </>
         ) : (
           <ul className={grid}>
             {free.map((p) => (
-              <SkillCard key={p.id} product={p} note={p.share.kicker} fresh={wasNew(p)}>
+              <SkillRow key={p.id} product={p} note={p.share.kicker} fresh={wasNew(p)}>
                 <FreeDownload product={p} />
-              </SkillCard>
+              </SkillRow>
             ))}
           </ul>
         )}
@@ -412,47 +412,28 @@ function ProValue({ paid }: { paid: Product[] }) {
   );
 }
 
-const grid = "grid gap-5 sm:grid-cols-2 2xl:grid-cols-3";
+const grid = "grid gap-3";
 
-/**
- * A SKILL, AS A CARD: its cut-paper mark on its own colour, then its name,
- * what it does and the one button. The stage links to the skill's page, the
- * button does the thing (download, buy, see the plan).
- */
-function SkillCard({
-  product: p,
-  note,
-  fresh,
-  yours = false,
-  children,
-}: {
-  product: Product;
-  note: string;
-  fresh: boolean;
-  yours?: boolean;
-  children: React.ReactNode;
-}) {
+/** A skill: its small picture, its name and what it does, and the one button. */
+function SkillRow({ product: p, note, fresh, children }: { product: Product; note: string; fresh: boolean; children: React.ReactNode }) {
   const when = fresh ? ago(SKILL_LOOK[p.id].added) : null;
   return (
-    <li className="group flex flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1">
-      <Link href={p.href} aria-label={`${p.name}: open its page`} className="block focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--ink)]">
-        <MarkStage look={SKILL_LOOK[p.id]} mark={p.id} instance="dash" className="aspect-[16/10]">
-          {fresh ? <Sticker tone="clay">New</Sticker> : yours ? <Sticker tone="ink">Yours</Sticker> : null}
-        </MarkStage>
-      </Link>
-      <div className="flex flex-1 flex-col p-5 md:p-6">
-        <p className={`font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
-          {note}
-          {when ? <span className="text-[var(--accent-clay-text)]"> · {when}</span> : null}
-        </p>
-        <h3 className="mt-2 font-serif text-[1.45rem] leading-[1.05] tracking-[-0.02em]">
-          <Link href={p.href} className="hover:underline hover:decoration-1 hover:underline-offset-4">
-            {p.name}
-          </Link>
-        </h3>
-        <p className={`mt-2 text-[0.93rem] leading-[1.45] ${soft}`}>{p.share.line}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">{children}</div>
+    <li className={`${card} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:pr-5`}>
+      <div className="flex min-w-0 items-center gap-4">
+        <Thumb look={SKILL_LOOK[p.id]} mark={p.id} instance="row" />
+        <div className="min-w-0">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Link href={p.href} className="text-[1.05rem] font-medium hover:underline hover:underline-offset-4">
+              {p.name}
+            </Link>
+            <span className={`font-mono text-[0.68rem] uppercase tracking-[0.12em] ${soft}`}>{note}</span>
+            {fresh ? <NewChip /> : null}
+            {when ? <span className="text-[0.8rem] text-[var(--accent-clay-text)]">{when}</span> : null}
+          </p>
+          <p className={`mt-1 text-[0.92rem] leading-[1.45] ${soft}`}>{p.share.line}</p>
+        </div>
       </div>
+      <div className="flex flex-none items-center gap-2">{children}</div>
     </li>
   );
 }
@@ -573,9 +554,9 @@ export function ShelfSection({
       {!perks ? (
         <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
       ) : rows.length ? (
-        <ul className={`mt-7 ${grid}`}>
+        <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
           {rows.map((t, i) => (
-            <ShelfCard key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
+            <ShelfRow key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
           ))}
         </ul>
       ) : (
@@ -594,53 +575,44 @@ export function ShelfSection({
 }
 
 /**
- * A LESSON OR A TEMPLATE: its number, big, on the shelf's colour (each one
- * leans its glow a little differently, so a row of them isn't one card
- * repeated), then the title and the way in. A locked one shows what it is
- * and the plan that opens it; the server never sent its link.
+ * A LESSON OR A TEMPLATE: its number on the shelf's colour, the title and
+ * the way in. A locked one shows what it is and the plan that opens it; the
+ * server never sent its link.
  */
-function ShelfCard({ row: t, n, shelf, fresh }: { row: Perks["training"][number]; n: number; shelf: keyof typeof SHELVES; fresh: boolean }) {
+function ShelfRow({ row: t, n, shelf, fresh }: { row: Perks["training"][number]; n: number; shelf: keyof typeof SHELVES; fresh: boolean }) {
   const s = SHELVES[shelf];
-  const look = SHELF_LOOK[shelf];
-  const tilt = [12, 88, 50, 20, 80][n % 5];
-  const Glyph = shelf === "design" ? LayoutTemplate : PlayCircle;
-  const body = (
-    <>
-      <div
-        className="relative flex aspect-[16/10] items-end justify-between overflow-hidden p-5"
-        style={stageStyle(look, `${tilt}% 0%`)}
-      >
-        <span className={`font-serif text-[4.2rem] leading-[0.8] tracking-[-0.05em] ${t.locked ? "opacity-30" : ""}`}>{String(n).padStart(2, "0")}</span>
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-white/80 shadow-[0_6px_18px_-8px_rgba(11,31,58,0.45)] transition-transform duration-300 group-hover:scale-110">
-          {t.locked ? <Lock aria-hidden className="h-4 w-4" /> : <Glyph aria-hidden className="h-5 w-5" />}
+  const row =
+    "flex items-center justify-between gap-4 p-4 pr-5 hover:bg-[rgba(11,31,58,0.03)] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[var(--ink)]";
+  const text = (
+    <span className={`flex min-w-0 items-center gap-4 ${t.locked ? "opacity-60" : ""}`}>
+      <Thumb look={SHELF_LOOK[shelf]} n={n} instance="row" />
+      <span className="min-w-0">
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="text-[1.02rem] font-medium">{t.title}</span>
+          {fresh && !t.locked ? <NewChip /> : null}
         </span>
-        {fresh && !t.locked ? <Sticker tone="clay">New</Sticker> : null}
-      </div>
-      <div className="flex flex-1 flex-col p-5 md:p-6">
-        <p className={`flex items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.13em] ${soft}`}>
-          {s.item} {String(n).padStart(2, "0")}
-          {t.locked ? <PlanBadge tier="ultimate" className="normal-case tracking-normal" /> : null}
-        </p>
-        <h3 className={`mt-2 font-serif text-[1.4rem] leading-[1.08] tracking-[-0.02em] ${t.locked ? "opacity-60" : ""}`}>{t.title}</h3>
-        {t.summary ? <p className={`mt-2 text-[0.93rem] leading-[1.45] ${soft}`}>{t.summary}</p> : null}
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[0.95rem] font-medium">
-          {t.locked ? "Opens with Ultimate" : s.open}
-          <ArrowUpRight aria-hidden className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </>
+        {t.summary ? <span className={`mt-0.5 block text-[0.9rem] leading-[1.45] ${soft}`}>{t.summary}</span> : null}
+      </span>
+    </span>
   );
-  const shell =
-    "group flex h-full flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_1px_2px_rgba(11,31,58,0.06),0_22px_44px_-30px_rgba(11,31,58,0.45)] ring-1 ring-[var(--hairline)] transition-transform duration-300 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
   return (
     <li>
       {t.url ? (
-        <a href={t.url} target="_blank" rel="noopener noreferrer" className={shell}>
-          {body}
+        <a href={t.url} target="_blank" rel="noopener noreferrer" className={row}>
+          {text}
+          <span className={`flex flex-none items-center gap-1.5 text-[0.9rem] ${soft}`}>
+            {s.open}
+            <ArrowUpRight aria-hidden className="h-4 w-4" />
+          </span>
         </a>
       ) : (
-        <a href="#billing" className={shell}>
-          {body}
+        <a href="#billing" className={row}>
+          {text}
+          <span className="flex flex-none items-center gap-2">
+            <Lock aria-hidden className="h-3.5 w-3.5 opacity-55" />
+            <PlanBadge tier="ultimate" />
+            <span className="sr-only">Opens with Ultimate</span>
+          </span>
         </a>
       )}
     </li>
