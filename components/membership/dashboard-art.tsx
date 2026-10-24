@@ -62,6 +62,30 @@ export const SHELF_LOOK = {
   network: { mark: "way-side-by-side", a: "#c9d3ff", b: "#eff2ff" },
 } as const;
 
+/**
+ * THE OVERVIEW'S TILES, on hover: each section's own soft colour, a glow
+ * from the top-right corner fading into a warm white. The Library's four
+ * use their shelf's colours; the rest get their own.
+ */
+const TILE_LOOK: Record<string, Look> = {
+  skills: SHELF_LOOK.skills,
+  masterclass: SHELF_LOOK.masterclass,
+  design: SHELF_LOOK.design,
+  training: SHELF_LOOK.training,
+  live: SHELF_LOOK.live,
+  telegram: { a: "#bfe0f6", b: "#eef7fc" },
+  calls: { a: "#d9c8ff", b: "#f5f0ff" },
+  custom: { a: "#ffe08f", b: "#fff8e3" },
+  network: SHELF_LOOK.network,
+};
+
+export const tileGlow = (section: string): React.CSSProperties | undefined => {
+  const look = TILE_LOOK[section];
+  return look
+    ? { background: `radial-gradient(120% 130% at 100% 0%, ${look.a} 0%, transparent 70%), linear-gradient(200deg, ${look.b} 0%, #fffdf9 100%)` }
+    : undefined;
+};
+
 /** `at` moves the glow, so a row of cards on one colour doesn't repeat itself. */
 export const stageStyle = ({ a, b }: Look, at = "12% 0%"): React.CSSProperties => ({
   background: `radial-gradient(85% 110% at ${at}, ${a} 0%, transparent 72%), linear-gradient(165deg, ${b} 0%, #fbf8f2 100%)`,

@@ -90,7 +90,7 @@ export const SECTIONS: Section[] = [
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
   { id: "telegram", name: "Direct messaging", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
   { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me.", match: /1-on-1/ },
-  { id: "custom", name: "Custom skills & ideas", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, and a say in what I build next.", match: /custom skills/i },
+  { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, and a say in what I build next.", match: /custom skills/i },
   { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship.", match: /network/i },
   { id: "billing", name: "Plan & billing", icon: CreditCard, about: "Your plan, your card and your invoices." },
 ];

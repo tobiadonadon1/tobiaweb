@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Check, LoaderCircle } from "lucide-react";
 import type { MemberInfo } from "@/components/account/use-member";
 import { higher, offer, planName, planPrice, PLANS, SELF_SERVE, type Tier } from "@/lib/membership/tiers";
 import { PRODUCTS } from "@/lib/shop/products";
-import { ago, LittleMan, nextQa, qaDate, SHELF_LOOK, SKILL_LOOK, Thumb, useSeen, type Look } from "./dashboard-art";
+import { ago, LittleMan, nextQa, qaDate, SHELF_LOOK, SKILL_LOOK, Thumb, tileGlow, useSeen, type Look } from "./dashboard-art";
 import { JoinButton } from "./join-plans";
 import { FREE_PLAN, LOOK, PLAN_BUTTON, TIERS, UniversalMail } from "./plan-cards";
 import { PlanBadge } from "./plan-badge";
@@ -44,7 +44,7 @@ import {
  *                    a tile for every section with its next step
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
  *   With me          Live Q&A, Direct messaging (Telegram)
- *   Ultimate         1-on-1 call (Calendly), Custom skills & ideas (with the requests board), Network
+ *   Ultimate         1-on-1 call (Calendly), Custom skills (with the requests board), Network
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
  *                    and every other plan, up or down, each one click away
  *
@@ -176,21 +176,11 @@ export function MemberPanel({
     <div ref={top} className="flex flex-col gap-10">
       {/* WHO */}
       <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
-        <div className="min-w-0">
-          <p className={`flex items-center gap-2 text-[0.85rem] uppercase tracking-[0.14em] ${soft}`}>
-            Your dashboard <PlanBadge tier={tier} className="normal-case tracking-normal" />
-          </p>
-          <h1 className="mt-3 font-serif text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.98] tracking-[-0.035em]">
-            Welcome <em>back</em>.
-          </h1>
-          <p className={`mt-4 break-all text-[1.05rem] ${soft}`}>
-            {member.email}
-            <span aria-hidden> · </span>
-            <button type="button" onClick={onSignOut} className={quiet}>
-              Sign out
-            </button>
-          </p>
-        </div>
+        {/* Just the greeting: the plan is on the overview's banner, the
+            account and the way out at the bottom of the sidebar (`Who`). */}
+        <h1 className="min-w-0 font-serif text-[clamp(2.4rem,7vw,3.6rem)] leading-[0.98] tracking-[-0.035em]">
+          Welcome <em>back</em>.
+        </h1>
         {/* The way back to Construct is the page's own button, top left. This
             one only shows after a sign-in that came from somewhere else. */}
         {next ? (
@@ -254,6 +244,7 @@ export function MemberPanel({
                 </ul>
               </div>
             ))}
+            <Who email={member.email} onSignOut={onSignOut} className="px-3" />
           </div>
         </nav>
 
@@ -294,9 +285,23 @@ export function MemberPanel({
           ) : (
             <Billing ids={ids} member={member} billingError={billingError} />
           )}
+          {/* On a phone the sidebar is a strip of pills, so the account line closes the page. */}
+          <Who email={member.email} onSignOut={onSignOut} className="mt-16 border-t border-[var(--hairline-strong)] pt-6 md:hidden" />
         </div>
       </div>
     </div>
+  );
+}
+
+/** Who's signed in, and the way out: small, at the bottom. */
+function Who({ email, onSignOut, className = "" }: { email: string; onSignOut: () => void; className?: string }) {
+  return (
+    <p className={`flex flex-col items-start gap-1 text-[0.9rem] leading-[1.4] ${soft} ${className}`}>
+      <span className="max-w-full break-all">{email}</span>
+      <button type="button" onClick={onSignOut} className={quiet}>
+        Sign out
+      </button>
+    </p>
   );
 }
 
@@ -521,12 +526,18 @@ function Overview({
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
-                className={`group flex h-full flex-col rounded-2xl border p-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] ${
+                className={`group relative isolate flex h-full flex-col overflow-hidden rounded-2xl border p-5 transition-[border-color,box-shadow] duration-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)] ${
                   lock
-                    ? "border-dashed border-[var(--hairline-strong)] bg-transparent hover:border-[rgba(11,31,58,0.4)]"
-                    : "border-[var(--hairline-strong)] bg-white hover:border-[var(--ink)]"
+                    ? "border-dashed border-[var(--hairline-strong)] bg-transparent hover:border-[rgba(11,31,58,0.3)]"
+                    : "border-[var(--hairline-strong)] bg-white hover:border-[rgba(11,31,58,0.18)] hover:shadow-[0_18px_40px_-24px_rgba(11,31,58,0.35)]"
                 }`}
               >
+                {/* Each section's own soft colour, rising in on hover. */}
+                <span
+                  aria-hidden
+                  className={`pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 ${lock ? "group-hover:opacity-60" : ""}`}
+                  style={tileGlow(s.id)}
+                />
                 <span className="flex items-center justify-between gap-3">
                   <Icon aria-hidden className={`h-5 w-5 ${lock ? "opacity-50" : ""}`} />
                   {lock ? (
