@@ -62,6 +62,8 @@ export type Perks = {
   tier: Tier;
   perks: Perk[];
   links: Partial<Record<Perk, string | null>>;
+  /** My Telegram's QR code (a data URL), for a plan with Telegram. */
+  telegramQr?: string | null;
   /** Training, Masterclass and Design rows. A `locked` row is above the plan: no url, shown as what the next plan adds. */
   training: { id: string; title: string; summary: string | null; kind: string; url: string | null; tier: string; shelf: string; locked: boolean; added: string; group?: string }[];
   owned: string[];
@@ -240,6 +242,16 @@ export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | nu
       <LinkCard icon={Send} url={perks?.links.telegram} label="Message me on Telegram" pending="Your Telegram link lands here soon.">
         {perks?.links.telegram ? <p className="text-[1.05rem] font-medium">Opens a chat with me.</p> : null}
       </LinkCard>
+      {perks?.telegramQr ? (
+        <div className={`${card} mt-4 flex flex-col items-center gap-6 p-6 sm:flex-row md:p-8`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from the perks check, not a static asset */}
+          <img src={perks.telegramQr} alt="QR code for my Telegram" width={176} height={176} className="h-44 w-44 flex-none rounded-2xl" />
+          <div className="text-center sm:text-left">
+            <p className="text-[1.05rem] font-medium">Or scan it with your phone</p>
+            <p className={`mt-1.5 max-w-[22rem] text-[0.98rem] leading-[1.5] ${soft}`}>Point your camera at the code and Telegram opens on a chat with me.</p>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

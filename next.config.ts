@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
     // The Design library's sealed sources and the training sheets (lib/design/files.ts, lib/training).
     "/api/design/source": ["./private/design/**/*"],
     "/api/membership/file": ["./private/training/**/*"],
+    // The members' Telegram link and QR code (lib/membership/contact.ts).
+    "/api/membership/perks": ["./private/members/**/*"],
   },
   // Required at runtime from node_modules (it resolves its binary's path).
   serverExternalPackages: ["ffmpeg-static"],

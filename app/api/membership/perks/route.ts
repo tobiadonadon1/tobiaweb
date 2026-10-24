@@ -2,6 +2,7 @@ import { accountsConfigured, adminClient, currentMember } from "@/lib/account";
 import { membershipOf, ownedProducts } from "@/lib/membership/server";
 import { hasPerk, perksOf, trainingReach, type Perk } from "@/lib/membership/tiers";
 import { SHEETS } from "@/lib/training/sheets";
+import { sealedTelegram } from "@/lib/membership/contact";
 
 /**
  * GET /api/membership/perks
@@ -18,6 +19,9 @@ import { SHEETS } from "@/lib/training/sheets";
  *   MEMBERS_WORKSHOP_URL   bi-monthly workshop       Ultimate and up
  *   MEMBERS_CALLS_URL      1-on-1 booking page       Ultimate and up
  *   MEMBERS_NETWORK_URL    the members' network      Ultimate and up
+ *
+ * Telegram also has a sealed default with its QR code (lib/membership/contact.ts),
+ * so it works with no variable set; MEMBERS_TELEGRAM_URL still wins if it is.
  */
 
 export const dynamic = "force-dynamic";
@@ -41,6 +45,12 @@ export async function GET(request: Request) {
   for (const [perk, env] of LINKS) {
     // null: the plan has it, but it isn't set up yet ("coming soon" on the page).
     if (hasPerk(tier, perk)) links[perk] = process.env[env] || null;
+  }
+  let telegramQr: string | null = null;
+  if (hasPerk(tier, "telegram")) {
+    const sealed = await sealedTelegram();
+    links.telegram ||= sealed?.url ?? null;
+    telegramQr = sealed?.qr ?? null;
   }
 
   // Rows above the plan (an Ultimate-only lesson, seen by Pro) come back
@@ -102,5 +112,5 @@ export async function GET(request: Request) {
   }
 
   const owned = await ownedProducts(member);
-  return new Response(JSON.stringify({ ok: true, tier, perks: perksOf(tier), links, training, owned }), { headers });
+  return new Response(JSON.stringify({ ok: true, tier, perks: perksOf(tier), links, telegramQr, training, owned }), { headers });
 }
