@@ -3455,3 +3455,24 @@ html.mdx-skip body:has(.mdx-intro) [data-site-nav] { animation: none; }
     --account-light: 40deg;
   }
 }
+
+/* A Masterclass lesson that isn't filmed yet: a slow sheen across its frame
+   (components/masterclass/masterclass-page.tsx). Still, with reduced motion. */
+.mc-shimmer {
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: mc-shimmer 2.8s ease-in-out infinite;
+}
+@keyframes mc-shimmer {
+  from {
+    background-position: 130% 0;
+  }
+  to {
+    background-position: -30% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mc-shimmer {
+    animation: none;
+  }
+}

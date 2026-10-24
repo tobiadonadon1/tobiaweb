@@ -195,7 +195,9 @@ export const SHELF: ShelfFamily[] = [
     open: false,
     tag: "Pro & Ultimate",
     line: "In-depth lessons, 10 to 20 minutes each. Never on YouTube.",
-    status: "Not open yet.",
+    status: "Being filmed: see what's coming; Pro and Ultimate watch.",
+    // Its card is a door to /projects/construct/masterclass (shelf-member-card.tsx).
+    cta: "See what's coming",
     spineRay: 7,
     dividerRay: 1,
   },

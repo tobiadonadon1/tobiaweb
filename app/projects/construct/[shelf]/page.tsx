@@ -20,9 +20,9 @@ import {
  *
  * The params come from OPEN_SHELF_IDS rather than from the whole shelf, so
  * "closed" is a fact in shelf-data.ts and not a rule written twice. With
- * `dynamicParams` off, /projects/construct/masterclass 404s at routing rather
- * than rendering an empty shell; next.config.ts redirects both retired URLs
- * back to the shelf so anything already indexed lands somewhere real.
+ * `dynamicParams` off, a closed family's id 404s at routing rather than
+ * rendering an empty shell. (Masterclass and Design have pages of their own,
+ * app/projects/construct/masterclass and /design, which win over this route.)
  *
  * Material is thirty-odd written pieces in six folders, so it gets a room
  * (components/superhuman/material/) rather than a list, and this route hands it

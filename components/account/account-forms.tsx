@@ -261,7 +261,27 @@ export function AccountForms() {
   };
 
   if (member === undefined) {
-    return <div className="min-h-[24rem]" aria-busy="true" />;
+    // Still asking who this is: the dashboard's outline, breathing, not a blank page.
+    return (
+      <div className="mx-auto min-h-[24rem] max-w-[72rem] animate-pulse motion-reduce:animate-none" aria-busy="true" aria-label="Loading your account">
+        <div className="h-[clamp(2.4rem,7vw,3.6rem)] w-[min(24rem,80%)] rounded-2xl bg-[rgba(11,31,58,0.07)]" />
+        <div className="mt-10 grid gap-8 md:grid-cols-[13.5rem_minmax(0,1fr)] md:gap-12">
+          <div className="hidden flex-col gap-3 md:flex">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-9 rounded-xl bg-[rgba(11,31,58,0.05)]" />
+            ))}
+          </div>
+          <div className="flex flex-col gap-5">
+            <div className="h-40 rounded-[2rem] bg-[rgba(11,31,58,0.07)]" />
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-32 rounded-2xl bg-[rgba(11,31,58,0.05)]" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (member) {

@@ -72,12 +72,9 @@ const nextConfig: NextConfig = {
       { source: "/construct/tester", destination: "/projects/construct/material/skills", statusCode: 301 },
       { source: "/projects/construct/ship-check", destination: "/projects/construct/material/skills", statusCode: 301 },
       { source: "/construct/ship-check", destination: "/projects/construct/material/skills", statusCode: 301 },
-      /* Masterclass lost its page: it was a lede, an empty state and an
-         email field, and is now a card on the shelf that says "Now locked"
-         when you click it. Anything already indexed lands on the shelf
-         rather than on a 404. Design has a page again: the library. */
-      { source: "/projects/construct/masterclass", destination: "/projects/construct#shelf", statusCode: 301 },
-      { source: "/construct/masterclass", destination: "/projects/construct#shelf", statusCode: 301 },
+      /* Masterclass and Design both have their own pages again (the
+         screening room, the library); the old short addresses go there. */
+      { source: "/construct/masterclass", destination: "/projects/construct/masterclass", statusCode: 301 },
       { source: "/construct/design", destination: "/projects/construct/design", statusCode: 301 },
       /* The-sweep absorbed Tester and Ship check. */
       { source: "/projects/construct/the-sweep", destination: "/projects/construct/material/skills/code-reviewer", statusCode: 301 },

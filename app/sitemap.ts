@@ -24,6 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE}/projects/mynd`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE}/projects/construct`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE}/projects/construct/design`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE}/projects/construct/masterclass`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE}/projects/book`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE}/lab/gallery`, changeFrequency: "monthly", priority: 0.4 },
   ];

@@ -248,8 +248,9 @@ export function MemberPanel({
           </div>
         </nav>
 
-        {/* THE SECTION, with the way back to the overview above it. */}
-        <div className="min-w-0">
+        {/* THE SECTION, with the way back to the overview above it. Tall
+            enough that a short one doesn't pull the footer up under it. */}
+        <div className="min-h-[70vh] min-w-0">
           {active !== "overview" ? (
             <a
               href="#overview"
@@ -590,7 +591,8 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
   const price = planPrice(tier);
   // A member doesn't "downgrade" to Free from a card next to the plans:
   // leaving is its own quiet section at the bottom (`Cancel`).
-  const others = TIERS.filter((t): t is Exclude<Tier, "free"> => t !== tier && t !== "free");
+  // A gift only sees what's above it: the plans below are inside it already.
+  const others = TIERS.filter((t): t is Exclude<Tier, "free"> => t !== tier && t !== "free" && (!member.granted || higher(t, tier) === t));
 
   return (
     <div className="flex flex-col gap-14">
@@ -601,12 +603,17 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
             <h2 id={`${ids}-plan`} className="mt-3 font-serif text-[clamp(3rem,8vw,4.4rem)] leading-[0.9] tracking-[-0.04em]">
               {plan.name}
             </h2>
-            <p className="mt-4 flex items-baseline gap-1.5">
-              <span className="text-[1.6rem] font-medium leading-none tracking-[-0.02em]">{price.amount}</span>
-              <span className={look.soft}>{tier === "free" ? "forever" : price.per}</span>
-            </p>
+            {/* A gift has no price on it: "€59 per month" beside "nothing to pay" reads as a charge. */}
+            {member.granted && !sub ? (
+              <p className="mt-4 text-[1.6rem] font-medium leading-none tracking-[-0.02em]">A gift</p>
+            ) : (
+              <p className="mt-4 flex items-baseline gap-1.5">
+                <span className="text-[1.6rem] font-medium leading-none tracking-[-0.02em]">{price.amount}</span>
+                <span className={look.soft}>{tier === "free" ? "forever" : price.per}</span>
+              </p>
+            )}
             <p className={`mt-4 text-[1rem] leading-[1.5] ${look.soft}`}>
-              {member.granted ? "Given to you by Tobi. Nothing to pay." : sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}
+              {member.granted && !sub ? "From Tobi. Nothing to pay, no end date." : sub ? statusLine(sub) : paid ? "Set up with me directly." : plan.line}
             </p>
             {sub ? (
               <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)} className="mt-auto pt-8">
@@ -642,7 +649,7 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
       {/* CHANGE PLAN: every other plan, in order, each with its one way in (see `Change`). */}
       <section aria-labelledby={`${ids}-up`}>
         <h2 id={`${ids}-up`} className={h2}>
-          {tier === "free" ? (
+          {tier === "free" || member.granted ? (
             <>
               Go <em>further</em>
             </>
@@ -656,10 +663,6 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
           <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
             Up or down, any time. Moving up, you pay only the difference this month. Moving down, the unused part comes off
             your next invoice.
-          </p>
-        ) : member.granted ? (
-          <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
-            Your plan is a gift. Anything above it you can join as usual.
           </p>
         ) : null}
         <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">

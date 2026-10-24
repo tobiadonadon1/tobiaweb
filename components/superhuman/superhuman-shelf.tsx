@@ -53,8 +53,8 @@ import { SECTION_LABELS } from "./sections";
 function CardText({ family, unlocked = false }: { family: ShelfFamily; unlocked?: boolean }) {
   // A members' family drawn for a member who has it: no lock, and a way in.
   const shut = !family.open && !unlocked;
-  // Design opens its own library page for everyone; Masterclass opens the dashboard.
-  const cta = family.perk === "design" ? family.cta : unlocked ? "Open in your dashboard" : family.cta;
+  // Design and Masterclass open their own pages, for everyone.
+  const cta = family.cta;
   return (
     <>
       {/* A CHIP ONLY WHERE IT CHANGES WHAT YOU CAN DO. There were three once,

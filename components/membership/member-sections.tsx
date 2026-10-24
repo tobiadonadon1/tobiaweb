@@ -328,7 +328,9 @@ export function SkillsSection({
   const paid = all.filter((p) => !p.free).sort((a, b) => Number(ready(b)) - Number(ready(a)) || a.priceCents - b.priceCents);
   // Newest first: what just went up is what a member came to see.
   const free = all.filter((p) => p.free).sort((a, b) => SKILL_LOOK[b.id].added.localeCompare(SKILL_LOOK[a.id].added));
-  const [tab, setTab] = useState<SkillTab>(tier === "free" ? "free" : "paid");
+  const newIn = { paid: paid.filter(wasNew).length, free: free.filter(wasNew).length };
+  // Opens where something is new, so the "new" that brought them here is in sight.
+  const [tab, setTab] = useState<SkillTab>(tier === "free" || (newIn.free && !newIn.paid) ? "free" : "paid");
 
   const tabs: { id: SkillTab; label: string; count: number }[] = [
     { id: "paid", label: "Paid", count: paid.length },
@@ -367,6 +369,9 @@ export function SkillsSection({
           >
             {t.label}
             <span className={`text-[0.82rem] tabular-nums ${tab === t.id ? "opacity-70" : "opacity-60"}`}>{t.count}</span>
+            {newIn[t.id] ? (
+              <span className="rounded-full bg-[var(--accent-clay)] px-1.5 py-[0.15rem] text-[0.68rem] font-medium leading-none text-white">{newIn[t.id]} new</span>
+            ) : null}
           </button>
         ))}
       </div>
@@ -586,13 +591,24 @@ export function ShelfSection({
     <section aria-labelledby={`${ids}-${shelf}`}>
       <SectionHead id={`${ids}-${shelf}`} title={s.title} line={line} />
       {shelf === "design" ? <DesignDashboardShelf /> : null}
+      {shelf === "masterclass" ? (
+        <Link
+          href="/projects/construct/masterclass"
+          className="group mt-7 flex items-center justify-between gap-4 rounded-2xl bg-[#07111f] px-6 py-5 text-white transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+        >
+          <span className="font-serif text-[1.35rem] leading-none tracking-[-0.02em]">
+            Open the Master<em>class</em>
+          </span>
+          <ArrowUpRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </Link>
+      ) : null}
       {!perks ? (
         shelf === "design" ? null : <p className={`${card} mt-7 p-6 text-[1rem] ${soft}`}>Loading…</p>
       ) : (
         <>
           {(
             [
-              ["skills", "Your skills"],
+              ["skills", "Skill sheets"],
               ["claude", "Claude Code"],
             ] as const
           ).map(([group, name]) => {
