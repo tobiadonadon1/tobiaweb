@@ -49,3 +49,6 @@ next-env.d.ts
 
 # local QA dumps, never commit
 .qa/
+
+# Supabase CLI cache (holds the database URL with its password)
+supabase/.temp/
