@@ -45,8 +45,6 @@ const TALK = {
   afterPoster: `${DIR}/talk-after.jpg`,
 };
 
-/** The storyboard review page, a still of it in use on the clip above. */
-const PLAN = { src: `${DIR}/storyboard.jpg`, width: 1440, height: 900 };
 
 /** The four things he said on camera, and what Claude did with each. */
 const MOMENTS = [
@@ -267,10 +265,10 @@ export function VideoEditorPage() {
         </div>
       </section>
 
-      {/* 3. THE STORYBOARD: the plan, scene by scene, before a frame is touched. A
-          real screen recording of the pack's review page on the clip above. */}
+      {/* 3. THE STORYBOARD: the plan, scene by scene, before a frame is touched,
+          said in three steps (no picture of it). */}
       <section aria-labelledby="vd-plan" className="vd-blue relative overflow-hidden text-white">
-        <div className="relative mx-auto max-w-[76rem] px-4 py-24 sm:px-8 md:py-32">
+        <div className="relative mx-auto max-w-[76rem] px-4 py-14 sm:px-8 md:py-20">
           <p className="text-center">
             <span className="inline-block rounded-full bg-white/15 px-3.5 py-1.5 text-[0.85rem] font-bold tracking-[-0.01em] backdrop-blur-md">
               Before it edits
@@ -278,31 +276,14 @@ export function VideoEditorPage() {
           </p>
           <h2
             id="vd-plan"
-            className="mx-auto mt-6 max-w-[14ch] text-balance text-center text-[clamp(2.5rem,7vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
+            className="mx-auto mt-5 max-w-[16ch] text-balance text-center text-[clamp(2rem,5vw,3.4rem)] font-extrabold leading-[0.95] tracking-[-0.05em]"
           >
             It shows you the plan first.
           </h2>
           <p className="mx-auto mt-5 max-w-[40ch] text-balance text-center text-[1.15rem] font-medium leading-[1.5] text-white/75">
             Every scene, what it will do and why. Change anything, approve, and it edits.
           </p>
-          <figure className="mx-auto mt-12 max-w-[64rem] md:mt-16">
-            <div className="overflow-hidden rounded-[1.4rem] bg-[#0a1fa8] shadow-[0_50px_100px_-40px_rgba(0,8,60,0.8)] ring-1 ring-white/20">
-              <div className="flex items-center gap-1.5 bg-white/10 px-4 py-3" aria-hidden>
-                <span className="size-2.5 rounded-full bg-white/35" />
-                <span className="size-2.5 rounded-full bg-white/35" />
-                <span className="size-2.5 rounded-full bg-white/35" />
-              </div>
-              <Image
-                src={PLAN.src}
-                alt="The storyboard: the video split into scenes, each with what it will do and why"
-                width={PLAN.width}
-                height={PLAN.height}
-                sizes="(min-width: 1024px) 64rem, 100vw"
-                className="block aspect-[16/10] h-auto w-full bg-[#0f1012] object-cover"
-              />
-            </div>
-          </figure>
-          <ol className="mx-auto mt-10 grid max-w-[64rem] list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
+          <ol className="mx-auto mt-9 grid max-w-[64rem] list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
             {["It splits your video into scenes", "You edit the plan, or add a note", "Approve, and it edits"].map((t, i) => (
               <li key={t} className="flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-4 text-[1.02rem] font-semibold backdrop-blur-md">
                 <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white text-[0.85rem] font-extrabold text-[#1238ff]">
