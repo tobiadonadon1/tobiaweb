@@ -65,7 +65,7 @@ export function MotionDesignerIntro() {
       ))}
       <div className="mdx-intro__hud">
         <span>Motion Designer</span>
-        <span>Kinetic · 16:9 · 122 bpm</span>
+        <span>Kinetic · 16:9 · 118 bpm</span>
       </div>
       <div className="mdx-intro__track">
         <i />

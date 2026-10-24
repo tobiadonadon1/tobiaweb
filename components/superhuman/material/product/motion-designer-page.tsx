@@ -25,7 +25,7 @@ import { SoundtrackWave } from "./motion-designer-wave";
  * EVERY FILM ON THE PAGE IS REAL: made with the skill, one about each of
  * Tobia's own products, from his site's images and their pages' claims (the
  * 98¢ Trade's numbers are its published backtest). The hero reel is cut from
- * those seven. The storyboard is a recording of the real page in use. The
+ * those seven. The storyboard is a still of the real page. The
  * devices, the three formats, the type before/after and the waveform are all
  * renders from the skill or its data, nothing drawn to look like a result.
  */
@@ -114,6 +114,7 @@ const STYLES = [
   { n: "03", style: "Paper", about: "App Launcher", best: "Consumer apps, explainers", id: "paper", bg: LIME, fg: INK },
   { n: "04", style: "Terminal", about: "Video Editor", best: "Dev tools, CLIs, agents", id: "terminal", bg: INK, fg: "#fff" },
   { n: "05", style: "Data", about: "The 98¢ Trade", best: "Results, reports, numbers", id: "data", bg: "#FFFFFF", fg: INK },
+  { n: "06", style: "Story", about: "Motion Designer", best: "People, a moment, a turn", id: "story", bg: "#F7B500", fg: INK },
 ] as const;
 
 /** One of the six, as a tile in its own colour: the claim, then the proof (Pro's tiles). */
@@ -150,7 +151,7 @@ function Tile({
 
 /** Tile 01: the sentence, and what it decided from it (the end-to-end test, 2026-10-23). */
 function DecidedProof() {
-  const chips = ["Kinetic", "16:9 for X", "21 s", "7 scenes", "EverMute's colours", "Bricolage type", "122 bpm"];
+  const chips = ["Kinetic", "16:9 for X", "22 s", "7 scenes", "EverMute's colours", "Bricolage type", "118 bpm"];
   return (
     <div className="w-full max-w-[32rem] rounded-[1.2rem] bg-[#111] p-5 text-left text-[#ECEAE3] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.6)] sm:p-6">
       <Mono className="text-[#ECEAE3]/60">What I typed</Mono>
@@ -233,8 +234,8 @@ export function MotionDesignerPage() {
           <figure className="mdx-screen">
             <Device d={DISPLAY}>
               <Film
-                src={S("reel-v1.mp4")}
-                poster={S("reel-v1.jpg")}
+                src={S("reel-v2.mp4")}
+                poster={S("reel-v2.jpg")}
                 label="the reel of seven films the skill made"
                 eager
                 className="h-full w-full"
@@ -288,8 +289,8 @@ export function MotionDesignerPage() {
                 </Mono>
                 <div className="mt-6 flex-1" />
                 <Film
-                  src={S(`${s.id}-v1.mp4`)}
-                  poster={S(`${s.id}-v1.jpg`)}
+                  src={S(`${s.id}-v2.mp4`)}
+                  poster={S(`${s.id}-v2.jpg`)}
                   label={`the ${s.style} film, about ${s.about}`}
                   className="aspect-video overflow-hidden rounded-[0.9rem] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.55)]"
                 />
@@ -310,8 +311,8 @@ export function MotionDesignerPage() {
               </p>
             </figcaption>
             <Film
-              src={S("kinetic-v1.mp4")}
-              poster={S("kinetic-v1.jpg")}
+              src={S("kinetic-v2.mp4")}
+              poster={S("kinetic-v2.jpg")}
               label="the Kinetic film about EverMute"
               className="aspect-video overflow-hidden rounded-[0.9rem] shadow-[0_20px_40px_-30px_rgba(0,0,0,0.45)]"
             />
