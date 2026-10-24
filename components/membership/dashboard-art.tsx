@@ -162,14 +162,9 @@ export function LittleMan({ pose = "stand", className = "" }: { pose?: "stand" |
  * words ("these are coming, stay tuned, thank you for your support"), with
  * the little man cheering on the shelf's own colour.
  * ------------------------------------------------------------------ */
-const COMING = {
-  masterclass: "The first lessons are being filmed now, and they land here before anywhere else.",
-  design: "The first templates are on my desk now, and they land here before anywhere else.",
-  training: "The first videos and files are being made now, and they land here first.",
-  network: "The network is being put together now, and members get in before anyone else.",
-} as const;
+type Shelf = "masterclass" | "design" | "training" | "network";
 
-export function ComingSoon({ shelf }: { shelf: keyof typeof COMING }) {
+export function ComingSoon({ shelf }: { shelf: Shelf }) {
   const look = SHELF_LOOK[shelf];
   return (
     <figure className="relative isolate mt-7 overflow-hidden rounded-[2rem] p-7 md:p-11" style={stageStyle(look)}>
@@ -184,7 +179,6 @@ export function ComingSoon({ shelf }: { shelf: keyof typeof COMING }) {
       </blockquote>
       <figcaption className="mt-5">
         <span className="block -rotate-2 font-hand text-[1.7rem] leading-none text-[var(--accent-clay)]">Tobi</span>
-        <span className="mt-4 block max-w-[30rem] text-[0.98rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)]">{COMING[shelf]}</span>
       </figcaption>
     </figure>
   );
@@ -212,33 +206,72 @@ export const qaDate = (at: Date, month: "long" | "short" = "long") =>
 
 export function QaCountdown({ url }: { url?: string | null }) {
   const [next, setNext] = useState<ReturnType<typeof nextQa> | null>(null);
+  const [shown, setShown] = useState(0);
   // Today is the viewer's today, so it's read in the browser.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setNext(nextQa()), []);
-  const look = SHELF_LOOK.live;
-  const days = next?.days ?? 14;
-  const counter = days === 0 ? "Today" : days === 1 ? "Tomorrow" : days % 7 === 0 ? `${days / 7} ${days === 7 ? "week" : "weeks"}` : `${days} days`;
+  // The number rolls up to the days left, once.
+  useEffect(() => {
+    if (!next) return;
+    const ms = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 900;
+    let frame = 0;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const k = ms ? Math.min(1, (t - t0) / ms) : 1;
+      setShown(Math.round(next.days * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [next]);
+
+  const days = next?.days ?? null;
+  const at = next?.at;
   return (
-    <figure className="relative isolate mt-7 overflow-hidden rounded-[2rem] p-7 md:p-11" style={stageStyle(look)}>
-      <LittleMan pose="cheer" className="h-14 w-auto" />
-      <p className="mt-6 text-[0.85rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.6)]">The next one</p>
-      <p className="mt-2 font-serif text-[clamp(2.6rem,7vw,4.5rem)] leading-[0.95] tracking-[-0.04em]">
-        {days > 1 ? <span className="text-[0.55em] tracking-[-0.03em]">in </span> : null}
-        <em>{counter}</em>
-      </p>
-      <p className="mt-3 font-serif text-[clamp(1.3rem,2.6vw,1.7rem)] leading-[1.15] tracking-[-0.02em]">{next ? qaDate(next.at) : "\u00a0"}</p>
-      <figcaption className="mt-6 max-w-[30rem] text-[0.98rem] leading-[1.5] text-[color:rgba(11,31,58,0.68)]">
-        Live on YouTube, with me and the other members. {url ? "Every session uses this link." : "The link appears here closer to the date."}
-      </figcaption>
-      {url ? (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-        >
-          Join on YouTube
-        </a>
+    <figure className="relative isolate mt-7 grid items-center gap-8 overflow-hidden rounded-[2rem] p-7 sm:grid-cols-[minmax(0,1fr)_auto] md:p-10" style={stageStyle(SHELF_LOOK.live)}>
+      <div className="min-w-0">
+        <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3.5 py-1.5 text-[0.8rem] font-medium uppercase tracking-[0.12em] ring-1 ring-inset ring-[rgba(11,31,58,0.08)]">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff2a2a] opacity-70 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#ff2a2a]" />
+          </span>
+          Live on YouTube
+        </span>
+        <p className="mt-6 font-serif leading-[0.85] tracking-[-0.05em]">
+          {days === 0 ? (
+            <em className="text-[clamp(4rem,11vw,7rem)]">Today!</em>
+          ) : days === 1 ? (
+            <em className="text-[clamp(4rem,11vw,7rem)]">Tomorrow!</em>
+          ) : (
+            <>
+              <span className="text-[clamp(5rem,14vw,9rem)] tabular-nums">{days === null ? "\u00a0" : shown}</span>
+              <span className="ml-3 text-[clamp(1.6rem,3.5vw,2.4rem)] tracking-[-0.03em]">
+                days <em>to go</em>
+              </span>
+            </>
+          )}
+        </p>
+        <figcaption className="mt-5 text-[1.05rem] leading-[1.45]">Bring your questions. {url ? "We go live here." : "The link drops here before we go live."}</figcaption>
+        {url ? (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+          >
+            Join the live
+          </a>
+        ) : null}
+      </div>
+      {/* The date as a calendar page, stuck on at an angle. */}
+      {at ? (
+        <div aria-label={qaDate(at)} className="mx-auto w-40 rotate-[4deg] overflow-hidden rounded-[1.4rem] bg-white text-center shadow-[0_22px_40px_-18px_rgba(11,31,58,0.45)] transition-transform duration-500 hover:rotate-0 sm:mx-0">
+          <p className="bg-[#ff2a2a] py-2 text-[0.85rem] font-medium uppercase tracking-[0.2em] text-white">
+            {at.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}
+          </p>
+          <p className="pt-3 font-serif text-[4.2rem] leading-none tracking-[-0.04em]">{at.getUTCDate()}</p>
+          <p className="pb-4 pt-1 text-[0.9rem] text-[color:rgba(11,31,58,0.6)]">{at.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" })}</p>
+        </div>
       ) : null}
     </figure>
   );

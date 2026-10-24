@@ -105,9 +105,6 @@ export function RequestsBoard() {
       <h2 id={`${ids}-h`} className="font-serif text-[1.9rem] leading-none tracking-[-0.03em]">
         What I build next
       </h2>
-      <p className={`mt-3 text-[1rem] leading-[1.5] ${soft}`}>
-        Ask for a skill, or vote for one someone else asked for. I build from the top.
-      </p>
 
       <form onSubmit={submit} className="mt-6 flex flex-col gap-3" noValidate>
         <label htmlFor={`${ids}-title`} className="sr-only">
@@ -132,7 +129,7 @@ export function RequestsBoard() {
               onChange={(e) => setDetails(e.target.value)}
               maxLength={2000}
               rows={3}
-              placeholder="What it should do, and why it would help you (optional)"
+              placeholder="Details (optional)"
               className={`${field} resize-y`}
             />
             <button
@@ -163,9 +160,7 @@ export function RequestsBoard() {
         </div>
       ) : requests === null ? (
         <div className="h-24" aria-busy="true" />
-      ) : requests.length === 0 ? (
-        <p className={`text-[1rem] ${soft}`}>Nothing asked yet. Be the first.</p>
-      ) : (
+      ) : requests.length === 0 ? null : (
         <ul className="flex flex-col gap-3">
           {requests.map((r) => (
             <li

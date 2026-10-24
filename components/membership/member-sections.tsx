@@ -124,13 +124,13 @@ const inkButton =
   "inline-flex items-center justify-center gap-2 rounded-full bg-[var(--ink)] px-6 py-3.5 text-[1rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]";
 
 /** A section's title and its one line. */
-export function SectionHead({ id, title, line }: { id: string; title: string; line: string }) {
+export function SectionHead({ id, title, line }: { id: string; title: string; line?: string }) {
   return (
     <header>
       <h2 id={id} className={h2}>
         {title}
       </h2>
-      <p className={`mt-3 max-w-[38rem] text-[1rem] leading-[1.5] ${soft}`}>{line}</p>
+      {line ? <p className={`mt-3 max-w-[38rem] text-[1rem] leading-[1.5] ${soft}`}>{line}</p> : null}
     </header>
   );
 }
@@ -202,7 +202,7 @@ function LinkCard({
 }) {
   return (
     <div className={`${card} mt-7 flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between md:p-8`}>
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <span className="grid h-12 w-12 flex-none place-items-center rounded-full bg-[rgba(11,31,58,0.06)]">
           <Icon aria-hidden className="h-5 w-5" />
         </span>
@@ -224,7 +224,7 @@ function LinkCard({
 export function LiveSection({ ids, perks }: { ids: string; perks: Perks | null }) {
   return (
     <section aria-labelledby={`${ids}-live`}>
-      <SectionHead id={`${ids}-live`} title="Live group Q&A" line="Twice a month, live with me and the other members. Bring what you're working on and what you're stuck on." />
+      <SectionHead id={`${ids}-live`} title="Live Q&A" />
       <QaCountdown url={perks?.links.qa} />
       {perks?.links.workshop ? (
         <LinkCard icon={PlayCircle} url={perks.links.workshop} label="Join the workshop" pending="">
@@ -238,9 +238,9 @@ export function LiveSection({ ids, perks }: { ids: string; perks: Perks | null }
 export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | null }) {
   return (
     <section aria-labelledby={`${ids}-telegram`}>
-      <SectionHead id={`${ids}-telegram`} title="Direct messaging" line="Message me on Telegram, for anything you're stuck on. I answer myself." />
-      <LinkCard icon={Send} url={perks?.links.telegram} label="Message me on Telegram" pending="Your Telegram link lands here soon.">
-        {perks?.links.telegram ? <p className="text-[1.05rem] font-medium">Opens a chat with me.</p> : null}
+      <SectionHead id={`${ids}-telegram`} title="Direct messaging" />
+      <LinkCard icon={Send} url={perks?.links.telegram} label="Get in touch directly" pending="Lands here soon.">
+        {perks?.links.telegram ? <p className="text-[1.05rem] font-medium">Telegram</p> : null}
       </LinkCard>
       {perks?.telegramQr ? (
         <div className={`${card} mt-4 flex flex-col items-center gap-6 p-6 sm:flex-row md:p-8`}>
@@ -248,7 +248,6 @@ export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | nu
           <img src={perks.telegramQr} alt="QR code for my Telegram" width={176} height={176} className="h-44 w-44 flex-none rounded-2xl" />
           <div className="text-center sm:text-left">
             <p className="text-[1.05rem] font-medium">Or scan it with your phone</p>
-            <p className={`mt-1.5 max-w-[22rem] text-[0.98rem] leading-[1.5] ${soft}`}>Point your camera at the code and Telegram opens on a chat with me.</p>
           </div>
         </div>
       ) : null}
@@ -259,10 +258,26 @@ export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | nu
 export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null }) {
   return (
     <section aria-labelledby={`${ids}-calls`}>
-      <SectionHead id={`${ids}-calls`} title="Your 1-on-1 call" line="A private call with me, about your product. Pick a time that works for you." />
-      <LinkCard icon={CalendarClock} url={perks?.links.calls} label="Book on Calendly" pending="My Calendly lands here soon.">
-        {perks?.links.calls ? <p className="text-[1.05rem] font-medium">Opens my Calendly: pick any open slot.</p> : null}
-      </LinkCard>
+      <SectionHead id={`${ids}-calls`} title="Your 1-on-1 call" />
+      {perks?.links.calls ? (
+        <>
+          {/* Calendly itself, in the page: pick a slot without leaving. */}
+          <div className="-mx-2 mt-4 overflow-hidden md:mx-0">
+            <iframe
+              title="Book your 1-on-1 call"
+              src={`${perks.links.calls}?embed_type=Inline&embed_domain=${window.location.host}&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=faf8f2&text_color=0b1f3a&primary_color=0b1f3a`}
+              className="block h-[44rem] w-full md:h-[42rem]"
+              loading="lazy"
+            />
+          </div>
+          <a href={perks.links.calls} target="_blank" rel="noopener noreferrer" className={`${quiet} mt-4 inline-flex items-center gap-1`}>
+            Open in Calendly
+            <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
+          </a>
+        </>
+      ) : (
+        <LinkCard icon={CalendarClock} url={null} label="" pending="Lands here soon." />
+      )}
     </section>
   );
 }
@@ -270,7 +285,7 @@ export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null 
 export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | null }) {
   return (
     <section aria-labelledby={`${ids}-network`}>
-      <SectionHead id={`${ids}-network`} title="The network" line="A private network of builders who ship. Show what you're making, find the people to make it with." />
+      <SectionHead id={`${ids}-network`} title="The network" />
       {perks?.links.network ? (
         <LinkCard icon={Users} url={perks.links.network} label="Open the network" pending="">
           <p className="text-[1.05rem] font-medium">Members only.</p>
@@ -332,11 +347,7 @@ export function SkillsSection({
       <SectionHead
         id={`${ids}-skills`}
         title="Skills"
-        line={
-          tier === "free"
-            ? "Every free skill downloads in one click. Premium ones are a small price each, or all included with Pro."
-            : `Every premium skill comes with ${planName(tier)}. Download any of them, as often as you like.`
-        }
+        line={tier === "free" ? "Free ones download in one click." : `All included with ${planName(tier)}.`}
       />
 
       <div role="tablist" aria-label="Skills" onKeyDown={onKey} className="mt-7 inline-flex gap-1 rounded-full border border-[var(--hairline-strong)] bg-white p-1">
@@ -569,7 +580,7 @@ export function ShelfSection({
         ? "One-page sheets to keep next to your screen."
         : "Every sheet, every video, every file."
       : shelf === "masterclass"
-        ? "In-depth lessons, 10 to 20 minutes each, on what I'd teach a friend building their first product. Made for members, never on YouTube."
+        ? "In-depth lessons, 10 to 20 minutes. Never on YouTube."
         : "Interactive components. Pick one, take its code.";
   return (
     <section aria-labelledby={`${ids}-${shelf}`}>
@@ -754,8 +765,7 @@ export function CustomSection() {
     <section aria-labelledby={`${ids}-h`}>
       <SectionHead
         id={`${ids}-h`}
-        title="Custom skills, or things you'd like to see"
-        line="A skill built to your spec, for you and your work: tell me what you need and I'll reply with a quote. Or ask for something for everyone, below."
+        title="Custom skills"
       />
       {state === "sent" ? (
         <p role="status" className={`${card} mt-7 p-6 text-[1.02rem]`}>

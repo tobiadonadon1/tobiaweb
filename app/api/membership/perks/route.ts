@@ -2,7 +2,7 @@ import { accountsConfigured, adminClient, currentMember } from "@/lib/account";
 import { membershipOf, ownedProducts } from "@/lib/membership/server";
 import { hasPerk, perksOf, trainingReach, type Perk } from "@/lib/membership/tiers";
 import { SHEETS } from "@/lib/training/sheets";
-import { sealedTelegram } from "@/lib/membership/contact";
+import { sealedLink } from "@/lib/membership/contact";
 
 /**
  * GET /api/membership/perks
@@ -20,8 +20,9 @@ import { sealedTelegram } from "@/lib/membership/contact";
  *   MEMBERS_CALLS_URL      1-on-1 booking page       Ultimate and up
  *   MEMBERS_NETWORK_URL    the members' network      Ultimate and up
  *
- * Telegram also has a sealed default with its QR code (lib/membership/contact.ts),
- * so it works with no variable set; MEMBERS_TELEGRAM_URL still wins if it is.
+ * Telegram (with its QR code) and the call have sealed defaults
+ * (lib/membership/contact.ts), so they work with no variable set; the
+ * variable still wins if it is.
  */
 
 export const dynamic = "force-dynamic";
@@ -48,10 +49,11 @@ export async function GET(request: Request) {
   }
   let telegramQr: string | null = null;
   if (hasPerk(tier, "telegram")) {
-    const sealed = await sealedTelegram();
+    const sealed = await sealedLink("telegram");
     links.telegram ||= sealed?.url ?? null;
     telegramQr = sealed?.qr ?? null;
   }
+  if (hasPerk(tier, "calls")) links.calls ||= (await sealedLink("calls"))?.url ?? null;
 
   // Rows above the plan (an Ultimate-only lesson, seen by Pro) come back
   // with no url and `locked`, so the dashboard can show what Ultimate adds
