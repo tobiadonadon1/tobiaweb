@@ -8,6 +8,7 @@ import { SHOP_EMAIL, productById } from "@/lib/shop/products";
 import { ACCOUNT_HREF } from "@/components/account/links";
 import { startDownload, useMember } from "@/components/account/use-member";
 import { NewsletterBox, rememberSubscribed, useKnownSubscribed } from "@/components/account/newsletter";
+import { useProPitch } from "@/components/membership/pro-pitch";
 
 /**
  * "LET ME KNOW WHERE YOU WANT ME TO SEND THE PRODUCT."
@@ -29,6 +30,10 @@ import { NewsletterBox, rememberSubscribed, useKnownSubscribed } from "@/compone
  * THE NEWSLETTER BOX sits right under the button, in every state that has
  * one, until this visitor has said yes (components/account/newsletter.tsx):
  * never ticked for them, never required. A tick rides along with the claim.
+ *
+ * THE PRO CARD comes first (components/membership/pro-pitch.tsx): the
+ * reveal button, the first touch of the email field, a send without one, and
+ * a Free member's Download all open it once; "Just send me …" carries on.
  */
 export function FreeClaim({
   productId,
@@ -84,7 +89,9 @@ export function FreeClaim({
   // While either is still unknown the box keeps its place, unseen.
   const askNews = member ? member.newsletter === false : member === null && known === false;
   const waitNews = member === undefined || (member === null && known === undefined);
+  const pitch = useProPitch(productId);
   const input = useRef<HTMLInputElement>(null);
+  const form = useRef<HTMLFormElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const holding = useRef(0);
   useEffect(() => () => window.clearTimeout(holding.current), []);
@@ -112,6 +119,8 @@ export function FreeClaim({
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (state === "sending") return;
+    // Sent without ever touching the field (autofill and Enter): the card still comes first.
+    if (pitch.wouldPitch()) return pitch.gate(() => form.current?.requestSubmit());
     setState("sending");
     try {
       const res = await fetch("/api/free", {
@@ -302,7 +311,7 @@ export function FreeClaim({
       <div ref={wrap} className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}>
         <button
           type="button"
-          onClick={() => afterHold(take)}
+          onClick={() => afterHold(() => pitch.gate(take))}
           disabled={state === "sending"}
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
@@ -323,6 +332,7 @@ export function FreeClaim({
             ? `That didn't work. Try again, or write to ${SHOP_EMAIL}.`
             : <>Downloads now. Signed in as <span className={t.ink}>{member.email}</span>.</>}
         </p>
+        {pitch.node}
       </div>
     );
   }
@@ -354,11 +364,13 @@ export function FreeClaim({
         <button
           type="button"
           onClick={() =>
-            afterHold(() => {
-              setOpen(true);
-              // The field takes the button's place; put the cursor in it.
-              requestAnimationFrame(() => input.current?.focus());
-            })
+            afterHold(() =>
+              pitch.gate(() => {
+                setOpen(true);
+                // The field takes the button's place; put the cursor in it.
+                requestAnimationFrame(() => input.current?.focus());
+              }),
+            )
           }
           className={`group inline-flex items-center gap-2.5 rounded-full border border-transparent px-7 py-3.5 text-[1.05rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring} ${buttonClassName}`}
         >
@@ -373,80 +385,90 @@ export function FreeClaim({
         <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
           Free. It arrives by email, or {signIn(t.ink)} to download it now.
         </p>
+        {pitch.node}
       </div>
     );
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}
-    >
-      {prompt ? (
-        <label htmlFor={id} className={`mb-3 text-[1rem] leading-[1.45] md:text-[1.05rem] ${light ? "text-balance" : ""} ${t.ask}`}>
-          Let me know where you want me to send the product.
-        </label>
-      ) : (
-        <label htmlFor={id} className="sr-only">
-          Your email
-        </label>
-      )}
-      <div className={`flex w-full items-center gap-1.5 rounded-full border p-1.5 ${t.field}`}>
+    <>
+      <form
+        ref={form}
+        onSubmit={submit}
+        className={`flex w-full max-w-[26rem] flex-col ${center ? "items-center text-center" : "items-start"} ${className}`}
+      >
+        {prompt ? (
+          <label htmlFor={id} className={`mb-3 text-[1rem] leading-[1.45] md:text-[1.05rem] ${light ? "text-balance" : ""} ${t.ask}`}>
+            Let me know where you want me to send the product.
+          </label>
+        ) : (
+          <label htmlFor={id} className="sr-only">
+            Your email
+          </label>
+        )}
+        <div className={`flex w-full items-center gap-1.5 rounded-full border p-1.5 ${t.field}`}>
+          <input
+            ref={input}
+            id={id}
+            type="email"
+            required
+            inputMode="email"
+            autoComplete="email"
+            placeholder="you@email.com"
+            value={email}
+            onFocus={(e) => {
+              if (!pitch.wouldPitch()) return;
+              e.currentTarget.blur();
+              pitch.gate(() => requestAnimationFrame(() => input.current?.focus()));
+            }}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (state !== "idle" && state !== "sending") setState("idle");
+            }}
+            className={`lx-input ${light ? "lx-input--light" : ""} min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-[1rem] outline-none ${t.input}`}
+          />
+          <button
+            type="submit"
+            disabled={state === "sending"}
+            className={`group inline-flex shrink-0 items-center gap-2 rounded-full border border-transparent px-5 py-2.5 text-[0.98rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring}`}
+          >
+            {state === "sending" ? (
+              <>
+                <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+                Sending
+              </>
+            ) : (
+              <>
+                Send
+                <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </>
+            )}
+          </button>
+        </div>
+        {newsBox}
+        {/* The honeypot. Off screen, out of the tab order, ignored by people. */}
         <input
-          ref={input}
-          id={id}
-          type="email"
-          required
-          inputMode="email"
-          autoComplete="email"
-          placeholder="you@email.com"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (state !== "idle" && state !== "sending") setState("idle");
-          }}
-          className={`lx-input ${light ? "lx-input--light" : ""} min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-[1rem] outline-none ${t.input}`}
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden
+          value={trap}
+          onChange={(e) => setTrap(e.target.value)}
+          className="absolute -left-[9999px] h-px w-px opacity-0"
         />
-        <button
-          type="submit"
-          disabled={state === "sending"}
-          className={`group inline-flex shrink-0 items-center gap-2 rounded-full border border-transparent px-5 py-2.5 text-[0.98rem] font-medium ${t.button} transition-transform duration-200 hover:scale-[1.03] active:scale-95 disabled:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${t.ring}`}
-        >
-          {state === "sending" ? (
-            <>
-              <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
-              Sending
-            </>
-          ) : (
-            <>
-              Send
-              <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-            </>
-          )}
-        </button>
-      </div>
-      {newsBox}
-      {/* The honeypot. Off screen, out of the tab order, ignored by people. */}
-      <input
-        type="text"
-        name="website"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden
-        value={trap}
-        onChange={(e) => setTrap(e.target.value)}
-        className="absolute -left-[9999px] h-px w-px opacity-0"
-      />
-      <p role="alert" className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.error}`}>
-        {state === "bad-email"
-          ? "That address doesn't look right. Mind checking it?"
-          : state === "too-many"
-            ? "Already on its way. Give it a few minutes, then check Spam."
-            : state === "failed"
-              ? `That didn't go through. Try again, or write to ${SHOP_EMAIL}.`
-              : ""}
-      </p>
-      <p className={`mt-1 text-[0.88rem] ${t.soft}`}>Have an account? {signIn(t.ink)} and skip this.</p>
-    </form>
+        <p role="alert" className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.error}`}>
+          {state === "bad-email"
+            ? "That address doesn't look right. Mind checking it?"
+            : state === "too-many"
+              ? "Already on its way. Give it a few minutes, then check Spam."
+              : state === "failed"
+                ? `That didn't go through. Try again, or write to ${SHOP_EMAIL}.`
+                : ""}
+        </p>
+        <p className={`mt-1 text-[0.88rem] ${t.soft}`}>Have an account? {signIn(t.ink)} and skip this.</p>
+      </form>
+      {pitch.node}
+    </>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { useMember } from "@/components/account/use-member";
+import { useProPitch } from "@/components/membership/pro-pitch";
 import { money, offer, planName } from "@/lib/membership/tiers";
 import { productById } from "@/lib/shop/products";
 
@@ -35,6 +36,10 @@ import { productById } from "@/lib/shop/products";
  * the same form posts to the same route, which reads the plan again on the
  * server and charges, downloads or sends to the plans accordingly. Signed
  * out, or still asking, the button reads as it always did.
+ *
+ * THE PRO CARD FIRST (components/membership/pro-pitch.tsx). Signed out or
+ * on Free, the first press opens the card instead of posting; "Just buy …"
+ * posts this same form. Members never see it.
  *
  * THE FILL IS THE DARKER CLAY. Paper on #ce4631 is 4.35:1, just under AA for
  * text this size; on --accent-clay-text it passes. Same colour to the eye,
@@ -72,6 +77,8 @@ export function BuyForm({
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState<false | "error" | "soon">(false);
   const member = useMember();
+  const pitch = useProPitch(productId);
+  const form = useRef<HTMLFormElement>(null);
   const product = productById(productId);
   const deal = member && product ? offer(product, member.tier) : null;
   const memberLabel =
@@ -104,63 +111,72 @@ export function BuyForm({
   }, [reportErrors]);
 
   return (
-    <form
-      action="/api/checkout"
-      method="post"
-      onSubmit={(e) => {
-        if (pending || soon) {
-          e.preventDefault();
-          return;
-        }
-        setPending(true);
-        setFailed(false);
-      }}
-      className={className}
-    >
-      <input type="hidden" name="product" value={productId} />
-
-      <button
-        type="submit"
-        aria-busy={pending}
-        disabled={pending || soon}
-        className={`group inline-flex items-center justify-center rounded-full font-medium ${
-          buttonClassName ?? "bg-[var(--accent-clay-text)] text-[var(--paper)] shadow-[0_18px_40px_-18px_rgba(185,58,38,0.75)] hover:shadow-[0_24px_48px_-18px_rgba(185,58,38,0.85)]"
-        } ${
-          compact ? "min-h-[2.9rem] gap-2 px-5 py-2.5 text-[0.95rem]" : "min-h-[3.5rem] gap-3 px-9 py-4 text-[1.05rem]"
-        } tracking-[-0.005em] transition-[transform,box-shadow,background-color] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 ${soon ? "disabled:cursor-default" : ""} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
-          tone === "ink" ? "focus-visible:outline-[var(--paper)]" : "focus-visible:outline-[var(--ink)]"
-        }`}
+    <>
+      <form
+        ref={form}
+        action="/api/checkout"
+        method="post"
+        onSubmit={(e) => {
+          if (pending || soon) {
+            e.preventDefault();
+            return;
+          }
+          if (pitch.wouldPitch()) {
+            e.preventDefault();
+            pitch.gate(() => form.current?.requestSubmit());
+            return;
+          }
+          setPending(true);
+          setFailed(false);
+        }}
+        className={className}
       >
-        {soon ? (
-          compact ? "Opens soon" : "Checkout opens soon"
-        ) : pending ? (
-          <>
-            <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" />
-            {compact ? "Opening" : "Opening checkout"}
-          </>
-        ) : (
-          <>
-            {memberLabel ?? label ?? (compact ? `Buy · ${price}` : `Buy it for ${price}`)}
-            <ArrowRight
-              aria-hidden
-              className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
-            />
-          </>
-        )}
-      </button>
+        <input type="hidden" name="product" value={productId} />
 
-      {failed ? (
-        <p
-          role="alert"
-          className={`${align === "center" ? "mx-auto" : ""} mt-5 max-w-[30ch] text-pretty text-[0.95rem] leading-[1.5] ${
-            tone === "ink" ? "text-[var(--paper)]" : "text-[var(--accent-clay-text)]"
+        <button
+          type="submit"
+          aria-busy={pending}
+          disabled={pending || soon}
+          className={`group inline-flex items-center justify-center rounded-full font-medium ${
+            buttonClassName ?? "bg-[var(--accent-clay-text)] text-[var(--paper)] shadow-[0_18px_40px_-18px_rgba(185,58,38,0.75)] hover:shadow-[0_24px_48px_-18px_rgba(185,58,38,0.85)]"
+          } ${
+            compact ? "min-h-[2.9rem] gap-2 px-5 py-2.5 text-[0.95rem]" : "min-h-[3.5rem] gap-3 px-9 py-4 text-[1.05rem]"
+          } tracking-[-0.005em] transition-[transform,box-shadow,background-color] duration-300 ease-out hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 ${soon ? "disabled:cursor-default" : ""} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ${
+            tone === "ink" ? "focus-visible:outline-[var(--paper)]" : "focus-visible:outline-[var(--ink)]"
           }`}
         >
-          {failed === "soon"
-            ? "Checkout isn\u2019t open yet. It opens soon, on this page."
-            : <>Checkout didn&rsquo;t open. Please try again in a moment.</>}
-        </p>
-      ) : null}
-    </form>
+          {soon ? (
+            compact ? "Opens soon" : "Checkout opens soon"
+          ) : pending ? (
+            <>
+              <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" />
+              {compact ? "Opening" : "Opening checkout"}
+            </>
+          ) : (
+            <>
+              {memberLabel ?? label ?? (compact ? `Buy · ${price}` : `Buy it for ${price}`)}
+              <ArrowRight
+                aria-hidden
+                className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </>
+          )}
+        </button>
+
+        {failed ? (
+          <p
+            role="alert"
+            className={`${align === "center" ? "mx-auto" : ""} mt-5 max-w-[30ch] text-pretty text-[0.95rem] leading-[1.5] ${
+              tone === "ink" ? "text-[var(--paper)]" : "text-[var(--accent-clay-text)]"
+            }`}
+          >
+            {failed === "soon"
+              ? "Checkout isn\u2019t open yet. It opens soon, on this page."
+              : <>Checkout didn&rsquo;t open. Please try again in a moment.</>}
+          </p>
+        ) : null}
+      </form>
+      {pitch.node}
+    </>
   );
 }
