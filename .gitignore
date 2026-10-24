@@ -52,3 +52,6 @@ next-env.d.ts
 
 # Supabase CLI cache (holds the database URL with its password)
 supabase/.temp/
+
+# Supabase CLI cache (project ref, pooler URL): local only
+/supabase/.temp/
