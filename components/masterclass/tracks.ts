@@ -6,8 +6,8 @@
  * themselves go in with scripts/shelf-add.mjs (shelf "masterclass") and show
  * up on the page for members as soon as they're in.
  *
- * `mark` is a cut-paper drawing from material/specimens.tsx; `from`/`to` is
- * the poster's colour, deep enough to carry white type.
+ * Each track is a row of videos on the page, like a YouTube channel's
+ * categories. (`mark`, `from` and `to` are unused for now.)
  */
 export type Track = { id: string; title: string; line: string; mark: string; from: string; to: string };
 

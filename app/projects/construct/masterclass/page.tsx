@@ -9,15 +9,16 @@ export const metadata: Metadata = {
 };
 
 /**
- * THE MASTERCLASS (the shelf's Masterclass family), a room of its own like
- * Design: dark, because these are films. The page is a client component
- * (components/masterclass/masterclass-page.tsx) because what it shows a
- * member, their lessons, comes from the plan check.
+ * THE MASTERCLASS (the shelf's Masterclass family), laid out like a YouTube
+ * channel on Construct's paper. Members only: proxy.ts sends anyone without
+ * an account to sign in first. The page is a client component
+ * (components/masterclass/masterclass-page.tsx) because a member's lessons
+ * come from the plan check.
  */
 export default function Masterclass() {
   return (
-    <main className="relative min-h-screen overflow-x-clip bg-[#07111f] text-white">
-      <BackLink href="/projects/construct" label="Construct" tone="ink" />
+    <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
+      <BackLink href="/projects/construct" label="Construct" />
       <MasterclassPage />
     </main>
   );
