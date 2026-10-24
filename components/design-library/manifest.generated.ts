@@ -5,9 +5,9 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "Five app ideas to sort. Drag the top card and it tilts with your hand while a Keep or Skip stamp fades in; throw or flick it off, or let go and it springs back. The card behind rises to meet you. Out of cards? Shuffle again.",
     "free": false
   },
-  "magnify-dock": {
-    "title": "Dock",
-    "description": "A desktop dock that swells under your pointer. Click an app and it bounces open.",
+  "silk-web": {
+    "title": "Web",
+    "description": "A spider web that behaves like a membrane. Pull it and the stretched silk glows; let go and it snaps back.",
     "free": false
   },
   "rolling-counter": {
@@ -203,6 +203,11 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
   "avatar-stack": {
     "title": "Avatar stack",
     "description": "Overlapping faces that fan apart one after another when you reach for them. The face under the pointer lifts, and one name tag slides along from face to face instead of blinking in and out.",
+    "free": false
+  },
+  "magnify-dock": {
+    "title": "Dock",
+    "description": "A desktop dock that swells under your pointer. Click an app and it bounces open.",
     "free": false
   }
 };
