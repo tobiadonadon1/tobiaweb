@@ -45,8 +45,8 @@ const TALK = {
   afterPoster: `${DIR}/talk-after.jpg`,
 };
 
-/** The storyboard review page, recorded in use on the clip above. */
-const PLAN = { src: `${DIR}/storyboard.mp4`, poster: `${DIR}/storyboard.jpg`, ratio: "16 / 10" };
+/** The storyboard review page, a still of it in use on the clip above. */
+const PLAN = { src: `${DIR}/storyboard.jpg`, width: 1440, height: 900 };
 
 /** The four things he said on camera, and what Claude did with each. */
 const MOMENTS = [
@@ -292,7 +292,14 @@ export function VideoEditorPage() {
                 <span className="size-2.5 rounded-full bg-white/35" />
                 <span className="size-2.5 rounded-full bg-white/35" />
               </div>
-              <Film src={PLAN.src} poster={PLAN.poster} ratio={PLAN.ratio} />
+              <Image
+                src={PLAN.src}
+                alt="The storyboard: the video split into scenes, each with what it will do and why"
+                width={PLAN.width}
+                height={PLAN.height}
+                sizes="(min-width: 1024px) 64rem, 100vw"
+                className="block aspect-[16/10] h-auto w-full bg-[#0f1012] object-cover"
+              />
             </div>
           </figure>
           <ol className="mx-auto mt-10 grid max-w-[64rem] list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">

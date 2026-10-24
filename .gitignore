@@ -55,3 +55,6 @@ supabase/.temp/
 
 # Supabase CLI cache (project ref, pooler URL): local only
 /supabase/.temp/
+
+# Supabase CLI cache
+supabase/.temp/
