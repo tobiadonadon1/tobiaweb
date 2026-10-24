@@ -23,17 +23,9 @@
   opacity: 0;
   transition: opacity 0.35s ease;
 }
-.pp-aura { opacity: 0; transition: opacity 0.5s ease; }
-.pp-veil[data-open="true"] .pp-dim,
-.pp-veil[data-open="true"] .pp-aura { opacity: 1; }
+.pp-veil[data-open="true"] .pp-dim { opacity: 1; }
 
-/* Lights behind the glass, so it has something to bend. They drift a little against the cursor. */
-.pp-aura { position: absolute; z-index: 0; left: 0; top: 0; border-radius: 50%; filter: blur(8px); pointer-events: none; will-change: transform; }
-.pp-aura-a { width: 300px; height: 300px; background: radial-gradient(circle at 35% 35%, #ffb08a, #d9502f 55%, #a82f1d); }
-.pp-aura-b { width: 220px; height: 220px; background: radial-gradient(circle at 40% 30%, #9db8ff, #4a3fb0 60%, #241a5e); }
-.pp-aura-c { width: 120px; height: 120px; background: radial-gradient(circle at 40% 30%, #ffe3a3, #ec8a35); }
-
-.pp-tilt { position: relative; z-index: 1; width: min(440px, 100%); will-change: transform; }
+.pp-tilt { position: relative; width: min(440px, 100%); will-change: transform; }
 
 .pp-card {
   position: relative;
@@ -211,5 +203,5 @@
   .pp-alt { padding: 0 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pp-dim, .pp-aura, .pp-card, .pp-cta { transition: none; }
+  .pp-dim, .pp-card, .pp-cta { transition: none; }
 }

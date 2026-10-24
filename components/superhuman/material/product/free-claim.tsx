@@ -179,7 +179,9 @@ export function FreeClaim({
         check: "bg-[#111111] text-white",
         error: "text-[#2a0700] font-semibold",
         button: "bg-[#111111] text-white hover:bg-black",
-        box: ["#111111", "#ffffff", "rgba(17,17,17,0.6)"],
+        // A white box with a black outline and black words: a see-through outline got lost in the orange.
+        box: ["#111111", "#ffffff", "#111111", "#ffffff"],
+        boxText: "text-[#111111] font-medium",
       }
     : tone === "cobalt"
     ? {
@@ -255,10 +257,11 @@ export function FreeClaim({
       <NewsletterBox
         checked={news}
         onChange={setNews}
-        soft={t.soft}
+        soft={("boxText" in t && t.boxText) || t.soft}
         accent={t.box[0]}
         mark={t.box[1]}
         line={t.box[2]}
+        fill={t.box[3]}
         center={center}
         fine={fine}
         hidden={!askNews}

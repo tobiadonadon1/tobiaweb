@@ -52,6 +52,7 @@ export function NewsletterBox({
   accent,
   mark,
   line,
+  fill,
   center = false,
   hidden = false,
   nudge = false,
@@ -66,6 +67,8 @@ export function NewsletterBox({
   accent: string;
   mark: string;
   line: string;
+  /** The empty box's fill, where an outline alone gets lost (Motion Designer's orange). */
+  fill?: string;
   center?: boolean;
   /** Keep its space but don't show it yet (while the page asks who this is). */
   hidden?: boolean;
@@ -83,7 +86,7 @@ export function NewsletterBox({
       data-nudge={nudge || undefined}
       data-fine={fine || undefined}
       aria-hidden={hidden || undefined}
-      style={{ "--nl-accent": accent, "--nl-mark": mark, "--nl-line": line } as React.CSSProperties}
+      style={{ "--nl-accent": accent, "--nl-mark": mark, "--nl-line": line, "--nl-fill": fill } as React.CSSProperties}
     >
       <input
         id={id}

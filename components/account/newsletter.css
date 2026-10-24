@@ -18,7 +18,7 @@
   margin: 0.1rem 0 0;
   border: 1.5px solid var(--nl-line);
   border-radius: 0.32rem;
-  background: transparent;
+  background: var(--nl-fill, transparent);
   display: grid;
   place-content: center;
   cursor: pointer;

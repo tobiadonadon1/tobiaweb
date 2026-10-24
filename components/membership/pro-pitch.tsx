@@ -26,7 +26,8 @@ import "./pro-pitch.css";
  * The Join buttons are the join page's own plain forms (/api/membership/join):
  * sign up first if needed, then Stripe Checkout.
  *
- * The card leans a little toward the cursor and its rim catches the light;
+ * The card leans a little toward the cursor and its rim catches the light,
+ * on the blurred page alone (no coloured lights behind it: Tobia, 2026-10-23);
  * kept small on purpose (Tobia: "way less reactiveness"). None of it moves
  * with reduced motion.
  */
@@ -117,7 +118,6 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
   const veil = useRef<HTMLDivElement>(null);
   const tilt = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLElement>(null);
-  const auras = useRef<(HTMLDivElement | null)[]>([]);
   const close = useRef(onClose);
   useEffect(() => void (close.current = onClose));
   const copy = copyFor(product);
@@ -154,7 +154,7 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
     };
   }, []);
 
-  // The light: a small lean toward the cursor, a soft highlight, the lights behind drifting a little.
+  // The light: a small lean toward the cursor and a soft highlight that follows it.
   useEffect(() => {
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let tx = 0, ty = 0, x = 0, y = 0, px = 0.5, py = 0.2, cx = 0.5, cy = 0.2, raf = 0;
@@ -180,17 +180,6 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
         c.style.setProperty("--pp-mx", `${cx * 100}%`);
         c.style.setProperty("--pp-my", `${cy * 100}%`);
         c.style.setProperty("--pp-ang", `${(Math.atan2(cy - 0.5, cx - 0.5) * 180) / Math.PI + 50}deg`);
-        const r = c.getBoundingClientRect();
-        const vr = el.getBoundingClientRect();
-        const mx = r.left - vr.left + r.width / 2;
-        const my = r.top - vr.top + el.scrollTop + r.height / 2;
-        const k = still ? 0 : 1;
-        const place = [
-          [-150 - r.width * 0.42 - x * 8 * k, -150 - r.height * 0.3 - y * 6 * k],
-          [-110 + r.width * 0.42 - x * 10 * k, -110 + r.height * 0.28 - y * 8 * k],
-          [-60 + r.width * 0.3 - x * 12 * k, -60 - r.height * 0.46 - y * 10 * k],
-        ];
-        auras.current.forEach((a, i) => a && (a.style.transform = `translate(${mx + place[i][0]}px, ${my + place[i][1]}px)`));
       }
       raf = requestAnimationFrame(frame);
     };
@@ -217,9 +206,6 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
       onSubmit={(e) => e.stopPropagation()}
     >
       <div aria-hidden className="pp-dim" onClick={onClose} />
-      {["pp-aura-a", "pp-aura-b", "pp-aura-c"].map((c, i) => (
-        <div key={c} ref={(n) => void (auras.current[i] = n)} aria-hidden className={`pp-aura ${c}`} />
-      ))}
       <div ref={tilt} className="pp-tilt">
         <article ref={card} className="pp-card">
           <button type="button" className="pp-close" aria-label="Close" onClick={onClose}>
