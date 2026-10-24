@@ -104,7 +104,7 @@ export type Product = {
    * is kept with the account. /api/free refuses to email it.
    */
   accountOnly?: boolean;
-  /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it" and goes to the tool (#check). */
+  /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it" (the page opens at its top, the tool is on it). */
   onPage?: boolean;
   /**
    * WHAT A MEMBERSHIP DOES TO A PAID SKILL (lib/membership/tiers.ts):

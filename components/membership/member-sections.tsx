@@ -488,7 +488,7 @@ function PaidAction({ product: p, tier, ready }: { product: Product; tier: Tier;
   }
   if (deal.kind !== "buy") return null;
   return (
-    <Link href={`${p.href}#buy`} className={inkPill}>
+    <Link href={p.href} className={inkPill}>
       Buy
       <span className="tabular-nums">
         {deal.priceCents < deal.fullCents ? (

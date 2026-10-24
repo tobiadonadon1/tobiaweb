@@ -79,11 +79,13 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
           {product ? (
             <>
               {product.free ? (
-                // Given away for an email: straight to the product page's form.
-                // A checkout button here would say "Buy · Free", and Stripe
+                // Given away for an email: the product page, from its top (its
+                // hero has the same button). Jumping straight to the form
+                // landed people halfway down a page they hadn't seen yet. A
+                // checkout button here would say "Buy · Free", and Stripe
                 // refuses a free product anyway.
                 <Link
-                  href={`${href}#${product.onPage ? "check" : "claim"}`}
+                  href={href}
                   className="group/get inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
                 >
                   {product.onPage ? "Try it" : "Get it free"}
