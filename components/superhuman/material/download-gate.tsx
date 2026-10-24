@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Download, X } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ACCOUNT_HREF } from "@/components/account/links";
 import { useMember } from "@/components/account/use-member";
 import { NewsletterBox, rememberSubscribed, useKnownSubscribed } from "@/components/account/newsletter";
 
@@ -57,7 +54,6 @@ export function DownloadGate({
   const [news, setNews] = useState(false);
   const known = useKnownSubscribed();
   const member = useMember();
-  const pathname = usePathname();
 
   const opener = useRef<HTMLButtonElement>(null);
   const field = useRef<HTMLInputElement>(null);
@@ -249,16 +245,6 @@ export function DownloadGate({
                     />
                   ) : null}
                 </form>
-                <p className="mt-4 text-[0.9rem] text-[color:rgba(11,31,58,0.62)]">
-                  Have an account?{" "}
-                  <Link
-                    href={`${ACCOUNT_HREF}?next=${encodeURIComponent(pathname ?? "/projects/construct")}`}
-                    className="text-[var(--ink)] underline underline-offset-4"
-                  >
-                    Sign in
-                  </Link>{" "}
-                  and it downloads straight away.
-                </p>
               </>
             )}
           </div>

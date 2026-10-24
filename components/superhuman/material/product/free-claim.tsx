@@ -24,8 +24,7 @@ import { useProPitch } from "@/components/membership/pro-pitch";
  *
  * SIGNED IN, IT IS ONE CLICK. A Construct member (components/account) sees
  * the same button, and pressing it downloads the product there and then:
- * no field, no email to wait for. Everyone else, once it's sent, is told
- * they can skip the form next time with an account.
+ * no field, no email to wait for.
  *
  * THE NEWSLETTER BOX sits right under the button, in every state that has
  * one, until this visitor has said yes (components/account/newsletter.tsx):
@@ -282,13 +281,6 @@ export function FreeClaim({
           It&rsquo;s on its way to <span className={t.ink}>{email}</span>. If it&rsquo;s
           not there in a minute, look in Promotions or Spam.
         </p>
-        <p className={`mt-3 max-w-[36ch] text-[0.95rem] leading-[1.5] ${t.soft}`}>
-          Next time, skip the email:{" "}
-          <Link href={`${ACCOUNT_HREF}?mode=signup&email=${encodeURIComponent(email)}`} className={`underline underline-offset-4 ${t.ink}`}>
-            create an account
-          </Link>
-          .
-        </p>
       </div>
     );
   }
@@ -386,7 +378,7 @@ export function FreeClaim({
         </button>
         {newsBox}
         <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
-          Free. It arrives by email, or {signIn(t.ink)} to download it now.
+          Free. It arrives by email.
         </p>
         {pitch.node}
       </div>
@@ -469,7 +461,6 @@ export function FreeClaim({
                 ? `That didn't go through. Try again, or write to ${SHOP_EMAIL}.`
                 : ""}
         </p>
-        <p className={`mt-1 text-[0.88rem] ${t.soft}`}>Have an account? {signIn(t.ink)} and skip this.</p>
       </form>
       {pitch.node}
     </>

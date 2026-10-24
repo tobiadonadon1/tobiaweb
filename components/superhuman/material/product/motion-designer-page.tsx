@@ -86,13 +86,16 @@ function Mono({ children, className = "" }: { children: React.ReactNode; classNa
   );
 }
 
-/** WHAT IT DOES, as pins on the hero (Pro's "over the free one" pins). */
-const PINS = ["Seven styles to pick from", "A storyboard that plays first", "Its own soundtrack", "Real iPhone & MacBook frames"];
-
 /** A photographed device with something playing in its screen. */
 function Device({ d, children, className = "" }: { d: typeof DISPLAY; children: React.ReactNode; className?: string }) {
   return (
     <div className={`relative ${className}`} style={{ aspectRatio: `${d.w} / ${d.h}` }}>
+      {/* black under the bezel's inner edge: scaled down, its soft edge would let the page colour through */}
+      <div
+        aria-hidden
+        className="absolute bg-black"
+        style={{ left: `${d.x - 0.8}%`, top: `${d.y - 1}%`, width: `${d.sw + 1.6}%`, height: `${d.sh + 2}%` }}
+      />
       <div
         className="absolute overflow-hidden bg-black"
         style={{ left: `${d.x}%`, top: `${d.y}%`, width: `${d.sw}%`, height: `${d.sh}%` }}
@@ -111,7 +114,6 @@ const STYLES = [
   { n: "03", style: "Paper", about: "App Launcher", best: "Consumer apps, explainers", id: "paper", bg: LIME, fg: INK },
   { n: "04", style: "Terminal", about: "Video Editor", best: "Dev tools, CLIs, agents", id: "terminal", bg: INK, fg: "#fff" },
   { n: "05", style: "Data", about: "The 98¢ Trade", best: "Results, reports, numbers", id: "data", bg: "#FFFFFF", fg: INK },
-  { n: "06", style: "Cinematic", about: "Motion Designer", best: "Teasers, brand films", id: "cinematic", bg: "#F7B500", fg: INK },
 ] as const;
 
 /** One of the six, as a tile in its own colour: the claim, then the proof (Pro's tiles). */
@@ -254,14 +256,6 @@ export function MotionDesignerPage() {
                 <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="ember" align="start" />
               </div>
             </div>
-            <ul className="mdx-pins mdx-in list-none p-0" style={{ "--i": 2 } as React.CSSProperties}>
-              {PINS.map((p, i) => (
-                <li key={p} className="mdx-pin" style={{ "--i": i } as React.CSSProperties}>
-                  <span aria-hidden className="mdx-pin__dot">+</span>
-                  <span>{p}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
@@ -325,7 +319,7 @@ export function MotionDesignerPage() {
         </div>
       </section>
 
-      {/* 003. THE PLAN FIRST: the storyboard, recorded in use. */}
+      {/* 003. THE PLAN FIRST: the storyboard, as you see it. */}
       <section aria-labelledby="mdx-plan" className="relative overflow-hidden bg-[#111] text-white">
         <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
           <div className="grid grid-cols-1 items-end gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
@@ -335,29 +329,22 @@ export function MotionDesignerPage() {
                 The plan <span className="block" style={{ color: ORANGE }}>plays first.</span>
               </h2>
             </div>
-            <p className="max-w-[40ch] text-pretty text-[1.12rem] font-medium leading-[1.5] text-white/70 md:pb-3">
-              Before it renders, it opens a storyboard in your browser that plays the real video. Flip the style, the
-              format or the length in one tap, fix a word, then approve.
+            <p className="max-w-[30ch] text-pretty text-[1.3rem] font-semibold leading-[1.4] text-white md:pb-3">
+              You see the plan before it renders. <span style={{ color: ORANGE }}>Every choice is one tap.</span>
             </p>
           </div>
           <div className="mx-auto mt-12 max-w-[68rem] md:mt-16">
             <Device d={MACBOOK}>
-              <Film
-                src={S("storyboard-v1.mp4")}
-                poster={S("storyboard-v1.jpg")}
-                label="the storyboard, recorded in use"
-                className="h-full"
+              <Image
+                src={S("storyboard-v1.jpg")}
+                alt="The storyboard: the video playing on top, and under it what it decided, with the other styles one tap away and Approve and render."
+                width={1280}
+                height={800}
+                unoptimized
+                className="block h-full w-full object-cover object-top"
               />
             </Device>
           </div>
-          <ol className="mx-auto mt-10 grid max-w-[68rem] list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3">
-            {["It plays, with its sound", "Every choice is one tap", "Approve once, it renders"].map((t, i) => (
-              <li key={t} className="flex items-baseline gap-3 border-t border-white/15 pt-4 text-[1.05rem] font-medium">
-                <Mono className="text-[#FF5A1F]">0{i + 1}</Mono>
-                {t}
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
 
@@ -367,7 +354,7 @@ export function MotionDesignerPage() {
           <div className="relative text-center">
             <Mono className="opacity-60">004</Mono>
             <h2 id="mdx-gets" className="mx-auto mt-3 max-w-[14ch] text-balance font-[family-name:var(--mdx-archivo)] text-[clamp(2.8rem,7.5vw,6.2rem)] font-black uppercase leading-[0.88] tracking-[-0.03em] [font-variation-settings:'wdth'_70]">
-              What free gets you.
+              Done for you.
             </h2>
             <p className={`mx-auto mt-5 max-w-[46ch] text-balance text-[1.08rem] font-medium leading-[1.5] ${MUTED}`}>
               A motion designer inside Claude Code. It decides, shows you, then makes it.
@@ -390,7 +377,7 @@ export function MotionDesignerPage() {
               />
             </Tile>
 
-            <Tile n="03" title="Its own soundtrack." text="Music composed for every video, cuts on the beat, mixed to −14 LUFS. Nothing to license." bg={COBALT} fg="#ffffff" wide>
+            <Tile n="03" title="Its own soundtrack." text="Music composed for every video, warm and on the beat. Nothing to license." bg={COBALT} fg="#ffffff" wide>
               <SoundtrackWave />
             </Tile>
 
