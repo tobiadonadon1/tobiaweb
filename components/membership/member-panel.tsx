@@ -460,13 +460,17 @@ function Overview({
             {member.granted ? "Given to you by Tobi." : sub ? statusLine(sub) : tier === "free" ? plan.line : "Set up with me directly."}
           </p>
         </div>
-        <div className="flex-none">
-          <a href="#billing" className={`${PLAN_BUTTON} px-7 ${look.button}`}>
-            {/* Free has only a way up; a member can go either way. */}
-            {tier === "free" ? "Upgrade" : "Change plan"}
-            <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
-        </div>
+        {/* Only Free gets a button here. A member's banner just says the
+            plan: "Change plan" on it read as an invitation to cancel, and
+            changing plan is still one click away in Plan & billing. */}
+        {tier === "free" ? (
+          <div className="flex-none">
+            <a href="#billing" className={`${PLAN_BUTTON} px-7 ${look.button}`}>
+              Upgrade
+              <ArrowRight aria-hidden className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+        ) : null}
       </div>
 
       {/* WHAT'S NEW, or the latest: small, one line each, above the map. */}
