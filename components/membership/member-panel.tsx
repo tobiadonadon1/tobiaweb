@@ -191,13 +191,17 @@ export function MemberPanel({
             </button>
           </p>
         </div>
-        <Link
-          href={next ?? "/projects/construct"}
-          className="group inline-flex items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-white px-5 py-2.5 text-[0.98rem] transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-        >
-          {next ? "Back to where you were" : "Browse Construct"}
-          <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </Link>
+        {/* The way back to Construct is the page's own button, top left. This
+            one only shows after a sign-in that came from somewhere else. */}
+        {next ? (
+          <Link
+            href={next}
+            className="group inline-flex items-center gap-2 rounded-full border border-[var(--hairline-strong)] bg-white px-5 py-2.5 text-[0.98rem] transition-colors hover:border-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+          >
+            Back to where you were
+            <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </Link>
+        ) : null}
       </header>
 
       {joined ? (
@@ -573,7 +577,9 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
   const look = LOOK[tier];
   const plan = tier === "free" ? FREE_PLAN : PLANS[tier];
   const price = planPrice(tier);
-  const others = TIERS.filter((t) => t !== tier);
+  // A member doesn't "downgrade" to Free from a card next to the plans:
+  // leaving is its own quiet section at the bottom (`Cancel`).
+  const others = TIERS.filter((t): t is Exclude<Tier, "free"> => t !== tier && t !== "free");
 
   return (
     <div className="flex flex-col gap-14">
@@ -598,7 +604,7 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
                   Manage billing
                 </button>
                 <p className={`mt-3 text-[0.88rem] leading-[1.45] ${look.soft}`}>
-                  Card, invoices, plan or cancel. Handled by Stripe.
+                  Card and invoices. Handled by Stripe.
                 </p>
               </form>
             ) : null}
@@ -638,11 +644,11 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
         {sub && !member.granted ? (
           <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
             Up or down, any time. Moving up, you pay only the difference this month. Moving down, the unused part comes off
-            your next invoice. Your free skills and anything you bought stay yours on every plan.
+            your next invoice.
           </p>
         ) : member.granted ? (
           <p className={`mt-3 max-w-[44rem] text-[1rem] leading-[1.5] ${soft}`}>
-            Your plan is a gift, so there&rsquo;s nothing to cancel or move down from. Anything above it you can join as usual.
+            Your plan is a gift. Anything above it you can join as usual.
           </p>
         ) : null}
         <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -653,7 +659,85 @@ function Billing({ ids, member, billingError }: { ids: string; member: NonNullab
           ))}
         </div>
       </section>
+
+      {paid ? <Cancel member={member} /> : null}
     </div>
+  );
+}
+
+/**
+ * CANCEL, at the very bottom of Plan & billing: plain about what happens,
+ * with a quiet button, not a card that sits beside the plans.
+ *
+ *   paying              what they keep and until when; Stripe's cancel step
+ *   already cancelled   until when it stays open; how to undo it
+ *   a gift              nothing to cancel, no card on file
+ *   set up by hand      write to me
+ */
+function Cancel({ member }: { member: NonNullable<MemberInfo> }) {
+  const [opening, setOpening] = useState(false);
+  const sub = member.subscription;
+  const name = planName(member.tier);
+  const until = sub ? date(sub.renews) : null;
+  const point = (text: string) => (
+    <li key={text} className="flex gap-2.5">
+      <span aria-hidden className="mt-[0.6rem] h-1 w-1 flex-none rounded-full bg-[rgba(11,31,58,0.4)]" />
+      <span>{text}</span>
+    </li>
+  );
+  const portal = (to: "free" | null, label: string) => (
+    <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)} className="mt-6">
+      {to ? <input type="hidden" name="to" value={to} /> : null}
+      <button type="submit" disabled={opening} className={`${quiet} inline-flex items-center gap-2 disabled:opacity-60`}>
+        {opening ? <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" /> : null}
+        {label}
+      </button>
+    </form>
+  );
+
+  let body: React.ReactNode;
+  if (member.granted && !sub) {
+    body = <p>Your plan was given to you by Tobi: there&rsquo;s no card on file and nothing is ever charged, so there&rsquo;s nothing to cancel.</p>;
+  } else if (!sub) {
+    body = (
+      <p>
+        Your plan was set up with me directly.{" "}
+        <a href={CHANGE_MAILTO} className={quiet}>
+          Write to me
+        </a>{" "}
+        and I&rsquo;ll stop it.
+      </p>
+    );
+  } else if (sub.cancelAtPeriodEnd) {
+    body = (
+      <>
+        <ul className="grid gap-1.5">
+          {point(until ? `Your subscription is cancelled. ${name} stays open until ${until}, then your account moves to Free.` : `Your subscription is cancelled. ${name} stays open to the end of this period, then your account moves to Free.`)}
+          {point("You won't be charged again.")}
+          {point("Changed your mind? Renew it in billing before then and nothing changes.")}
+        </ul>
+        {portal(null, "Renew in billing")}
+      </>
+    );
+  } else {
+    body = (
+      <>
+        <ul className="grid gap-1.5">
+          {point(until ? `${name} stays open until ${until}, the end of what you've paid for. You won't be charged again.` : `${name} stays open to the end of what you've paid for. You won't be charged again.`)}
+          {point("Then your account moves to Free. Your free skills and anything you bought stay yours.")}
+          {point("You can undo it until that day, or join again any time.")}
+        </ul>
+        {portal("free", "Cancel subscription")}
+        <p className="mt-2 text-[0.88rem]">Handled by Stripe, in one step.</p>
+      </>
+    );
+  }
+
+  return (
+    <section aria-label="Cancel your subscription" className={`border-t border-[var(--hairline-strong)] pt-8 text-[0.98rem] leading-[1.55] ${soft}`}>
+      <h2 className="mb-3 text-[1.05rem] font-medium text-[var(--ink)]">Cancel your subscription</h2>
+      {body}
+    </section>
   );
 }
 
@@ -668,14 +752,12 @@ const CHANGE_MAILTO =
  *
  *   Universal                  an email to Tobia, from any plan
  *   paying, to another plan    Stripe's "confirm your new plan" (prorated), up or down
- *   paying, to Free            Stripe's "cancel your plan": open to the period's end
  *   Free, to a paid plan       Stripe Checkout
  *   a gift, to a plan above    Checkout too (the higher of the two wins)
  *   a gift, to a plan below    nothing to do: it's inside what they have
  *   set up by hand             an email to Tobia
  */
-function Change({ to, member }: { to: Tier; member: NonNullable<MemberInfo> }) {
-  const [opening, setOpening] = useState(false);
+function Change({ to, member }: { to: Exclude<Tier, "free">; member: NonNullable<MemberInfo> }) {
   const tier = member.tier;
   const sub = member.subscription;
   const up = higher(to, tier) === to;
@@ -683,22 +765,6 @@ function Change({ to, member }: { to: Tier; member: NonNullable<MemberInfo> }) {
 
   if (to === "universal") return <UniversalMail />;
   if (member.granted && !up) return note("Included in the plan Tobi gave you.");
-  if (to === "free") {
-    if (!sub) return note("Write to me and I'll move you.");
-    if (sub.cancelAtPeriodEnd) return note(date(sub.renews) ? `You move to Free on ${date(sub.renews)}.` : "You move to Free at the end of this month.");
-    return (
-      <form action="/api/membership/billing" method="post" onSubmit={() => setOpening(true)}>
-        <input type="hidden" name="to" value="free" />
-        <button type="submit" disabled={opening} className={`${PLAN_BUTTON} ${LOOK.free.button}`}>
-          {opening ? <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" /> : null}
-          Move to Free
-        </button>
-        <p className={`mt-3 text-[0.88rem] leading-[1.45] ${LOOK.free.soft}`}>
-          {date(sub.renews) ? `${planName(tier)} stays open until ${date(sub.renews)}.` : `${planName(tier)} stays open to the end of the month.`}
-        </p>
-      </form>
-    );
-  }
   if (sub || tier === "free" || (member.granted && up)) {
     return <JoinButton tier={to} label={sub ? `${up ? "Switch" : "Move"} to ${PLANS[to].name}` : `Join ${PLANS[to].name}`} />;
   }
