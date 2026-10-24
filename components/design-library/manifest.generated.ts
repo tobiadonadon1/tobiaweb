@@ -5,9 +5,9 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
     "description": "Five app ideas to sort. Drag the top card and it tilts with your hand while a Keep or Skip stamp fades in; throw or flick it off, or let go and it springs back. The card behind rises to meet you. Out of cards? Shuffle again.",
     "free": false
   },
-  "silk-web": {
-    "title": "Web",
-    "description": "A spider web that behaves like a membrane. Pull it and the stretched silk glows; let go and it snaps back.",
+  "album-stack": {
+    "title": "Album stack",
+    "description": "A pile of record sleeves. Throw the front one either way and it swings out and tucks in at the back while the rest step up; let go short and it springs home. Press play and the record slides out of its sleeve and spins.",
     "free": false
   },
   "rolling-counter": {
