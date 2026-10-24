@@ -236,21 +236,52 @@ export function LiveSection({ ids, perks }: { ids: string; perks: Perks | null }
 }
 
 export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  const url = perks?.links.telegram;
   return (
     <section aria-labelledby={`${ids}-telegram`}>
       <SectionHead id={`${ids}-telegram`} title="Direct messaging" />
-      <LinkCard icon={Send} url={perks?.links.telegram} label="Get in touch directly" pending="Lands here soon.">
-        {perks?.links.telegram ? <p className="text-[1.05rem] font-medium">Telegram</p> : null}
-      </LinkCard>
-      {perks?.telegramQr ? (
-        <div className={`${card} mt-4 flex flex-col items-center gap-6 p-6 sm:flex-row md:p-8`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from the perks check, not a static asset */}
-          <img src={perks.telegramQr} alt="QR code for my Telegram" width={176} height={176} className="h-44 w-44 flex-none rounded-2xl" />
-          <div className="text-center sm:text-left">
-            <p className="text-[1.05rem] font-medium">Or scan it with your phone</p>
+      {url ? (
+        // a chat with me, in Telegram's own blue: my face, a first message, the way in (and the QR for a phone)
+        <div className="relative mt-7 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#37AEE2_0%,#1E96C8_100%)] p-6 text-white md:p-10">
+          <Send aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-64 w-64 rotate-12 text-white/10" strokeWidth={1.2} />
+          <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-[30rem]">
+              <div className="flex items-center gap-3">
+                <span className="relative flex-none">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- a small static photo */}
+                  <img src="/shop/copycat-detective/tobi-avatar-v1.jpg" alt="" width={56} height={56} className="h-14 w-14 rounded-full object-cover ring-2 ring-white/70" />
+                  <span aria-hidden className="absolute bottom-0.5 right-0.5 h-3.5 w-3.5 rounded-full bg-[#4ADE80] ring-2 ring-[#2AA3D6]" />
+                </span>
+                <div>
+                  <p className="text-[1.1rem] font-semibold leading-tight">Tobi</p>
+                  <p className="text-[0.9rem] text-white/75">on Telegram</p>
+                </div>
+              </div>
+              <p className="mt-6 w-fit max-w-full rounded-[1.4rem] rounded-tl-[0.4rem] bg-white px-5 py-3.5 text-[1.05rem] leading-[1.45] text-[#0b1f3a] shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]">
+                Hey! Tell me what you&rsquo;re building.
+              </p>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0b1f3a] px-6 py-3.5 text-[1rem] font-semibold text-white transition-transform hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                Message me
+                <ArrowUpRight aria-hidden className="h-4 w-4" />
+              </a>
+            </div>
+            {perks?.telegramQr ? (
+              <div className="hidden flex-none flex-col items-center gap-3 rounded-[1.6rem] bg-white p-5 text-[#0b1f3a] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.4)] md:flex">
+                {/* eslint-disable-next-line @next/next/no-img-element -- a data URL from the perks check, not a static asset */}
+                <img src={perks.telegramQr} alt="QR code for my Telegram" width={176} height={176} className="h-44 w-44" />
+                <p className="text-[0.88rem] font-medium text-[rgba(11,31,58,0.65)]">Or scan it with your phone</p>
+              </div>
+            ) : null}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <LinkCard icon={Send} url={null} label="" pending="Lands here soon." />
+      )}
     </section>
   );
 }
