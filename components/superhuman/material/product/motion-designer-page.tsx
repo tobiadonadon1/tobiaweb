@@ -319,29 +319,19 @@ export function MotionDesignerPage() {
         </div>
       </section>
 
-      {/* 003. THE PLAN FIRST: the storyboard, as you see it. */}
+      {/* 003. THE PLAN FIRST: just the words, a thin band (no picture of the storyboard). */}
       <section aria-labelledby="mdx-plan" className="relative overflow-hidden bg-[#111] text-white">
-        <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
-          <div className="grid grid-cols-1 items-end gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <div className="mx-auto max-w-[90rem] px-5 py-12 sm:px-8 md:py-16">
+          <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
             <div>
               <Mono className="opacity-60">003</Mono>
-              <h2 id="mdx-plan" className="mt-3 max-w-[13ch] font-[family-name:var(--mdx-archivo)] text-[clamp(3rem,8.5vw,7.5rem)] font-black uppercase leading-[0.86] tracking-[-0.03em] [font-variation-settings:'wdth'_68]">
+              <h2 id="mdx-plan" className="mt-3 max-w-[13ch] font-[family-name:var(--mdx-archivo)] text-[clamp(2.4rem,5.5vw,4.6rem)] font-black uppercase leading-[0.86] tracking-[-0.03em] [font-variation-settings:'wdth'_68]">
                 The plan <span className="block" style={{ color: ORANGE }}>plays first.</span>
               </h2>
             </div>
-            <p className="max-w-[30ch] text-pretty text-[1.3rem] font-semibold leading-[1.4] text-white md:pb-3">
+            <p className="max-w-[30ch] text-pretty text-[1.15rem] font-semibold leading-[1.4] text-white md:pb-2">
               You see the plan before it renders. <span style={{ color: ORANGE }}>Every choice is one tap.</span>
             </p>
-          </div>
-          <div className="mx-auto mt-12 max-w-[68rem] md:mt-16">
-            <Image
-              src={S("storyboard-v1.jpg")}
-              alt="The storyboard: the video playing on top, and under it what it decided, with the other styles one tap away and Approve and render."
-              width={1280}
-              height={800}
-              unoptimized
-              className="block h-auto w-full overflow-hidden rounded-[1.2rem]"
-            />
           </div>
         </div>
       </section>
