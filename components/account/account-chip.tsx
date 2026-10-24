@@ -19,6 +19,9 @@ import { useMember } from "./use-member";
  * there the way in sits under each email form instead (FreeClaim and the
  * download card say "sign in" right where the address is asked for).
  *
+ * A streak of light runs round its border (.account-light, globals.css),
+ * so it's the thing the eye finds in the corner.
+ *
  * It isn't shown on the account page itself, and it waits for the answer
  * from /api/account/me rather than guessing, so it never flips its words.
  */
@@ -31,7 +34,7 @@ export function AccountChip() {
     <Link
       href={ACCOUNT_HREF}
       className={[
-        "back-link group fixed right-5 z-40 hidden sm:inline-flex min-h-11 items-center gap-2 rounded-full",
+        "back-link account-light group fixed isolate right-5 z-40 hidden sm:inline-flex min-h-11 items-center gap-2 rounded-full",
         "border px-4 py-3 text-[13px] leading-none backdrop-blur-md",
         "transition-[color,border-color,opacity,translate] duration-300 sm:right-7 sm:top-7",
         "top-[max(1.25rem,env(safe-area-inset-top))]",
@@ -39,6 +42,7 @@ export function AccountChip() {
         "border-[rgba(11,31,58,0.2)] bg-[rgba(250,248,242,0.75)] text-[color:rgba(11,31,58,0.8)] outline-[var(--accent-sky)] hover:border-[rgba(11,31,58,0.45)] hover:text-[var(--ink)]",
       ].join(" ")}
     >
+      <span aria-hidden className="absolute inset-0 -z-10 rounded-full bg-[rgba(250,248,242,0.92)]" />
       <UserRound aria-hidden className="h-4 w-4" />
       {member && member.tier !== "free" ? "Dashboard" : "Account"}
       {member ? <PlanBadge tier={member.tier} className="-my-1 -mr-1.5" /> : null}

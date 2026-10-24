@@ -3398,3 +3398,60 @@ body:has(.vd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
 body:has(.mdx-intro) [data-site-nav] { animation: mdx-nav-in 350ms ease-out 2.45s backwards; }
 html.mdx-skip body:has(.mdx-intro) [data-site-nav] { animation: none; }
 @media (prefers-reduced-motion: reduce) { body:has(.mdx-intro) [data-site-nav] { animation: none; } }
+
+/* ---------------------------------------------------------------------------
+   THE ACCOUNT PILL'S LIGHT (components/account/account-chip.tsx): a short
+   streak of light running round its border, so the way in is the thing the
+   eye finds in the corner. A conic gradient turns behind a 2px ring
+   (the mask cuts out the middle), and a blurred copy glows behind it.
+   Still, with reduced motion.
+   --------------------------------------------------------------------------- */
+@property --account-light {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.account-light::before,
+.account-light::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--account-light),
+    transparent 0deg,
+    transparent 250deg,
+    rgba(206, 70, 49, 0.55) 300deg,
+    #ff8a5c 335deg,
+    #fff3d6 350deg,
+    transparent 360deg
+  );
+  animation: account-light 3.6s linear infinite;
+}
+.account-light::before {
+  padding: 2px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+/* The glow: the same light, blurred, behind the pill. Its own fill
+   (.account-light-fill, a child) sits over it, so it only shows outside. */
+.account-light::after {
+  z-index: -2;
+  inset: -2px;
+  filter: blur(8px);
+  opacity: 1;
+}
+@keyframes account-light {
+  to {
+    --account-light: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-light::before,
+  .account-light::after {
+    animation: none;
+    --account-light: 40deg;
+  }
+}
