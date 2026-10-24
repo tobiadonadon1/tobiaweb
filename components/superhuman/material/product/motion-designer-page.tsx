@@ -47,7 +47,6 @@ const BUTTON = "bg-[#111111] text-white shadow-[0_18px_40px_-18px_rgba(17,17,17,
 
 /** The Studio Display the reel plays on: the skill's own photographed frame and its measured screen. */
 const DISPLAY = { src: S("display-v1.webp"), w: 1240, h: 929, x: 3.629, y: 4.952, sw: 92.661, sh: 67.6 };
-const MACBOOK = { src: S("macbook-v1.webp"), w: 1299, h: 798, x: 8.083, y: 2.882, sw: 83.757, sh: 88.596 };
 
 const STEPS: React.ReactNode[] = [
   <>Unzip the folder.</>,
@@ -335,16 +334,14 @@ export function MotionDesignerPage() {
             </p>
           </div>
           <div className="mx-auto mt-12 max-w-[68rem] md:mt-16">
-            <Device d={MACBOOK}>
-              <Image
-                src={S("storyboard-v1.jpg")}
-                alt="The storyboard: the video playing on top, and under it what it decided, with the other styles one tap away and Approve and render."
-                width={1280}
-                height={800}
-                unoptimized
-                className="block h-full w-full object-cover object-top"
-              />
-            </Device>
+            <Image
+              src={S("storyboard-v1.jpg")}
+              alt="The storyboard: the video playing on top, and under it what it decided, with the other styles one tap away and Approve and render."
+              width={1280}
+              height={800}
+              unoptimized
+              className="block h-auto w-full overflow-hidden rounded-[1.2rem]"
+            />
           </div>
         </div>
       </section>
