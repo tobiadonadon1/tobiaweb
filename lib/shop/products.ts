@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -104,6 +104,12 @@ export type Product = {
    * is kept with the account. /api/free refuses to email it.
    */
   accountOnly?: boolean;
+  /**
+   * DOWNLOADS AT ONCE FOR AN ADDRESS: a visitor without an account types their
+   * email and the download starts right there, as a member's does; the link is
+   * still emailed and the lead kept. Without it, the email is the only way in.
+   */
+  instant?: boolean;
   /** USED ON ITS PAGE, NOT DOWNLOADED: the shelf's button says "Try it" (the page opens at its top, the tool is on it). */
   onPage?: boolean;
   /**
@@ -1024,6 +1030,60 @@ export const MOTION_DESIGNER: Product = {
   },
 };
 
+export const SHORTS_ANIMATOR: Product = {
+  id: "shorts-animator",
+  name: "Shorts Animator",
+  description:
+    "Narrated animated shorts drawn frame by frame entirely by code, made by Claude Code or Codex: describe the look in words, give it a script, get a painted, captioned MP4.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/shorts-animator",
+  file: {
+    sealed: "shorts-animator.zip.enc",
+    filename: "shorts-animator.zip",
+    // It ships scripts (.mjs, .js, .py), and Gmail refuses those zips.
+    attach: false,
+  },
+  free: true,
+  // Tobia's call: put the address in, get the download there and then.
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Shorts Animator makes the painted, narrated shorts of TikTok, Reels and YouTube Shorts. Describe the look in words (oil, watercolour, pastel, ink, anything) and give it a script or a topic: Claude draws every scene in code, paints each frame in that look like hand animation, narrates it with a voice that runs on your computer, captions and scores it. No cameras, no stock footage, no studio. Free, for Claude Code and Codex.",
+    kicker: "Skill · for Claude Code & Codex",
+    line: "Animated shorts, drawn frame by frame by code and AI.",
+    proof: "Any look you describe · narrated · about a minute to render",
+  },
+  contents: [
+    ["install.mjs", "installs the skill for Claude Code, Codex or both, sets up the narrator and makes a test short"],
+    ["shorts-animator/", "the skill: the drawing kit, the paint engine, five looks, the narrator, the soundtrack"],
+    ["START HERE.txt", "the three steps"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude (or codex)",
+    "Type hi. It installs in a few minutes and makes a test short.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code or Codex and type hi.",
+    after: [
+      "From then on, ask for the short you want in any session: \"Psalm 23 in oil paint, for TikTok\", \"a watercolour story about my grandmother's bakery\", or \"a Marcus Aurelius quote in ink\".",
+      "It shows you one painted frame per shot first, then renders the MP4 on your computer in about a minute.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), Node.js 22 or newer, ffmpeg and Chrome; the installer tells you if one is missing. Mac, Windows or Linux.",
+    next: [
+      ["Right after install", "It offers to make your first short. A verse, a quote or one sentence of story is enough."],
+      ["Every short", "Describe the look in words. It draws, paints, narrates and captions it."],
+      ["Changes", "One sentence: \"softer\", \"a woman's voice\", \"slower\", \"for YouTube\"."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1041,6 +1101,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "duo-designer": DUO_DESIGNER,
   "video-editor": VIDEO_EDITOR,
   "motion-designer": MOTION_DESIGNER,
+  "shorts-animator": SHORTS_ANIMATOR,
 };
 
 export function productById(id: unknown): Product | undefined {

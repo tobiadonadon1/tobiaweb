@@ -317,4 +317,22 @@ export const SKILLS: MaterialEntry[] = [
     body: [],
     product: "video-editor",
   },
+  /* ---------------------------------------------------------------- *
+   * Narrated animated shorts, every frame drawn in code and painted in
+   * the look you describe, given away for an email
+   * (shorts-animator-page.tsx).
+   * ---------------------------------------------------------------- */
+  {
+    slug: "shorts-animator",
+    title: "Shorts Animator",
+    kind: "skill",
+    summary: "Animated shorts drawn frame by frame by code: describe the look, it paints, narrates and captions.",
+    // Minutes from the download to the first short.
+    minutes: 10,
+    status: "ready",
+    when: "You want painted, narrated shorts for TikTok, Reels or Shorts (a verse, a quote, a tiny story) without a camera, an animator or stock footage.",
+    level: "Anyone",
+    body: [],
+    product: "shorts-animator",
+  },
 ];

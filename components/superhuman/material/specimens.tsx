@@ -1020,6 +1020,29 @@ function MotionDesigner() {
   );
 }
 
+/**
+ * SHORTS ANIMATOR — a flipbook of painted frames: two paler pages fanned
+ * behind (the drawings before), and the front page tall like a phone: a
+ * night-blue sky, a saffron sun, a green hill and a small figure on it, with
+ * the caption strip across the bottom. The blue is the page's own
+ * (product/shorts-animator-page.tsx).
+ */
+function ShortsAnimator() {
+  return (
+    <>
+      <Cut d={CARD} x={92} y={40} s={0.72} sy={1.42} fill="#faf8f2" rotate={-9} opacity={0.75} />
+      <Cut d={CARD} x={118} y={34} s={0.72} sy={1.42} fill="#E7D9A8" rotate={-4} opacity={0.9} />
+      <Cut d={CARD} x={150} y={34} s={0.72} sy={1.42} fill={SHADE} />
+      <Cut d={CARD} x={144} y={28} s={0.72} sy={1.42} fill="#16295f" />
+      <Cut d={DISC} x={210} y={58} s={0.3} fill={SAFFRON} />
+      <Cut d={BAR} x={148} y={150} s={0.52} sy={2.6} fill={FOREST} />
+      <Cut d={BAR} x={200} y={128} s={0.022} sy={1.4} fill={INK} />
+      <Cut d={DISC} x={196} y={118} s={0.06} fill={INK} />
+      <Cut d={BAR} x={176} y={196} s={0.3} sy={0.5} fill="#faf8f2" opacity={0.9} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1046,6 +1069,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "duo-designer": DuoDesigner,
   "video-editor": VideoEditor,
   "motion-designer": MotionDesigner,
+  "shorts-animator": ShortsAnimator,
   // the guides
   whitehat: Whitehat,
   "jev-review-miner": JevReviewMiner,

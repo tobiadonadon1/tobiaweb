@@ -37,7 +37,17 @@ function themeMeta(): HTMLMetaElement {
   return m;
 }
 
-export function ProIntro({ words }: { words: { word: string; bg: string; fg: string }[] }) {
+export function ProIntro({
+  words,
+  name = "App Designer Pro",
+  className = "",
+}: {
+  words: { word: string; bg: string; fg: string }[];
+  /** The small name under every word. Shorts Animator's page plays this opening too. */
+  name?: string;
+  /** A modifier for another page's curtain colours (globals.css, .adp-intro--sa). */
+  className?: string;
+}) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
@@ -95,7 +105,7 @@ export function ProIntro({ words }: { words: { word: string; bg: string; fg: str
   }, [words]);
 
   return (
-    <div className="adp-intro" data-done={done || undefined} aria-hidden>
+    <div className={`adp-intro ${className}`} data-done={done || undefined} aria-hidden>
       {words.map((w, i) => (
         <div
           key={w.word}
@@ -103,7 +113,7 @@ export function ProIntro({ words }: { words: { word: string; bg: string; fg: str
           style={{ "--i": i, "--bg": w.bg, "--fg": w.fg } as React.CSSProperties}
         >
           <span className="adp-intro__word">{w.word}</span>
-          <span className="adp-intro__name">App Designer Pro</span>
+          <span className="adp-intro__name">{name}</span>
         </div>
       ))}
     </div>

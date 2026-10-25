@@ -105,7 +105,8 @@ export async function POST(request: Request) {
       const stored = await recordLead({ email, product: product.id, page: `${product.href}${tag}` });
       console.info("[free] lead", product.id, stored);
     });
-    return Response.json({ ok: true });
+    // An instant product downloads on the page too, signed for this address.
+    return Response.json(product.instant ? { ok: true, download: freeLink(origin, product, email) } : { ok: true });
   } catch (err) {
     console.error("[free] could not send", product.id, err);
     // Keep the address even if the send failed, so Tobia can follow up.
@@ -113,6 +114,8 @@ export async function POST(request: Request) {
       if (news) await subscribe(email, "free_skill", product.id);
       await recordLead({ email, product: product.id, page: `${product.href} (send failed)${tag}` });
     });
+    // The address is kept, so an instant product still downloads: the email was only a copy.
+    if (product.instant) return Response.json({ ok: true, download: freeLink(origin, product, email) });
     return Response.json({ ok: false, error: "send-failed" }, { status: 502 });
   }
 }

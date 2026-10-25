@@ -62,6 +62,8 @@ const EDITOR_ZIP = Buffer.from("PK\u0003\u0004 the video editing skills " + "v".
 writeFileSync(path.join(cwd, "private", "video-editor.zip.enc"), seal(EDITOR_ZIP, parseKey(fileKey)));
 const MOTION_ZIP = Buffer.from("PK\u0003\u0004 the motion graphics skill " + "m".repeat(3900));
 writeFileSync(path.join(cwd, "private", "motion-designer.zip.enc"), seal(MOTION_ZIP, parseKey(fileKey)));
+const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s".repeat(3900));
+writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -203,6 +205,14 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(mdz.stripeProductId, "none");
   // It ships scripts (.mjs), and Gmail refuses a zip that holds them.
   assert.equal(mdz.file.attach, false);
+  // Shorts Animator: free for an email, its own page, no Stripe, never attached (it ships scripts).
+  const sa = productById("shorts-animator");
+  assert.equal(sa.href, entryHref("skills", "shorts-animator"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "shorts-animator")?.product, "shorts-animator");
+  assert.equal(sa.free, true);
+  assert.equal(forSale(sa), false);
+  assert.equal(sa.stripeProductId, "none");
+  assert.equal(sa.file.attach, false);
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
@@ -423,6 +433,22 @@ test("free: an address gets the Launchr email with a link that downloads the fil
   }
 });
 
+test("free: Shorts Animator downloads at once for an address, and still emails the link", async () => {
+  const res = await ask({ product: "shorts-animator", email: "ada@example.com" }, "203.0.113.77");
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.ok, true);
+  assert.match(body.download, /^http:\/\/localhost:3000\/api\/download\?/, "the page gets the link and starts the download");
+  const dl = await download(new Request(body.download));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-disposition"), /filename="shorts-animator.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), SHORTS_ZIP);
+  assert.ok(mail().some((m) => m.message.to === "ada@example.com"), "the link is emailed too");
+  // Launchr is not instant: the email is still the only way in.
+  const other = await ask({ product: "launchr", email: "bo@example.com" }, "203.0.113.78");
+  assert.deepEqual(await other.json(), { ok: true });
+});
+
 test("free: Jev Crypto Analyst sends its own file, and its link never opens Launchr", async () => {
   const { JEV_CRYPTO_ANALYST } = await import("../lib/shop/products.ts");
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
@@ -555,7 +581,8 @@ test("free: Duo Designer opens the fourth row, sent as a link for an email, at o
   assert.equal(skills.find((e) => e.slug === "duo-designer")?.product, "duo-designer");
   // The tenth card: the rack is three wide, so it starts the fourth row.
   assert.equal(skills.findIndex((e) => e.slug === "duo-designer"), 9);
-  assert.equal(skills.at(-1)?.slug, "video-editor", "Video Editor follows it on the fourth row");
+  assert.equal(skills.at(-2)?.slug, "video-editor", "Video Editor follows it on the fourth row");
+  assert.equal(skills.at(-1)?.slug, "shorts-animator", "Shorts Animator closes the fourth row");
   assert.equal(DUO_DESIGNER.free, true);
   assert.equal(DUO_DESIGNER.accountOnly, undefined, "an email is enough, no account needed");
   assert.equal(forSale(DUO_DESIGNER), false);
@@ -945,6 +972,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["duo-designer"].bytes, DUO_ZIP.length);
   assert.equal(body.files["video-editor"].bytes, EDITOR_ZIP.length);
   assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
+  assert.equal(body.files["shorts-animator"].bytes, SHORTS_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

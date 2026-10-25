@@ -56,7 +56,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -127,9 +127,13 @@ export function FreeClaim({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ product: productId, email, website: trap, newsletter: news }),
       });
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; download?: string };
       if (body.ok && news) rememberSubscribed();
-      if (body.ok) setState("sent");
+      // An instant product (products.ts) answers with its link: download it here, the email is a copy.
+      if (body.ok && body.download) {
+        startDownload(body.download);
+        setState("downloaded");
+      } else if (body.ok) setState("sent");
       else if (body.error === "bad-email") setState("bad-email");
       else if (body.error === "too-many") setState("too-many");
       else setState("failed");
@@ -165,7 +169,7 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
   const t = tone === "ember"
     ? {
@@ -181,6 +185,20 @@ export function FreeClaim({
         // A white box with a black outline and black words: a see-through outline got lost in the orange.
         box: ["#111111", "#ffffff", "#111111", "#ffffff"],
         boxText: "text-[#111111] font-medium",
+      }
+    : tone === "night"
+    ? {
+        // Shorts Animator's painted night: white words, a white field, the sunset's saffron button.
+        ink: "text-white",
+        soft: "text-[rgba(255,255,255,0.78)]",
+        ask: "text-[rgba(255,255,255,0.9)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(0,0,30,0.7)] focus-within:border-white",
+        input: "text-[#14254F] placeholder:text-[rgba(20,37,79,0.45)]",
+        ring: "focus-visible:outline-white",
+        check: "bg-white text-[#14254F]",
+        error: "text-[#ffd9cf]",
+        button: "bg-[#F6B23C] text-[#1b1206] hover:bg-[#ffc257]",
+        box: ["#ffffff", "#14254F", "rgba(255,255,255,0.75)"],
       }
     : tone === "cobalt"
     ? {
@@ -295,7 +313,8 @@ export function FreeClaim({
           Downloading now.
         </p>
         <p className={`mt-2 max-w-[36ch] text-[0.95rem] leading-[1.5] ${t.soft}`}>
-          Check your Downloads folder. You can come back and get it again any time.
+          Check your Downloads folder.{" "}
+          {member ? "You can come back and get it again any time." : "The link is in your inbox too, for later."}
         </p>
       </div>
     );
