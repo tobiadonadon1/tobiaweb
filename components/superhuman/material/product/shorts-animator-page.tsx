@@ -25,8 +25,8 @@ import { ProIntro } from "./app-designer-pro-intro";
  *
  * EVERYTHING ON THE PAGE IS REAL: both films were made with the skill (the
  * scenes written as code, the voice its local narrator, the music its own),
- * and the five looks are one frame of the first film rendered again with
- * each look, nothing retouched.
+ * and the five looks are scenes from those films rendered again in each
+ * look, nothing retouched.
  */
 
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--sa-archivo", display: "swap" });
@@ -98,13 +98,13 @@ function Phone({ children, className = "" }: { children: React.ReactNode; classN
   );
 }
 
-/** THE FIVE LOOKS: one frame of the first film, painted again from five sentences. */
+/** THE FIVE LOOKS: five scenes from the two films, each painted from one sentence. */
 const LOOKS = [
-  { id: "oil", name: "Oil", said: "oil paint, like the faith shorts" },
-  { id: "watercolor", name: "Watercolour", said: "soft watercolour, dreamy" },
-  { id: "pastel", name: "Pastel", said: "crayon on paper, for kids" },
-  { id: "ink", name: "Ink", said: "inked, like a graphic novel" },
-  { id: "gouache", name: "Gouache", said: "a calm, flat storybook" },
+  { id: "oil", name: "Oil", said: "oil paint, like the faith shorts", alt: "A figure with open arms in front of a blazing orange sunset, in swirling oil strokes." },
+  { id: "watercolor", name: "Watercolour", said: "soft watercolour, dreamy", alt: "A red and white lighthouse on a rock at dusk, in soft watercolour washes." },
+  { id: "pastel", name: "Pastel", said: "crayon on paper, for kids", alt: "Two people walking by a lake under small clouds, in chalky pastel hatching." },
+  { id: "ink", name: "Ink", said: "inked, like a graphic novel", alt: "A hooded figure walking through rain past two houses and a mountain, inked in wobbly lines." },
+  { id: "gouache", name: "Gouache", said: "a calm, flat storybook", alt: "A small figure on a path to a pagoda between tall dark trees, in flat gouache." },
 ] as const;
 
 /** THE TWO FILMS, both made with the skill. */
@@ -194,7 +194,7 @@ export function ShortsAnimatorPage() {
               </h2>
             </div>
             <p className={`max-w-[40ch] text-pretty text-[1.12rem] font-medium leading-[1.5] md:pb-3 ${MUTED}`}>
-              Say it in your own words and it paints in it. The same frame, five sentences.
+              Say it in your own words and it paints in it. Five sentences, five looks.
             </p>
           </div>
 
@@ -203,8 +203,8 @@ export function ShortsAnimatorPage() {
               <li key={l.id} className="flex flex-col">
                 <div className="overflow-hidden rounded-[1rem] bg-black/10 shadow-[0_30px_60px_-34px_rgba(0,0,0,0.55)]">
                   <Image
-                    src={S(`look-${l.id}-v1.jpg`)}
-                    alt={`Two robed figures walking on a meadow under a cream sky, painted as ${l.name.toLowerCase()}.`}
+                    src={S(`look-${l.id}-v2.jpg`)}
+                    alt={l.alt}
                     width={540}
                     height={960}
                     unoptimized
