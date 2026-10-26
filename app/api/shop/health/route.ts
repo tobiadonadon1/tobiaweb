@@ -50,6 +50,11 @@ export async function GET() {
     webhookSecret: (process.env.STRIPE_WEBHOOK_SECRET ?? "").startsWith("whsec_"),
     email: emailTransport() !== null,
     emailVia: emailTransport(),
+    // When Gmail hits its daily cap, mail goes out through Resend: is that set
+    // up, and is its sender on a domain Resend can send from (not a Gmail
+    // address)? Yes/no only, the address itself is never printed.
+    emailFallback: emailTransport() === "gmail" && Boolean(process.env.RESEND_API_KEY),
+    fallbackSender: Boolean(process.env.RESEND_EMAIL_FROM) && !/@gmail\.com>?\s*$/i.test(process.env.RESEND_EMAIL_FROM ?? ""),
     files,
   };
 
