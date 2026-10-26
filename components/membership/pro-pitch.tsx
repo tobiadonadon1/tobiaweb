@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, LoaderCircle, X } from "lucide-react";
+import { ArrowRight, Crown, LoaderCircle, Mail, ShoppingBag, X } from "lucide-react";
 import { useMember } from "@/components/account/use-member";
 import { PLANS, money } from "@/lib/membership/tiers";
 import { productById, type Product } from "@/lib/shop/products";
@@ -14,7 +14,7 @@ import "./pro-pitch.css";
  * Every time someone reaches for a skill (the free one's "I want it" or its
  * email field, the paid one's Buy button), a liquid glass card asks first:
  * why take just one, when Pro opens all of them. Join Pro, Ultimate beside
- * it, and right under them, in its own colour, the way they came in: "Just
+ * it in black and gold, and right under them, in pearl, the way they came in: "Just
  * send me Duo Designer" or "Just buy Grok Army · €15". Taking that, or
  * closing the card, carries on exactly as before, and the card doesn't come
  * back on that button until the page is loaded again.
@@ -228,10 +228,13 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
               <ArrowRight aria-hidden className="h-4 w-4" />
             </JoinForm>
             <JoinForm tier="ultimate" className="pp-alt">
-              {ultimate.name} <small>{money(ultimate.priceCents, ultimate.currency)}</small>
+              <Crown aria-hidden className="h-4 w-4" />
+              <b>{ultimate.name}</b>
+              <small>{money(ultimate.priceCents, ultimate.currency)}/mo</small>
             </JoinForm>
           </div>
           <button type="button" className="pp-skip" onClick={onContinue}>
+            {product.free ? <Mail aria-hidden className="h-4 w-4" /> : <ShoppingBag aria-hidden className="h-4 w-4" />}
             {copy.skip}
           </button>
         </article>
