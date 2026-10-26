@@ -56,7 +56,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -169,7 +169,7 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
   const t = tone === "ember"
     ? {
@@ -199,6 +199,20 @@ export function FreeClaim({
         error: "text-[#ffd9cf]",
         button: "bg-[#F6B23C] text-[#1b1206] hover:bg-[#ffc257]",
         box: ["#ffffff", "#14254F", "rgba(255,255,255,0.75)"],
+      }
+    : tone === "violet"
+    ? {
+        // Reel Bot's violet field: white words, a white field, a lime button with black words.
+        ink: "text-white",
+        soft: "text-[rgba(255,255,255,0.8)]",
+        ask: "text-[rgba(255,255,255,0.92)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(20,0,80,0.6)] focus-within:border-white",
+        input: "text-[#1d1060] placeholder:text-[rgba(29,16,96,0.45)]",
+        ring: "focus-visible:outline-white",
+        check: "bg-white text-[#5b3df6]",
+        error: "text-[#ffe0d6] font-semibold",
+        button: "bg-[#e4ff4f] text-[#111111] hover:bg-[#eeff7a]",
+        box: ["#ffffff", "#5b3df6", "rgba(255,255,255,0.75)"],
       }
     : tone === "cobalt"
     ? {
