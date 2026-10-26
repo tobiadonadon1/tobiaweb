@@ -86,6 +86,7 @@ globalThis.fetch = async (url, init) => {
     return globalThis.__sheetEcho === "404" ? new Response("<html>Not Found</html>", { status: 404 }) : new Response("ok");
   }
   if (String(url) === "https://api.resend.com/emails") {
+    if (globalThis.__resendDown) return Response.json({ message: "mock: Resend is down" }, { status: 500 });
     resendCalls.push({ body: JSON.parse(init.body), headers: init.headers });
     return Response.json({ id: `email_${resendCalls.length}` });
   }
@@ -113,6 +114,7 @@ beforeEach(() => {
   };
   globalThis.__mail = [];
   globalThis.__mailDown = false;
+  globalThis.__resendDown = false;
   globalThis.__mailRefusesZips = false;
   resendCalls.length = 0;
 });
@@ -766,10 +768,19 @@ test("free: Google's reply page failing after the row went in never writes the r
   delete process.env.LEADS_WEBHOOK_URL;
 });
 
-test("free: if Gmail fails the visitor is told, and the address is still kept", async () => {
+test("free: if Gmail refuses, the same email goes out through Resend", async () => {
+  globalThis.__mailDown = true;
+  const res = await ask({ product: "launchr", email: "over-the-limit@example.com" }, "203.0.113.31");
+  assert.equal(res.status, 200);
+  assert.equal(resendCalls.length, 1);
+  assert.deepEqual(resendCalls[0].body.to, ["over-the-limit@example.com"]);
+});
+
+test("free: if Gmail and Resend both fail the visitor is told, and the address is still kept", async () => {
   process.env.LEADS_WEBHOOK_URL = "https://sheet.example/exec";
   sheetRows.length = 0;
   globalThis.__mailDown = true;
+  globalThis.__resendDown = true;
   try {
     const res = await ask({ product: "launchr", email: "unlucky@example.com" }, "203.0.113.30");
     assert.equal(res.status, 502);
@@ -823,11 +834,13 @@ test("webhook: a payment still clearing waits, then delivers when it clears", as
 test("webhook: if the email fails, Stripe is told to retry, and the retry delivers", async () => {
   const id = purchase();
   globalThis.__mailDown = true;
+  globalThis.__resendDown = true;
   const failed = await webhook(signedEvent(id));
   assert.equal(failed.status, 500, "500 makes Stripe retry");
   assert.equal(stamp(id), undefined, "not stamped, so the retry will send");
 
   globalThis.__mailDown = false;
+  globalThis.__resendDown = false;
   const retry = await webhook(signedEvent(id));
   assert.equal(retry.status, 200);
   assert.equal((await retry.json()).delivery, "sent");

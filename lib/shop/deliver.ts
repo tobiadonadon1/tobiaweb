@@ -66,6 +66,25 @@ export function emailTransport(): "gmail" | "resend" | null {
 }
 
 const sender = () => process.env.SHOP_EMAIL_FROM || SHOP_EMAIL;
+// Resend cannot send as a Gmail address: it sends from the verified domain, and replies still go to Gmail.
+const resendSender = () => process.env.RESEND_EMAIL_FROM || sender();
+
+/**
+ * Gmail first. When Gmail refuses (the ~500-a-day limit, 550 5.4.5) and
+ * Resend is configured too, the same message goes out through Resend. A
+ * refused attachment is not a Gmail problem, so it is passed up to the
+ * caller's link-only retry instead.
+ */
+async function viaEither(msg: Message): Promise<string> {
+  if (!process.env.GMAIL_APP_PASSWORD) return viaResend(msg);
+  try {
+    return await viaGmail(msg);
+  } catch (err) {
+    if (!process.env.RESEND_API_KEY || refusedAttachment(err)) throw err;
+    console.warn("[shop] Gmail refused the email, sending it through Resend", err);
+    return viaResend(msg);
+  }
+}
 
 async function viaGmail(msg: Message): Promise<string> {
   const user = sender();
@@ -106,7 +125,7 @@ async function viaResend(msg: Message): Promise<string> {
       "Idempotency-Key": `delivery/${msg.sessionId}${msg.attachment ? "" : "/link"}`,
     },
     body: JSON.stringify({
-      from: `${FROM_NAME} <${sender()}>`,
+      from: `${FROM_NAME} <${resendSender()}>`,
       to: [msg.to],
       reply_to: sender(),
       subject: msg.subject,
@@ -145,7 +164,7 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
       sessionId: purchase.session.id,
       product: purchase.product,
     };
-    return via === "gmail" ? viaGmail(msg) : viaResend(msg);
+    return viaEither(msg);
   };
 
   let file: "attached" | "link" = purchase.product.file.attach === false ? "link" : "attached";
@@ -261,7 +280,7 @@ export async function sendFree(product: Product, to: string, base: string) {
       sessionId: `free/${product.id}/${to.toLowerCase()}/${Math.floor(Date.now() / 60_000)}${attached ? "" : "/link"}`,
       product,
     };
-    return via === "gmail" ? viaGmail(msg) : viaResend(msg);
+    return viaEither(msg);
   };
   const attach = product.file.attach === true;
   try {
@@ -299,7 +318,7 @@ export async function sendGift(product: Product, to: string, base: string) {
     sessionId: `gift/${product.id}/${to.toLowerCase()}`,
     product,
   };
-  return { id: await (via === "gmail" ? viaGmail(msg) : viaResend(msg)), via };
+  return { id: await viaEither(msg), via };
 }
 
 function renderEmail({
