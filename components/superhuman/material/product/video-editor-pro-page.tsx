@@ -2,10 +2,10 @@ import Image from "next/image";
 import { Archivo, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
-import { VIDEO_EDITOR_PRO as PRODUCT, VIDEO_EDITOR, forSale } from "@/lib/shop/products";
+import { VIDEO_EDITOR_PRO as PRODUCT, forSale } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
-import { Film } from "./motion-designer-film";
+import { VideoEditorProLoader } from "./video-editor-pro-loader";
 import { StickyBuy } from "./sticky-buy";
 
 /**
@@ -13,19 +13,18 @@ import { StickyBuy } from "./sticky-buy";
  * (reel-director) that edits your own raw footage into a finished reel, sold
  * with the editing masterclass Tobia is recording, €15.
  *
- * TOBIA'S BRIEF (2026-10-26, second pass): centred on what matters, no pile
- * of examples. So five parts: the poster (the edit playing, the name, the
- * price, one line), what it does to your clip (six cards, four of them real
- * frames), one band on approving and one-sentence changes, what you get (the
- * skill and the masterclass), the close. Royal blue and red, bright and
- * crisp; the hero moves in on load and every section reveals as you scroll.
+ * TOBIA'S BRIEF (2026-10-26, third pass): the value from the very start, a
+ * loader, few sections and little text, dark with bordeaux writing, and no
+ * video until his new one arrives (a grey frame holds its place). So: the
+ * loader says the value in three beats; the poster says it again with what
+ * you get and the price; one grid of what it does; the close.
  *
- * THE VIDEO in the hero is one file (HERO_FILM). Tobia is sending a new one:
- * drop it in public/shop/video-editor-pro/ and change the two names below.
+ * THE VIDEO SLOT is HERO_FILM: null shows the grey frame. When the new video
+ * arrives, put it in public/shop/video-editor-pro/ and set its src and poster.
  *
  * WHAT IS REAL: the stills are frames of reel-director's render of Tobia's
  * raw clip (his test, 2026-10-23). The masterclass is described only as what
- * it is: his, on making reels with it. Nothing about it is invented.
+ * it is: his, on making reels with it.
  */
 
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--vep-archivo", display: "swap" });
@@ -37,61 +36,23 @@ const CLOSE_ID = "vep-close";
 const SOON = !forSale(PRODUCT);
 const S = (name: string) => `/shop/video-editor-pro/${name}`;
 
-/** The hero's video. Swap these two for the new one. */
-const HERO_FILM = { src: S("pro-edit-v1.mp4"), poster: S("pro-edit-v1.jpg") };
+/** The hero's video, or null for the grey frame that holds its place. */
+const HERO_FILM = null as { src: string; poster: string } | null;
 
-const BLUE = "#1F3FE0";
-const RED = "#FF3B2F";
-const PAPER = "#FBF8F3";
-const INK = "#0E1220";
-const BUTTON = "bg-[#FF3B2F] text-white shadow-[0_18px_40px_-16px_rgba(255,59,47,0.75)] hover:bg-[#ff5247]";
+const GROUND = "#0F0D0E";
+const PANEL = "#1A1718";
+const WINE = "#B0243B";
+const CREAM = "#F4EEE6";
+const BUTTON = "bg-[#9E1F34] text-white shadow-[0_18px_40px_-16px_rgba(158,31,52,0.8)] hover:bg-[#b0243b]";
 
-/** What it does to a clip: four are frames of the Pro edit, two are lists. */
-const DOES: { title: string; text: string; img?: string; alt?: string; list?: string[] }[] = [
-  {
-    title: "Cuts the takes.",
-    text: "Bad takes can stay in. It keeps the last good one.",
-    list: ["Retakes", "Fillers and stutters", "Lines that trail off", "Dead air"],
-  },
-  {
-    title: "Fixes the light.",
-    text: "Exposure measured on your face. Say “warmer” and it relights you.",
-    img: "warmer-v2.jpg",
-    alt: "The before/after slider across Tobia: the edit's light is warmer than the raw.",
-  },
-  {
-    title: "Captions on the word.",
-    text: "Each word as you say it. Never on your face or under the app's buttons.",
-    img: "captions-v2.jpg",
-    alt: "A clean caption, “skill for Claude Code”, low on the frame under Tobia's hands.",
-  },
-  {
-    title: "Type behind you.",
-    text: "You're cut out of every frame, so big words sit behind your head.",
-    img: "behind-v2.jpg",
-    alt: "“bigger phrase.” in heavy type and serif italics, behind Tobia's head and raised hand.",
-  },
-  {
-    title: "Your colours.",
-    text: "One look, taken from your footage. Here, the navy of the shirt.",
-    img: "backdrop-v2.jpg",
-    alt: "The room turned navy behind Tobia, with “your own brand.” in cream and brass.",
-  },
-  {
-    title: "Sound, mixed.",
-    text: "A clean voice, a designed sound kit, music that steps aside.",
-    list: ["Voice cleaned and levelled", "34 sounds made to fit", "Music drops on the big moments"],
-  },
-];
-
-const SAY = ["tighter cut", "make it moody", "bigger captions"];
-
-const STEPS: React.ReactNode[] = [
-  <>Buy, then unzip the folder.</>,
-  <>
-    Open it in Claude Code and type <q className="font-semibold text-white">hi</q>. It installs in a minute.
-  </>,
-  <>Hand it a clip. Approve the plan. Post the reel.</>,
+/** What it does: four are frames of a real Pro edit, two are words. */
+const DOES: { title: string; text: string; img?: string; alt?: string }[] = [
+  { title: "Cuts the takes", text: "Retakes, fillers, dead air: gone." },
+  { title: "Fixes the light", text: "Exposed on your face, warmer on request.", img: "warmer-v2.jpg", alt: "The before/after slider across Tobia: the edit is warmer." },
+  { title: "Captions on the word", text: "Off your face, clear of the app's buttons.", img: "captions-v2.jpg", alt: "A clean caption low on the frame." },
+  { title: "Type behind you", text: "You're cut out of every frame.", img: "behind-v2.jpg", alt: "“bigger phrase.” behind Tobia's head and raised hand." },
+  { title: "Your colours", text: "One look, taken from your footage.", img: "backdrop-v2.jpg", alt: "The room turned navy behind Tobia, “your own brand.”" },
+  { title: "Sound, mixed", text: "Clean voice, a sound kit, music that steps aside." },
 ];
 
 const JSON_LD = {
@@ -138,201 +99,118 @@ function Buy({ reportErrors = false }: { reportErrors?: boolean }) {
   );
 }
 
-/** A section heading in two voices: grotesk caps, then a serif italic (red on paper, white on blue). */
-function Heading({ id, n, caps, serifLine, onBlue = false }: { id: string; n: string; caps: string; serifLine: string; onBlue?: boolean }) {
-  return (
-    <div className="vep-reveal">
-      <Mono className="opacity-60">{n}</Mono>
-      <h2 id={id} className="mt-3 font-[family-name:var(--vep-archivo)] text-[clamp(2.8rem,7.4vw,6.4rem)] font-black uppercase leading-[0.86] tracking-[-0.03em] [font-variation-settings:'wdth'_74]">
-        {caps}{" "}
-        <span className="block font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ color: onBlue ? "#FFFFFF" : RED }}>
-          {serifLine}
-        </span>
-      </h2>
-    </div>
-  );
-}
-
 export function VideoEditorProPage() {
   return (
-    <main className={`vep-page ${archivo.variable} ${serif.variable} ${mono.variable} relative overflow-x-clip`} style={{ background: PAPER, color: INK }}>
+    <main className={`vep-page ${archivo.variable} ${serif.variable} ${mono.variable} relative overflow-x-clip`} style={{ background: GROUND, color: CREAM }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+      <VideoEditorProLoader />
       <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
 
-      {/* 01. THE POSTER: the edit playing, the name, the price, one line. */}
-      <section aria-labelledby="vep-title" className="relative isolate overflow-hidden text-white" style={{ background: BLUE }}>
-        <div className="mx-auto grid min-h-[100svh] max-w-[90rem] grid-cols-1 gap-y-12 px-5 pb-14 pt-24 sm:px-8 md:pt-28 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-12">
-          <div className="vep-in flex items-start justify-between gap-4 lg:col-span-2" style={{ "--i": 0 } as React.CSSProperties}>
-            <Mono>
-              {PRODUCT.priceLabel}
-              <span className="hidden sm:inline"> · skill + masterclass</span>
-            </Mono>
-            <Mono className="hidden text-center md:block">Edits your own footage · no editing app</Mono>
-            <Mono className="text-right">
-              <span className="hidden sm:inline">Skill for </span>Claude Code
-            </Mono>
-          </div>
-
-          <div className="flex flex-col justify-end">
+      {/* 01. THE VALUE, AT ONCE: what it does, what you get, the price. */}
+      <section aria-labelledby="vep-title" className="relative isolate overflow-hidden">
+        <div className="mx-auto grid min-h-[100svh] max-w-[90rem] grid-cols-1 gap-y-12 px-5 pb-16 pt-24 sm:px-8 md:pt-28 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-end lg:gap-x-14">
+          <div>
             <h1 id="vep-title" className="vep-title font-[family-name:var(--vep-archivo)] font-black uppercase leading-[0.82] tracking-[-0.035em]">
               <span className="vep-line">
-                <span style={{ "--i": 1 } as React.CSSProperties}>Video</span>
+                <span style={{ "--i": 0 } as React.CSSProperties}>Video Editor</span>
               </span>
               <span className="vep-line">
-                <span style={{ "--i": 2 } as React.CSSProperties}>Editor</span>
-              </span>
-              <span className="vep-line">
-                <span className="font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ "--i": 3, color: RED } as React.CSSProperties}>
+                <span className="font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ "--i": 1, color: WINE } as React.CSSProperties}>
                   Pro.
                 </span>
               </span>
             </h1>
-            <p className="vep-in mt-7 text-[clamp(1.3rem,2.2vw,1.75rem)] font-semibold leading-[1.2]" style={{ "--i": 4 } as React.CSSProperties}>
-              Your raw clip in. A finished reel out.
+
+            <p className="vep-in mt-8 max-w-[24ch] text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-[1.1] tracking-[-0.02em]" style={{ "--i": 2 } as React.CSSProperties}>
+              Your raw clip in. <span className="whitespace-nowrap" style={{ color: WINE }}>A finished reel out.</span>
             </p>
-            <ul className="mt-5 flex list-none flex-wrap gap-2 p-0">
-              {["Cut", "Lit", "Captioned", "Designed", "Mixed"].map((w, i) => (
-                <li key={w} className="vep-pop rounded-full bg-white px-3.5 py-1.5 text-[0.95rem] font-bold text-[#1F3FE0]" style={{ "--i": 5 + i * 0.6 } as React.CSSProperties}>
-                  {w}
+            <p className="vep-in mt-4 max-w-[46ch] text-[1.12rem] leading-[1.5] text-[rgba(244,238,230,0.72)]" style={{ "--i": 3 } as React.CSSProperties}>
+              Claude cuts, lights, captions, designs and mixes it. No editing app.
+            </p>
+
+            <div className="vep-in mt-9 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-10" style={{ "--i": 4 } as React.CSSProperties}>
+              <ul className="m-0 list-none p-0 text-[1.05rem] font-semibold">
+                <li className="flex items-center gap-3 py-1">
+                  <span className="h-2 w-2 rounded-full" style={{ background: WINE }} />
+                  The Video Editor Pro skill
                 </li>
-              ))}
-            </ul>
-            <div id={HERO_ID} className="vep-in mt-8 scroll-mt-28" style={{ "--i": 8 } as React.CSSProperties}>
+                <li className="flex items-center gap-3 py-1">
+                  <span className="h-2 w-2 rounded-full" style={{ background: WINE }} />
+                  The editing masterclass
+                </li>
+              </ul>
+              <p className="m-0 font-[family-name:var(--vep-archivo)] text-[3.2rem] font-black leading-none tracking-[-0.03em] [font-variation-settings:'wdth'_80]">
+                {PRODUCT.priceLabel}
+              </p>
+            </div>
+            <div id={HERO_ID} className="vep-in mt-8 scroll-mt-28" style={{ "--i": 5 } as React.CSSProperties}>
               <Buy reportErrors />
-              <p className="mt-3 text-[0.95rem] font-medium text-white/85">The skill and the editing masterclass, one payment.</p>
             </div>
           </div>
 
-          <figure className="vep-phone-in m-0 self-end justify-self-center lg:justify-self-end" style={{ "--i": 3 } as React.CSSProperties}>
-            <div className="vep-phone w-[min(72vw,19rem)] lg:w-[min(30vw,23rem)]">
+          <figure className="vep-phone-in m-0 justify-self-center lg:justify-self-end">
+            <div className="vep-phone w-[min(70vw,19rem)] lg:w-[min(28vw,21rem)]">
               <div className="vep-phone__screen">
-                <Film src={HERO_FILM.src} poster={HERO_FILM.poster} label="a reel Video Editor Pro made" eager className="h-full w-full" buttonClassName="mdx-sound--screen" />
+                {HERO_FILM ? (
+                  <video src={HERO_FILM.src} poster={HERO_FILM.poster} muted loop playsInline autoPlay className="h-full w-full object-cover" />
+                ) : (
+                  <div className="vep-grey h-full w-full" role="img" aria-label="The video, coming soon" />
+                )}
               </div>
             </div>
-            <figcaption className="mt-3 text-center">
-              <Mono className="text-white/80">Edited by it · sound on</Mono>
-            </figcaption>
           </figure>
         </div>
       </section>
 
-      {/* 02. WHAT IT DOES TO YOUR CLIP. */}
-      <section aria-labelledby="vep-does">
-        <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
-          <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-            <Heading id="vep-does" n="02" caps="What it does" serifLine="to your clip." />
-            <p className="vep-reveal max-w-[36ch] text-pretty text-[1.15rem] font-medium leading-[1.5] text-[rgba(14,18,32,0.68)] md:pb-3">
-              What a pro editor would do, in one go. The pictures are frames of a real edit.
-            </p>
-          </div>
-          <ol className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 md:mt-16 lg:grid-cols-3 lg:gap-5">
-            {DOES.map((d, i) => (
-              <li
-                key={d.title}
-                className="vep-reveal flex flex-col overflow-hidden rounded-[1.5rem]"
-                style={{ background: d.img ? "#FFFFFF" : i === 0 ? BLUE : RED, color: d.img ? INK : "#FFFFFF" }}
-              >
-                <div className="px-6 pb-5 pt-6 sm:px-7">
-                  <Mono className="opacity-60">{String(i + 1).padStart(2, "0")}</Mono>
-                  <h3 className="mt-2 font-[family-name:var(--vep-archivo)] text-[1.95rem] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]">
+      {/* 02. WHAT IT DOES. */}
+      <section aria-labelledby="vep-does" className="border-t border-white/10">
+        <div className="mx-auto max-w-[90rem] px-5 py-20 sm:px-8 md:py-28">
+          <h2 id="vep-does" className="vep-reveal font-[family-name:var(--vep-archivo)] text-[clamp(2.6rem,6.6vw,5.6rem)] font-black uppercase leading-[0.88] tracking-[-0.03em] [font-variation-settings:'wdth'_74]">
+            What it does{" "}
+            <span className="font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ color: WINE }}>
+              to your clip.
+            </span>
+          </h2>
+          <ol className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
+            {DOES.filter((d) => d.img).map((d) => (
+              <li key={d.title} className="vep-reveal flex flex-col overflow-hidden rounded-[1.4rem]" style={{ background: PANEL }}>
+                <div className="px-6 pb-5 pt-6">
+                  <h3 className="font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
                     {d.title}
                   </h3>
-                  <p className="mt-2 text-pretty text-[1.04rem] font-medium leading-[1.45] opacity-85">{d.text}</p>
+                  <p className="mt-2 text-[1rem] leading-[1.4] text-[rgba(244,238,230,0.75)]">{d.text}</p>
                 </div>
-                {d.img ? (
-                  <div className="relative mt-auto aspect-square overflow-hidden sm:aspect-[4/5]">
-                    <Image src={S(d.img)} alt={d.alt ?? ""} fill sizes="(min-width: 1024px) 30vw, (min-width: 640px) 50vw, 100vw" quality={90} className="object-cover object-top" />
-                  </div>
-                ) : (
-                  <ul className="mt-auto flex list-none flex-wrap gap-2 px-6 pb-7 pt-2 sm:px-7">
-                    {d.list?.map((l) => (
-                      <li key={l} className="rounded-full bg-white/15 px-3.5 py-2 text-[0.95rem] font-semibold">
-                        {l}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <div className="relative mt-auto aspect-[4/5] overflow-hidden">
+                  <Image src={S(d.img!)} alt={d.alt ?? ""} fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 100vw" quality={90} className="object-cover object-[50%_20%]" />
+                </div>
+              </li>
+            ))}
+            {DOES.filter((d) => !d.img).map((d) => (
+              <li key={d.title} className="vep-reveal flex flex-col justify-between gap-6 rounded-[1.4rem] px-6 py-7 sm:flex-row sm:items-end lg:col-span-2" style={{ background: PANEL }}>
+                <h3 className="font-[family-name:var(--vep-archivo)] text-[clamp(1.9rem,3vw,2.6rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
+                  {d.title}
+                </h3>
+                <p className="max-w-[26ch] text-[1.05rem] leading-[1.4] text-[rgba(244,238,230,0.75)] sm:text-right">{d.text}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* 03. APPROVE, THEN ONE SENTENCE. One band. */}
-      <section aria-labelledby="vep-approve" className="text-white" style={{ background: BLUE }}>
-        <div className="mx-auto grid max-w-[90rem] grid-cols-1 items-end gap-10 px-5 py-20 sm:px-8 md:py-24 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <Heading id="vep-approve" n="03" caps="You approve." serifLine="Then one sentence changes it." onBlue />
+      {/* 03. THE CLOSE. */}
+      <section id={CLOSE_ID} aria-labelledby="vep-close-title" className="scroll-mt-28 border-t border-white/10">
+        <div className="mx-auto flex max-w-[90rem] flex-col gap-10 px-5 pb-28 pt-20 sm:px-8 md:pb-32 md:pt-28 lg:flex-row lg:items-end lg:justify-between">
+          <h2 id="vep-close-title" className="vep-reveal font-[family-name:var(--vep-archivo)] text-[clamp(2.6rem,6.6vw,5.6rem)] font-black uppercase leading-[0.88] tracking-[-0.03em] [font-variation-settings:'wdth'_74]">
+            Film it.{" "}
+            <span className="block font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ color: WINE }}>
+              It edits. You post.
+            </span>
+          </h2>
           <div className="vep-reveal">
-            <p className="max-w-[40ch] text-pretty text-[1.15rem] font-medium leading-[1.5] text-white/85">
-              Before it renders, you see every change, before and after. Then just say it:
+            <Buy />
+            <p className="mt-4 max-w-[40ch] text-[0.95rem] leading-[1.5] text-[rgba(244,238,230,0.6)]">
+              The skill and the masterclass, one payment. Needs Claude Code; best on a Mac.
             </p>
-            <ul className="mt-6 flex list-none flex-wrap gap-2.5 p-0">
-              {SAY.map((s) => (
-                <li key={s} className="rounded-full bg-white px-4 py-2 font-[family-name:var(--vep-mono)] text-[0.98rem] font-semibold text-[#0E1220]">
-                  &ldquo;{s}&rdquo;
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* 04. WHAT YOU GET: the skill and the masterclass. */}
-      <section aria-labelledby="vep-get">
-        <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
-          <Heading id="vep-get" n="04" caps="What you get" serifLine={`for ${PRODUCT.priceLabel}.`} />
-          <div className="mt-12 grid grid-cols-1 gap-4 md:mt-16 md:grid-cols-2 md:gap-5">
-            <article className="vep-reveal rounded-[1.6rem] bg-white p-7 shadow-[0_30px_60px_-40px_rgba(14,18,32,0.35)] sm:p-9">
-              <Mono className="text-[#1F3FE0]">The skill</Mono>
-              <h3 className="mt-3 font-[family-name:var(--vep-archivo)] text-[clamp(2rem,3.6vw,2.8rem)] font-black uppercase leading-[0.92] tracking-[-0.02em] [font-variation-settings:'wdth'_76]">
-                Video Editor Pro
-              </h3>
-              <p className="mt-4 max-w-[44ch] text-pretty text-[1.08rem] leading-[1.5] text-[rgba(14,18,32,0.72)]">
-                Installs into Claude Code in a minute. Hand it a clip, it hands back the reel. Your style is remembered for
-                the next one.
-              </p>
-            </article>
-            <article className="vep-reveal rounded-[1.6rem] p-7 text-white sm:p-9" style={{ background: RED }}>
-              <Mono className="text-white/80">Included</Mono>
-              <h3 className="mt-3 font-[family-name:var(--vep-archivo)] text-[clamp(2rem,3.6vw,2.8rem)] font-black uppercase leading-[0.92] tracking-[-0.02em] [font-variation-settings:'wdth'_76]">
-                The editing masterclass
-              </h3>
-              <p className="mt-4 max-w-[44ch] text-pretty text-[1.08rem] leading-[1.5] text-white/90">
-                Mine, on making reels with it: how I film, how I edit with it, how I post.
-              </p>
-            </article>
-          </div>
-          <p className="vep-reveal mt-6 text-[0.98rem] text-[rgba(14,18,32,0.62)]">
-            Making videos from scratch, with no footage? That&rsquo;s the free{" "}
-            <a href={VIDEO_EDITOR.href} className="font-semibold text-[#0E1220] underline decoration-[rgba(14,18,32,0.3)] underline-offset-4">
-              Video Editor
-            </a>
-            .
-          </p>
-        </div>
-      </section>
-
-      {/* 05. THE CLOSE. */}
-      <section id={CLOSE_ID} aria-labelledby="vep-close-title" className="scroll-mt-28 text-white" style={{ background: BLUE }}>
-        <div className="mx-auto max-w-[90rem] px-5 pb-28 pt-20 sm:px-8 md:pb-32 md:pt-28">
-          <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-20">
-            <Heading id="vep-close-title" n="05" caps="Film it." serifLine="It edits. You post." onBlue />
-            <div className="vep-reveal self-end">
-              <ol className="list-none border-b border-white/25 p-0">
-                {STEPS.map((step, i) => (
-                  <li key={i} className="flex items-baseline gap-5 border-t border-white/25 py-5 text-[1.1rem] leading-[1.45]">
-                    <span className="w-5 shrink-0 font-[family-name:var(--vep-mono)] text-[0.95rem] font-bold">{i + 1}</span>
-                    <span className="text-white/90">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-10">
-                <Buy />
-                <p className="mt-4 max-w-[48ch] text-pretty text-[0.95rem] leading-[1.5] text-white/80">
-                  One payment, secure checkout by Stripe. Included with Pro. {PRODUCT.thanks.needs}
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
