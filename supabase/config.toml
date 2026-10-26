@@ -186,11 +186,13 @@ otp_expiry = 3600
 # Use a production-ready SMTP server
 [auth.email.smtp]
 enabled = true
-host = "smtp.gmail.com"
+# Resend, not Gmail: the shop's downloads use Gmail's ~500-a-day limit, and
+# codes must never wait behind them. lib/account.ts falls back to Gmail.
+host = "smtp.resend.com"
 port = 465
-user = "tobia10donadon@gmail.com"
-pass = "env(GMAIL_APP_PASSWORD)"
-admin_email = "tobia10donadon@gmail.com"
+user = "resend"
+pass = "env(RESEND_API_KEY)"
+admin_email = "tobia@tobiadonadon.com"
 sender_name = "Tobia Donadon"
 
 [auth.email.template.confirmation]

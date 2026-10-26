@@ -1,4 +1,4 @@
-import { accountsConfigured, adminClient, authClient, currentMember, sessionCookies, type Session } from "@/lib/account";
+import { accountsConfigured, adminClient, authClient, currentMember, sendCodeOurselves, sessionCookies, type Session } from "@/lib/account";
 import { later } from "@/lib/later";
 import { membershipOf } from "@/lib/membership/server";
 import { isSubscribed, setMailing, subscribe } from "@/lib/newsletter";
@@ -62,7 +62,8 @@ function reason(err: { message?: string; code?: string; status?: number } | null
   if (/weak_password|password should/.test(m)) return "weak-password";
   if (/rate|too many|over_.*limit|security purposes/.test(m) || err?.status === 429) return "too-many";
   if (/user_already_exists|email_exists|already (been )?registered/.test(m)) return "exists";
-  // The code's email didn't go out (Supabase sends it through Tobia's Gmail).
+  // The code's email didn't go out (Supabase sends it through Resend):
+  // sendCodeOurselves tries Gmail before the visitor is told.
   if (/error sending|smtp/.test(m)) return "mail-down";
   return "failed";
 }
@@ -116,7 +117,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
     case "signup": {
       if (password.length < MIN_PASSWORD) return fail("weak-password");
       const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) return fail(reason(error));
+      if (error) {
+        const why = reason(error);
+        if (why !== "mail-down") return fail(why);
+        if (!(await sendCodeOurselves("signup", email, password))) return fail("mail-down", 503);
+        await later(() => setMailing(email, newsletter, "account_signup", "signup"));
+        return reply({ ok: true, next: "code" });
+      }
       // Supabase answers an address that already has a confirmed account with
       // an empty user rather than an error, and sends nothing.
       if (data.user && (data.user.identities ?? []).length === 0) return fail("exists");
@@ -126,7 +133,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
     }
     case "resend": {
       const { error } = await sb.auth.resend({ type: "signup", email });
-      return error ? fail(reason(error)) : reply({ ok: true });
+      if (!error) return reply({ ok: true });
+      if (reason(error) !== "mail-down") return fail(reason(error));
+      return (await sendCodeOurselves("confirm", email)) ? reply({ ok: true }) : fail("mail-down", 503);
     }
     case "verify": {
       if (code.length < 6) return fail("bad-code");
@@ -143,7 +152,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
           // The password was right (Supabase checks it first): a tick counts.
           if (newsletter) await later(() => subscribe(email, "login_prompt", "signin"));
           const sent = await sb.auth.resend({ type: "signup", email });
-          if (sent.error && reason(sent.error) === "mail-down") return fail("mail-down", 503);
+          if (sent.error && reason(sent.error) === "mail-down" && !(await sendCodeOurselves("confirm", email))) {
+            return fail("mail-down", 503);
+          }
           return reply({ ok: false, error: "unconfirmed", next: "code" });
         }
         return fail(why);
@@ -160,7 +171,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ act
       if (!error) return reply({ ok: true, next: "reset" });
       const why = reason(error);
       if (why === "too-many") return fail("too-many", 429);
-      return why === "mail-down" ? fail("mail-down", 503) : reply({ ok: true, next: "reset" });
+      if (why === "mail-down" && !(await sendCodeOurselves("recovery", email))) return fail("mail-down", 503);
+      return reply({ ok: true, next: "reset" });
     }
     case "reset": {
       if (password.length < MIN_PASSWORD) return fail("weak-password");

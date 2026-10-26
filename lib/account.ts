@@ -1,4 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import nodemailer from "nodemailer";
+import { SHOP_EMAIL } from "@/lib/shop/products";
 
 /**
  * CONSTRUCT ACCOUNTS.
@@ -9,7 +11,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
  * also a row in `members`, Tobia's mailing list.
  *
  * Supabase Auth does the hard parts (password hashing, codes, rate limits;
- * project "tobiaweb", codes sent from Tobia's Gmail). The browser never
+ * project "tobiaweb", codes sent through Resend from the domain). The browser never
  * talks to Supabase: the site's API routes do, and keep the session in two
  * httpOnly cookies, so no token is ever readable by a script on the page.
  *
@@ -88,5 +90,87 @@ export async function noteDownload(member: Member, product: string) {
     await adminClient().from("downloads").insert({ member_id: member.id, product });
   } catch (err) {
     console.error("[account] could not note download", err);
+  }
+}
+
+/**
+ * WHEN SUPABASE CAN'T SEND THE CODE. Supabase sends codes through Resend
+ * (smtp.resend.com, from the domain). When that fails, the admin API makes
+ * the code without sending anything, and it goes out from Tobia's Gmail
+ * instead (Resend again only if Gmail refuses too). Same code, same email
+ * (supabase/templates), same verifyOtp.
+ *
+ *   signup    a new account: needs the password, creates the user
+ *   confirm   an account that exists but was never confirmed (resend, signin)
+ *   recovery  the forgot-password code
+ *
+ * Returns false when it couldn't either, and the visitor sees "mail-down".
+ */
+export async function sendCodeOurselves(kind: "signup" | "confirm" | "recovery", email: string, password = "") {
+  const gmailPass = (process.env.GMAIL_APP_PASSWORD ?? "").replace(/\s+/g, "");
+  if (!gmailPass && !process.env.RESEND_API_KEY) return false;
+  const admin = adminClient().auth.admin;
+  let made =
+    kind === "signup"
+      ? await admin.generateLink({ type: "signup", email, password })
+      : kind === "recovery"
+        ? await admin.generateLink({ type: "recovery", email })
+        : await admin.generateLink({ type: "magiclink", email });
+  // The failed signUp may have left the user behind, unconfirmed: a code for it.
+  if (kind === "signup" && made.error) made = await admin.generateLink({ type: "magiclink", email });
+  const code = made.data?.properties?.email_otp;
+  if (made.error || !code) {
+    console.error("[account] could not make a code", made.error);
+    return false;
+  }
+  const reset = kind === "recovery";
+  const subject = reset ? "Reset your Construct password" : "Your Construct code";
+  const heading = reset ? "Reset your password" : "Your Construct code";
+  const line = reset
+    ? "Type this code on the page, then choose a new password."
+    : "Type this code on the page to finish creating your account.";
+  const html = `<!doctype html><html><body style="margin:0;padding:32px 20px;background:#f4f3ef;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#0b1230">
+<div style="max-width:440px;margin:0 auto;background:#ffffff;border-radius:14px;padding:32px">
+<p style="margin:0 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#4a5683">Construct · Tobia Donadon</p>
+<h1 style="margin:0 0 18px;font-size:24px;line-height:1.2">${heading}</h1>
+<p style="margin:0 0 22px;font-size:16px;line-height:1.55;color:#3a4160">${line}</p>
+<p style="margin:0 0 22px;font-size:38px;font-weight:700;letter-spacing:.18em;font-family:Menlo,Consolas,monospace">${code}</p>
+<p style="margin:0;font-size:14px;line-height:1.5;color:#6a7090">The code works for one hour. If you didn't ask for it, you can ignore this email.</p>
+</div></body></html>`;
+  const text = `${line}\n\n${code}\n\nThe code works for one hour. If you didn't ask for it, you can ignore this email.`;
+  const gmail = process.env.SHOP_EMAIL_FROM || SHOP_EMAIL;
+  if (gmailPass) {
+    try {
+      const info = await nodemailer
+        .createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user: gmail, pass: gmailPass }, connectionTimeout: 15_000 })
+        .sendMail({ from: { name: "Tobia Donadon", address: gmail }, to: email, subject, html, text });
+      if (!info.accepted?.length) throw new Error(`Gmail did not accept it: ${info.response ?? "no response"}`);
+      console.warn(`[account] Supabase couldn't send the ${kind} code; sent it from Gmail`);
+      return true;
+    } catch (err) {
+      console.error("[account] Gmail couldn't send the code either", err);
+    }
+  }
+  if (!process.env.RESEND_API_KEY) return false;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: `Tobia Donadon <${process.env.RESEND_EMAIL_FROM || gmail}>`,
+        to: [email],
+        reply_to: gmail,
+        subject,
+        html,
+        text,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!res.ok) throw new Error(`Resend ${res.status}: ${await res.text()}`);
+    console.warn(`[account] Supabase couldn't send the ${kind} code; sent it through Resend`);
+    return true;
+  } catch (err) {
+    console.error("[account] Resend couldn't send the code either", err);
+    return false;
   }
 }
