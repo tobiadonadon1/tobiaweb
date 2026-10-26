@@ -3780,11 +3780,12 @@ body:has(.rb-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
 /* Grok Army's spring, for the loader and the perched bot (this page isn't .ga-page). */
 .rb-page { --ga-spring: linear(0, 0.42 9%, 0.84 21%, 1.02 33%, 1.05 41%, 1.01 55%, 0.99 70%, 1); }
 /* The Pro card's "Just send me Reel Bot Factory": its default lilac glass
-   vanished on this page's violet, so here it takes the page's lime. */
+   vanished on this page's violet, so here it is plain white with black
+   words: clear, and still quieter than Join Pro. */
 body:has(.rb-page) .pp-skip {
   color: #111111;
   font-weight: 600;
-  background: #e4ff4f;
-  box-shadow: 0 10px 24px -14px rgba(228, 255, 79, 0.7);
+  background: #ffffff;
+  box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.5);
 }
-body:has(.rb-page) .pp-skip:hover { background: #eeff7a; }
+body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
