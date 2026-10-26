@@ -898,6 +898,27 @@ function VideoEditor() {
 }
 
 /**
+ * VIDEO EDITOR PRO — the Pro edit, cut from paper: a tall phone in the
+ * reel's own navy (the colour it took from the shirt), a cream figure in it,
+ * big cream type behind the head and a brass line under it (the serif second
+ * voice), with a cream caption pill low on the screen. The colours are the
+ * page's (product/video-editor-pro-page.tsx).
+ */
+function VideoEditorPro() {
+  return (
+    <>
+      <Cut d={CARD} x={132} y={30} s={0.8} sy={1.5} fill={SHADE} />
+      <Cut d={CARD} x={126} y={24} s={0.8} sy={1.5} fill="#1d2433" />
+      <Cut d={BAR} x={142} y={62} s={0.58} sy={1.5} fill="#F2E8D5" />
+      <Cut d={BAR} x={170} y={98} s={0.34} sy={0.9} fill="#C9A961" />
+      <Cut d={DISC} x={186} y={112} s={0.2} fill="#F2E8D5" />
+      <Cut d={CARD} x={168} y={160} s={0.34} sy={0.62} fill="#F2E8D5" />
+      <Cut d={BAR} x={160} y={258} s={0.4} sy={1.1} fill="#F2E8D5" />
+    </>
+  );
+}
+
+/**
  * APP DESIGNER PRO — two phones, cut from paper, side by side: an iPhone and
  * an Android, the same app on both. Each holds one decision (a disc, a bar),
  * and a pink wedge in front is the play button: the screens move now. The
@@ -1063,6 +1084,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "jev-crypto-analyst": JevCryptoAnalyst,
   "grok-army": GrokArmy,
   "reel-bot": ReelBot,
+  "video-editor-pro": VideoEditorPro,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,

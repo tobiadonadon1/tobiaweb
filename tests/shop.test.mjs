@@ -66,6 +66,8 @@ const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s"
 writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
 const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(3900));
 writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
+const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
+writeFileSync(path.join(cwd, "private", "video-editor-pro.zip.enc"), seal(VEP_ZIP, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -217,6 +219,14 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(forSale(sa), false);
   assert.equal(sa.stripeProductId, "none");
   assert.equal(sa.file.attach, false);
+  // Video Editor Pro: €5, a setup, never attached (it ships scripts); not sold until its Stripe product exists.
+  const vep = productById("video-editor-pro");
+  assert.equal(vep.href, entryHref("setups", "video-editor-pro"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "video-editor-pro")?.product, "video-editor-pro");
+  assert.equal(vep.priceCents, 500);
+  assert.equal(vep.free, undefined);
+  assert.equal(vep.file.attach, false);
+  assert.equal(forSale(vep), vep.stripeProductId.startsWith("prod_"));
   // Reel Bot: a free Grok Bot, one Markdown file, free for an email, beside Grok Army.
   const rb = productById("reel-bot");
   assert.equal(rb.href, entryHref("setups", "reel-bot"));
@@ -227,7 +237,7 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Web Designer Pro first, then App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Video Editor Pro first, then Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
@@ -978,7 +988,8 @@ test("forSale: only a paid product with a real Stripe product id", async () => {
   assert.equal(forSale({ ...THE_98C_TRADE, stripeProductId: "" }), false, "no id yet");
   assert.equal(forSale({ ...THE_98C_TRADE, stripeProductId: "grok-army" }), false, "a made-up id is not one");
   for (const p of Object.values(PRODUCTS)) {
-    if (!p.free && p.id !== "grok-army") assert.equal(forSale(p), true, `${p.id} is on sale`);
+    // A paid product built ahead of its Stripe product (an empty id) is shown, not sold yet.
+    if (!p.free && p.id !== "grok-army" && p.stripeProductId) assert.equal(forSale(p), true, `${p.id} is on sale`);
   }
 });
 
@@ -1009,6 +1020,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
   assert.equal(body.files["shorts-animator"].bytes, SHORTS_ZIP.length);
   assert.equal(body.files["reel-bot"].bytes, REEL_MD.length);
+  assert.equal(body.files["video-editor-pro"].bytes, VEP_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

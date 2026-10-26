@@ -52,6 +52,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "motion-designer": { a: "#ffb08c", b: "#fff1e8", added: "2026-10-23" },
   "shorts-animator": { a: "#a9bdf0", b: "#fdf3d8", added: "2026-10-25" },
   "reel-bot": { a: "#d6d6d4", b: "#f3f3f1", added: "2026-10-26" },
+  "video-editor-pro": { a: "#c9b37e", b: "#eef0f5", added: "2026-10-26" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

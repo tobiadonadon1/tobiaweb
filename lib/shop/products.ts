@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1143,6 +1143,75 @@ export const REEL_BOT: Product = {
   },
 };
 
+/**
+ * VIDEO EDITOR PRO, the paid follow-up to the free Video Editor: one Claude
+ * Code skill (reel-director) that edits a person's own raw footage into a
+ * finished reel, the way an editor would, and shows every change before it
+ * renders.
+ *
+ * The zip (folder "Video Editor Pro": START HERE.txt, CLAUDE.md, README.md,
+ * install.mjs, skills/reel-director) leaves out the 8 music beds (9.8 MB, all
+ * CC0 or synthesized by the skill): install.mjs fetches them from
+ * public/shop/video-editor-pro/music/ and checks them against SHA256SUMS, so
+ * the download stays under Vercel's 4.5 MB response. Reseal whenever the skill
+ * changes: npm run seal -- <path to>/video-editor-pro.zip
+ *
+ * Stripe: no product yet, so the page says "Checkout opens soon" (forSale).
+ * Put its prod_ id here once it exists; the checkout charges this row.
+ */
+export const VIDEO_EDITOR_PRO: Product = {
+  id: "video-editor-pro",
+  name: "Video Editor Pro",
+  description:
+    "A €5 Claude Code skill that edits your raw footage into a finished reel: cuts the bad takes, fixes the light, captions on the word, designs the graphics, does the sound, and shows you every change before it renders.",
+  priceCents: 500,
+  currency: "eur",
+  priceLabel: money(500, "eur"),
+  href: "/projects/construct/material/setups/video-editor-pro",
+  file: {
+    sealed: "video-editor-pro.zip.enc",
+    filename: "video-editor-pro.zip",
+    // The skill ships scripts (.mjs, .swift), and Gmail refuses those zips.
+    attach: false,
+  },
+  stripeProductId: "",
+  share: {
+    description:
+      "Video Editor Pro edits your raw footage into a finished reel inside Claude Code: it cuts the bad takes, fixes the light on your face, captions in time with your voice, designs the graphics from your own colours, does the sound like an engineer, and shows you every change before it renders. Then one sentence changes it.",
+    kicker: "Skill · for Claude Code",
+    line: "Your raw clip in. A finished reel out.",
+    proof: "Cut · light · captions · graphics · sound",
+    theme: "dark",
+  },
+  contents: [
+    ["skills/reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
+    ["scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
+    ["assets/", "50 effects, 6 caption styles, a 34-sound studio kit, fonts; 8 music beds downloaded on install"],
+    ["install.mjs", "installs it, fetches the music, checks ffmpeg"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude",
+    "Type hi. It installs Video Editor Pro in about a minute.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code and type hi.",
+    after: [
+      "From then on, hand it footage in any Claude Code session: \"edit ~/Movies/IMG_1234.mov into a reel\". Bad takes can stay in.",
+      "Before anything renders you get a before/after table of every change to approve. After that one sentence changes it: \"tighter cut\", \"bigger captions\", \"make it moody\".",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan), Node.js 18 or newer and ffmpeg. Best on a Mac: face tracking and the cut-out of you use Apple's Vision; on Windows and Linux edits work without them.",
+    next: [
+      ["Right after install", "It offers to edit your first video. Have a clip ready, bad takes and all."],
+      ["Every video", "A before/after table of every change, once. You approve, it renders and checks its own frames."],
+      ["Then", "One sentence: \"tighter cut\", \"warmer\", \"make it moody\", \"go back to the second version\"."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1162,6 +1231,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "motion-designer": MOTION_DESIGNER,
   "shorts-animator": SHORTS_ANIMATOR,
   "reel-bot": REEL_BOT,
+  "video-editor-pro": VIDEO_EDITOR_PRO,
 };
 
 export function productById(id: unknown): Product | undefined {

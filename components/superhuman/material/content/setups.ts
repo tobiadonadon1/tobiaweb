@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "video-editor-pro",
+    title: "Video Editor Pro",
+    kind: "setup",
+    summary: "Your raw clip in, bad takes and all. A finished reel out: cut, lit, captioned, designed and scored, every change shown before it renders.",
+    // Minutes from the download to the first edit underway.
+    minutes: 5,
+    status: "ready",
+    when: "You film yourself talking and want reels that look edited by a pro, without opening an editing app.",
+    level: "Anyone",
+    body: [],
+    product: "video-editor-pro",
+  },
+  {
     slug: "web-designer-pro",
     title: "Web Designer Pro",
     kind: "setup",

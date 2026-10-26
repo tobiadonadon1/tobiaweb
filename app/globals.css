@@ -3789,3 +3789,25 @@ body:has(.rb-page) .pp-skip {
   box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.5);
 }
 body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
+
+/* ------------------------------------------------------------------ *
+ * VIDEO EDITOR PRO (video-editor-pro-page.tsx). The edit's own look: the
+ * navy it took from the shirt, cream, brass, grotesk caps with a serif
+ * italic second voice.
+ * ------------------------------------------------------------------ */
+.vep-title { font-size: clamp(3.6rem, 19vw, 9rem); font-variation-settings: "wdth" 88; }
+@media (min-width: 1024px) { .vep-title { font-size: clamp(6rem, 9.6vw, 10.5rem); } }
+.vep-phone {
+  aspect-ratio: 9 / 18.4;
+  border-radius: 2.2rem;
+  background: #07090d;
+  padding: 0.45rem;
+  box-shadow: 0 0 0 1.5px rgba(242, 232, 213, 0.18), 0 40px 80px -30px rgba(0, 0, 0, 0.65);
+}
+.vep-phone__screen { position: relative; height: 100%; overflow: hidden; border-radius: 1.8rem; background: #000; }
+.vep-phone__screen video { object-fit: cover; }
+@media (max-width: 639px) { .vep-phone { border-radius: 1.3rem; padding: 0.3rem; } .vep-phone__screen { border-radius: 1.05rem; } }
+@media (prefers-reduced-motion: no-preference) {
+  .vep-arrow { animation: vep-nudge 1.8s ease-in-out infinite; }
+}
+@keyframes vep-nudge { 50% { translate: 6px 0; } }
