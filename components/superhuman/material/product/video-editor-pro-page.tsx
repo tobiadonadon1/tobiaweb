@@ -6,6 +6,7 @@ import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { VideoEditorProFilm } from "./video-editor-pro-film";
 import { VideoEditorProLoader } from "./video-editor-pro-loader";
+import { VideoEditorProLoop } from "./video-editor-pro-loop";
 import { StickyBuy } from "./sticky-buy";
 
 /**
@@ -19,15 +20,18 @@ import { StickyBuy } from "./sticky-buy";
  * loader says the value in three beats; the poster says it again with what
  * you get (the masterclass as a badge, so nobody has to scroll to find it)
  * and the price; the masterclass (you learn it, you don't guess); what it
- * does ("and a bunch more"); the close. The pictures are grey placeholders
- * until the real ones exist.
+ * does ("and a bunch more"); the close. Each "what it does" card plays a few
+ * seconds of the same reel, showing that one effect.
  *
  * THE VIDEO SLOT is HERO_FILM: his v2 reel, re-encoded for the web (720x1280,
  * about 8 MB), with its title frame as the poster. null shows a grey frame.
  *
- * WHAT IS REAL: the stills are frames of reel-director's render of Tobia's
- * raw clip (his test, 2026-10-23). The masterclass is described only as what
- * it is: his, on making reels with it.
+ * WHAT IS REAL: every clip is cut from that v2 reel (reel-director's render of
+ * his raw IMG_8336.MOV, project in ~/Downloads/IMG_8336-edit). The light card
+ * is the raw clip and the reel at the same moment, split by a sweeping line.
+ * The others: the captions, the hook he walks in front of, the green "20+"
+ * and the "$700" counter. The masterclass is described only as what it is:
+ * his, on making reels with it.
  */
 
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--vep-archivo", display: "swap" });
@@ -50,15 +54,16 @@ const WINE = "#B0243B";
 const CREAM = "#F4EEE6";
 const BUTTON = "bg-[#9E1F34] text-white shadow-[0_18px_40px_-16px_rgba(158,31,52,0.8)] hover:bg-[#b0243b]";
 
-/** What it does: four get a picture (grey placeholders for now), two are words. */
-const DOES: { title: string; text: string; img?: string }[] = [
+/** What it does: four get a clip of the v2 reel (public/shop/video-editor-pro/does-<clip>), two are words. */
+const DOES: { title: string; text: string; clip?: string; split?: boolean }[] = [
   { title: "Cuts the takes", text: "Retakes, fillers, dead air: gone." },
-  { title: "Fixes the light", text: "Exposed on your face, warmer on request.", img: "warmer-v2.jpg" },
-  { title: "Captions on the word", text: "Off your face, clear of the app's buttons.", img: "captions-v2.jpg" },
-  { title: "Type behind you", text: "You're cut out of every frame.", img: "behind-v2.jpg" },
-  { title: "Your colours", text: "One look, taken from your footage.", img: "backdrop-v2.jpg" },
+  { title: "Fixes the light", text: "Exposed on your face, warmer on request.", clip: "light", split: true },
+  { title: "Captions on the word", text: "Off your face, clear of the app's buttons.", clip: "captions" },
+  { title: "Type behind you", text: "You're cut out of every frame.", clip: "behind" },
+  { title: "Your colours", text: "One look, taken from your footage.", clip: "colours" },
   { title: "Sound, mixed", text: "Clean voice, a sound kit, music that steps aside." },
 ];
+const CLIPS = "/shop/video-editor-pro";
 
 /** "And much more": from the skill's own feature list (README, SKILL.md). */
 const MORE = [
@@ -221,7 +226,7 @@ export function VideoEditorProPage() {
             </span>
           </h2>
           <ol className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
-            {DOES.filter((d) => d.img).map((d) => (
+            {DOES.filter((d) => d.clip).map((d) => (
               <li key={d.title} className="vep-reveal flex flex-col overflow-hidden rounded-[1.4rem]" style={{ background: PANEL }}>
                 <div className="px-6 pb-5 pt-6">
                   <h3 className="font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
@@ -229,10 +234,22 @@ export function VideoEditorProPage() {
                   </h3>
                   <p className="mt-2 text-[1rem] leading-[1.4] text-[rgba(244,238,230,0.75)]">{d.text}</p>
                 </div>
-                <div className="vep-grey mt-auto aspect-[4/5]" role="img" aria-label={`${d.title}: picture coming soon`} />
+                <div className="relative mt-auto aspect-[4/5] bg-black">
+                  <VideoEditorProLoop
+                    src={`${CLIPS}/does-${d.clip}.mp4`}
+                    poster={`${CLIPS}/does-${d.clip}.jpg`}
+                    label={d.split ? `${d.title}: the raw clip beside the Pro edit` : `${d.title}, in a reel it edited`}
+                  />
+                  {d.split ? (
+                    <div className="pointer-events-none absolute inset-x-3 top-3 flex justify-between text-[0.8rem] font-semibold text-white" aria-hidden>
+                      <span className="rounded-full bg-black/55 px-2.5 py-1 backdrop-blur-md">Raw</span>
+                      <span className="rounded-full px-2.5 py-1" style={{ background: WINE }}>Pro</span>
+                    </div>
+                  ) : null}
+                </div>
               </li>
             ))}
-            {DOES.filter((d) => !d.img).map((d) => (
+            {DOES.filter((d) => !d.clip).map((d) => (
               <li key={d.title} className="vep-reveal flex flex-col justify-between gap-6 rounded-[1.4rem] px-6 py-7 sm:flex-row sm:items-end lg:col-span-2" style={{ background: PANEL }}>
                 <h3 className="font-[family-name:var(--vep-archivo)] text-[clamp(1.9rem,3vw,2.6rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
                   {d.title}
