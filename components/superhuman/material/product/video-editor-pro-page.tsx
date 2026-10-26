@@ -78,12 +78,6 @@ const JSON_LD = {
       }),
 };
 
-function Mono({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <span className={`font-[family-name:var(--vep-mono)] text-[0.75rem] font-medium uppercase tracking-[0.08em] ${className}`}>{children}</span>
-  );
-}
-
 function Buy({ reportErrors = false }: { reportErrors?: boolean }) {
   return (
     <BuyForm
