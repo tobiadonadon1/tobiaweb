@@ -58,6 +58,19 @@ export const SETUPS: MaterialEntry[] = [
     product: "grok-army",
   },
   {
+    slug: "reel-bot",
+    title: "Reel Bot",
+    kind: "setup",
+    summary: "One file to a Grok Bot, and it makes your animated reels with Claude: the brief, the voice, the video, checked.",
+    // Minutes from the download to the bot working on its first reel.
+    minutes: 5,
+    status: "ready",
+    when: "You use Grok Bot and want animated vertical videos for Reels, TikTok or Shorts, without drawing, filming or editing.",
+    level: "Anyone",
+    body: [],
+    product: "reel-bot",
+  },
+  {
     slug: "the-98c-trade",
     title: "The 98¢ Trade",
     kind: "setup",

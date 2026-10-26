@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1084,6 +1084,65 @@ export const SHORTS_ANIMATOR: Product = {
   },
 };
 
+/**
+ * REEL BOT, a free Grok Bot: one Markdown file a Grok Bot works from to make
+ * animated vertical videos with Claude (it writes the brief, makes the voice,
+ * drives the browser to a Claude project, downloads, checks and hands over).
+ * The file: Tobia's pipeline.md, sealed as private/reel-bot.md.enc with
+ * `npm run seal -- reel-bot.md`. Reseal whenever the file changes.
+ */
+export const REEL_BOT: Product = {
+  id: "reel-bot",
+  name: "Reel Bot",
+  description:
+    "A free Grok Bot that makes animated vertical videos with Claude: it writes the brief, records the voice, has Claude animate every frame in code, checks the file and hands it to you.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/reel-bot",
+  file: {
+    sealed: "reel-bot.md.enc",
+    filename: "reel-bot.md",
+    // One Markdown file, which Gmail is happy to carry: it arrives attached.
+    attach: true,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Reel Bot is a free Grok Bot that makes 20 to 70 second animated videos for Reels, TikTok and Shorts. Pick a style and a topic: it writes the brief, records the voiceover, has Claude draw and animate every frame in code, checks the finished MP4 and sends it to you for your OK.",
+    kicker: "Grok Bot · free",
+    line: "A Grok Bot that makes your animated reels.",
+    proof: "One file · nothing posted without your OK",
+    theme: "dark",
+  },
+  contents: [["reel-bot.md", "the whole bot: the pipeline, the brief it writes, the voice, the checks, the styles that work"]],
+  steps: [
+    "Download reel-bot.md.",
+    "Create a new Grok Bot and attach the file.",
+    "Say \"Make my first reel from this file\", with a style and a topic.",
+  ],
+  email: {
+    preheader: "Your Grok Bot is attached. Give it to a new Grok Bot with a style and a topic.",
+    stepsIntro: "Where to start:",
+    after: [
+      "It writes the brief, makes the voiceover, opens a chat in your Claude project and has Claude animate the video in code. Then it downloads the MP4, checks it and sends it to you with an honest list of weak spots.",
+      "Nothing is posted under your name until you approve it.",
+    ],
+    footnote: "Reel Bot is an independent Grok Bot, not made by xAI or Anthropic.",
+  },
+  thanks: {
+    needs:
+      "You'll need Grok Bot (with its own computer and browser) and a Claude plan with room to spare (Max recommended). For videos that talk, an ElevenLabs account for the voice.",
+    next: [
+      ["The first reel", "About 25 to 40 minutes of Claude's time, for 30 to 60 seconds of video."],
+      ["Every reel", "It shows you the file and its weak spots. You approve before anything is posted."],
+      ["Every day, if you like", "A routine: it picks the next topic, makes the reel and sends it to you."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1102,6 +1161,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "video-editor": VIDEO_EDITOR,
   "motion-designer": MOTION_DESIGNER,
   "shorts-animator": SHORTS_ANIMATOR,
+  "reel-bot": REEL_BOT,
 };
 
 export function productById(id: unknown): Product | undefined {
@@ -1110,9 +1170,13 @@ export function productById(id: unknown): Product | undefined {
     : undefined;
 }
 
-/** The file's media type, from its name: the zips and the one PDF. */
+/** The file's media type, from its name: the zips, the PDFs and Reel Bot's one Markdown file. */
 export const fileType = (product: Product) =>
-  product.file.filename.endsWith(".pdf") ? "application/pdf" : "application/zip";
+  product.file.filename.endsWith(".pdf")
+    ? "application/pdf"
+    : product.file.filename.endsWith(".md")
+      ? "text/markdown; charset=utf-8"
+      : "application/zip";
 
 export const thanksHref = (product: Product) => `${product.href}/thanks`;
 

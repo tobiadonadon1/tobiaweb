@@ -64,6 +64,8 @@ const MOTION_ZIP = Buffer.from("PK\u0003\u0004 the motion graphics skill " + "m"
 writeFileSync(path.join(cwd, "private", "motion-designer.zip.enc"), seal(MOTION_ZIP, parseKey(fileKey)));
 const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s".repeat(3900));
 writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
+const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(3900));
+writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -215,10 +217,17 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(forSale(sa), false);
   assert.equal(sa.stripeProductId, "none");
   assert.equal(sa.file.attach, false);
+  // Reel Bot: a free Grok Bot, one Markdown file, free for an email, beside Grok Army.
+  const rb = productById("reel-bot");
+  assert.equal(rb.href, entryHref("setups", "reel-bot"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "reel-bot")?.product, "reel-bot");
+  assert.equal(rb.free, true);
+  assert.equal(forSale(rb), false);
+  assert.equal(rb.stripeProductId, "none");
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["web-designer-pro", "app-designer-pro", "grok-army", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Web Designer Pro first, then App Designer Pro, Grok Army, the 98¢ Trade, Launchr, Jev");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Web Designer Pro first, then App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
@@ -449,6 +458,19 @@ test("free: Shorts Animator downloads at once for an address, and still emails t
   // Launchr is not instant: the email is still the only way in.
   const other = await ask({ product: "launchr", email: "bo@example.com" }, "203.0.113.78");
   assert.deepEqual(await other.json(), { ok: true });
+});
+
+test("free: Reel Bot downloads its Markdown file at once, and emails it attached", async () => {
+  const res = await ask({ product: "reel-bot", email: "cy@example.com" }, "203.0.113.79");
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.ok, true);
+  const dl = await download(new Request(body.download));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-type"), /^text\/markdown/);
+  assert.match(dl.headers.get("content-disposition"), /filename="reel-bot.md"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), REEL_MD);
+  assert.ok(mail().some((m) => m.message.to === "cy@example.com"), "the email goes too");
 });
 
 test("free: Jev Crypto Analyst sends its own file, and its link never opens Launchr", async () => {
@@ -986,6 +1008,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["video-editor"].bytes, EDITOR_ZIP.length);
   assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
   assert.equal(body.files["shorts-animator"].bytes, SHORTS_ZIP.length);
+  assert.equal(body.files["reel-bot"].bytes, REEL_MD.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {
     assert.ok(!raw.includes(secret));

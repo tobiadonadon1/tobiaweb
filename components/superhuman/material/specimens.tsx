@@ -40,7 +40,7 @@
  * the two that do the most work: they are the far ends of the wheel from each
  * other and both hold their own against the paper.
  * ------------------------------------------------------------------ */
-import { botShape, squadShapes } from "./product/grok-army-bots";
+import { LEAD, botShape, squadShapes } from "./product/grok-army-bots";
 import { SIX as VM_SIX } from "./product/viral-machine-bits";
 
 const INK = "#0b1f3a";
@@ -848,6 +848,14 @@ function GrokArmy() {
 }
 
 /**
+ * REEL BOT — just one bot, on purpose: the metal disc alone, large, the same
+ * drawing that hops onto GROK in its page's opening (product/reel-bot-loader.tsx).
+ */
+function ReelBot() {
+  return botShape(LEAD, { x: 115, y: 80, s: 1.7 });
+}
+
+/**
  * VIRAL MACHINE — its six Grok bots, one per job, in the page's own colours
  * (product/viral-machine-bits.tsx): the metal disc, the one you talk to, in
  * front and largest, the five others gathered round it.
@@ -1054,6 +1062,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   launchr: Launchr,
   "jev-crypto-analyst": JevCryptoAnalyst,
   "grok-army": GrokArmy,
+  "reel-bot": ReelBot,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,
