@@ -12,6 +12,7 @@ const state = () => {
   globalThis.__stripe ??= {
     sessions: new Map(),
     paymentIntents: new Map(),
+    subscriptions: new Map(),
     products: new Set(),
     createdSessions: [],
     createdProducts: [],
@@ -39,6 +40,9 @@ export default class Stripe {
           if (params?.expand?.includes("payment_intent") && typeof out.payment_intent === "string") {
             out.payment_intent = structuredClone(state().paymentIntents.get(out.payment_intent));
           }
+          if (params?.expand?.some((e) => e.startsWith("subscription")) && typeof out.subscription === "string") {
+            out.subscription = structuredClone(state().subscriptions.get(out.subscription) ?? out.subscription);
+          }
           return out;
         },
         create: async (params) => {
@@ -62,6 +66,15 @@ export default class Stripe {
         if (!pi) throw invalid(`No such payment_intent: '${id}'`, "resource_missing", "id");
         pi.metadata = { ...pi.metadata, ...params.metadata };
         return structuredClone(pi);
+      },
+    };
+
+    this.subscriptions = {
+      update: async (id, params) => {
+        const sub = state().subscriptions.get(id);
+        if (!sub) throw invalid(`No such subscription: '${id}'`, "resource_missing", "id");
+        sub.metadata = { ...sub.metadata, ...params.metadata };
+        return structuredClone(sub);
       },
     };
 

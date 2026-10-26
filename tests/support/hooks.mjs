@@ -10,6 +10,8 @@
  *                      uses its genuine webhook signing.
  *   "nodemailer"     → tests/support/nodemailer-mock.mjs, which records mail
  *                      instead of sending it.
+ *   "next/server", "next/og" → their .js files, which Next's bundler finds
+ *                      by itself and plain Node does not.
  */
 import { existsSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -37,8 +39,8 @@ export function resolve(specifier, context, next) {
     return { url: mailMock, shortCircuit: true };
   }
   // Next's bundler resolves "next/server" by itself; plain Node needs the file.
-  if (specifier === "next/server") {
-    return next("next/server.js", context);
+  if (specifier === "next/server" || specifier === "next/og") {
+    return next(`${specifier}.js`, context);
   }
   if (specifier.startsWith("@/")) {
     const file = withExtension(path.join(root, specifier.slice(2)));

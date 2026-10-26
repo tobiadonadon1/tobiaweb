@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { recordPurchase, syncSubscription } from "@/lib/membership/server";
+import { welcomeMember } from "@/lib/membership/welcome";
 import { deliver } from "@/lib/shop/deliver";
 import { findPurchase, originFor, stripe } from "@/lib/shop/stripe";
 
@@ -27,6 +28,9 @@ import { findPurchase, originFor, stripe } from "@/lib/shop/stripe";
  *   and copies its plan and status into `subscriptions` (lib/membership).
  *   Renewals, failed cards, plan changes and cancellations all arrive as
  *   customer.subscription.updated or .deleted.
+ *
+ *   A NEW MEMBER IS WELCOMED. A subscription checkout finishing also sends
+ *   the welcome email (lib/membership/welcome.ts), once per subscription.
  *
  * Events to send (Stripe dashboard → Developers → Webhooks, or
  * scripts/membership-setup.mjs, which adds the subscription ones):
@@ -99,7 +103,19 @@ export async function POST(request: Request) {
   const object = event.data.object as Stripe.Checkout.Session;
   if (object.mode === "subscription") {
     const sub = typeof object.subscription === "string" ? object.subscription : object.subscription?.id;
-    return sub ? membership(sub, event.id) : Response.json({ received: true, ignored: "no-subscription" });
+    if (!sub) return Response.json({ received: true, ignored: "no-subscription" });
+    const synced = await membership(sub, event.id);
+    if (!synced.ok) return synced;
+    // A new member: the welcome email, once. A retry re-copies the
+    // subscription (harmless) and skips a welcome that has already gone.
+    try {
+      const welcome = await welcomeMember(object.id, originFor(request));
+      console.info("[membership] welcome", object.id, welcome.status);
+      return Response.json({ received: true, welcome: welcome.status });
+    } catch (err) {
+      console.error("[membership] welcome email failed, Stripe will retry", object.id, err);
+      return new Response("welcome failed", { status: 500 });
+    }
   }
 
   const sessionId = object.id;
