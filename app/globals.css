@@ -3791,23 +3791,43 @@ body:has(.rb-page) .pp-skip {
 body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
 
 /* ------------------------------------------------------------------ *
- * VIDEO EDITOR PRO (video-editor-pro-page.tsx). The edit's own look: the
- * navy it took from the shirt, cream, brass, grotesk caps with a serif
- * italic second voice.
+ * VIDEO EDITOR PRO (video-editor-pro-page.tsx). Royal blue and red, white,
+ * a light paper: bright and crisp. The hero comes in on load (the title line
+ * by line from under its own edge, the phone rising, the chips popping), and
+ * every section reveals as it scrolls into view where the browser can tie
+ * an animation to the scroll; elsewhere it is simply there.
  * ------------------------------------------------------------------ */
-.vep-title { font-size: clamp(3.6rem, 19vw, 9rem); font-variation-settings: "wdth" 88; }
-@media (min-width: 1024px) { .vep-title { font-size: clamp(6rem, 9.6vw, 10.5rem); } }
+.vep-page { --vep-ease: cubic-bezier(0.16, 1, 0.3, 1); --vep-spring: linear(0, 0.42 9%, 0.84 21%, 1.02 33%, 1.05 41%, 1.01 55%, 0.99 70%, 1); }
+.vep-title { font-size: clamp(3.8rem, 20vw, 9rem); font-variation-settings: "wdth" 88; }
+@media (min-width: 1024px) { .vep-title { font-size: clamp(6.5rem, 10.5vw, 11.5rem); } }
+.vep-line { display: block; overflow: hidden; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+.vep-line > span { display: inline-block; }
 .vep-phone {
   aspect-ratio: 9 / 18.4;
-  border-radius: 2.2rem;
-  background: #07090d;
-  padding: 0.45rem;
-  box-shadow: 0 0 0 1.5px rgba(242, 232, 213, 0.18), 0 40px 80px -30px rgba(0, 0, 0, 0.65);
+  border-radius: 2.3rem;
+  background: #ffffff;
+  padding: 0.5rem;
+  box-shadow: 0 50px 90px -30px rgba(5, 12, 70, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
-.vep-phone__screen { position: relative; height: 100%; overflow: hidden; border-radius: 1.8rem; background: #000; }
+.vep-phone__screen { position: relative; height: 100%; overflow: hidden; border-radius: 1.85rem; background: #000; }
 .vep-phone__screen video { object-fit: cover; }
-@media (max-width: 639px) { .vep-phone { border-radius: 1.3rem; padding: 0.3rem; } .vep-phone__screen { border-radius: 1.05rem; } }
+
 @media (prefers-reduced-motion: no-preference) {
-  .vep-arrow { animation: vep-nudge 1.8s ease-in-out infinite; }
+  .vep-in { animation: vep-rise 900ms var(--vep-ease) calc(var(--i, 0) * 90ms + 80ms) both; }
+  .vep-line > span { animation: vep-up 1000ms var(--vep-ease) calc(var(--i, 0) * 110ms) both; }
+  .vep-pop { animation: vep-pop 620ms var(--vep-spring) calc(var(--i, 0) * 90ms + 120ms) both; }
+  .vep-phone-in { animation: vep-phone 1200ms var(--vep-ease) 250ms both; }
+  @supports (animation-timeline: view()) {
+    .vep-reveal {
+      animation: vep-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
 }
-@keyframes vep-nudge { 50% { translate: 6px 0; } }
+@keyframes vep-rise { from { opacity: 0; translate: 0 26px; } }
+@keyframes vep-up { from { translate: 0 105%; } }
+@keyframes vep-pop { from { opacity: 0; scale: 0.6; } }
+@keyframes vep-phone { from { opacity: 0; translate: 0 70px; scale: 0.94; rotate: 0deg; } }
+@keyframes vep-reveal { from { opacity: 0; translate: 0 48px; } }
+

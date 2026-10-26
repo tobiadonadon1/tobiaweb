@@ -1156,6 +1156,8 @@ export const REEL_BOT: Product = {
  * the download stays under Vercel's 4.5 MB response. Reseal whenever the skill
  * changes: npm run seal -- <path to>/video-editor-pro.zip
  *
+ * Sold with the editing masterclass Tobia is recording (not in the zip).
+ *
  * Stripe: no product yet, so the page says "Checkout opens soon" (forSale).
  * Put its prod_ id here once it exists; the checkout charges this row.
  */
@@ -1163,10 +1165,11 @@ export const VIDEO_EDITOR_PRO: Product = {
   id: "video-editor-pro",
   name: "Video Editor Pro",
   description:
-    "A €5 Claude Code skill that edits your raw footage into a finished reel: cuts the bad takes, fixes the light, captions on the word, designs the graphics, does the sound, and shows you every change before it renders.",
-  priceCents: 500,
+    "A Claude Code skill that edits your raw footage into a finished reel (cuts the bad takes, fixes the light, captions on the word, designs the graphics, does the sound, shows you every change before it renders), with the editing masterclass.",
+  // Tobia, 2026-10-26: €15, the skill and the editing masterclass together.
+  priceCents: 1500,
   currency: "eur",
-  priceLabel: money(500, "eur"),
+  priceLabel: money(1500, "eur"),
   href: "/projects/construct/material/setups/video-editor-pro",
   file: {
     sealed: "video-editor-pro.zip.enc",
@@ -1177,11 +1180,10 @@ export const VIDEO_EDITOR_PRO: Product = {
   stripeProductId: "",
   share: {
     description:
-      "Video Editor Pro edits your raw footage into a finished reel inside Claude Code: it cuts the bad takes, fixes the light on your face, captions in time with your voice, designs the graphics from your own colours, does the sound like an engineer, and shows you every change before it renders. Then one sentence changes it.",
+      "Video Editor Pro edits your raw footage into a finished reel inside Claude Code: it cuts the bad takes, fixes the light on your face, captions in time with your voice, designs the graphics from your own colours, does the sound like an engineer, and shows you every change before it renders. Then one sentence changes it. With the editing masterclass.",
     kicker: "Skill · for Claude Code",
     line: "Your raw clip in. A finished reel out.",
-    proof: "Cut · light · captions · graphics · sound",
-    theme: "dark",
+    proof: "The skill + the editing masterclass",
   },
   contents: [
     ["skills/reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],

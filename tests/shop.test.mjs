@@ -223,7 +223,7 @@ test("the product, its page and its folder entry agree", async () => {
   const vep = productById("video-editor-pro");
   assert.equal(vep.href, entryHref("setups", "video-editor-pro"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "video-editor-pro")?.product, "video-editor-pro");
-  assert.equal(vep.priceCents, 500);
+  assert.equal(vep.priceCents, 1500);
   assert.equal(vep.free, undefined);
   assert.equal(vep.file.attach, false);
   assert.equal(forSale(vep), vep.stripeProductId.startsWith("prod_"));
