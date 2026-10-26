@@ -17,7 +17,8 @@ import { StickyBuy } from "./sticky-buy";
  * loader, few sections and little text, dark with bordeaux writing, and no
  * video until his new one arrives (a grey frame holds its place). So: the
  * loader says the value in three beats; the poster says it again with what
- * you get and the price; one grid of what it does; the close.
+ * you get and the price; what it does ("and much more"); the masterclass
+ * (you learn it, you don't guess); the close.
  *
  * THE VIDEO SLOT is HERO_FILM: null shows the grey frame. When the new video
  * arrives, put it in public/shop/video-editor-pro/ and set its src and poster.
@@ -53,6 +54,26 @@ const DOES: { title: string; text: string; img?: string; alt?: string }[] = [
   { title: "Type behind you", text: "You're cut out of every frame.", img: "behind-v2.jpg", alt: "“bigger phrase.” behind Tobia's head and raised hand." },
   { title: "Your colours", text: "One look, taken from your footage.", img: "backdrop-v2.jpg", alt: "The room turned navy behind Tobia, “your own brand.”" },
   { title: "Sound, mixed", text: "Clean voice, a sound kit, music that steps aside." },
+];
+
+/** "And much more": from the skill's own feature list (README, SKILL.md). */
+const MORE = [
+  "50 effects",
+  "9 moods in one word",
+  "Selfie, pro camera or product",
+  "6 caption styles",
+  "Clear of Instagram, TikTok and Shorts buttons",
+  "A before/after of every change",
+  "One sentence to change anything",
+  "Every version kept",
+  "It learns your style",
+];
+
+/** What the masterclass covers, in Tobia's words: how he films, edits with it and posts. */
+const LEARN: [string, string][] = [
+  ["Film it", "How I shoot a clip on my phone that edits well."],
+  ["Edit it", "How I hand it over, approve the plan and change it in a sentence."],
+  ["Post it", "How the finished reel goes out."],
 ];
 
 const JSON_LD = {
@@ -115,14 +136,15 @@ export function VideoEditorProPage() {
               </span>
             </h1>
 
-            <p className="vep-in mt-8 max-w-[24ch] text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-[1.1] tracking-[-0.02em]" style={{ "--i": 2 } as React.CSSProperties}>
-              Your raw clip in. <span className="whitespace-nowrap" style={{ color: WINE }}>A finished reel out.</span>
+            <p className="vep-in mt-8 max-w-[22ch] text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-[1.1] tracking-[-0.02em]" style={{ "--i": 2 } as React.CSSProperties}>
+              The editor you&rsquo;d hire, <span className="whitespace-nowrap" style={{ color: WINE }}>inside Claude Code.</span>
             </p>
-            <p className="vep-in mt-4 max-w-[46ch] text-[1.12rem] leading-[1.5] text-[rgba(244,238,230,0.72)]" style={{ "--i": 3 } as React.CSSProperties}>
-              Claude cuts, lights, captions, designs and mixes it. No editing app.
+            <p className="vep-in mt-4 max-w-[46ch] text-[1.12rem] leading-[1.5] text-[rgba(244,238,230,0.75)]" style={{ "--i": 3 } as React.CSSProperties}>
+              Hand it your raw clip, bad takes and all. It hands back a reel that&rsquo;s cut, lit, captioned, designed and
+              mixed. And the masterclass shows you how to get the most out of it.
             </p>
 
-            <div className="vep-in mt-9 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-10" style={{ "--i": 4 } as React.CSSProperties}>
+            <div className="vep-in mt-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-10" style={{ "--i": 4 } as React.CSSProperties}>
               <ul className="m-0 list-none p-0 text-[1.05rem] font-semibold">
                 <li className="flex items-center gap-3 py-1">
                   <span className="h-2 w-2 rounded-full" style={{ background: WINE }} />
@@ -133,8 +155,8 @@ export function VideoEditorProPage() {
                   The editing masterclass
                 </li>
               </ul>
-              <p className="m-0 font-[family-name:var(--vep-archivo)] text-[3.2rem] font-black leading-none tracking-[-0.03em] [font-variation-settings:'wdth'_80]">
-                {PRODUCT.priceLabel}
+              <p className="m-0 text-[1.05rem] font-semibold text-[rgba(244,238,230,0.75)]">
+                Both for <span className="font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black text-[#F4EEE6] [font-variation-settings:'wdth'_80]">{PRODUCT.priceLabel}</span>
               </p>
             </div>
             <div id={HERO_ID} className="vep-in mt-8 scroll-mt-28" style={{ "--i": 5 } as React.CSSProperties}>
@@ -187,11 +209,61 @@ export function VideoEditorProPage() {
                 <p className="max-w-[26ch] text-[1.05rem] leading-[1.4] text-[rgba(244,238,230,0.75)] sm:text-right">{d.text}</p>
               </li>
             ))}
+            <li className="vep-reveal rounded-[1.4rem] px-6 py-7 sm:px-8 sm:py-8 lg:col-span-4" style={{ background: WINE }}>
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
+                <h3 className="shrink-0 font-[family-name:var(--vep-serif)] text-[clamp(2.2rem,4vw,3.2rem)] italic leading-none text-white">
+                  And much more.
+                </h3>
+                <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+                  {MORE.map((m) => (
+                    <li key={m} className="rounded-full bg-white/15 px-3.5 py-2 text-[0.95rem] font-semibold text-white">
+                      {m}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
           </ol>
         </div>
       </section>
 
-      {/* 03. THE CLOSE. */}
+      {/* 03. THE MASTERCLASS: you learn it, you don't guess. */}
+      <section aria-labelledby="vep-learn" className="border-t border-white/10">
+        <div className="mx-auto grid max-w-[90rem] grid-cols-1 gap-12 px-5 py-20 sm:px-8 md:py-28 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
+          <div className="vep-reveal">
+            <p className="m-0 text-[1rem] font-semibold" style={{ color: WINE }}>
+              Included: the editing masterclass
+            </p>
+            <h2 id="vep-learn" className="mt-4 font-[family-name:var(--vep-archivo)] text-[clamp(2.6rem,6.6vw,5.6rem)] font-black uppercase leading-[0.88] tracking-[-0.03em] [font-variation-settings:'wdth'_74]">
+              Don&rsquo;t guess.{" "}
+              <span className="block font-[family-name:var(--vep-serif)] font-normal normal-case italic tracking-[-0.01em]" style={{ color: WINE }}>
+                Learn it.
+              </span>
+            </h2>
+            <p className="mt-6 max-w-[42ch] text-[1.15rem] leading-[1.55] text-[rgba(244,238,230,0.78)]">
+              Most tools hand you a file and leave you to figure it out. This comes with my masterclass, so your first reel
+              already looks right.
+            </p>
+          </div>
+          <ol className="vep-reveal m-0 list-none self-end p-0">
+            {LEARN.map(([k, v], i) => (
+              <li key={k} className="flex items-baseline gap-6 border-t border-white/12 py-6 last:border-b">
+                <span className="w-8 shrink-0 font-[family-name:var(--vep-archivo)] text-[1.3rem] font-black" style={{ color: WINE }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="m-0 font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black uppercase leading-none tracking-[-0.02em] [font-variation-settings:'wdth'_76]">
+                    {k}
+                  </p>
+                  <p className="m-0 mt-2 text-[1.05rem] leading-[1.45] text-[rgba(244,238,230,0.72)]">{v}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 04. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="vep-close-title" className="scroll-mt-28 border-t border-white/10">
         <div className="mx-auto flex max-w-[90rem] flex-col gap-10 px-5 pb-28 pt-20 sm:px-8 md:pb-32 md:pt-28 lg:flex-row lg:items-end lg:justify-between">
           <h2 id="vep-close-title" className="vep-reveal font-[family-name:var(--vep-archivo)] text-[clamp(2.6rem,6.6vw,5.6rem)] font-black uppercase leading-[0.88] tracking-[-0.03em] [font-variation-settings:'wdth'_74]">
@@ -203,7 +275,8 @@ export function VideoEditorProPage() {
           <div className="vep-reveal">
             <Buy />
             <p className="mt-4 max-w-[40ch] text-[0.95rem] leading-[1.5] text-[rgba(244,238,230,0.6)]">
-              The skill and the masterclass, one payment. Needs Claude Code; best on a Mac.
+              The skill and the masterclass, {PRODUCT.priceLabel}, one payment. No editor to hire, no editing app to learn.
+              Needs Claude Code; best on a Mac.
             </p>
           </div>
         </div>
