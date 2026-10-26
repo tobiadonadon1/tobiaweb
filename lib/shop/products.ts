@@ -1158,8 +1158,8 @@ export const REEL_BOT: Product = {
  *
  * Sold with the editing masterclass Tobia is recording (not in the zip).
  *
- * Stripe: no product yet, so the page says "Checkout opens soon" (forSale).
- * Put its prod_ id here once it exists; the checkout charges this row.
+ * Stripe: prod_VideoEditorPro, created by the first checkout (2026-10-26:
+ * on sale from today); the checkout charges this row, €15.
  */
 export const VIDEO_EDITOR_PRO: Product = {
   id: "video-editor-pro",
@@ -1177,7 +1177,9 @@ export const VIDEO_EDITOR_PRO: Product = {
     // The skill ships scripts (.mjs, .swift), and Gmail refuses those zips.
     attach: false,
   },
-  stripeProductId: "",
+  // A fixed id: the first checkout finds it missing in Stripe and creates it
+  // (api/checkout ensureProduct), so every sale lands on one product.
+  stripeProductId: "prod_VideoEditorPro",
   share: {
     description:
       "Video Editor Pro edits your raw footage into a finished reel inside Claude Code: it cuts the bad takes, fixes the light on your face, captions in time with your voice, designs the graphics from your own colours, does the sound like an engineer, and shows you every change before it renders. Then one sentence changes it. With the editing masterclass.",

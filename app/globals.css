@@ -3889,3 +3889,11 @@ body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
 @keyframes vep-reveal { from { opacity: 0; translate: 0 48px; } }
 body:has(.vep-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--vep-wait) backwards; }
 
+/* The masterclass badge in the hero: a soft ring that breathes, so it's seen first. */
+@media (prefers-reduced-motion: no-preference) {
+  .vep-badge { animation: vep-ring 2.4s ease-out calc(var(--vep-wait, 0s) + 1.2s) infinite; }
+}
+@keyframes vep-ring {
+  0% { box-shadow: 0 0 0 0 rgba(176, 36, 59, 0.6); }
+  70%, 100% { box-shadow: 0 0 0 14px rgba(176, 36, 59, 0); }
+}
