@@ -4,6 +4,7 @@ import { abs } from "@/lib/site";
 import { VIDEO_EDITOR_PRO as PRODUCT, forSale } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
+import { VideoEditorProFilm } from "./video-editor-pro-film";
 import { VideoEditorProLoader } from "./video-editor-pro-loader";
 import { StickyBuy } from "./sticky-buy";
 
@@ -13,16 +14,16 @@ import { StickyBuy } from "./sticky-buy";
  * with the editing masterclass Tobia is recording, €15.
  *
  * TOBIA'S BRIEF (2026-10-26, third pass): the value from the very start, a
- * loader, few sections and little text, dark with bordeaux writing, and no
- * video until his new one arrives (a grey frame holds its place). So: the
+ * loader, few sections and little text, dark with bordeaux writing, and his
+ * new video in the phone (v2, 2026-10-26). So: the
  * loader says the value in three beats; the poster says it again with what
  * you get (the masterclass as a badge, so nobody has to scroll to find it)
  * and the price; the masterclass (you learn it, you don't guess); what it
  * does ("and a bunch more"); the close. The pictures are grey placeholders
  * until the real ones exist.
  *
- * THE VIDEO SLOT is HERO_FILM: null shows the grey frame. When the new video
- * arrives, put it in public/shop/video-editor-pro/ and set its src and poster.
+ * THE VIDEO SLOT is HERO_FILM: his v2 reel, re-encoded for the web (720x1280,
+ * about 8 MB), with its title frame as the poster. null shows a grey frame.
  *
  * WHAT IS REAL: the stills are frames of reel-director's render of Tobia's
  * raw clip (his test, 2026-10-23). The masterclass is described only as what
@@ -38,7 +39,10 @@ const CLOSE_ID = "vep-close";
 const SOON = !forSale(PRODUCT);
 
 /** The hero's video, or null for the grey frame that holds its place. */
-const HERO_FILM = null as { src: string; poster: string } | null;
+const HERO_FILM = {
+  src: "/shop/video-editor-pro/hero-v2.mp4",
+  poster: "/shop/video-editor-pro/hero-v2.jpg",
+} as { src: string; poster: string } | null;
 
 const GROUND = "#0F0D0E";
 const PANEL = "#1A1718";
@@ -161,7 +165,7 @@ export function VideoEditorProPage() {
             <div className="vep-phone w-[min(70vw,19rem)] lg:w-[min(28vw,21rem)]">
               <div className="vep-phone__screen">
                 {HERO_FILM ? (
-                  <video src={HERO_FILM.src} poster={HERO_FILM.poster} muted loop playsInline autoPlay className="h-full w-full object-cover" />
+                  <VideoEditorProFilm src={HERO_FILM.src} poster={HERO_FILM.poster} />
                 ) : (
                   <div className="vep-grey h-full w-full" role="img" aria-label="The video, coming soon" />
                 )}
