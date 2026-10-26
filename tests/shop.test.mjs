@@ -468,7 +468,7 @@ test("free: Reel Bot downloads its Markdown file at once, and emails it attached
   const dl = await download(new Request(body.download));
   assert.equal(dl.status, 200);
   assert.match(dl.headers.get("content-type"), /^text\/markdown/);
-  assert.match(dl.headers.get("content-disposition"), /filename="reel-bot.md"/);
+  assert.match(dl.headers.get("content-disposition"), /filename="reel-bot-factory.md"/);
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), REEL_MD);
   assert.ok(mail().some((m) => m.message.to === "cy@example.com"), "the email goes too");
 });

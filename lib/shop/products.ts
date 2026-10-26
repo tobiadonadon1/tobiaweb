@@ -1085,7 +1085,7 @@ export const SHORTS_ANIMATOR: Product = {
 };
 
 /**
- * REEL BOT, a free Grok Bot: one Markdown file a Grok Bot works from to make
+ * REEL BOT FACTORY (id reel-bot, kept so links stay put), a free Grok Bot: one Markdown file a Grok Bot works from to make
  * animated vertical videos with Claude (it writes the brief, makes the voice,
  * drives the browser to a Claude project, downloads, checks and hands over).
  * The file: Tobia's pipeline.md, sealed as private/reel-bot.md.enc with
@@ -1093,7 +1093,7 @@ export const SHORTS_ANIMATOR: Product = {
  */
 export const REEL_BOT: Product = {
   id: "reel-bot",
-  name: "Reel Bot",
+  name: "Reel Bot Factory",
   description:
     "A free Grok Bot that makes animated vertical videos with Claude: it writes the brief, records the voice, has Claude animate every frame in code, checks the file and hands it to you.",
   priceCents: 0,
@@ -1102,7 +1102,7 @@ export const REEL_BOT: Product = {
   href: "/projects/construct/material/setups/reel-bot",
   file: {
     sealed: "reel-bot.md.enc",
-    filename: "reel-bot.md",
+    filename: "reel-bot-factory.md",
     // One Markdown file, which Gmail is happy to carry: it arrives attached.
     attach: true,
   },
@@ -1111,15 +1111,15 @@ export const REEL_BOT: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Reel Bot is a free Grok Bot that makes 20 to 70 second animated videos for Reels, TikTok and Shorts. Pick a style and a topic: it writes the brief, records the voiceover, has Claude draw and animate every frame in code, checks the finished MP4 and sends it to you for your OK.",
+      "Reel Bot Factory is a free Grok Bot that makes 20 to 70 second animated videos for Reels, TikTok and Shorts. Pick a style and a topic: it writes the brief, records the voiceover, has Claude draw and animate every frame in code, checks the finished MP4 and sends it to you for your OK.",
     kicker: "Grok Bot · free",
     line: "A Grok Bot that makes your animated reels.",
     proof: "One file · nothing posted without your OK",
     theme: "dark",
   },
-  contents: [["reel-bot.md", "the whole bot: the pipeline, the brief it writes, the voice, the checks, the styles that work"]],
+  contents: [["reel-bot-factory.md", "the whole bot: the pipeline, the brief it writes, the voice, the checks, the styles that work"]],
   steps: [
-    "Download reel-bot.md.",
+    "Download reel-bot-factory.md.",
     "Create a new Grok Bot and attach the file.",
     "Say \"Make my first reel from this file\", with a style and a topic.",
   ],
@@ -1130,7 +1130,7 @@ export const REEL_BOT: Product = {
       "It writes the brief, makes the voiceover, opens a chat in your Claude project and has Claude animate the video in code. Then it downloads the MP4, checks it and sends it to you with an honest list of weak spots.",
       "Nothing is posted under your name until you approve it.",
     ],
-    footnote: "Reel Bot is an independent Grok Bot, not made by xAI or Anthropic.",
+    footnote: "Reel Bot Factory is an independent Grok Bot, not made by xAI or Anthropic.",
   },
   thanks: {
     needs:

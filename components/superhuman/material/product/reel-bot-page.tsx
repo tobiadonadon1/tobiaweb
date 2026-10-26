@@ -7,6 +7,7 @@ import { folderHref } from "../material-data";
 import { FreeClaim } from "./free-claim";
 import { LEAD, botShape } from "./grok-army-bots";
 import { Film } from "./motion-designer-film";
+import { DirectorRig } from "./reel-bot-director";
 import { ReelBotLoader } from "./reel-bot-loader";
 import { StickyBuy } from "./sticky-buy";
 
@@ -17,7 +18,8 @@ import { StickyBuy } from "./sticky-buy";
  * THE POSTER FAMILY (Tobia, 2026-10-26, after a first version that was a dark,
  * centred column: "nobody's going to read this"): Motion Designer's and Web
  * Designer Pro's page in its own colour. A violet field, the name huge and
- * left, three reels playing on phones with the bot sitting on top of them,
+ * left, three reels playing on phones, shot by the bot as a director behind
+ * a film camera (reel-bot-director.tsx),
  * one short line; then the three styles as colour tiles, five tiles for what
  * the bot does, the close.
  *
@@ -79,7 +81,7 @@ const REELS = [
 ] as const;
 
 const STEPS: React.ReactNode[] = [
-  <>Download reel-bot.md.</>,
+  <>Download reel-bot-factory.md.</>,
   <>Create a new Grok Bot and attach the file.</>,
   <>
     Say <q className="font-semibold">Make my first reel</q>, with a style and a topic.
@@ -301,9 +303,9 @@ export function ReelBotPage() {
               className="rb-rise rb-title font-[family-name:var(--rb-archivo)] font-black uppercase leading-[0.8] tracking-[-0.035em]"
               style={{ "--i": 1 } as React.CSSProperties}
             >
-              <span className="block">Reel</span>
+              <span className="block">Reel Bot</span>
               <span className="block" style={{ color: LIME }}>
-                Bot.
+                Factory.
               </span>
             </h1>
             <p className="rb-rise mt-7 text-[clamp(1.3rem,2.2vw,1.7rem)] font-semibold leading-[1.25]" style={{ "--i": 2 } as React.CSSProperties}>
@@ -320,9 +322,6 @@ export function ReelBotPage() {
                 <Reel id="paper-boat" label="The Paper Boat, a papercraft reel" quiet />
               </Phone>
               <div className="rb-stack__mid">
-                <svg viewBox="0 0 100 100" className="rb-perch" aria-hidden>
-                  {botShape(LEAD)}
-                </svg>
                 <Phone>
                   <Reel id="last-light" label="The Last Light, a noir reel" eager />
                 </Phone>
@@ -330,9 +329,10 @@ export function ReelBotPage() {
               <Phone className="rb-stack__side">
                 <Reel id="day-on-mars" label="A Day on Mars, an explainer reel" quiet />
               </Phone>
+              <DirectorRig className="rb-stack__rig" />
             </div>
-            <figcaption className="mt-4 text-center">
-              <Mono className="text-white/80">Three reels · every frame drawn in code</Mono>
+            <figcaption className="mt-20 text-right lg:mt-16">
+              <Mono className="text-white/80">Grok Bot directs · Claude draws every frame</Mono>
             </figcaption>
           </figure>
         </div>
@@ -373,7 +373,7 @@ export function ReelBotPage() {
             ))}
           </ul>
           <p className="mt-6 max-w-[64ch] text-pretty text-[0.98rem] leading-[1.5] text-[rgba(17,17,17,0.62)]">
-            Made the way Reel Bot makes them: a written brief, then Claude drawing every frame in Python, composing the
+            Made the way Reel Bot Factory makes them: a written brief, then Claude drawing every frame in Python, composing the
             sound in code and rendering with ffmpeg. No stock, nothing traced.
           </p>
         </div>
@@ -440,7 +440,7 @@ export function ReelBotPage() {
             </div>
           </div>
           <p className="mt-16 max-w-[70ch] text-pretty text-[0.9rem] leading-[1.6] text-white/60">
-            It runs on your own Grok Bot, Claude and ElevenLabs plans. Reel Bot is an independent Grok Bot, not made by
+            It runs on your own Grok Bot, Claude and ElevenLabs plans. Reel Bot Factory is an independent Grok Bot, not made by
             xAI or Anthropic.
           </p>
         </div>
