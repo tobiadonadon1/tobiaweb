@@ -1156,8 +1156,10 @@ export const REEL_BOT: Product = {
  * finished reel, the way an editor would, and shows every change before it
  * renders.
  *
- * The download is Tobia's own "Video Editor Pro.zip", byte for byte (v2.3,
- * 2026-10-26: README.md and reel-director, the 8 music beds inside, 12.2 MB).
+ * The download is Tobia's own "Video Editor Pro.zip", byte for byte (updated
+ * 2026-10-27: a "Video Editor Pro" folder with START HERE.txt, CLAUDE.md,
+ * AGENTS.md, install.mjs, README.md and reel-director, the 8 music beds
+ * inside, 12.2 MB; its installer needs nothing from this site).
  * Too big for a function's 4.5 MB response, so it is `stored` in Supabase and
  * handed out as a signed link. A new version: node scripts/store-product.mjs
  * "<path to>/Video Editor Pro.zip" video-editor-pro.zip
@@ -1199,12 +1201,12 @@ export const VIDEO_EDITOR_PRO: Product = {
     ["reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
     ["reel-director/scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
     ["reel-director/assets/", "63 effects, caption styles, a studio sound kit, 8 music beds, fonts"],
-    ["README.md", "what's new, how to install it and how to use it"],
+    ["install.mjs", "installs it, downloads the speech model and word aligner once, makes a 4-second test edit"],
   ],
   steps: [
-    "Unzip it.",
-    "Open a terminal where you unzipped it and type: cp -R reel-director ~/.claude/skills/",
-    'In Claude Code, hand it a clip: "Edit ~/Movies/IMG_1234.mov into a reel".',
+    "Unzip the folder.",
+    "Open a terminal in the folder and type claude (or codex)",
+    "Type hi. It installs Video Editor Pro and makes a 4-second test edit to prove it works.",
   ],
   email: {
     preheader: "Your download link is inside. Unzip it, open it in Claude Code and type hi.",
@@ -1215,9 +1217,9 @@ export const VIDEO_EDITOR_PRO: Product = {
   },
   thanks: {
     needs:
-      "You'll need Claude Code (paid Claude plan), Node.js 18 or newer and ffmpeg. Best on a Mac: face tracking and the cut-out of you use Apple's Vision; on Windows and Linux edits work without them.",
+      "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), Node.js 22 or newer and ffmpeg. Best on a Mac: face tracking and the cut-out of you use Apple's Vision; on Windows and Linux everything else works.",
     next: [
-      ["Right after install", "It offers to edit your first video. Have a clip ready, bad takes and all."],
+      ["Right after install", "In Claude Code type /reel-director (in Codex $reel-director), or just hand it a clip, bad takes and all."],
       ["Every video", "A before/after table of every change, once. You approve, it renders and checks its own frames."],
       ["Then", "One sentence: \"tighter cut\", \"warmer\", \"make it moody\", \"go back to the second version\"."],
     ],
