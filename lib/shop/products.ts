@@ -1152,13 +1152,13 @@ export const REEL_BOT: Product = {
 
 /**
  * VIDEO EDITOR PRO, the paid follow-up to the free Video Editor: one Claude
- * Code skill (reel-director) that edits a person's own raw footage into a
+ * Code skill (video-editor-pro) that edits a person's own raw footage into a
  * finished reel, the way an editor would, and shows every change before it
  * renders.
  *
  * The download is Tobia's own "Video Editor Pro.zip", byte for byte (updated
- * 2026-10-27: a "Video Editor Pro" folder with START HERE.txt, CLAUDE.md,
- * AGENTS.md, install.mjs, README.md and reel-director, the 8 music beds
+ * 2026-10-27, 14:25: a "Video Editor Pro" folder with START HERE.txt, CLAUDE.md,
+ * AGENTS.md, install.mjs, README.md and the video-editor-pro skill, the 8 music beds
  * inside, 12.2 MB; its installer needs nothing from this site).
  * Too big for a function's 4.5 MB response, so it is `stored` in Supabase and
  * handed out as a signed link. A new version: node scripts/store-product.mjs
@@ -1198,9 +1198,9 @@ export const VIDEO_EDITOR_PRO: Product = {
     proof: "The skill + the editing masterclass",
   },
   contents: [
-    ["reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
-    ["reel-director/scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
-    ["reel-director/assets/", "63 effects, caption styles, a studio sound kit, 8 music beds, fonts"],
+    ["video-editor-pro/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
+    ["video-editor-pro/scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
+    ["video-editor-pro/assets/", "63 effects, caption styles, a studio sound kit, 8 music beds, fonts"],
     ["install.mjs", "installs it, downloads the speech model and word aligner once, makes a 4-second test edit"],
   ],
   steps: [
@@ -1219,7 +1219,7 @@ export const VIDEO_EDITOR_PRO: Product = {
     needs:
       "You'll need Claude Code (paid Claude plan) or Codex (ChatGPT plan), Node.js 22 or newer and ffmpeg. Best on a Mac: face tracking and the cut-out of you use Apple's Vision; on Windows and Linux everything else works.",
     next: [
-      ["Right after install", "In Claude Code type /reel-director (in Codex $reel-director), or just hand it a clip, bad takes and all."],
+      ["Right after install", "In Claude Code type /video-editor-pro (in Codex $video-editor-pro), or just hand it a clip, bad takes and all."],
       ["Every video", "A before/after table of every change, once. You approve, it renders and checks its own frames."],
       ["Then", "One sentence: \"tighter cut\", \"warmer\", \"make it moody\", \"go back to the second version\"."],
     ],

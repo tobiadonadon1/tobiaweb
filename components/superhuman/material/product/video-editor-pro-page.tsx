@@ -11,7 +11,7 @@ import { StickyBuy } from "./sticky-buy";
 
 /**
  * VIDEO EDITOR PRO, the paid follow-up to the free Video Editor: one skill
- * (reel-director) that edits your own raw footage into a finished reel, sold
+ * (video-editor-pro) that edits your own raw footage into a finished reel, sold
  * with the editing masterclass Tobia is recording, €15.
  *
  * TOBIA'S BRIEF (2026-10-26, third pass): the value from the very start, a
@@ -26,7 +26,7 @@ import { StickyBuy } from "./sticky-buy";
  * THE VIDEO SLOT is HERO_FILM: his final reel ("final .mp4"), re-encoded for the web (720x1280,
  * about 8 MB), with its title frame as the poster. null shows a grey frame.
  *
- * WHAT IS REAL: every clip is cut from that final reel (reel-director's render of
+ * WHAT IS REAL: every clip is cut from that final reel (the skill's render of
  * his raw IMG_8336.MOV, project in ~/Downloads/IMG_8336-edit). The light card
  * is the raw clip and the reel at the same moment, split by a sweeping line.
  * The others: the captions, the hook he walks in front of, the blue "20+"
