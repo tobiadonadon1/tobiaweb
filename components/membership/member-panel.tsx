@@ -401,7 +401,9 @@ function whatsNew(rows: Perks["training"], wasNew: (section: string, iso: string
   const label = { masterclass: "Masterclass", design: "Design", training: "Training" } as Record<string, string>;
   const shelves: NewItem[] = rows.map((t) => {
     const shelf = (t.shelf in SHELF_LOOK ? t.shelf : "training") as keyof typeof SHELF_LOOK;
-    const n = rows.filter((r) => r.shelf === t.shelf).indexOf(t) + 1;
+    // Rows come newest first; its number on the shelf counts from the oldest.
+    const same = rows.filter((r) => r.shelf === t.shelf);
+    const n = same.length - same.indexOf(t);
     return { key: t.id, label: label[shelf], title: t.title, line: t.summary, href: `#${shelf}`, added: t.added, look: SHELF_LOOK[shelf], n };
   });
   const all = [...shelves, ...skills].sort((a, b) => b.added.localeCompare(a.added));

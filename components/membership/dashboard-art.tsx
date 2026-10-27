@@ -28,8 +28,9 @@ import type { ProductId } from "@/lib/shop/products";
 
 /* ------------------------------------------------------------------ *
  * STAGES: [glow, ground]. The glow sits in the top-left corner and fades
- * into the ground. `added` is the day the skill went up, from git: what
- * makes it "new" in the dashboard.
+ * into the ground. `added` is the day the skill went up, from git (or the
+ * day Tobia says it comes out): what makes it "new" in the dashboard, and
+ * what puts it first.
  * ------------------------------------------------------------------ */
 export type Look = { a: string; b: string };
 
@@ -52,7 +53,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "motion-designer": { a: "#ffb08c", b: "#fff1e8", added: "2026-10-23" },
   "shorts-animator": { a: "#a9bdf0", b: "#fdf3d8", added: "2026-10-25" },
   "reel-bot": { a: "#d6d6d4", b: "#f3f3f1", added: "2026-10-26" },
-  "video-editor-pro": { a: "#c9b37e", b: "#eef0f5", added: "2026-10-26" },
+  "video-editor-pro": { a: "#c9b37e", b: "#eef0f5", added: "2026-10-27" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */
@@ -339,7 +340,15 @@ export function useSeen(email: string) {
   return { fresh, wasNew, markSeen };
 }
 
+/**
+ * "today", "yesterday", "3 days ago": counted in calendar days where the
+ * member is, not in UTC (a bare "2026-10-27" is that day on their own
+ * calendar). A day still to come is said as the date: "October 27".
+ */
 export const ago = (iso: string) => {
-  const days = Math.floor((Date.now() - Date.parse(iso)) / (24 * 3600 * 1000));
-  return days <= 0 ? "today" : days === 1 ? "yesterday" : days < 7 ? `${days} days ago` : days < 14 ? "last week" : null;
+  const at = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso);
+  const day = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / (24 * 3600 * 1000);
+  const days = day(new Date()) - day(at);
+  if (days < 0) return at.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+  return days === 0 ? "today" : days === 1 ? "yesterday" : days < 7 ? `${days} days ago` : days < 14 ? "last week" : null;
 };

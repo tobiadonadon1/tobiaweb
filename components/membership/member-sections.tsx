@@ -355,10 +355,10 @@ export function SkillsSection({
 }) {
   const all = Object.values(PRODUCTS);
   const ready = (p: Product) => owned.has(p.id) || offer(p, tier).kind === "included";
-  // What's theirs first, then by price.
-  const paid = all.filter((p) => !p.free).sort((a, b) => Number(ready(b)) - Number(ready(a)) || a.priceCents - b.priceCents);
-  // Newest first: what just went up is what a member came to see.
-  const free = all.filter((p) => p.free).sort((a, b) => SKILL_LOOK[b.id].added.localeCompare(SKILL_LOOK[a.id].added));
+  // Newest first, both tabs: what just went up is what a member came to see.
+  const newest = (a: Product, b: Product) => SKILL_LOOK[b.id].added.localeCompare(SKILL_LOOK[a.id].added);
+  const paid = all.filter((p) => !p.free).sort(newest);
+  const free = all.filter((p) => p.free).sort(newest);
   const newIn = { paid: paid.filter(wasNew).length, free: free.filter(wasNew).length };
   // Opens where something is new, so the "new" that brought them here is in sight.
   const [tab, setTab] = useState<SkillTab>(tier === "free" || (newIn.free && !newIn.paid) ? "free" : "paid");
@@ -658,7 +658,7 @@ export function ShelfSection({
           {rows.length ? (
             <ul className={`${card} mt-7 divide-y divide-[var(--hairline)]`}>
               {rows.map((t, i) => (
-                <ShelfRow key={t.id} row={t} n={i + 1} shelf={shelf} fresh={wasNew(t)} />
+                <ShelfRow key={t.id} row={t} n={rows.length - i} shelf={shelf} fresh={wasNew(t)} />
               ))}
             </ul>
           ) : null}

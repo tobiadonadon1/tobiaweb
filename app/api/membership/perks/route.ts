@@ -112,6 +112,9 @@ export async function GET(request: Request) {
     });
     training = [...sheets, ...training];
   }
+  // Newest first on every shelf (the dashboard and the Masterclass page show
+  // them in this order); rows that went up together keep their sort order.
+  training.sort((a, b) => Date.parse(b.added) - Date.parse(a.added));
 
   const owned = await ownedProducts(member);
   return new Response(JSON.stringify({ ok: true, tier, perks: perksOf(tier), links, telegramQr, training, owned }), { headers });
