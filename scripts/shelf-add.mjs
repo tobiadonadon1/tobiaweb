@@ -7,7 +7,8 @@
  * ultimate  Ultimate only: Pro sees it in the list, locked, with the way up
  *
  * The url is where it lives (an unlisted YouTube or Vimeo video, a Drive
- * folder, a Figma file, a zip). It is only ever handed to a member whose
+ * folder, a Figma file, a zip), or a page of this site starting with "/"
+ * (a lesson that plays on the Masterclass page: /projects/construct/masterclass?watch=<slug>). It is only ever handed to a member whose
  * plan reaches it (/api/membership/perks). Masterclass and training are
  * videos, Design is templates; a title that already exists is updated, so
  * fixing a link is the same command again. New items go to the bottom.
@@ -67,7 +68,7 @@ if (cmd === "remove") {
 
 const SHELVES = { masterclass: "video", design: "template", training: "video" };
 const [shelf, tier, title, link, summary] = [cmd, ...rest_];
-if (!(shelf in SHELVES) || !["pro", "ultimate"].includes(tier) || !title || !/^https?:\/\//.test(link ?? "")) {
+if (!(shelf in SHELVES) || !["pro", "ultimate"].includes(tier) || !title || !/^(https?:\/\/|\/)/.test(link ?? "")) {
   console.error('usage: node scripts/shelf-add.mjs <masterclass|design|training> <pro|ultimate> "<title>" <url> ["<one line about it>"]');
   process.exit(1);
 }
