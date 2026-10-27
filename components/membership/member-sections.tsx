@@ -27,7 +27,7 @@ import { hasPerk, money, offer, planName, PLANS, type PaidTier, type Perk, type 
 import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { JoinButton } from "./join-plans";
 import { LOOK } from "./plan-cards";
-import { ago, ComingSoon, NewChip, QaCountdown, SHELF_LOOK, SKILL_LOOK, Thumb } from "./dashboard-art";
+import { ago, ComingSoon, NewChip, QaCountdown, released, SHELF_LOOK, SKILL_LOOK, Thumb } from "./dashboard-art";
 import { RequestsBoard } from "./requests-board";
 import { PlanBadge } from "./plan-badge";
 
@@ -412,8 +412,8 @@ export function SkillsSection({
           <>
             {tier === "free" ? <ProValue paid={paid} /> : null}
             <ul className={grid}>
-              {paid.map((p) => (
-                <SkillRow key={p.id} product={p} note={paidNote(p, tier, owned)} fresh={wasNew(p)}>
+              {paid.map((p, i) => (
+                <SkillRow key={p.id} product={p} note={paidNote(p, tier, owned)} fresh={wasNew(p)} dated={i < DATED}>
                   <PaidAction product={p} tier={tier} ready={ready(p)} />
                 </SkillRow>
               ))}
@@ -421,8 +421,8 @@ export function SkillsSection({
           </>
         ) : (
           <ul className={grid}>
-            {free.map((p) => (
-              <SkillRow key={p.id} product={p} note={p.share.kicker} fresh={wasNew(p)}>
+            {free.map((p, i) => (
+              <SkillRow key={p.id} product={p} note={p.share.kicker} fresh={wasNew(p)} dated={i < DATED}>
                 <FreeDownload product={p} />
               </SkillRow>
             ))}
@@ -475,9 +475,16 @@ function ProValue({ paid }: { paid: Product[] }) {
 
 const grid = "grid gap-3";
 
-/** A skill: its small picture, its name and what it does, and the one button. */
-function SkillRow({ product: p, note, fresh, children }: { product: Product; note: string; fresh: boolean; children: React.ReactNode }) {
-  const when = fresh ? ago(SKILL_LOOK[p.id].added) : null;
+/** The newest few in each tab always say when they came out. */
+const DATED = 3;
+
+/**
+ * A skill: its small picture, its name and what it does, and the one button.
+ * `dated` (the newest three): when it came out, "today", "yesterday" or
+ * "27 October". Any other row says how long ago only while it's new to them.
+ */
+function SkillRow({ product: p, note, fresh, dated, children }: { product: Product; note: string; fresh: boolean; dated: boolean; children: React.ReactNode }) {
+  const when = dated ? released(SKILL_LOOK[p.id].added) : fresh ? ago(SKILL_LOOK[p.id].added) : null;
   return (
     <li className={`${card} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:pr-5`}>
       <div className="flex min-w-0 items-center gap-4">

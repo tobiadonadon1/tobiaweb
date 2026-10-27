@@ -341,14 +341,25 @@ export function useSeen(email: string) {
 }
 
 /**
- * "today", "yesterday", "3 days ago": counted in calendar days where the
- * member is, not in UTC (a bare "2026-10-27" is that day on their own
- * calendar). A day still to come is said as the date: "October 27".
+ * Calendar days from `iso` to today, where the member is, not in UTC (a bare
+ * "2026-10-27" is that day on their own calendar). Negative: still to come.
  */
-export const ago = (iso: string) => {
+const daysSince = (iso: string) => {
   const at = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso);
   const day = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / (24 * 3600 * 1000);
-  const days = day(new Date()) - day(at);
-  if (days < 0) return at.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+  return { at, days: day(new Date()) - day(at) };
+};
+const dayMonth = (d: Date) => d.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+
+/** "today", "yesterday", "3 days ago", "last week"; a day still to come is its date, "27 October". */
+export const ago = (iso: string) => {
+  const { at, days } = daysSince(iso);
+  if (days < 0) return dayMonth(at);
   return days === 0 ? "today" : days === 1 ? "yesterday" : days < 7 ? `${days} days ago` : days < 14 ? "last week" : null;
+};
+
+/** When it came out: "today", "yesterday", or the date, "27 October". */
+export const released = (iso: string) => {
+  const { at, days } = daysSince(iso);
+  return days === 0 ? "today" : days === 1 ? "yesterday" : dayMonth(at);
 };
