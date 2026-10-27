@@ -56,8 +56,15 @@ export type Product = {
    * download link only, for a product that ships code, so Gmail is never
    * handed a message it will refuse. (If it refuses one anyway, deliver.ts
    * sends the link instead.)
+   *
+   * A file too big for that, delivered exactly as Tobia made it, is `stored`
+   * instead of `sealed`: its path in the accounts Supabase's private
+   * "products" bucket. The download answers with a signed link to it that
+   * lasts five minutes (lib/shop/file.ts), so the browser fetches it from
+   * Supabase and no size limit applies. Never attached. Upload a new version
+   * with: node scripts/store-product.mjs <path to the zip> <path in the bucket>
    */
-  file: { sealed: string; filename: string; attach?: boolean };
+  file: { sealed?: string; stored?: string; filename: string; attach?: boolean };
   /**
    * The product in Stripe, so every sale lands on ONE product in the
    * dashboard rather than on a new inline product per checkout. The price is
@@ -1149,16 +1156,13 @@ export const REEL_BOT: Product = {
  * finished reel, the way an editor would, and shows every change before it
  * renders.
  *
- * The zip (folder "Video Editor Pro": START HERE.txt, CLAUDE.md, README.md,
- * install.mjs, reel-director) is Tobia's own "Video Editor Pro.zip" (v2.3,
- * 2026-10-26: reel-director exactly as he made it, his README with its install
- * section pointed at install.mjs) plus the
- * three install files, minus the 8 music beds (9.8 MB, all CC0 or
- * synthesized by the skill): install.mjs fetches them from
- * public/shop/video-editor-pro/music/ and checks them against
- * reel-director/assets/music/SHA256SUMS, so the download stays under Vercel's
- * 4.5 MB response. Reseal whenever the skill changes: rebuild that folder,
- * zip it, npm run seal -- <path to>/video-editor-pro.zip
+ * The download is Tobia's own "Video Editor Pro.zip", byte for byte (v2.3,
+ * 2026-10-26: README.md and reel-director, the 8 music beds inside, 12.2 MB).
+ * Too big for a function's 4.5 MB response, so it is `stored` in Supabase and
+ * handed out as a signed link. A new version: node scripts/store-product.mjs
+ * "<path to>/Video Editor Pro.zip" video-editor-pro.zip
+ * (public/shop/video-editor-pro/music/ stays: the earlier zip's installer
+ * fetches its beds from there.)
  *
  * Sold with the editing masterclass Tobia is recording (not in the zip).
  *
@@ -1176,8 +1180,8 @@ export const VIDEO_EDITOR_PRO: Product = {
   priceLabel: money(1500, "eur"),
   href: "/projects/construct/material/setups/video-editor-pro",
   file: {
-    sealed: "video-editor-pro.zip.enc",
-    filename: "video-editor-pro.zip",
+    stored: "video-editor-pro.zip",
+    filename: "Video Editor Pro.zip",
     // The skill ships scripts (.mjs, .swift), and Gmail refuses those zips.
     attach: false,
   },
@@ -1194,13 +1198,13 @@ export const VIDEO_EDITOR_PRO: Product = {
   contents: [
     ["reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
     ["reel-director/scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
-    ["reel-director/assets/", "63 effects, caption styles, a studio sound kit, fonts; 8 music beds downloaded on install"],
-    ["install.mjs", "installs it, fetches the music, checks ffmpeg"],
+    ["reel-director/assets/", "63 effects, caption styles, a studio sound kit, 8 music beds, fonts"],
+    ["README.md", "what's new, how to install it and how to use it"],
   ],
   steps: [
-    "Unzip the folder.",
-    "Open a terminal in the folder and type claude",
-    "Type hi. It installs Video Editor Pro in about a minute.",
+    "Unzip it.",
+    "Open a terminal where you unzipped it and type: cp -R reel-director ~/.claude/skills/",
+    'In Claude Code, hand it a clip: "Edit ~/Movies/IMG_1234.mov into a reel".',
   ],
   email: {
     preheader: "Your download link is inside. Unzip it, open it in Claude Code and type hi.",

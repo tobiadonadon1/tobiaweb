@@ -23,6 +23,10 @@ process.env.STRIPE_SECRET_KEY = "sk_test_mock";
 process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_secret";
 process.env.GMAIL_APP_PASSWORD = "abcd efgh ijkl mnop";
 process.env.RESEND_API_KEY = "re_test_key";
+// Video Editor Pro's file is stored in Supabase (too big to send from a
+// function): a fake project, whose two storage calls are stubbed below.
+process.env.ACCOUNTS_SUPABASE_URL = "https://accounts.example";
+process.env.ACCOUNTS_SUPABASE_SECRET_KEY = "sb_secret_test";
 delete process.env.VERCEL_ENV;
 
 const { newKey, parseKey, seal, unseal } = await import("../lib/shop/seal.ts");
@@ -66,8 +70,9 @@ const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s"
 writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
 const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(3900));
 writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
+// Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
-writeFileSync(path.join(cwd, "private", "video-editor-pro.zip.enc"), seal(VEP_ZIP, parseKey(fileKey)));
+const VEP_OBJECT = "https://accounts.example/storage/v1/object/sign/products/video-editor-pro.zip";
 process.chdir(cwd);
 
 /* ---- email: Gmail is recorded by the nodemailer mock; Resend, the
@@ -77,6 +82,11 @@ const realFetch = globalThis.fetch;
 const sheetRows = [];
 globalThis.__sheetDown = false;
 globalThis.fetch = async (url, init) => {
+  // Supabase Storage: sign a link to the stored file, then that link itself.
+  if (String(url) === VEP_OBJECT) return Response.json({ signedURL: "/object/sign/products/video-editor-pro.zip?token=t" });
+  if (String(url).startsWith(`${VEP_OBJECT}?token=t`)) {
+    return new Response(init?.method === "HEAD" ? null : VEP_ZIP, { headers: { "content-length": String(VEP_ZIP.length) } });
+  }
   if (String(url) === "https://sheet.example/exec") {
     if (globalThis.__sheetDown) return new Response("boom", { status: 500 });
     sheetRows.push(JSON.parse(init.body));
@@ -1043,6 +1053,17 @@ test("no bypass: a zero total or a no-payment-required session never gets App De
   assert.match(dl.headers.get("content-disposition"), /filename="app-designer-pro.zip"/);
 });
 
+
+test("a stored file: Video Editor Pro's download is a five-minute signed link to the zip, saved as Tobia named it", async () => {
+  const { VIDEO_EDITOR_PRO } = await import("../lib/shop/products.ts");
+  const { giftLink } = await import("../lib/shop/free.ts");
+  const res = await download(new Request(giftLink(ORIGIN, VIDEO_EDITOR_PRO, "friend@example.com")));
+  assert.equal(res.status, 303);
+  const to = new URL(res.headers.get("location"));
+  assert.equal(`${to.origin}${to.pathname}`, VEP_OBJECT);
+  assert.equal(to.searchParams.get("download"), "Video Editor Pro.zip");
+  assert.equal(res.headers.get("cache-control"), "private, no-store");
+});
 
 test("a gift: the link opens App Designer Pro for that address only, and a free token or a forgery never does", async () => {
   const { APP_DESIGNER_PRO, APP_DESIGNER } = await import("../lib/shop/products.ts");

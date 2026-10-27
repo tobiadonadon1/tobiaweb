@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { adminClient } from "../account";
 import type { Product } from "./products";
 import { parseKey, unseal } from "./seal";
 import { ShopNotConfigured } from "./stripe";
@@ -26,6 +27,7 @@ export function productFile(product: Product): Promise<Buffer> {
   const load = (async () => {
     const raw = process.env.SHOP_FILE_KEY;
     if (!raw) throw new ShopNotConfigured("SHOP_FILE_KEY");
+    if (!product.file.sealed) throw new Error(`${product.id} is stored, not sealed: use storedLink`);
     // "private" is written out, not taken from the product, so the tracer can
     // see which one folder this reads from instead of tracing the project.
     const sealed = await readFile(path.join(process.cwd(), "private", product.file.sealed));
@@ -37,4 +39,19 @@ export function productFile(product: Product): Promise<Buffer> {
   // stuck with one bad read for the life of the instance.
   load.catch(() => cache.delete(product.id));
   return load;
+}
+
+/**
+ * A STORED PRODUCT'S LINK: a file too big to send through a function (see
+ * `file.stored` in products.ts) is handed out as a link to the private
+ * "products" bucket, signed for five minutes and saved under the product's
+ * filename. Only ever made after the same checks a sealed file gets.
+ */
+export async function storedLink(product: Product): Promise<string> {
+  if (!product.file.stored) throw new Error(`${product.id} has no stored file`);
+  const { data, error } = await adminClient()
+    .storage.from("products")
+    .createSignedUrl(product.file.stored, 300, { download: product.file.filename });
+  if (error || !data?.signedUrl) throw error ?? new Error(`no signed link for ${product.id}`);
+  return data.signedUrl;
 }

@@ -2,7 +2,7 @@ import { currentMember, noteDownload } from "@/lib/account";
 import { JOIN_HREF } from "@/components/account/links";
 import { membershipOf, owns } from "@/lib/membership/server";
 import { offer } from "@/lib/membership/tiers";
-import { productFile } from "@/lib/shop/file";
+import { productFile, storedLink } from "@/lib/shop/file";
 import { verifyFree, verifyGift } from "@/lib/shop/free";
 import { fileType, productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
 import { findPurchase, originFor } from "@/lib/shop/stripe";
@@ -36,6 +36,17 @@ import { findPurchase, originFor } from "@/lib/shop/stripe";
 
 export const dynamic = "force-dynamic";
 
+/** The file itself, or for a stored one (too big to send from here) a short-lived link to it. */
+async function hand(product: Product) {
+  if (product.file.stored) {
+    return new Response(null, {
+      status: 303,
+      headers: { Location: await storedLink(product), "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex" },
+    });
+  }
+  return serve(await productFile(product), product);
+}
+
 function serve(bytes: Buffer, product: Product) {
   return new Response(new Uint8Array(bytes), {
     headers: {
@@ -62,7 +73,7 @@ export async function GET(request: Request) {
     if (!member) return Response.redirect(`${origin}${free.href}#buy`, 303);
     if (deal.kind === "included" || (await owns(member, free.id))) {
       try {
-        const res = serve(await productFile(free), free);
+        const res = await hand(free);
         await noteDownload(member, free.id);
         return res;
       } catch (err) {
@@ -79,7 +90,7 @@ export async function GET(request: Request) {
       return Response.redirect(`${origin}${free.href}#claim`, 303);
     }
     try {
-      return serve(await productFile(free), free);
+      return await hand(free);
     } catch (err) {
       console.error("[shop] download: could not read the free product file", err);
       return Response.redirect(`${origin}${free.href}#claim`, 303);
@@ -92,7 +103,7 @@ export async function GET(request: Request) {
       return Response.redirect(`${origin}${free.href}`, 303);
     }
     try {
-      return serve(await productFile(free), free);
+      return await hand(free);
     } catch (err) {
       console.error("[shop] download: could not read the gifted product file", err);
       return Response.redirect(`${origin}${free.href}`, 303);
@@ -118,7 +129,7 @@ export async function GET(request: Request) {
   if (!purchase || !purchase.paid) return back(purchase?.product);
 
   try {
-    return serve(await productFile(purchase.product), purchase.product);
+    return await hand(purchase.product);
   } catch (err) {
     console.error("[shop] download: could not read the product file", err);
     return back(purchase.product, "failed");

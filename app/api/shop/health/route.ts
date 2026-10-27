@@ -1,5 +1,5 @@
 import { emailTransport } from "@/lib/shop/deliver";
-import { productFile } from "@/lib/shop/file";
+import { productFile, storedLink } from "@/lib/shop/file";
 import { forSale, PRODUCTS } from "@/lib/shop/products";
 
 /**
@@ -33,8 +33,12 @@ export async function GET() {
   for (const product of Object.values(PRODUCTS)) {
     const pending = !product.free && !forSale(product);
     try {
-      const bytes = await productFile(product);
-      files[product.id] = { ok: true, bytes: bytes.length, ...(pending ? { pending } : {}) };
+      // A stored file: its signed link has to open, and says how big it is.
+      const bytes = product.file.stored
+        ? Number((await fetch(await storedLink(product), { method: "HEAD" })).headers.get("content-length") ?? 0)
+        : (await productFile(product)).length;
+      if (!bytes) throw new Error("the stored file is missing or empty");
+      files[product.id] = { ok: true, bytes, ...(pending ? { pending } : {}) };
     } catch (err) {
       files[product.id] = {
         ok: false,
