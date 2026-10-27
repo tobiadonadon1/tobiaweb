@@ -67,7 +67,7 @@ const CLIPS = "/shop/video-editor-pro";
 
 /** "And much more": from the skill's own feature list (README, SKILL.md). */
 const MORE = [
-  "50 effects",
+  "63 effects",
   "9 moods in one word",
   "Selfie, pro camera or product",
   "6 caption styles",

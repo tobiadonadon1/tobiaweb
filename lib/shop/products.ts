@@ -1151,7 +1151,8 @@ export const REEL_BOT: Product = {
  *
  * The zip (folder "Video Editor Pro": START HERE.txt, CLAUDE.md, README.md,
  * install.mjs, reel-director) is Tobia's own "Video Editor Pro.zip" (v2.3,
- * 2026-10-26: his README and reel-director exactly as he made them) plus the
+ * 2026-10-26: reel-director exactly as he made it, his README with its install
+ * section pointed at install.mjs) plus the
  * three install files, minus the 8 music beds (9.8 MB, all CC0 or
  * synthesized by the skill): install.mjs fetches them from
  * public/shop/video-editor-pro/music/ and checks them against
