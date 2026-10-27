@@ -1150,11 +1150,14 @@ export const REEL_BOT: Product = {
  * renders.
  *
  * The zip (folder "Video Editor Pro": START HERE.txt, CLAUDE.md, README.md,
- * install.mjs, skills/reel-director) leaves out the 8 music beds (9.8 MB, all
- * CC0 or synthesized by the skill): install.mjs fetches them from
- * public/shop/video-editor-pro/music/ and checks them against SHA256SUMS, so
- * the download stays under Vercel's 4.5 MB response. Reseal whenever the skill
- * changes: npm run seal -- <path to>/video-editor-pro.zip
+ * install.mjs, reel-director) is Tobia's own "Video Editor Pro.zip" (v2.3,
+ * 2026-10-26: his README and reel-director exactly as he made them) plus the
+ * three install files, minus the 8 music beds (9.8 MB, all CC0 or
+ * synthesized by the skill): install.mjs fetches them from
+ * public/shop/video-editor-pro/music/ and checks them against
+ * reel-director/assets/music/SHA256SUMS, so the download stays under Vercel's
+ * 4.5 MB response. Reseal whenever the skill changes: rebuild that folder,
+ * zip it, npm run seal -- <path to>/video-editor-pro.zip
  *
  * Sold with the editing masterclass Tobia is recording (not in the zip).
  *
@@ -1188,9 +1191,9 @@ export const VIDEO_EDITOR_PRO: Product = {
     proof: "The skill + the editing masterclass",
   },
   contents: [
-    ["skills/reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
-    ["scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
-    ["assets/", "50 effects, 6 caption styles, a 34-sound studio kit, fonts; 8 music beds downloaded on install"],
+    ["reel-director/SKILL.md", "the edit Claude follows: cut, correct, caption, design, sound, review, build, check"],
+    ["reel-director/scripts/director.mjs", "the editor: takes, cut, plan, review table, build, one-sentence changes, versions"],
+    ["reel-director/assets/", "63 effects, caption styles, a studio sound kit, fonts; 8 music beds downloaded on install"],
     ["install.mjs", "installs it, fetches the music, checks ffmpeg"],
   ],
   steps: [
