@@ -16,20 +16,20 @@ import { StickyBuy } from "./sticky-buy";
  *
  * TOBIA'S BRIEF (2026-10-26, third pass): the value from the very start, a
  * loader, few sections and little text, dark with bordeaux writing, and his
- * new video in the phone (v2, 2026-10-26). So: the
+ * final reel in the phone (2026-10-26). So: the
  * loader says the value in three beats; the poster says it again with what
  * you get (the masterclass as a badge, so nobody has to scroll to find it)
  * and the price; the masterclass (you learn it, you don't guess); what it
  * does ("and a bunch more"); the close. Each "what it does" card plays a few
  * seconds of the same reel, showing that one effect.
  *
- * THE VIDEO SLOT is HERO_FILM: his v2 reel, re-encoded for the web (720x1280,
+ * THE VIDEO SLOT is HERO_FILM: his final reel ("final .mp4"), re-encoded for the web (720x1280,
  * about 8 MB), with its title frame as the poster. null shows a grey frame.
  *
- * WHAT IS REAL: every clip is cut from that v2 reel (reel-director's render of
+ * WHAT IS REAL: every clip is cut from that final reel (reel-director's render of
  * his raw IMG_8336.MOV, project in ~/Downloads/IMG_8336-edit). The light card
  * is the raw clip and the reel at the same moment, split by a sweeping line.
- * The others: the captions, the hook he walks in front of, the green "20+"
+ * The others: the captions, the hook he walks in front of, the blue "20+"
  * and the "$700" counter. The masterclass is described only as what it is:
  * his, on making reels with it.
  */
@@ -44,8 +44,8 @@ const SOON = !forSale(PRODUCT);
 
 /** The hero's video, or null for the grey frame that holds its place. */
 const HERO_FILM = {
-  src: "/shop/video-editor-pro/hero-v2.mp4",
-  poster: "/shop/video-editor-pro/hero-v2.jpg",
+  src: "/shop/video-editor-pro/hero-final.mp4",
+  poster: "/shop/video-editor-pro/hero-final.jpg",
 } as { src: string; poster: string } | null;
 
 const GROUND = "#0F0D0E";
@@ -54,7 +54,7 @@ const WINE = "#B0243B";
 const CREAM = "#F4EEE6";
 const BUTTON = "bg-[#9E1F34] text-white shadow-[0_18px_40px_-16px_rgba(158,31,52,0.8)] hover:bg-[#b0243b]";
 
-/** What it does: four get a clip of the v2 reel (public/shop/video-editor-pro/does-<clip>), two are words. */
+/** What it does: four get a clip of the final reel (public/shop/video-editor-pro/does-<clip>), two are words. */
 const DOES: { title: string; text: string; clip?: string; split?: boolean }[] = [
   { title: "Cuts the takes", text: "Retakes, fillers, dead air: gone." },
   { title: "Fixes the light", text: "Exposed on your face, warmer on request.", clip: "light", split: true },

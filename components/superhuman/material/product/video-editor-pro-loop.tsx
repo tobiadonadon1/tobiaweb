@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 /**
- * A "What it does" card's clip: a few seconds of the v2 reel, silent, looping.
+ * A "What it does" card's clip: a few seconds of the final reel, silent, looping.
  * It loads nothing until it's near the screen and plays only while it's seen,
  * so four of them don't fight the hero film. Reduced motion keeps the poster.
  */
