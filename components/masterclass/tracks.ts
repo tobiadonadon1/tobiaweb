@@ -12,6 +12,7 @@
 export type Track = { id: string; title: string; line: string; mark: string; from: string; to: string };
 
 export const TRACKS: Track[] = [
+  { id: "edit", title: "Edit your videos", line: "From your raw footage to a reel worth posting, with Claude doing the cutting.", mark: "video-editor-pro", from: "#2440ff", to: "#0a1238" },
   { id: "build", title: "Build an app", line: "From an idea to a working app, with Claude doing the typing.", mark: "app-designer", from: "#2346e0", to: "#0a1638" },
   { id: "design", title: "Design it properly", line: "Screens that look made by a designer, not generated.", mark: "web-designer", from: "#d4492f", to: "#3b0f18" },
   { id: "launch", title: "Launch and grow", line: "The App Store, X, and your first thousand people.", mark: "app-launcher", from: "#e3a11c", to: "#3a2406" },

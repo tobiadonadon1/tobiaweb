@@ -63,14 +63,30 @@ export async function POST(request: Request) {
 
     if (!price) return back("soon");
 
+    // Where they came from (components/account/footprints.tsx), kept on the
+    // subscription so a new member can be traced to the page that sold it.
+    const cookie = request.headers.get("cookie") ?? "";
+    const read = (name: string) => {
+      const m = cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+      try {
+        return m ? decodeURIComponent(m[1]).slice(0, 300) : "";
+      } catch {
+        return "";
+      }
+    };
+    const [landing = "", ref = ""] = read("cx_land").split("|");
+    const source = Object.fromEntries(
+      Object.entries({ from: read("cx_from"), landing, ref }).filter(([, v]) => v),
+    );
+
     const session = await stripe().checkout.sessions.create({
       mode: "subscription",
       customer,
       client_reference_id: member.id,
       line_items: [{ price, quantity: 1 }],
       allow_promotion_codes: true,
-      metadata: { member: member.id, tier },
-      subscription_data: { metadata: { member: member.id, tier } },
+      metadata: { member: member.id, tier, ...source },
+      subscription_data: { metadata: { member: member.id, tier, ...source } },
       success_url: `${origin}/api/membership/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}${JOIN_HREF}#${tier}`,
       custom_text: {

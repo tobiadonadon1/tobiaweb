@@ -757,7 +757,8 @@ function ShelfRow({ row: t, n, shelf, fresh }: { row: Perks["training"][number];
   return (
     <li>
       {t.url ? (
-        <a href={t.url} target="_blank" rel="noopener noreferrer" className={row}>
+        // A lesson that plays on the site (the Masterclass page) opens here; anything elsewhere, in a new tab.
+        <a href={t.url} {...(t.url.startsWith("/") ? {} : { target: "_blank", rel: "noopener noreferrer" })} className={row}>
           {text}
           <span className={`flex flex-none items-center gap-1.5 text-[0.9rem] ${soft}`}>
             {s.open}

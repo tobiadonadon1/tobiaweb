@@ -1,11 +1,15 @@
+import { after } from "next/server";
 import { currentMember, noteDownload } from "@/lib/account";
 import { JOIN_HREF } from "@/components/account/links";
+import { lessonForProduct } from "@/lib/masterclass/lessons";
+import { neverDownloaded, sendLessonOnFirstDownload } from "@/lib/masterclass/email";
 import { membershipOf, owns } from "@/lib/membership/server";
 import { offer } from "@/lib/membership/tiers";
 import { productFile, storedLink } from "@/lib/shop/file";
 import { verifyFree, verifyGift } from "@/lib/shop/free";
 import { fileType, productById, thanksHref, THE_98C_TRADE, type Product } from "@/lib/shop/products";
 import { findPurchase, originFor } from "@/lib/shop/stripe";
+import { SITE } from "@/lib/site";
 
 /**
  * GET /api/download?session_id=cs_…
@@ -74,7 +78,14 @@ export async function GET(request: Request) {
     if (deal.kind === "included" || (await owns(member, free.id))) {
       try {
         const res = await hand(free);
+        // A skill with a masterclass lesson: the first download brings it by
+        // email (lib/masterclass/email.ts), after the file is on its way.
+        const first = lessonForProduct(free.id) ? await neverDownloaded(member, free.id) : false;
         await noteDownload(member, free.id);
+        if (first) {
+          const base = origin.includes("localhost") ? origin : SITE;
+          after(() => sendLessonOnFirstDownload(member, free.id, base, true));
+        }
         return res;
       } catch (err) {
         console.error("[shop] download: could not read the member's product file", err);

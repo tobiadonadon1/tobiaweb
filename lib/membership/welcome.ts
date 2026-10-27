@@ -194,7 +194,7 @@ ${p("Tobia", "font-weight:600;")}
  * THE SEND
  * ------------------------------------------------------------------ */
 
-type Outgoing = { to: string; subject: string; html: string; text: string; card: Buffer | null; key: string };
+export type Outgoing = { to: string; subject: string; html: string; text: string; card: Buffer | null; key: string };
 
 async function viaGmail(msg: Outgoing): Promise<string> {
   const user = sender();
@@ -238,8 +238,8 @@ async function viaResend(msg: Outgoing): Promise<string> {
   return body.id;
 }
 
-/** Gmail first, Resend when Gmail refuses (or is not set up). */
-async function send(msg: Outgoing): Promise<{ id: string; via: "gmail" | "resend" }> {
+/** Gmail first, Resend when Gmail refuses (or is not set up). Also sends the Masterclass lesson email. */
+export async function send(msg: Outgoing): Promise<{ id: string; via: "gmail" | "resend" }> {
   if (!process.env.GMAIL_APP_PASSWORD) {
     if (!process.env.RESEND_API_KEY) throw new ShopNotConfigured("GMAIL_APP_PASSWORD");
     return { id: await viaResend(msg), via: "resend" };

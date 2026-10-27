@@ -23,6 +23,9 @@ const nextConfig: NextConfig = {
     "/api/membership/file": ["./private/training/**/*"],
     // The members' Telegram link and QR code (lib/membership/contact.ts).
     "/api/membership/perks": ["./private/members/**/*"],
+    // The Drive copies of the Masterclass lessons, for buyers without a plan
+    // (lib/masterclass/drive.ts): the delivery email (above) and the thank-you page.
+    "/projects/construct/\\[shelf\\]/\\[folder\\]/\\[entry\\]/thanks": ["./private/masterclass/**/*"],
   },
   // Required at runtime from node_modules (it resolves its binary's path).
   serverExternalPackages: ["ffmpeg-static"],

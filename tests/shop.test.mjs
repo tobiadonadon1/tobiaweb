@@ -72,6 +72,10 @@ const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(39
 writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
+// The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
+const VEP_DRIVE = "https://drive.example/the-lesson";
+mkdirSync(path.join(cwd, "private", "masterclass"));
+writeFileSync(path.join(cwd, "private", "masterclass", "drive.json.enc"), seal(Buffer.from(JSON.stringify({ "video-editor-pro": VEP_DRIVE })), parseKey(fileKey)));
 const VEP_OBJECT = "https://accounts.example/storage/v1/object/sign/products/video-editor-pro.zip";
 process.chdir(cwd);
 
@@ -87,6 +91,8 @@ globalThis.fetch = async (url, init) => {
   if (String(url).startsWith(`${VEP_OBJECT}?token=t`)) {
     return new Response(init?.method === "HEAD" ? null : VEP_ZIP, { headers: { "content-length": String(VEP_ZIP.length) } });
   }
+  // Supabase's tables: nobody has an account unless a test says so.
+  if (String(url).startsWith("https://accounts.example/rest/v1/")) return Response.json([]);
   if (String(url) === "https://sheet.example/exec") {
     if (globalThis.__sheetDown) return new Response("boom", { status: 500 });
     sheetRows.push(JSON.parse(init.body));
@@ -405,6 +411,40 @@ test("webhook: a Grok Army purchase gets its own email, as a link, and the link 
   assert.equal(dl.status, 200);
   assert.match(dl.headers.get("content-disposition"), /filename="grok-army.zip"/);
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), GROK_ARMY_ZIP);
+});
+
+test("webhook: a Video Editor Pro buyer without a plan gets the masterclass on Drive, in the email", async () => {
+  const id = purchase({ product: "video-editor-pro", name: "Grace Hopper" });
+  const res = await webhook(signedEvent(id));
+  assert.equal((await res.json()).delivery, "sent");
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Video Editor Pro + the masterclass");
+  assert.ok(m.text.includes(VEP_DRIVE) && m.html.includes(VEP_DRIVE), "the Drive link, in both parts");
+  assert.ok(!m.text.includes("/projects/construct/masterclass"), "not the members' page");
+  assert.ok(m.html.includes("/masterclass/01-video-editor-pro-email.jpg"), "the lesson's cover");
+  assert.ok(m.text.includes(`${ORIGIN}/api/download?session_id=${id}`), "the download is still there");
+  assert.ok(!/\u2014/.test(m.text + m.html), "no em dashes");
+});
+
+test("email: someone with a plan is sent to the Masterclass page, never to Drive", async () => {
+  const { lessonEmail } = await import("../lib/masterclass/email.ts");
+  const { LESSONS, lessonHref } = await import("../lib/masterclass/lessons.ts");
+  const lesson = LESSONS[0];
+  const href = `https://www.tobiadonadon.com${lessonHref(lesson)}`;
+  const link = { lesson, href, where: "site", poster: "https://www.tobiadonadon.com/masterclass/01-video-editor-pro-email.jpg" };
+  const m = lessonEmail("Video Editor Pro", link);
+  assert.equal(m.subject, "Your Video Editor Pro masterclass");
+  assert.ok(m.text.includes(href) && m.html.includes(href.replace("?", "?")));
+  assert.ok(!m.text.includes(VEP_DRIVE) && !m.html.includes(VEP_DRIVE));
+  assert.ok(m.text.includes("1:01  The storyboard"), "the chapters, with their times");
+  assert.ok(!/\u2014/.test(m.text + m.html), "no em dashes");
+
+  const { deliveryEmail } = await import("../lib/shop/deliver.ts");
+  const id = purchase({ product: "video-editor-pro" });
+  const s = globalThis.__stripe.sessions.get(id);
+  const d = deliveryEmail({ session: { ...s, livemode: true }, product: productById("video-editor-pro"), paid: true, email: "a@b.c", name: null, paymentIntent: null }, ORIGIN, { lesson: link });
+  assert.ok(d.text.includes(href) && d.html.includes("Watch it on the Masterclass"));
+  assert.ok(!d.text.includes(VEP_DRIVE) && !d.html.includes(VEP_DRIVE));
 });
 
 test("checkout: Launchr is free now, so it never opens a checkout", async () => {

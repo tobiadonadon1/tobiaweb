@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { lessonLinkFor, type LessonLink } from "@/lib/masterclass/access";
+import { clock } from "@/lib/masterclass/lessons";
 import { SITE } from "@/lib/site";
 import { productFile } from "./file";
 import { freeLink, giftLink } from "./free";
@@ -154,10 +156,20 @@ export async function deliver(purchase: Purchase, origin: string): Promise<Deliv
   if (!via) throw new ShopNotConfigured("GMAIL_APP_PASSWORD");
 
   const to = purchase.email;
+  // The lesson that comes with the skill: the Masterclass page for someone
+  // with a plan, the Drive copy for everyone else (lib/masterclass/access.ts).
+  const lesson = await lessonLinkFor(
+    purchase.product.id,
+    { memberId: purchase.session.metadata?.member || null, email: to },
+    emailBase(purchase, origin),
+  ).catch((err) => {
+    console.error("[shop] could not work out the masterclass link", err);
+    return null;
+  });
   const send = async (attached: boolean) => {
     const msg: Message = {
       to,
-      ...deliveryEmail(purchase, origin, { attached }),
+      ...deliveryEmail(purchase, origin, { attached, lesson }),
       attachment: attached
         ? { filename: purchase.product.file.filename, content: await productFile(purchase.product) }
         : undefined,
@@ -235,7 +247,10 @@ export function emailBase(purchase: Purchase, origin: string): string {
 export function deliveryEmail(
   purchase: Purchase,
   origin: string,
-  { attached = purchase.product.file.attach !== false }: { attached?: boolean } = {},
+  {
+    attached = purchase.product.file.attach !== false,
+    lesson = null,
+  }: { attached?: boolean; lesson?: LessonLink | null } = {},
 ) {
   const { product, session } = purchase;
   const base = emailBase(purchase, origin);
@@ -245,6 +260,7 @@ export function deliveryEmail(
     guide: `${base}${thanksHref(product)}?session_id=${encodeURIComponent(session.id)}`,
     attached,
     free: false,
+    lesson,
   });
 }
 
@@ -328,6 +344,7 @@ function renderEmail({
   attached,
   free,
   gift = false,
+  lesson = null,
 }: {
   product: Product;
   download: string;
@@ -335,6 +352,8 @@ function renderEmail({
   attached: boolean;
   free: boolean;
   gift?: boolean;
+  /** The masterclass lesson that comes with it, and where this buyer watches it. */
+  lesson?: LessonLink | null;
 }) {
   // Plain "Hi," for everyone. The name typed at checkout is often a card
   // name, a company or a test fixture ("Jenny"), and a wrong name reads worse
@@ -343,7 +362,10 @@ function renderEmail({
   const file = product.file.filename;
   const { steps, email } = product;
 
-  const subject = `Your copy of ${product.name}`;
+  const subject = `Your copy of ${product.name}${lesson ? " + the masterclass" : ""}`;
+  const watchLine = lesson
+    ? `Lesson ${String(lesson.lesson.number).padStart(2, "0")} · ${clock(lesson.lesson.seconds)} · ${lesson.where === "site" ? "on the Masterclass page, with your plan" : "on Google Drive"}`
+    : "";
   const opening = gift
     ? `Here's ${product.name}, on me.`
     : free
@@ -363,6 +385,13 @@ function renderEmail({
         ]),
     download,
     "",
+    ...(lesson
+      ? [
+          `Your masterclass: "${lesson.lesson.title}" (${watchLine}). Watch it here:`,
+          lesson.href,
+          "",
+        ]
+      : []),
     email.stepsIntro ?? "Open it on the computer you will run it on:",
     ...steps.map((s, i) => `${i + 1}. ${s}`),
     "",
@@ -417,6 +446,7 @@ ${p(
     ? "The same file, in case your email app hides the attachment."
     : `It saves as <strong style="font-weight:500;">${escape(file)}</strong>.`
 }</p>
+${lesson ? masterclassBlock(lesson, watchLine, font) : ""}
 ${p(`<span style="color:${soft};">${escape(email.stepsIntro ?? "Open it on the computer you will run it on:")}</span>`)}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border-bottom:1px solid rgba(11,31,58,0.12);">
 ${steps.map((s, i) => step(i + 1, commands(s))).join("\n")}
@@ -430,4 +460,29 @@ ${p("Tobia")}
 </body></html>`;
 
   return { subject, html, text };
+}
+
+/**
+ * THE MASTERCLASS, IN THE EMAIL: the lesson's cover as a picture that links
+ * to it, its title, and one dark button. Images are often off by default, so
+ * the title and the button carry it on their own.
+ */
+function masterclassBlock(
+  { lesson, href, poster, where }: LessonLink,
+  watchLine: string,
+  font: string,
+) {
+  const label = where === "site" ? "Watch it on the Masterclass" : "Watch the masterclass";
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 32px;background:#0b0b0c;border-radius:16px;">
+<tr><td style="padding:0;">
+<a href="${escape(href)}" style="display:block;text-decoration:none;"><img src="${escape(poster)}" width="520" alt="${escape(`Masterclass, lesson ${lesson.number}: ${lesson.title}`)}" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:16px 16px 0 0;"></a>
+</td></tr>
+<tr><td style="padding:22px 24px 24px;">
+<p style="margin:0 0 8px;font:600 11px/1 ${font};letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.55);">Your masterclass · included</p>
+<p style="margin:0 0 6px;font:600 20px/1.25 ${font};color:#ffffff;">${escape(lesson.title)}</p>
+<p style="margin:0 0 18px;font:400 14px/1.5 ${font};color:rgba(255,255,255,0.68);">${escape(watchLine)}</p>
+<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:999px;background:#ffffff;">
+<a href="${escape(href)}" style="display:inline-block;padding:12px 22px;font:600 14px/1 ${font};color:#0b0b0c;text-decoration:none;border-radius:999px;">${escape(label)} &rarr;</a>
+</td></tr></table>
+</td></tr></table>`;
 }

@@ -11,6 +11,10 @@
  * downloads it again through a signed link to prove the copy is byte for
  * byte the same. Every buyer's link serves the new one at once, no deploy.
  *
+ * Also the Masterclass videos (members watch them through a signed link,
+ * /api/membership/watch):
+ *   node scripts/store-product.mjs ~/Downloads/lesson.mp4 masterclass/01-video-editor-pro.mp4
+ *
  * Reads ACCOUNTS_SUPABASE_URL and ACCOUNTS_SUPABASE_SECRET_KEY from .env.local.
  * Makes the bucket (private) the first time.
  */
@@ -48,10 +52,13 @@ if (!made.ok && !/already exists/i.test(await made.text())) {
   process.exit(1);
 }
 
+const TYPES = { ".zip": "application/zip", ".mp4": "video/mp4", ".pdf": "application/pdf" };
+const type = TYPES[path.extname(dest).toLowerCase()] ?? "application/octet-stream";
+
 const object = `${url}/storage/v1/object/products/${dest.split("/").map(encodeURIComponent).join("/")}`;
 const put = await fetch(object, {
   method: "POST",
-  headers: { ...auth, "content-type": "application/zip", "x-upsert": "true", "cache-control": "no-store" },
+  headers: { ...auth, "content-type": type, "x-upsert": "true", "cache-control": "no-store" },
   body: file,
 });
 if (!put.ok) {

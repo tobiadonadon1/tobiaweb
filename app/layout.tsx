@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "./project-chapters.css";
 import { SiteNav } from "@/components/nav/SiteNav";
+import { Footprints } from "@/components/account/footprints";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import { CustomCursor } from "@/components/ui/custom-cursor";
 import { SHARE_DESCRIPTION } from "@/lib/bio";
@@ -157,6 +158,7 @@ export default function RootLayout({
             and the page it links to. Switched on for the project in Vercel;
             it only reports from production deployments. */}
         <Analytics />
+        <Footprints />
       </body>
     </html>
   );

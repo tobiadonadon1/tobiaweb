@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Download } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight, Download, Play } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { FOLDER_BY_ID } from "@/components/superhuman/material/material-data";
 import { Specimen } from "@/components/superhuman/material/specimens";
 import { Commands } from "@/components/superhuman/material/product/commands";
 import { downloadHref, PRODUCTS, SHOP_EMAIL as EMAIL, type Product } from "@/lib/shop/products";
 import { findPurchase, type Purchase } from "@/lib/shop/stripe";
+import { lessonLinkFor, type LessonLink } from "@/lib/masterclass/access";
 
 /**
  * /projects/construct/material/[folder]/[entry]/thanks?session_id=cs_…
@@ -68,12 +70,18 @@ export default async function ThanksPage({
   }
   if (purchase && purchase.product.id !== product.id) purchase = null;
 
+  // The masterclass lesson that comes with it: on the site with a plan, on
+  // Drive without (the same choice as the email, lib/masterclass/access.ts).
+  const lesson = purchase?.paid
+    ? await lessonLinkFor(product.id, { memberId: purchase.session.metadata?.member || null, email: purchase.email }, "").catch(() => null)
+    : null;
+
   return (
     <main className="paper-bg relative min-h-screen overflow-x-clip text-[#0a0a0a]">
       <BackLink href={product.href} label={product.name} tone="ink" />
       <div className="mx-auto w-full max-w-[40rem] px-6 pb-28 pt-28 md:pb-36 md:pt-36">
         {purchase?.paid ? (
-          <Paid product={product} purchase={purchase} downloadFailed={downloadFailed} />
+          <Paid product={product} purchase={purchase} downloadFailed={downloadFailed} lesson={lesson} />
         ) : purchase && purchase.session.status === "complete" ? (
           <Processing product={product} email={purchase.email} />
         ) : (
@@ -98,10 +106,12 @@ function Paid({
   product,
   purchase,
   downloadFailed,
+  lesson,
 }: {
   product: Product;
   purchase: Purchase;
   downloadFailed: boolean;
+  lesson: LessonLink | null;
 }) {
   const first = purchase.name?.trim().split(/\s+/)[0];
 
@@ -146,6 +156,8 @@ function Paid({
           </p>
         )}
       </header>
+
+      {lesson ? <Masterclass link={lesson} /> : null}
 
       <section aria-labelledby="steps-title" className="mt-20">
         <h2 id="steps-title" className={label}>
@@ -246,5 +258,50 @@ function Contact({ product }: { product: Product }) {
         {EMAIL}
       </a>
     </p>
+  );
+}
+
+/**
+ * THE MASTERCLASS THAT COMES WITH IT: the lesson's cover, its title, and
+ * where to watch it. A Drive link opens in a new tab; the Masterclass page
+ * is this site.
+ */
+function Masterclass({ link: { lesson, href, where } }: { link: LessonLink }) {
+  const drive = where === "drive";
+  return (
+    <section aria-labelledby="masterclass-title" className="mt-16">
+      <h2 className={label}>Your masterclass · included</h2>
+      <a
+        href={href}
+        {...(drive ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        className="group mt-5 block overflow-hidden rounded-[1.25rem] bg-[#0b0b0c] text-white shadow-[0_30px_60px_-30px_rgba(10,10,11,0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]"
+      >
+        <span className="relative block aspect-video">
+          <Image src={lesson.poster} alt="" fill sizes="40rem" className="object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+          <span className="absolute inset-0 grid place-items-center">
+            <span className="grid h-16 w-16 place-items-center rounded-full bg-white text-[#0b0b0c] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.6)] transition-transform duration-300 group-hover:scale-105">
+              <Play aria-hidden className="ml-1 h-6 w-6 fill-current" />
+            </span>
+          </span>
+        </span>
+        <span className="flex flex-wrap items-end justify-between gap-4 p-6">
+          <span>
+            <span id="masterclass-title" className="block text-[1.3rem] font-semibold leading-tight tracking-[-0.01em]">
+              {lesson.title}
+            </span>
+            <span className="mt-1.5 block text-[0.95rem] text-white/65">
+              Lesson {String(lesson.number).padStart(2, "0")} · {lesson.duration} · {drive ? "on Google Drive" : "on the Masterclass page"}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[0.95rem] font-semibold text-[#0b0b0c]">
+            Watch it
+            <ArrowRight aria-hidden className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </span>
+        </span>
+      </a>
+      <p className="mt-4 text-pretty text-[0.95rem] leading-[1.6] text-[color:rgba(11,31,58,0.66)]">
+        The link is in your email too, so it&rsquo;s there whenever you want to watch it again.
+      </p>
+    </section>
   );
 }
