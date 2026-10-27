@@ -3889,6 +3889,24 @@ body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
 @keyframes vep-reveal { from { opacity: 0; translate: 0 48px; } }
 body:has(.vep-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--vep-wait) backwards; }
 
+/* "And way more" / "Way more", white caps running down both sides of the clip cards (wide screens only). */
+.vep-side {
+  display: none;
+  position: absolute;
+  top: 0;
+  writing-mode: vertical-rl;
+  font-family: var(--vep-archivo);
+  font-weight: 900;
+  font-variation-settings: "wdth" 74;
+  font-size: clamp(2.4rem, 3.4vw, 3.4rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+}
+@media (min-width: 1024px) { .vep-side { display: block; } }
+
 /* The masterclass badge in the hero: a soft ring that breathes, so it's seen first. */
 @media (prefers-reduced-motion: no-preference) {
   .vep-badge { animation: vep-ring 2.4s ease-out calc(var(--vep-wait, 0s) + 1.2s) infinite; }

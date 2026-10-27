@@ -225,53 +225,58 @@ export function VideoEditorProPage() {
               to your clip.
             </span>
           </h2>
-          <ol className="mt-12 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 md:mt-16 lg:grid-cols-4">
-            {DOES.filter((d) => d.clip).map((d) => (
-              <li key={d.title} className="vep-reveal flex flex-col overflow-hidden rounded-[1.4rem]" style={{ background: PANEL }}>
-                <div className="px-6 pb-5 pt-6">
-                  <h3 className="font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
+          <div className="relative mt-12 md:mt-16 lg:px-[4.5rem]">
+            {/* Down both sides of the clips: there's more than these four. */}
+            <span aria-hidden className="vep-side left-0">And way more</span>
+            <span aria-hidden className="vep-side right-0">Way more</span>
+            <ol className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4">
+              {DOES.filter((d) => d.clip).map((d) => (
+                <li key={d.title} className="vep-reveal flex flex-col overflow-hidden rounded-[1.4rem]" style={{ background: PANEL }}>
+                  <div className="px-6 pb-5 pt-6">
+                    <h3 className="font-[family-name:var(--vep-archivo)] text-[1.6rem] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
+                      {d.title}
+                    </h3>
+                    <p className="mt-2 text-[1rem] leading-[1.4] text-[rgba(244,238,230,0.75)]">{d.text}</p>
+                  </div>
+                  <div className="relative mt-auto aspect-[4/5] bg-black">
+                    <VideoEditorProLoop
+                      src={`${CLIPS}/does-${d.clip}.mp4`}
+                      poster={`${CLIPS}/does-${d.clip}.jpg`}
+                      label={d.split ? `${d.title}: the raw clip beside the Pro edit` : `${d.title}, in a reel it edited`}
+                    />
+                    {d.split ? (
+                      <div className="pointer-events-none absolute inset-x-3 top-3 flex justify-between text-[0.8rem] font-semibold text-white" aria-hidden>
+                        <span className="rounded-full bg-black/55 px-2.5 py-1 backdrop-blur-md">Raw</span>
+                        <span className="rounded-full px-2.5 py-1" style={{ background: WINE }}>Pro</span>
+                      </div>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+              {DOES.filter((d) => !d.clip).map((d) => (
+                <li key={d.title} className="vep-reveal flex flex-col justify-between gap-6 rounded-[1.4rem] px-6 py-7 sm:flex-row sm:items-end lg:col-span-2" style={{ background: PANEL }}>
+                  <h3 className="font-[family-name:var(--vep-archivo)] text-[clamp(1.9rem,3vw,2.6rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
                     {d.title}
                   </h3>
-                  <p className="mt-2 text-[1rem] leading-[1.4] text-[rgba(244,238,230,0.75)]">{d.text}</p>
-                </div>
-                <div className="relative mt-auto aspect-[4/5] bg-black">
-                  <VideoEditorProLoop
-                    src={`${CLIPS}/does-${d.clip}.mp4`}
-                    poster={`${CLIPS}/does-${d.clip}.jpg`}
-                    label={d.split ? `${d.title}: the raw clip beside the Pro edit` : `${d.title}, in a reel it edited`}
-                  />
-                  {d.split ? (
-                    <div className="pointer-events-none absolute inset-x-3 top-3 flex justify-between text-[0.8rem] font-semibold text-white" aria-hidden>
-                      <span className="rounded-full bg-black/55 px-2.5 py-1 backdrop-blur-md">Raw</span>
-                      <span className="rounded-full px-2.5 py-1" style={{ background: WINE }}>Pro</span>
-                    </div>
-                  ) : null}
+                  <p className="max-w-[26ch] text-[1.05rem] leading-[1.4] text-[rgba(244,238,230,0.75)] sm:text-right">{d.text}</p>
+                </li>
+              ))}
+              <li className="vep-reveal rounded-[1.4rem] px-6 py-7 sm:px-8 sm:py-8 lg:col-span-4" style={{ background: WINE }}>
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
+                  <h3 className="shrink-0 font-[family-name:var(--vep-serif)] text-[clamp(2.2rem,4vw,3.2rem)] italic leading-none text-white">
+                    And a bunch more.
+                  </h3>
+                  <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+                    {MORE.map((m) => (
+                      <li key={m} className="rounded-full bg-white/15 px-3.5 py-2 text-[0.95rem] font-semibold text-white">
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </li>
-            ))}
-            {DOES.filter((d) => !d.clip).map((d) => (
-              <li key={d.title} className="vep-reveal flex flex-col justify-between gap-6 rounded-[1.4rem] px-6 py-7 sm:flex-row sm:items-end lg:col-span-2" style={{ background: PANEL }}>
-                <h3 className="font-[family-name:var(--vep-archivo)] text-[clamp(1.9rem,3vw,2.6rem)] font-black uppercase leading-[0.95] tracking-[-0.02em] [font-variation-settings:'wdth'_76]" style={{ color: WINE }}>
-                  {d.title}
-                </h3>
-                <p className="max-w-[26ch] text-[1.05rem] leading-[1.4] text-[rgba(244,238,230,0.75)] sm:text-right">{d.text}</p>
-              </li>
-            ))}
-            <li className="vep-reveal rounded-[1.4rem] px-6 py-7 sm:px-8 sm:py-8 lg:col-span-4" style={{ background: WINE }}>
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-10">
-                <h3 className="shrink-0 font-[family-name:var(--vep-serif)] text-[clamp(2.2rem,4vw,3.2rem)] italic leading-none text-white">
-                  And a bunch more.
-                </h3>
-                <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-                  {MORE.map((m) => (
-                    <li key={m} className="rounded-full bg-white/15 px-3.5 py-2 text-[0.95rem] font-semibold text-white">
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          </ol>
+            </ol>
+          </div>
         </div>
       </section>
 
