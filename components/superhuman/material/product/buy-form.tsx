@@ -37,6 +37,10 @@ import { productById } from "@/lib/shop/products";
  * server and charges, downloads or sends to the plans accordingly. Signed
  * out, or still asking, the button reads as it always did.
  *
+ * A DOWNLOAD NEVER LEAVES THE PAGE, so it never gets the pending state (it
+ * would spin on "Opening checkout" forever): the button stays as it is and a
+ * line under it says the download has started.
+ *
  * THE PRO CARD FIRST (components/membership/pro-pitch.tsx). Signed out or
  * on Free, the first press opens the card instead of posting; "Just buy …"
  * posts this same form. Members never see it.
@@ -75,6 +79,7 @@ export function BuyForm({
   className?: string;
 }) {
   const [pending, setPending] = useState(false);
+  const [started, setStarted] = useState(false);
   const [failed, setFailed] = useState<false | "error" | "soon">(false);
   const member = useMember();
   const pitch = useProPitch(productId);
@@ -126,6 +131,10 @@ export function BuyForm({
             pitch.gate(() => form.current?.requestSubmit());
             return;
           }
+          if (deal?.kind === "included") {
+            setStarted(true);
+            return;
+          }
           setPending(true);
           setFailed(false);
         }}
@@ -162,6 +171,17 @@ export function BuyForm({
             </>
           )}
         </button>
+
+        {started ? (
+          <p
+            role="status"
+            className={`${align === "center" ? "mx-auto" : ""} mt-4 max-w-[34ch] text-pretty text-[0.95rem] leading-[1.5] ${
+              tone === "ink" ? "text-[color:rgba(244,238,230,0.75)]" : "text-[color:rgba(11,31,58,0.7)]"
+            }`}
+          >
+            Your download has started. It&rsquo;s in your Downloads folder.
+          </p>
+        ) : null}
 
         {failed ? (
           <p
