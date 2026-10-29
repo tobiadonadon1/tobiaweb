@@ -898,6 +898,27 @@ function VideoEditor() {
 }
 
 /**
+ * THE $1K BOT — ten days as five gold bars cut from paper, climbing left to
+ * right, and the metal disc (the Grok Bot) standing on the tallest one: the
+ * same bot that hops along the days in its page's opening
+ * (product/one-k-bot-loader.tsx). The gold is the page's.
+ */
+function OneKBot() {
+  const heights = [34, 58, 88, 124, 166];
+  return (
+    <>
+      {heights.map((h, i) => (
+        <g key={i}>
+          <Cut d={CARD} x={70 + i * 54} y={296 - h} s={0.19} sy={h / 150} fill={SHADE} />
+          <Cut d={CARD} x={64 + i * 54} y={290 - h} s={0.19} sy={h / 150} fill="#F2CD6B" />
+        </g>
+      ))}
+      {botShape(LEAD, { x: 232, y: 30, s: 1.02 })}
+    </>
+  );
+}
+
+/**
  * VIDEO EDITOR PRO — the Pro edit, cut from paper: a tall phone in the
  * reel's own navy (the colour it took from the shirt), a cream figure in it,
  * big cream type behind the head and a brass line under it (the serif second
@@ -1085,6 +1106,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "grok-army": GrokArmy,
   "reel-bot": ReelBot,
   "video-editor-pro": VideoEditorPro,
+  "1k-bot": OneKBot,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,

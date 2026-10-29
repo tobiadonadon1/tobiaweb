@@ -20,6 +20,7 @@ import { MotionDesignerPage } from "@/components/superhuman/material/product/mot
 import { ShortsAnimatorPage } from "@/components/superhuman/material/product/shorts-animator-page";
 import { ReelBotPage } from "@/components/superhuman/material/product/reel-bot-page";
 import { VideoEditorProPage } from "@/components/superhuman/material/product/video-editor-pro-page";
+import { OneKBotPage } from "@/components/superhuman/material/product/one-k-bot-page";
 import { PRODUCTS, priceText, type ProductId } from "@/lib/shop/products";
 import {
   FOLDER_BY_ID,
@@ -172,4 +173,5 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "shorts-animator": ShortsAnimatorPage,
   "reel-bot": ReelBotPage,
   "video-editor-pro": VideoEditorProPage,
+  "1k-bot": OneKBotPage,
 };

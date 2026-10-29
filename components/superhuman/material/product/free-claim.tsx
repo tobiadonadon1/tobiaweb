@@ -56,7 +56,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -169,7 +169,7 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
   const t = tone === "ember"
     ? {
@@ -199,6 +199,21 @@ export function FreeClaim({
         error: "text-[#ffd9cf]",
         button: "bg-[#F6B23C] text-[#1b1206] hover:bg-[#ffc257]",
         box: ["#ffffff", "#14254F", "rgba(255,255,255,0.75)"],
+      }
+    : tone === "gold"
+    ? {
+        // The $1K Bot's black page: white words, a white field, a gold button with black words.
+        ink: "text-[#f4f2ec]",
+        soft: "text-[rgba(244,242,236,0.66)]",
+        ask: "text-[rgba(244,242,236,0.9)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(242,205,107,0.35)] focus-within:border-[#f2cd6b]",
+        input: "text-[#0a0a0a] placeholder:text-[rgba(10,10,10,0.42)]",
+        ring: "focus-visible:outline-[#f2cd6b]",
+        check: "bg-[#f2cd6b] text-[#140d00]",
+        error: "text-[#ffb4a1] font-semibold",
+        // .okb-btn (one-k-bot.css): foil with a lit edge, on the one page that uses this tone.
+        button: "okb-btn text-[#140d00]",
+        box: ["#f2cd6b", "#140d00", "rgba(244,242,236,0.5)"],
       }
     : tone === "violet"
     ? {
@@ -411,7 +426,7 @@ export function FreeClaim({
         </button>
         {newsBox}
         <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
-          Free. It arrives by email.
+          {productById(productId)?.instant ? "Free. It downloads now, and a copy comes by email." : "Free. It arrives by email."}
         </p>
         {pitch.node}
       </div>

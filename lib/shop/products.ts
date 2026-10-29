@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1226,6 +1226,73 @@ export const VIDEO_EDITOR_PRO: Product = {
   },
 };
 
+/**
+ * THE $1K BOT, a free Grok Bot and the entry to Tobia's 10-day challenge
+ * (Friday October 30 to Sunday November 8, 2026): one Markdown file a Grok
+ * Bot works from to help its owner make $1,000 in 10 days, by one of three
+ * ways (AI automations for local businesses, the owner's own skills, or a
+ * product they already have), plus the challenge's instructions as a PDF.
+ * The zip: "The 1K Bot" folder with grok-bot-1k-challenge.md and
+ * challenge-instructions.pdf, sealed as private/1k-bot.zip.enc with
+ * `npm run seal -- 1k-bot.zip private/1k-bot.zip.enc`. No scripts inside, so
+ * Gmail carries it attached.
+ */
+export const ONE_K_BOT: Product = {
+  id: "1k-bot",
+  name: "The $1K Bot",
+  description:
+    "A free Grok Bot that helps you make $1,000 in 10 days: it finds the buyers, builds the demos, drafts the outreach and checks in every morning with today's 3 tasks. You approve, send and close.",
+  priceCents: 0,
+  currency: "eur",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/1k-bot",
+  file: {
+    sealed: "1k-bot.zip.enc",
+    filename: "The 1K Bot.zip",
+    // The bot's Markdown file and a PDF, no scripts: Gmail carries it attached.
+    attach: true,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "The $1K Bot is a free Grok Bot built to help you make $1,000 in 10 days. Pick a way (AI automations for local businesses, your own skills, or a product you already have): it finds the buyers, builds the demos, drafts every message and checks in each morning with today's 3 tasks. Nothing goes out without your OK.",
+    kicker: "Grok Bot · free",
+    line: "$1K in 10 days. The bot does the prep.",
+    proof: "One file · the 10-day challenge",
+    theme: "dark",
+  },
+  contents: [
+    ["grok-bot-1k-challenge.md", "the whole bot: the three ways, the 10-day plan, the morning check-in, the scoreboard, its rules"],
+    ["challenge-instructions.pdf", "the challenge: the dates, what to do each day, how to send your result, the prize"],
+  ],
+  steps: [
+    "Unzip it and give grok-bot-1k-challenge.md to a new Grok Bot, on a computer that stays on.",
+    "Connect a business email and a way to get paid.",
+    "Say \"Start the challenge\" and pick 1, 2 or 3. Not sure? Pick 1.",
+  ],
+  email: {
+    preheader: "Your Grok Bot is attached, with the challenge instructions. It starts Friday, October 30.",
+    stepsIntro: "Before Friday:",
+    after: [
+      "It asks a few questions, then gives you the target math, a 10-day plan and a scoreboard. Every morning: yesterday's numbers, where you stand against $1,000 and today's 3 tasks, everything already drafted.",
+      "Nothing is sent, posted or paid in your name until you approve it. Money counts when it's paid, not promised.",
+      "The challenge runs Friday October 30 to Sunday November 8. Whoever makes the most wins a product built with Tobia, a personal masterclass on growing on X, and Construct Ultimate free.",
+    ],
+    footnote: "$1,000 is the target the bot pushes for, not a promise. The $1K Bot is an independent Grok Bot, not made by xAI.",
+  },
+  thanks: {
+    needs:
+      "You'll need Grok Bot on a computer that stays on, a business email (Gmail or Outlook) and a way to get paid (a Stripe link, PayPal, an invoice or a bank transfer).",
+    next: [
+      ["Day 0", "Under 15 minutes of questions. Then the target math, your 10-day plan and a scoreboard at zero."],
+      ["Every morning", "Yesterday's numbers, where you stand against $1,000 and today's 3 tasks, already prepared."],
+      ["Day 10", "Post how you made it on X with proof of payment and tag @tobiadonadon_. The most money wins."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1246,6 +1313,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "shorts-animator": SHORTS_ANIMATOR,
   "reel-bot": REEL_BOT,
   "video-editor-pro": VIDEO_EDITOR_PRO,
+  "1k-bot": ONE_K_BOT,
 };
 
 export function productById(id: unknown): Product | undefined {

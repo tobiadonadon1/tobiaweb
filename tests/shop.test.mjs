@@ -70,6 +70,8 @@ const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s"
 writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
 const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(3900));
 writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
+const ONEK_ZIP = Buffer.from("PK\u0003\u0004 the 1k bot and the challenge " + "k".repeat(3900));
+writeFileSync(path.join(cwd, "private", "1k-bot.zip.enc"), seal(ONEK_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -253,7 +255,14 @@ test("the product, its page and its folder entry agree", async () => {
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Video Editor Pro first, then Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  // The $1K Bot: a free Grok Bot (the bot file and the challenge's instructions), first on Setups.
+  const okb = productById("1k-bot");
+  assert.equal(okb.href, entryHref("setups", "1k-bot"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "1k-bot")?.product, "1k-bot");
+  assert.equal(okb.free, true);
+  assert.equal(forSale(okb), false);
+  assert.equal(okb.stripeProductId, "none");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "The $1K Bot first, then Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
@@ -518,6 +527,19 @@ test("free: Shorts Animator downloads at once for an address, and still emails t
   // Launchr is not instant: the email is still the only way in.
   const other = await ask({ product: "launchr", email: "bo@example.com" }, "203.0.113.78");
   assert.deepEqual(await other.json(), { ok: true });
+});
+
+test("free: The $1K Bot downloads its zip at once, and emails it attached", async () => {
+  const res = await ask({ product: "1k-bot", email: "dk@example.com" }, "203.0.113.81");
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.ok, true);
+  const dl = await download(new Request(body.download));
+  assert.equal(dl.status, 200);
+  assert.match(dl.headers.get("content-type"), /^application\/zip/);
+  assert.match(dl.headers.get("content-disposition"), /filename="The 1K Bot.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), ONEK_ZIP);
+  assert.ok(mail().some((m) => m.message.to === "dk@example.com"), "the email goes too");
 });
 
 test("free: Reel Bot downloads its Markdown file at once, and emails it attached", async () => {
@@ -1070,6 +1092,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
   assert.equal(body.files["shorts-animator"].bytes, SHORTS_ZIP.length);
   assert.equal(body.files["reel-bot"].bytes, REEL_MD.length);
+  assert.equal(body.files["1k-bot"].bytes, ONEK_ZIP.length);
   assert.equal(body.files["video-editor-pro"].bytes, VEP_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {

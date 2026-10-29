@@ -27,7 +27,15 @@ export function VideoEditorProLoader() {
     };
     const events = ["wheel", "touchmove", "keydown", "pointerdown"] as const;
     for (const e of events) window.addEventListener(e, finish, { once: true, passive: true });
+    // Once it has played out, stop listening: a late "finish" restarted the
+    // fade from fully shown, and for its 320 ms the invisible layer swallowed
+    // the click that caused it (the first tap on the page's button did nothing).
+    const end = window.setTimeout(() => {
+      for (const e of events) window.removeEventListener(e, finish);
+      document.documentElement.dataset.vepIntro = "done";
+    }, 4000);
     return () => {
+      window.clearTimeout(end);
       for (const e of events) window.removeEventListener(e, finish);
     };
   }, []);

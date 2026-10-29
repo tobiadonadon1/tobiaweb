@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "1k-bot",
+    title: "The $1K Bot",
+    kind: "setup",
+    summary: "One file to a Grok Bot, and it works with you to make $1,000 in 10 days: it finds the buyers, drafts the outreach and hands you today's 3 tasks.",
+    // Minutes from the download to the bot asking its first questions.
+    minutes: 5,
+    status: "ready",
+    when: "You have Grok Bot, two hours a day for 10 days, and you want your first $1,000 from it.",
+    level: "Anyone",
+    body: [],
+    product: "1k-bot",
+  },
+  {
     slug: "video-editor-pro",
     title: "Video Editor Pro",
     kind: "setup",
