@@ -44,6 +44,7 @@ export function FreeClaim({
   hold = 0,
   fine = false,
   buttonClassName = "",
+  quiet = false,
   className = "",
 }: {
   productId: string;
@@ -65,6 +66,8 @@ export function FreeClaim({
   face?: React.ReactNode;
   /** Extra classes for that button. */
   buttonClassName?: string;
+  /** Drop the "Free. It downloads now…" line under the button, for a page that says it elsewhere (Meta Ads). */
+  quiet?: boolean;
   /**
    * Milliseconds the button stays after a click before the form (or the
    * download) takes its place, so what it says in its speech bubble is said
@@ -425,9 +428,11 @@ export function FreeClaim({
           )}
         </button>
         {newsBox}
-        <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
-          {productById(productId)?.instant ? "Free. It downloads now, and a copy comes by email." : "Free. It arrives by email."}
-        </p>
+        {quiet ? null : (
+          <p className={`mt-3 min-h-[1.2em] text-[0.88rem] ${t.soft}`}>
+            {productById(productId)?.instant ? "Free. It downloads now, and a copy comes by email." : "Free. It arrives by email."}
+          </p>
+        )}
         {pitch.node}
       </div>
     );

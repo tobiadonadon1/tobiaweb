@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "meta-ads",
+    title: "Meta Ads Skill",
+    kind: "setup",
+    summary: "Your Meta ads, run by Claude: it studies your numbers, leads and competitors, proposes options every morning, and moves nothing without your ok.",
+    // Minutes from the download to the account connected and the first report.
+    minutes: 20,
+    status: "ready",
+    when: "You run Meta ads and want every dollar checked daily, without handing an AI your budget.",
+    level: "Anyone",
+    body: [],
+    product: "meta-ads",
+  },
+  {
     slug: "1k-bot",
     title: "The $1K Bot",
     kind: "setup",

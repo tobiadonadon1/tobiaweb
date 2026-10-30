@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1293,6 +1293,71 @@ export const ONE_K_BOT: Product = {
   },
 };
 
+/**
+ * META ADS SKILL, three skills for Claude Code that run a Meta ad account the
+ * careful way: it studies the numbers, the leads and the competitors' live
+ * ads, proposes options each morning, moves nothing without a written ok,
+ * then acts through Meta's API and learns from what won.
+ *
+ * GIVEN AWAY (Tobia, 2026-10-30): free for an email, downloading at once like
+ * the $1K Bot. The zip (skills-meta-ads) still has to be sealed into private/
+ * before the download works.
+ */
+export const META_ADS: Product = {
+  id: "meta-ads",
+  name: "Meta Ads Skill",
+  description:
+    "A free skill for Claude Code that runs your Meta ads: it studies your numbers, leads and competitors, proposes options, and moves nothing without your ok.",
+  priceCents: 0,
+  currency: "usd",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/meta-ads",
+  file: {
+    sealed: "meta-ads.zip.enc",
+    filename: "meta-ads.zip",
+    // The skill ships ads.py, and Gmail refuses zips with scripts in them.
+    attach: false,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Meta Ads Skill, free for Claude Code: it studies your numbers, your leads and your competitors' ads, proposes options every morning, and moves no money without your ok.",
+    kicker: "Skill · for Claude Code",
+    line: "No dollar moves without your ok.",
+    proof: "Studies · proposes · waits for you · learns",
+  },
+  contents: [
+    ["skills/ads-meta/", "the daily loop: setup, launch, one proposal a morning, the stop and scale rules, the month-end report"],
+    ["skills/mkt-ad-creative/", "headlines, primary text and new variants, written from what's winning"],
+    ["skills/util-competitive-ads-extractor/", "reads competitors' live ads in the Ad Library and what they lead with"],
+    ["03_ADS/pipeline/ads/ads.py", "talks to Meta's Marketing API directly, with a daily cap and a +20% limit on every change"],
+    ["03_ADS/_template-ads/", "a folder per client: plan, budget, setup, launch file, daily log"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Copy the skills into Claude Code and open a terminal in the folder.",
+    "Type claude, then \"set up my Meta ads\". It walks you through connecting the account.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code, and ask it to set up your Meta ads.",
+    after: [
+      "From then on, ask \"how are my ads today?\" each morning. It reads the numbers and the leads, then gives you one proposal and waits for your ok.",
+      "Set a spending limit on the ad account in Ads Manager first: the skill can never spend past it.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code (paid Claude plan), Python 3.11 or newer, and a Meta ad account you manage, on a Mac, Windows or Linux.",
+    next: [
+      ["Right after install", "It sets up the account with you: the app, the token, the spending limit and the daily cap."],
+      ["Every morning", "Ask how your ads are doing. One proposal, with the numbers behind it. Nothing moves until you say ok."],
+      ["End of the month", "It writes the report: what won, what to drop, what to test next."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1314,6 +1379,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "reel-bot": REEL_BOT,
   "video-editor-pro": VIDEO_EDITOR_PRO,
   "1k-bot": ONE_K_BOT,
+  "meta-ads": META_ADS,
 };
 
 export function productById(id: unknown): Product | undefined {

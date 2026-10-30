@@ -55,6 +55,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "reel-bot": { a: "#d6d6d4", b: "#f3f3f1", added: "2026-10-26" },
   "video-editor-pro": { a: "#c9b37e", b: "#eef0f5", added: "2026-10-27" },
   "1k-bot": { a: "#f2cd6b", b: "#f6f3ea", added: "2026-10-29" },
+  "meta-ads": { a: "#f0a487", b: "#f6f1e8", added: "2026-10-30" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

@@ -1093,6 +1093,29 @@ function ShortsAnimator() {
   );
 }
 
+/**
+ * META ADS SKILL — the loop's result, cut from paper: four ink bars stepping
+ * down (cost per lead, week by week), the last one in the film's burnt
+ * orange, and an Ads Manager toggle above them, switched on. The colours are
+ * the page's (product/meta-ads-page.tsx).
+ */
+function MetaAds() {
+  const heights = [150, 124, 96, 86];
+  return (
+    <>
+      {heights.map((h, i) => (
+        <g key={i}>
+          <Cut d={CARD} x={70 + i * 54} y={296 - h} s={0.19} sy={h / 150} fill={SHADE} />
+          <Cut d={CARD} x={64 + i * 54} y={290 - h} s={0.19} sy={h / 150} fill={i === 3 ? "#C94A1F" : "#141413"} />
+        </g>
+      ))}
+      <Cut d={CARD} x={238} y={44} s={0.4} sy={0.36} fill={SHADE} />
+      <Cut d={CARD} x={232} y={38} s={0.4} sy={0.36} fill="#DCE6F2" />
+      <Cut d={DISC} x={280} y={46} s={0.16} fill="#3576B9" />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1107,6 +1130,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "reel-bot": ReelBot,
   "video-editor-pro": VideoEditorPro,
   "1k-bot": OneKBot,
+  "meta-ads": MetaAds,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,
