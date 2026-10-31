@@ -1,6 +1,6 @@
 "use client";
 /* Construct · Design library: the compiled preview of "Day agenda". The source is for members. */
-import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D,jsx as a,jsxs as l}from"react/jsx-runtime";var A=[{start:"09:30",title:"Team standup",where:"Zoom \xB7 15 min",details:"Marta, Joan, Priya +4",minutes:15},{start:"11:00",title:"Design critique",where:"Room 4B \xB7 45 min",details:"Bring the onboarding flows",minutes:45},{start:"13:30",title:"Lunch with Leo",where:"Taberna Sal \xB7 1 h",details:"Table for two, by the window",minutes:60},{start:"16:00",title:"Release review",where:"Video call \xB7 30 min",details:"Version 4.2, ship or wait",minutes:30}],b=g=>{let[c,r]=g.split(":").map(Number);return c*60+r};function R({weekday:g="Thursday",day:c=30,month:r="October",events:i=A,accent:o="#3d3df5",autoplay:y=!0}){let N=M(null),h=M([]),f=I(N,y),s=i.length,m=Math.min(1,s-1),[p,E]=L(()=>b(i[m]?.start??"10:00")-20),[t,x]=L(m),[w,v]=L(0),d=(()=>{let e=i.findIndex(n=>b(n.start)+n.minutes>p);return e===-1?0:e})();T(()=>{if(!f||s===0)return;let e=window.setInterval(()=>{if(t!==d){x(d);return}let n=b(i[t].start)-p;if(n>0){E(p+Math.min(5,n));return}if(w<1){v(w+1);return}let u=(t+1)%s;v(0),E(b(i[u].start)-20),x(u)},2e3);return()=>window.clearInterval(e)},[f,s,i,d,p,t,w]);let k=(e,n=!1)=>{let u=(e+s)%s;x(u),v(0),n&&h.current[u]?.focus()},$=e=>{let n={ArrowDown:t+1,ArrowUp:t-1,Home:0,End:s-1};e.key in n&&(e.preventDefault(),k(n[e.key],!0))};return l(D,{children:[a("style",{children:P}),a("div",{className:"ag-wrap",children:l("div",{ref:N,className:"ag",style:{"--ag-accent":o,"--ag-i":t},children:[l("div",{className:"ag-date",children:[l("div",{className:"ag-head",children:[a("span",{className:"ag-dot","aria-hidden":!0}),g]}),a("div",{className:"ag-day",children:c}),l("div",{className:"ag-month",children:[a("span",{children:r}),l("span",{className:"ag-count",children:[s," ",s===1?"event":"events"," today"]})]})]}),a("div",{className:"ag-rule","aria-hidden":!0}),l("div",{className:"ag-listwrap",children:[l("div",{className:"ag-hl","aria-hidden":!0,children:[a("span",{className:"ag-hl-time"}),a("span",{className:"ag-hl-bar"}),a("span",{className:"ag-hl-gap"}),a("span",{className:"ag-pill",children:a("span",{className:"ag-pilltext",children:z(i[t],p)},`${t}-${z(i[t],p)}`)})]}),a("ul",{className:"ag-list","aria-label":`${g} ${c} ${r}`,onKeyDown:$,children:i.map((e,n)=>{let u=b(e.start)+e.minutes<=p;return a("li",{children:l("button",{ref:S=>{h.current[n]=S},type:"button",className:"ag-row",tabIndex:n===t?0:-1,"aria-current":n===t?"true":void 0,"aria-label":`${e.start}, ${e.title}, ${e.where}. ${e.details}. ${z(e,p)}`,"data-past":u||void 0,"data-on":n===t||void 0,onClick:()=>k(n),children:[a("span",{className:"ag-time",children:e.start}),a("span",{className:"ag-bar"}),l("span",{className:"ag-text",children:[a("span",{className:"ag-title",children:e.title}),l("span",{className:"ag-sub",children:[l("span",{className:"ag-where",children:[l("span",{className:"ag-tinline",children:[a("span",{className:"ag-tmono",children:e.start})," \xB7"," "]}),e.where]}),a("span",{className:"ag-details",children:e.details})]})]})]})},e.start+e.title)})})]})]})})]})}function z(g,c){if(!g)return"";let r=b(g.start)-c;if(r>0){if(r<60)return`in ${r} min`;let i=r%60;return i?`in ${Math.floor(r/60)}h ${i}m`:`in ${r/60}h`}return r>-g.minutes?"now":"done"}function I(g,c){let[r,i]=L(!1);return T(()=>{let o=g.current;if(!o)return;let y=window.matchMedia("(prefers-reduced-motion: reduce)"),N=!1,h=!1,f=!1,s=0,m=(d=0)=>{window.clearTimeout(s);let k=c&&N&&!h&&!f&&!y.matches;!k||!d?i(k):s=window.setTimeout(()=>i(!0),d)},p=new IntersectionObserver(([d])=>{N=d.isIntersecting,m()});p.observe(o);let E=()=>{h=!0,m()},t=()=>{h=!1,m(1500)},x=()=>{f=!0,m()},w=d=>{d.relatedTarget instanceof Node&&o.contains(d.relatedTarget)||(f=!1,m(1500))},v=()=>m();return o.addEventListener("pointerenter",E),o.addEventListener("pointerleave",t),o.addEventListener("focusin",x),o.addEventListener("focusout",w),y.addEventListener("change",v),()=>{window.clearTimeout(s),p.disconnect(),o.removeEventListener("pointerenter",E),o.removeEventListener("pointerleave",t),o.removeEventListener("focusin",x),o.removeEventListener("focusout",w),y.removeEventListener("change",v)}},[g,c]),r}var P=`
+import{useEffect as A,useRef as S,useState as L}from"react";import{Fragment as j,jsx as t,jsxs as l}from"react/jsx-runtime";var R="#3d3df5",O="#7b5cff",P="#ff4f7b",H="#2ecf8f",D=[{start:"09:30",title:"Team standup",where:"Zoom \xB7 15 min",details:"Marta, Joan, Priya +4",minutes:15,color:R},{start:"11:00",title:"Design critique",where:"Room 4B \xB7 45 min",details:"Bring the onboarding flows",minutes:45,color:O},{start:"13:30",title:"Lunch with Leo",where:"Taberna Sal \xB7 1 h",details:"Table for two, by the window",minutes:60,color:P},{start:"18:00",title:"Evening run",where:"Riverside \xB7 45 min",details:"Easy 6 km, meet at the bridge",minutes:45,color:H}];function Y(o){let g=/^#?([0-9a-f]{6})$/i.exec(o.trim());if(!g)return"#fff";let n=parseInt(g[1],16),a=u=>{let f=u/255;return f<=.04045?f/12.92:((f+.055)/1.055)**2.4};return .2126*a(n>>16&255)+.7152*a(n>>8&255)+.0722*a(n&255)>.3?`color-mix(in oklab, ${o} 26%, #000)`:"#fff"}var v=o=>{let[g,n]=o.split(":").map(Number);return g*60+n};function F({weekday:o="Thursday",day:g=30,month:n="October",events:a=D,colors:s="calendar",accent:u="#3d3df5",today:f="#ff4f7b",autoplay:y=!0}){let h=e=>s==="calendar"&&e?.color||u,w=S(null),m=S([]),E=K(w,y),c=a.length,N=Math.min(1,c-1),[d,k]=L(()=>v(a[N]?.start??"10:00")-20),[r,p]=L(N),[b,T]=L(0),z=(()=>{let e=a.findIndex(i=>v(i.start)+i.minutes>d);return e===-1?0:e})();A(()=>{if(!E||c===0)return;let e=window.setInterval(()=>{if(r!==z){p(z);return}let i=v(a[r].start)-d;if(i>0){k(d+Math.min(5,i));return}if(b<1){T(b+1);return}let x=(r+1)%c;T(0),k(v(a[x].start)-20),p(x)},2e3);return()=>window.clearInterval(e)},[E,c,a,z,d,r,b]);let $=(e,i=!1)=>{let x=(e+c)%c;p(x),T(0),i&&m.current[x]?.focus()},C=e=>{let i={ArrowDown:r+1,ArrowUp:r-1,Home:0,End:c-1};e.key in i&&(e.preventDefault(),$(i[e.key],!0))};return l(j,{children:[t("style",{children:B}),t("div",{className:"ag-wrap",children:l("div",{ref:w,className:"ag",style:{"--ag-accent":u,"--ag-today":f,"--ag-sel":h(a[r]),"--ag-on":Y(h(a[r])),"--ag-i":r},children:[l("div",{className:"ag-date",children:[l("div",{className:"ag-head",children:[t("span",{className:"ag-dot","aria-hidden":!0}),o]}),t("div",{className:"ag-day",children:g}),l("div",{className:"ag-month",children:[t("span",{children:n}),l("span",{className:"ag-count",children:[c," ",c===1?"event":"events"," today"]})]})]}),t("div",{className:"ag-rule","aria-hidden":!0}),l("div",{className:"ag-listwrap",children:[t("span",{className:"ag-wash","aria-hidden":!0}),l("div",{className:"ag-hl","aria-hidden":!0,children:[t("span",{className:"ag-hl-time"}),t("span",{className:"ag-hl-bar"}),t("span",{className:"ag-hl-gap"}),t("span",{className:"ag-pill",children:t("span",{className:"ag-pilltext",children:M(a[r],d)},`${r}-${M(a[r],d)}`)})]}),t("ul",{className:"ag-list","aria-label":`${o} ${g} ${n}`,onKeyDown:C,children:a.map((e,i)=>{let x=v(e.start)+e.minutes<=d;return t("li",{children:l("button",{ref:I=>{m.current[i]=I},type:"button",className:"ag-row",tabIndex:i===r?0:-1,"aria-current":i===r?"true":void 0,"aria-label":`${e.start}, ${e.title}, ${e.where}. ${e.details}. ${M(e,d)}`,"data-past":x||void 0,"data-on":i===r||void 0,style:{"--ag-c":h(e)},onClick:()=>$(i),children:[t("span",{className:"ag-time",children:e.start}),t("span",{className:"ag-bar"}),l("span",{className:"ag-text",children:[t("span",{className:"ag-title",children:e.title}),l("span",{className:"ag-sub",children:[l("span",{className:"ag-where",children:[l("span",{className:"ag-tinline",children:[t("span",{className:"ag-tmono",children:e.start})," \xB7"," "]}),e.where]}),t("span",{className:"ag-details",children:e.details})]})]})]})},e.start+e.title)})})]})]})})]})}function M(o,g){if(!o)return"";let n=v(o.start)-g;if(n>0){if(n<60)return`in ${n} min`;let a=n%60;return a?`in ${Math.floor(n/60)}h ${a}m`:`in ${n/60}h`}return n>-o.minutes?"now":"done"}function K(o,g){let[n,a]=L(!1);return A(()=>{let s=o.current;if(!s)return;let u=window.matchMedia("(prefers-reduced-motion: reduce)"),f=!1,y=!1,h=!1,w=0,m=(p=0)=>{window.clearTimeout(w);let b=g&&f&&!y&&!h&&!u.matches;!b||!p?a(b):w=window.setTimeout(()=>a(!0),p)},E=new IntersectionObserver(([p])=>{f=p.isIntersecting,m()});E.observe(s);let c=()=>{y=!0,m()},N=()=>{y=!1,m(1500)},d=()=>{h=!0,m()},k=p=>{p.relatedTarget instanceof Node&&s.contains(p.relatedTarget)||(h=!1,m(1500))},r=()=>m();return s.addEventListener("pointerenter",c),s.addEventListener("pointerleave",N),s.addEventListener("focusin",d),s.addEventListener("focusout",k),u.addEventListener("change",r),()=>{window.clearTimeout(w),E.disconnect(),s.removeEventListener("pointerenter",c),s.removeEventListener("pointerleave",N),s.removeEventListener("focusin",d),s.removeEventListener("focusout",k),u.removeEventListener("change",r)}},[o,g]),n}var q=`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2.2 0 0 0 -.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`,B=`
 .ag-wrap {
   container: ag / inline-size;
   box-sizing: border-box;
@@ -15,19 +15,34 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
   --ag-row: 60px;
   --ag-cols: 44px 2px 1fr 78px;
   --ag-spring: cubic-bezier(.3, 1.3, .5, 1);
+  position: relative;
+  isolation: isolate;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: 158px 1px 1fr;
   gap: 0 26px;
   padding: 22px 24px 22px 24px;
   border-radius: 28px;
-  background: #f8f8f6;
+  /* soft light from the top left onto a warm off-white */
+  background:
+    radial-gradient(90% 120% at 0% 0%, #ffffff 0%, rgb(255 255 255 / 0) 60%),
+    #f5f5f1;
   color: var(--ag-ink);
   font-family: inherit;
   box-shadow:
-    0 0 0 1px rgb(0 0 0 / .04),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 0 0 1px rgb(0 0 0 / .045),
     0 1px 2px rgb(0 0 0 / .04),
-    0 10px 30px -14px rgb(0 0 0 / .14);
+    0 10px 30px -14px rgb(0 0 0 / .16);
+}
+.ag::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  background-image: ${q};
+  background-size: 160px 160px;
+  opacity: .045;
+  pointer-events: none;
 }
 
 /* Left: the date. */
@@ -36,7 +51,11 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
   display: flex; align-items: center; gap: 9px;
   font-size: 13px; line-height: 1; color: #6b6b6b;
 }
-.ag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ag-accent); flex: none; }
+.ag-dot {
+  width: 6px; height: 6px; border-radius: 50%; flex: none;
+  background: var(--ag-today);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ag-today) 16%, transparent);
+}
 .ag-day {
   margin: auto 0 0;
   padding-top: 18px;
@@ -79,7 +98,7 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
   transition: background-color 200ms ease;
 }
 .ag-row:hover { background: rgb(0 0 0 / .025); }
-.ag-row:focus-visible { outline: 2px solid var(--ag-accent); outline-offset: -2px; }
+.ag-row:focus-visible { outline: 2px solid var(--ag-sel); outline-offset: -2px; }
 
 .ag-time {
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
@@ -88,7 +107,13 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
   transition: color 300ms ease;
 }
 .ag-row[data-on] .ag-time { color: var(--ag-ink); }
-.ag-bar { align-self: center; height: 30px; border-radius: 2px; background: #e0e0dd; }
+/* Every event shows its calendar colour, quietly; the selected one in full. */
+.ag-bar {
+  align-self: center; height: 30px; border-radius: 2px;
+  background: color-mix(in srgb, var(--ag-c) 48%, #ecece8);
+  transition: opacity 300ms ease;
+}
+.ag-row[data-past] .ag-bar { opacity: .55; }
 .ag-text { display: grid; gap: 6px; min-width: 0; }
 .ag-title {
   font-size: 15px; font-weight: 500; line-height: 1.1; letter-spacing: -0.012em;
@@ -113,6 +138,21 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
 .ag-tinline { display: none; }
 .ag-tmono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; font-variant-numeric: tabular-nums; }
 
+/* The selected row's wash: its colour, strongest by the bar, fading out.
+   It sits under the rows (the list paints over it). */
+.ag-wash {
+  position: absolute; left: -8px; right: -8px; top: 0;
+  height: var(--ag-row);
+  border-radius: 14px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--ag-sel) 15%, transparent),
+    color-mix(in srgb, var(--ag-sel) 7%, transparent) 45%,
+    color-mix(in srgb, var(--ag-sel) 2%, transparent));
+  transform: translateY(calc(var(--ag-i) * var(--ag-row)));
+  transition: transform 520ms var(--ag-spring), background 400ms ease;
+  pointer-events: none;
+}
+
 /* The sliding highlight, laid over the rows with the same columns. */
 .ag-hl {
   position: absolute; left: 0; right: 0; top: 0;
@@ -121,14 +161,21 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
   transform: translateY(calc(var(--ag-i) * var(--ag-row)));
   transition: transform 520ms var(--ag-spring);
 }
-.ag-hl-bar { height: 30px; border-radius: 2px; background: var(--ag-accent); }
+.ag-hl-bar {
+  height: 30px; border-radius: 2px;
+  background: var(--ag-sel);
+  box-shadow: 0 0 10px -1px color-mix(in srgb, var(--ag-sel) 55%, transparent);
+  transition: background-color 400ms ease, box-shadow 400ms ease;
+}
 .ag-pill {
   justify-self: end;
   display: inline-grid; place-items: center;
   height: 22px; padding: 0 9px;
   border-radius: 99px;
-  background: var(--ag-accent);
-  color: #fff;
+  background: var(--ag-sel);
+  color: var(--ag-on);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), 0 4px 10px -4px color-mix(in srgb, var(--ag-sel) 70%, transparent);
+  transition: background-color 400ms ease, color 400ms ease;
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 10.5px; line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -154,7 +201,7 @@ import{useEffect as T,useRef as M,useState as L}from"react";import{Fragment as D
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ag-hl, .ag-where, .ag-details { transition: none; }
+  .ag-hl, .ag-wash, .ag-where, .ag-details { transition: none; }
   .ag-pilltext { animation: none; }
 }
-`;export{R as default};
+`;export{F as default};

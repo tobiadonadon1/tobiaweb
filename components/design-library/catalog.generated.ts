@@ -131,32 +131,13 @@ export const BLOCKS: Block[] = [
     "component": "RangeDial",
     "title": "Range dial",
     "category": "Drag",
-    "description": "A thermostat widget: a ring of fine ticks lit blue to the setpoint, the number huge in the middle. Drag around it, scroll or use the arrows; flick it and it coasts, then settles. Left alone, it slowly turns itself to a new setpoint.",
+    "description": "A thermostat widget: a ring of fine ticks warming from sky blue to sunset orange up to the setpoint, a soft heating or cooling glow inside, the number huge in the middle. Drag, scroll or use the arrows; flick it and it coasts. Left alone, it turns itself.",
     "free": false,
     "added": "2026-10-23",
     "order": 119,
     "ground": "#f1f1f0",
     "dark": false,
     "controls": [
-      {
-        "prop": "tone",
-        "label": "Accent",
-        "type": "swatch",
-        "options": [
-          [
-            "Blue",
-            "#3d3df5"
-          ],
-          [
-            "Black",
-            "#111111"
-          ],
-          [
-            "Orange",
-            "#ff5b14"
-          ]
-        ]
-      },
       {
         "prop": "unit",
         "label": "Unit",
@@ -174,8 +155,8 @@ export const BLOCKS: Block[] = [
       }
     ],
     "howItWorks": "// turn by the angle you moved through, wrapped to ±180°\nconst delta = ((((deg - last) % 360) + 540) % 360) - 180;\nraw += (delta / 300) * (max - min);\n// past an end, it turns at most ~9° more, harder the further you go\nangle = base + Math.sign(over) * 9 * (1 - 1 / (Math.abs(over) / 9 + 1));\n// autoplay: the same spring, just soft (k = 9), toward the next setpoint\nv += (-k * (raw - target) - 2 * 0.92 * Math.sqrt(k) * v) * dt;\n/* each digit is a 0–9 column that rolls into place */\n.col { transform: translateY(calc(var(--n) * -1.1em)); }",
-    "lines": 640,
-    "sha": "988457fd2b657dad"
+    "lines": 747,
+    "sha": "b4f2edaf1101ddb9"
   }, Component: B_range_dial },
   { ...{
     "slug": "now-playing",
@@ -210,8 +191,8 @@ export const BLOCKS: Block[] = [
       }
     ],
     "howItWorks": "/* the equaliser: five 2px bars, each on its own beat; only while playing */\n.np-eq i { transform-origin: 50% 100%; transform: scaleY(var(--r)); }\n.np-eq i:nth-child(2) { --r: 1; --d: 700ms; --dl: -380ms; }\n.np[data-playing=\"true\"] .np-eq i {\n  animation: np-eq var(--d) ease-in-out var(--dl) infinite alternate;\n}\n@keyframes np-eq { from { transform: scaleY(.22) } to { transform: scaleY(1) } }\n/* autoplay pauses on pointerenter / keyboard focus, resumes 1.5s after leaving */",
-    "lines": 480,
-    "sha": "8d1831d24bb46cb1"
+    "lines": 796,
+    "sha": "cd92f36f22fb38a5"
   }, Component: B_now_playing },
   { ...{
     "slug": "weather",
@@ -265,15 +246,15 @@ export const BLOCKS: Block[] = [
       }
     ],
     "howItWorks": "// the arc is a half sine; the sun sits on it at t (0 = sunrise, 1 = sunset)\nconst at = (t) => ({ x: X0 + W * t, y: BASE - H * Math.sin(Math.PI * t) });\n// solid up to the sun, dotted after it (round caps on a 0-length dash = dots)\n<path d={arc(0, t)} stroke={accent} />\n<path d={arc(t, 1)} stroke=\"#c4c4bf\" strokeDasharray=\"0 5\" />\n// autoplay: t = (1 - cos φ) / 2, with φ recovered from wherever you left it\nlet φ = Math.acos(1 - 2 * t); if (dir < 0) φ = 2 * Math.PI - φ;",
-    "lines": 410,
-    "sha": "50f2929345cd64ac"
+    "lines": 543,
+    "sha": "c9ba4afa771e2c92"
   }, Component: B_weather },
   { ...{
     "slug": "batteries",
     "component": "Batteries",
     "title": "Batteries",
     "category": "Hover",
-    "description": "A home-screen battery widget. The device on the charger turns blue with a light running along its bar. Hover a row to see the time left or to full; click it to plug it in or out. Left alone, it charges and drains by itself.",
+    "description": "A home-screen battery widget where colour means charge: mint and glowing on the charger, amber under 30%, coral under 15%. Hover a row to see the time left or to full; click it to plug it in or out. Left alone, it charges and drains by itself.",
     "free": false,
     "added": "2026-10-31",
     "order": 116,
@@ -286,30 +267,30 @@ export const BLOCKS: Block[] = [
         "type": "swatch",
         "options": [
           [
+            "Mint",
+            "#2ecf8f"
+          ],
+          [
             "Blue",
             "#3d3df5"
           ],
           [
-            "Orange",
-            "#ff5a1f"
-          ],
-          [
-            "Green",
-            "#16a34a"
+            "Sky",
+            "#4cc2ff"
           ]
         ]
       }
     ],
     "howItWorks": "/* % and time share one 1-line window; hover rolls the time up */\n.val  { display: grid; height: 13px; overflow: hidden; }\n.pct, .time { grid-area: 1 / 1; transition: transform 380ms cubic-bezier(.3,1.4,.5,1); }\n.time { transform: translateY(100%); }\n.row:hover .pct  { transform: translateY(-100%); }\n.row:hover .time { transform: none; }\n/* the demo runs only while visible, unhovered and unfocused (IntersectionObserver + pointerenter/focusin) */",
-    "lines": 379,
-    "sha": "361fa314ecde877a"
+    "lines": 464,
+    "sha": "c623eb11c060c323"
   }, Component: B_batteries },
   { ...{
     "slug": "focus-mode",
     "component": "FocusMode",
     "title": "Focus",
     "category": "Press",
-    "description": "A dark Focus widget with a moon and a switch. Turn it on and a soft blue light rises in the corner and breathes, the moon wakes and the words roll from Off to On. Click or press Space to flip it; left alone, it flips by itself.",
+    "description": "A dark, grained Focus widget with a moon and a switch. Turn it on and a violet and sky aurora rises in the corner, breathing and drifting; the moon lights up from inside and the words roll from Off to On. Click or press Space; left alone, it flips by itself.",
     "free": false,
     "added": "2026-10-31",
     "order": 115,
@@ -322,36 +303,70 @@ export const BLOCKS: Block[] = [
         "type": "swatch",
         "options": [
           [
+            "Violet",
+            "#7b5cff"
+          ],
+          [
             "Blue",
             "#3d3df5"
           ],
           [
-            "Orange",
-            "#ff5a1f"
+            "Coral",
+            "#ff4f7b"
+          ]
+        ]
+      },
+      {
+        "prop": "second",
+        "label": "Second light",
+        "type": "swatch",
+        "options": [
+          [
+            "Sky",
+            "#4cc2ff"
           ],
           [
-            "Green",
-            "#16a34a"
+            "Mint",
+            "#2ecf8f"
+          ],
+          [
+            "Amber",
+            "#ffb020"
           ]
         ]
       }
     ],
-    "howItWorks": "/* the light: a radial glow in the corner, tinted from one prop */\n.glow-in {\n  background: radial-gradient(closest-side,\n    color-mix(in srgb, var(--accent) 62%, transparent),\n    transparent);\n  animation: breathe 5.5s ease-in-out infinite;\n}\n/* the words are a two-row wheel: On above, Off below, the window rolls */",
-    "lines": 314,
-    "sha": "3e0196e86c16f178"
+    "howItWorks": "/* the aurora: two radial lights, each on its own slow drift loop */\n.glow-a { background: radial-gradient(closest-side,\n  color-mix(in srgb, var(--accent) 70%, transparent), transparent);\n  animation: drift-a 11s ease-in-out infinite; }\n.glow-b { mix-blend-mode: screen; animation: drift-b 14s ease-in-out infinite; }\n/* grain: an SVG feTurbulence data URI at 6% over the dark surface */",
+    "lines": 401,
+    "sha": "4ea3c77b5ef7ea3a"
   }, Component: B_focus_mode },
   { ...{
     "slug": "agenda",
     "component": "Agenda",
     "title": "Day agenda",
     "category": "Select",
-    "description": "Today on one card: the date big on the left, the events on the right. The next one gets a blue bar and a pill counting down. Click an event or use the arrow keys and both slide to it; hover one for its details. Left alone, it counts down and moves on.",
+    "description": "Today on one card: the date big on the left, events on the right, each in its calendar's colour. The next one gets a colour wash, a bar and a countdown pill. Click an event or use the arrow keys and they slide to it; hover for details. Left alone, it moves on.",
     "free": false,
     "added": "2026-10-31",
     "order": 114,
     "ground": "#f1f1f0",
     "dark": false,
     "controls": [
+      {
+        "prop": "colors",
+        "label": "Colours",
+        "type": "segment",
+        "options": [
+          [
+            "Calendars",
+            "calendar"
+          ],
+          [
+            "One accent",
+            "accent"
+          ]
+        ]
+      },
       {
         "prop": "accent",
         "label": "Accent",
@@ -362,8 +377,8 @@ export const BLOCKS: Block[] = [
             "#3d3df5"
           ],
           [
-            "Orange",
-            "#ff5a1f"
+            "Violet",
+            "#7b5cff"
           ],
           [
             "Black",
@@ -373,15 +388,15 @@ export const BLOCKS: Block[] = [
       }
     ],
     "howItWorks": "/* rows are a fixed height, so ONE highlight (bar + pill) slides\n   over them by exactly the selected index */\n.hl {\n  position: absolute; inset: 0 0 auto;\n  transform: translateY(calc(var(--i) * var(--row)));\n  transition: transform 520ms cubic-bezier(.3, 1.3, .5, 1);\n}\n/* the pill's text is keyed by its label, so each change rolls in fresh */",
-    "lines": 422,
-    "sha": "0445c2e8b7a03e35"
+    "lines": 516,
+    "sha": "88f5db816b2cb896"
   }, Component: B_agenda },
   { ...{
     "slug": "stacked-bars",
     "component": "StackedBars",
     "title": "Stacked bars",
     "category": "Hover",
-    "description": "A week of traffic as a widget: the total huge, seven tall bars on grey tracks, today's in blue. Point at a day and its bar splits into its sources while the number becomes that day's; point at a source to isolate it. Left alone, it walks the week.",
+    "description": "A week of traffic as a widget: the total huge, seven bars stacked by source (blue, coral, amber), today's in full colour. Point at a day and it lights up while the number becomes that day's; point at a source to isolate it. Left alone, it walks the week.",
     "free": false,
     "added": "2026-10-23",
     "order": 113,
@@ -390,7 +405,7 @@ export const BLOCKS: Block[] = [
     "controls": [
       {
         "prop": "tone",
-        "label": "Today",
+        "label": "Organic",
         "type": "swatch",
         "options": [
           [
@@ -402,47 +417,28 @@ export const BLOCKS: Block[] = [
             "#111111"
           ],
           [
-            "Orange",
-            "#ff5b14"
+            "Violet",
+            "#7b5cff"
           ]
         ]
       }
     ],
-    "howItWorks": "// one bar: a fill as tall as the day's total, its sources stacked\n// inside it with flex-grow = their value, darkest at the bottom\n<div className=\"fill\" style={{ height: `${(total / top) * 100}%` }}>\n  {SERIES.map((s, k) => <span style={{ flexGrow: shown(k) ? s.values[d] : 0 }} />)}\n</div>\n/* one colour until you point at the day; then tonal, with a 2px gap */\n.fill { display: flex; flex-direction: column-reverse; }\n.seg { transition: flex-grow 560ms cubic-bezier(.3,1.25,.5,1); }\n.on .seg:not(:last-child) { border-top: 2px solid var(--card); }",
-    "lines": 438,
-    "sha": "9bbdbe8816443e81"
+    "howItWorks": "// one bar: a fill as tall as the day's total, its sources stacked\n// inside it with flex-grow = their value, Organic at the bottom\n<div className=\"fill\" style={{ height: `${(total / top) * 100}%` }}>\n  {SERIES.map((s, k) => <span style={{ flexGrow: shown(k) ? s.values[d] : 0 }} />)}\n</div>\n/* soft tints at rest; full colour, with a 2px gap, on the day you point at */\n.fill { display: flex; flex-direction: column-reverse; }\n.seg { transition: flex-grow 560ms cubic-bezier(.3,1.25,.5,1); }\n.on .seg:not(:last-child) { border-top: 2px solid var(--card); }",
+    "lines": 469,
+    "sha": "2ffa0df55132db8a"
   }, Component: B_stacked_bars },
   { ...{
     "slug": "rolling-counter",
     "component": "RollingCounter",
     "title": "Rolling counter",
     "category": "Drag",
-    "description": "A step-count widget: the day's steps huge, how far to the goal under it, a thin blue line filling to it. Drag, scroll or flick the number and each digit rolls on its own reel. Left alone, it counts itself up a few dozen steps at a time.",
+    "description": "A step-count widget: the day's steps huge, the goal share in mint, a mint-to-sky line with a glowing tip, a coral streak flame. Drag, scroll or flick the number and each digit rolls on its own reel. Left alone, it counts itself up a few dozen at a time.",
     "free": false,
     "added": "2026-10-23",
     "order": 112,
     "ground": "#f1f1f0",
     "dark": false,
     "controls": [
-      {
-        "prop": "tone",
-        "label": "Accent",
-        "type": "swatch",
-        "options": [
-          [
-            "Blue",
-            "#3d3df5"
-          ],
-          [
-            "Black",
-            "#111111"
-          ],
-          [
-            "Orange",
-            "#ff5b14"
-          ]
-        ]
-      },
       {
         "prop": "value",
         "label": "Start",
@@ -463,16 +459,16 @@ export const BLOCKS: Block[] = [
         ]
       }
     ],
-    "howItWorks": "// the ones reel IS the value; each reel above only turns\n// while the one below goes from 9 to 0\nconst carry = clamp(raw - base * 10 ** i - (10 ** i - 1), 0, 1);\ntarget[i] = Math.floor(raw / 10 ** i) + smoothstep(carry);\n// every reel follows its target on its own spring, heavier as it goes up\nvel[i] += (-k[i] * (pos[i] - target[i]) - c[i] * vel[i]) * dt;\n// the goal line follows the same continuous value\nfill.style.width = `${Math.min(1, raw / goal) * 100}%`;",
-    "lines": 647,
-    "sha": "2be90f606490ae44"
+    "howItWorks": "// the ones reel IS the value; each reel above only turns\n// while the one below goes from 9 to 0\nconst carry = clamp(raw - base * 10 ** i - (10 ** i - 1), 0, 1);\ntarget[i] = Math.floor(raw / 10 ** i) + smoothstep(carry);\n// every reel follows its target on its own spring, heavier as it goes up\nvel[i] += (-k[i] * (pos[i] - target[i]) - c[i] * vel[i]) * dt;\n// the goal line follows the same continuous value: one full-width\n// gradient, uncovered with clip-path up to --w\nline.style.setProperty(\"--w\", `${Math.min(1, raw / goal) * 100}%`);",
+    "lines": 724,
+    "sha": "bd7112916914ccea"
   }, Component: B_rolling_counter },
   { ...{
     "slug": "member-card",
     "component": "MemberCard",
     "title": "Member card",
     "category": "Hover",
-    "description": "A sleek membership card that turns toward your pointer: it tilts in 3D, a soft light slides across its face and a 1px edge catches it. Left alone, it drifts through a slow figure-eight so the light keeps moving.",
+    "description": "A titanium-like membership card that turns toward your pointer: fine brushed grain, a holographic foil that slides through violet, sky, mint and coral with the tilt, an iridescent edge and chip. Left alone, it drifts in a slow figure-eight.",
     "free": false,
     "added": "2026-10-23",
     "order": 111,
@@ -491,6 +487,10 @@ export const BLOCKS: Block[] = [
           [
             "White",
             "white"
+          ],
+          [
+            "Aurora",
+            "aurora"
           ]
         ]
       },
@@ -505,16 +505,16 @@ export const BLOCKS: Block[] = [
         "default": 50
       }
     ],
-    "howItWorks": "/* one card, two springs-driven angles */\n.card { transform: rotateX(var(--rx)) rotateY(var(--ry)); }\n/* the light rides on --gx/--gy, on the side turned toward you */\n.glare { background: radial-gradient(at var(--gx) var(--gy), rgba(255,255,255,.16), transparent 72%); }\n/* the edge: the same light, masked to a 1px ring */\n.edge { padding: 1px; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }\n// idle: a figure-eight the springs chase, so a pointer can take over mid-move\nry = sin(t) * 13; rx = sin(2t) * 7;",
-    "lines": 483,
-    "sha": "c4ecb60010d37188"
+    "howItWorks": "/* material: SVG noise as a tiny tile (fine grain + long brushed strokes) */\n.tex { background-image: url(\"data:image/svg+xml,…feTurbulence…\"); }\n/* foil: one band of the palette, slid by the light, so by the tilt */\n.foil { background: linear-gradient(115deg, #7b5cff, #4cc2ff, #2ecf8f, #ff4f7b) calc(100% - var(--gx)) 0 / 260% 100%; mix-blend-mode: screen; }\n/* iridescent edge: a conic ring that turns with the card, masked to 1px */\n.edge { background: conic-gradient(from calc(var(--ry) * 9deg), …); padding: 1px; mask-composite: exclude; }\n// idle: a figure-eight the springs chase\nry = sin(t) * 13; rx = sin(2t) * 7;",
+    "lines": 596,
+    "sha": "6c71e60b19afc26c"
   }, Component: B_member_card },
   { ...{
     "slug": "pay-button",
     "component": "PayButton",
     "title": "Pay button",
     "category": "Press",
-    "description": "A black pill checkout button. Press it and it gives under your finger, a thin ring spins, closes into a check and the button turns blue: paid. It resets itself, and presses itself now and then when nobody is near.",
+    "description": "A black pill checkout button. Press it and it gives under your finger, a gradient ring spins, closes into a check and the button fills blue to violet from the centre, with a shine and a soft glow: paid. It resets, and presses itself when nobody is near.",
     "free": false,
     "added": "2026-10-23",
     "order": 110,
@@ -539,11 +539,30 @@ export const BLOCKS: Block[] = [
             1280
           ]
         ]
+      },
+      {
+        "prop": "accent",
+        "label": "Paid",
+        "type": "swatch",
+        "options": [
+          [
+            "Violet",
+            "#7b5cff"
+          ],
+          [
+            "Sky",
+            "#4cc2ff"
+          ],
+          [
+            "Coral",
+            "#ff4f7b"
+          ]
+        ]
       }
     ],
-    "howItWorks": "/* one ring, three states: drawn, closed, ticked */\n.arc { stroke-dasharray: 0 100; }                    /* pathLength=100 */\n[data-phase=busy] .arc { stroke-dasharray: 28 100; }  /* + spinning */\n[data-phase=done] .arc { stroke-dasharray: 100 100; } /* spin now invisible */\n[data-phase=done] .tick { stroke-dashoffset: 0; }\n[data-phase=done] { background: #3d3df5; }\n/* \"Paid\" opens beside the ring: its grid column goes 0fr -> 1fr */\n[data-phase=done] .status { grid-template-columns: auto 1fr; }",
-    "lines": 426,
-    "sha": "79410f1a88e30abd"
+    "howItWorks": "/* one ring, three states: drawn, closed, ticked */\n.arc { stroke: url(#blue-violet-coral); stroke-dasharray: 0 100; }\n[data-phase=busy] .arc { stroke-dasharray: 28 100; } /* + spinning */\n[data-phase=done] .arc { stroke-dasharray: 100 100; }\n/* paid: the colour grows out of the ring */\n.fill { background: linear-gradient(100deg, #3d3df5, #7b5cff); clip-path: circle(0%); }\n[data-phase=done] .fill { clip-path: circle(80%); }\n[data-phase=done] .glow { animation: bloom 1.3s both; } /* blooms, then settles */",
+    "lines": 542,
+    "sha": "a790e9b4b896b5ee"
   }, Component: B_pay_button },
   { ...{
     "slug": "swipe-deck",

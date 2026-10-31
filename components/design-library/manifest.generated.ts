@@ -7,7 +7,7 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
   },
   "range-dial": {
     "title": "Range dial",
-    "description": "A thermostat widget: a ring of fine ticks lit blue to the setpoint, the number huge in the middle. Drag around it, scroll or use the arrows; flick it and it coasts, then settles. Left alone, it slowly turns itself to a new setpoint.",
+    "description": "A thermostat widget: a ring of fine ticks warming from sky blue to sunset orange up to the setpoint, a soft heating or cooling glow inside, the number huge in the middle. Drag, scroll or use the arrows; flick it and it coasts. Left alone, it turns itself.",
     "free": false
   },
   "now-playing": {
@@ -22,37 +22,37 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
   },
   "batteries": {
     "title": "Batteries",
-    "description": "A home-screen battery widget. The device on the charger turns blue with a light running along its bar. Hover a row to see the time left or to full; click it to plug it in or out. Left alone, it charges and drains by itself.",
+    "description": "A home-screen battery widget where colour means charge: mint and glowing on the charger, amber under 30%, coral under 15%. Hover a row to see the time left or to full; click it to plug it in or out. Left alone, it charges and drains by itself.",
     "free": false
   },
   "focus-mode": {
     "title": "Focus",
-    "description": "A dark Focus widget with a moon and a switch. Turn it on and a soft blue light rises in the corner and breathes, the moon wakes and the words roll from Off to On. Click or press Space to flip it; left alone, it flips by itself.",
+    "description": "A dark, grained Focus widget with a moon and a switch. Turn it on and a violet and sky aurora rises in the corner, breathing and drifting; the moon lights up from inside and the words roll from Off to On. Click or press Space; left alone, it flips by itself.",
     "free": false
   },
   "agenda": {
     "title": "Day agenda",
-    "description": "Today on one card: the date big on the left, the events on the right. The next one gets a blue bar and a pill counting down. Click an event or use the arrow keys and both slide to it; hover one for its details. Left alone, it counts down and moves on.",
+    "description": "Today on one card: the date big on the left, events on the right, each in its calendar's colour. The next one gets a colour wash, a bar and a countdown pill. Click an event or use the arrow keys and they slide to it; hover for details. Left alone, it moves on.",
     "free": false
   },
   "stacked-bars": {
     "title": "Stacked bars",
-    "description": "A week of traffic as a widget: the total huge, seven tall bars on grey tracks, today's in blue. Point at a day and its bar splits into its sources while the number becomes that day's; point at a source to isolate it. Left alone, it walks the week.",
+    "description": "A week of traffic as a widget: the total huge, seven bars stacked by source (blue, coral, amber), today's in full colour. Point at a day and it lights up while the number becomes that day's; point at a source to isolate it. Left alone, it walks the week.",
     "free": false
   },
   "rolling-counter": {
     "title": "Rolling counter",
-    "description": "A step-count widget: the day's steps huge, how far to the goal under it, a thin blue line filling to it. Drag, scroll or flick the number and each digit rolls on its own reel. Left alone, it counts itself up a few dozen steps at a time.",
+    "description": "A step-count widget: the day's steps huge, the goal share in mint, a mint-to-sky line with a glowing tip, a coral streak flame. Drag, scroll or flick the number and each digit rolls on its own reel. Left alone, it counts itself up a few dozen at a time.",
     "free": false
   },
   "member-card": {
     "title": "Member card",
-    "description": "A sleek membership card that turns toward your pointer: it tilts in 3D, a soft light slides across its face and a 1px edge catches it. Left alone, it drifts through a slow figure-eight so the light keeps moving.",
+    "description": "A titanium-like membership card that turns toward your pointer: fine brushed grain, a holographic foil that slides through violet, sky, mint and coral with the tilt, an iridescent edge and chip. Left alone, it drifts in a slow figure-eight.",
     "free": false
   },
   "pay-button": {
     "title": "Pay button",
-    "description": "A black pill checkout button. Press it and it gives under your finger, a thin ring spins, closes into a check and the button turns blue: paid. It resets itself, and presses itself now and then when nobody is near.",
+    "description": "A black pill checkout button. Press it and it gives under your finger, a gradient ring spins, closes into a check and the button fills blue to violet from the centre, with a shine and a soft glow: paid. It resets, and presses itself when nobody is near.",
     "free": false
   },
   "swipe-deck": {
