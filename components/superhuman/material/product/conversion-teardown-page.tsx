@@ -223,7 +223,7 @@ export function ConversionTeardownPage() {
               ["The score", "Out of 20, each check with its evidence, and what the page already does well."],
               ["The fixes", "5 to 8, ranked by impact and effort, the before and after written out."],
               ["Three new first screens", "Headline, subhead and button, written three ways: outcome, edge, pain."],
-              ["The card", "Sized for X, with the page's first screen and numbered pins on what to fix."],
+              ["The cards", "A roast card with numbered pins on what to fix, and the score as a poster to share."],
             ].map(([k, v]) => (
               <li key={k} className="rounded-[1.1rem] border-[2.5px] border-[#0B0B0B] bg-white px-5 pb-5 pt-4">
                 <h3 className={`text-[1.3rem] leading-[1.1] ${DISPLAY}`}>{k}</h3>
@@ -231,6 +231,44 @@ export function ConversionTeardownPage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* 003b. MADE TO BE SHARED: the score as a poster, in the three shapes people post in. */}
+      <section aria-labelledby="ct-share" className="bg-[#0B0B0B] text-white">
+        <div className="mx-auto max-w-[80rem] px-5 pb-24 pt-20 sm:px-8 md:pb-32 md:pt-28">
+          <div className="grid grid-cols-1 items-end gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+            <h2 id="ct-share" className={`max-w-[12ch] text-[clamp(2.6rem,6.6vw,5.6rem)] leading-[0.92] ${DISPLAY}`}>
+              Your score, ready to <span style={{ color: YELLOW }}>post.</span>
+            </h2>
+            <p className="max-w-[40ch] text-pretty text-[1.1rem] font-medium leading-[1.5] text-white/70 md:pb-2">
+              Every teardown also draws the score as a poster, in three shapes: wide for X and LinkedIn, square for the
+              feed, tall for Stories. Drag one into a post, or ask Claude to put it on your clipboard.
+            </p>
+          </div>
+          <div className="mt-12 grid grid-cols-[9fr_5.06fr] items-end gap-3 sm:gap-5 md:mt-16 lg:grid-cols-[16fr_9fr_5.06fr]">
+            {(
+              [
+                ["wide", 1920, 1080, "Wide · X, LinkedIn", "col-span-2 lg:col-span-1"],
+                ["square", 1440, 1440, "Square · Instagram", ""],
+                ["story", 1080, 1920, "Tall · Stories", ""],
+              ] as const
+            ).map(([shape, w, h, label, span]) => (
+              <figure key={shape} className={span}>
+                <Image
+                  src={S(`share-${shape}-cal-v1.webp`)}
+                  alt={`The ${shape} poster for cal.com: ${EXAMPLES.cal.score} out of 20, "Good, with clear gaps", the ten checks, the page's first screen in a browser window, and the fix that matters most: "${EXAMPLES.cal.fix}".`}
+                  width={w}
+                  height={h}
+                  sizes={shape === "wide" ? "(min-width: 1024px) 42rem, 100vw" : "(min-width: 1024px) 24rem, 60vw"}
+                  className="block h-auto w-full rounded-[0.7rem]"
+                />
+                <figcaption className="mt-3">
+                  <Mono className="text-white/60">{label}</Mono>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 

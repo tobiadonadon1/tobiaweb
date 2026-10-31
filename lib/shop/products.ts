@@ -1389,6 +1389,7 @@ export const CONVERSION_TEARDOWN: Product = {
     ["references/fixes.md", "the fix patterns, by check and by kind of page"],
     ["scripts/capture.mjs", "opens the page on desktop and phone in your own Chrome and measures everything on it"],
     ["scripts/report.mjs", "checks every quote against the page, then draws the report and the score card"],
+    ["scripts/share.mjs", "draws the score as a poster to share: wide for X, square for the feed, tall for Stories"],
   ],
   steps: [
     "Unzip the folder.",
