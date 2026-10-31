@@ -588,8 +588,8 @@ export const BLOCKS: Block[] = [
       }
     ],
     "howItWorks": "/* one number, --lift (0 → 1 as you drag), moves the whole stack */\n.card {\n  --k: calc(var(--d) - var(--lift));   /* depth, minus how far the top card is gone */\n  transform: translateY(calc(var(--k) * -8px)) scale(calc(1 - var(--k) * .06));\n}\n// release: past the threshold, or a flick the same way, throws it\nconst flick = Math.abs(vx) > 0.55 && Math.sign(vx) === Math.sign(x);\nif (Math.abs(x) > threshold || flick) leave(dir, vx, vy); else springBack(vx, vy);",
-    "lines": 624,
-    "sha": "99ab4e0829fd523e"
+    "lines": 702,
+    "sha": "fb608961f1cb4f88"
   }, Component: B_swipe_deck },
   { ...{
     "slug": "album-stack",
