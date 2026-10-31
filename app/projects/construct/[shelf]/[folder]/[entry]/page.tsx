@@ -14,6 +14,7 @@ import { AppDesignerProPage } from "@/components/superhuman/material/product/app
 import { ViralMachinePage } from "@/components/superhuman/material/product/viral-machine-page";
 import { WebDesignerProPage } from "@/components/superhuman/material/product/web-designer-pro-page";
 import { MetaAdsPage } from "@/components/superhuman/material/product/meta-ads-page";
+import { ConversionTeardownPage } from "@/components/superhuman/material/product/conversion-teardown-page";
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { DuoDesignerPage } from "@/components/superhuman/material/product/duo-designer-page";
 import { VideoEditorPage } from "@/components/superhuman/material/product/video-editor-page";
@@ -169,6 +170,7 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "viral-machine": ViralMachinePage,
   "web-designer-pro": WebDesignerProPage,
   "meta-ads": MetaAdsPage,
+  "conversion-teardown": ConversionTeardownPage,
   "duo-designer": DuoDesignerPage,
   "video-editor": VideoEditorPage,
   "motion-designer": MotionDesignerPage,

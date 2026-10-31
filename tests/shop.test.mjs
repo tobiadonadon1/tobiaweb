@@ -74,6 +74,8 @@ const ONEK_ZIP = Buffer.from("PK\u0003\u0004 the 1k bot and the challenge " + "k
 writeFileSync(path.join(cwd, "private", "1k-bot.zip.enc"), seal(ONEK_ZIP, parseKey(fileKey)));
 const META_ADS_ZIP = Buffer.from("PK\u0003\u0004 the meta ads skills " + "a".repeat(3900));
 writeFileSync(path.join(cwd, "private", "meta-ads.zip.enc"), seal(META_ADS_ZIP, parseKey(fileKey)));
+const TEARDOWN_ZIP = Buffer.from("PK\u0003\u0004 the conversion teardown skill " + "t".repeat(3900));
+writeFileSync(path.join(cwd, "private", "conversion-teardown.zip.enc"), seal(TEARDOWN_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -272,7 +274,16 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(mad.instant, true);
   assert.equal(forSale(mad), false);
   assert.equal(mad.stripeProductId, "none");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "The Meta Ads Skill first, then the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  // Conversion Teardown: a free skill for Claude Code, downloading at once, first on Setups.
+  const ctd = productById("conversion-teardown");
+  assert.equal(ctd.href, entryHref("setups", "conversion-teardown"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "conversion-teardown")?.product, "conversion-teardown");
+  assert.equal(ctd.free, true);
+  assert.equal(ctd.instant, true);
+  assert.equal(ctd.file.attach, false);
+  assert.equal(forSale(ctd), false);
+  assert.equal(ctd.stripeProductId, "none");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Conversion Teardown first, then the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
@@ -1104,6 +1115,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["reel-bot"].bytes, REEL_MD.length);
   assert.equal(body.files["1k-bot"].bytes, ONEK_ZIP.length);
   assert.equal(body.files["meta-ads"].bytes, META_ADS_ZIP.length);
+  assert.equal(body.files["conversion-teardown"].bytes, TEARDOWN_ZIP.length);
   assert.equal(body.files["video-editor-pro"].bytes, VEP_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {

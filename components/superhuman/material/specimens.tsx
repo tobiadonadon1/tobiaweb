@@ -1116,6 +1116,35 @@ function MetaAds() {
   );
 }
 
+/**
+ * CONVERSION TEARDOWN — the score card, cut from paper: a signal-yellow card
+ * (the report's own colour) with a page's first screen on it, an ink pin
+ * marking the first fix, and the meter underneath: ten pairs of cells, the
+ * ones the page earned filled in ink. The colours are the page's
+ * (product/conversion-teardown-page.tsx).
+ */
+function ConversionTeardown() {
+  const earned = [2, 1, 2, 1, 1, 2, 1, 1, 1, 2];
+  return (
+    <>
+      <Cut d={CARD} x={66} y={80} s={0.86} sy={0.9} fill={SHADE} />
+      <Cut d={CARD} x={60} y={74} s={0.86} sy={0.9} fill="#FFDD1F" />
+      <Cut d={CARD} x={84} y={96} s={0.5} sy={0.46} fill="#faf8f2" />
+      <Cut d={BAR} x={98} y={116} s={0.34} sy={0.5} fill="#141413" />
+      <Cut d={BAR} x={98} y={138} s={0.24} sy={0.5} fill="#141413" opacity={0.55} />
+      <Cut d={BAR} x={98} y={166} s={0.16} sy={0.8} fill="#141413" />
+      <Cut d={DISC} x={86} y={108} s={0.14} fill="#141413" />
+      {earned.map((v, i) => (
+        <g key={i}>
+          <Cut d={CARD} x={84 + i * 21} y={226} s={0.06} sy={0.05} fill={v >= 2 ? "#141413" : "#FFDD1F"} />
+          <Cut d={CARD} x={84 + i * 21} y={244} s={0.06} sy={0.05} fill={v >= 1 ? "#141413" : "#FFDD1F"} />
+        </g>
+      ))}
+      <Cut d={CARD} x={248} y={98} s={0.24} sy={0.3} fill="#141413" />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1131,6 +1160,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "video-editor-pro": VideoEditorPro,
   "1k-bot": OneKBot,
   "meta-ads": MetaAds,
+  "conversion-teardown": ConversionTeardown,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,

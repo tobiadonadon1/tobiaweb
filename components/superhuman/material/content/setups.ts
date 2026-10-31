@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "conversion-teardown",
+    title: "Conversion Teardown",
+    kind: "setup",
+    summary: "Any landing page, scored out of 20 on 10 checks, with the fixes that would win more sign-ups written out and ready to paste.",
+    // Minutes from the download to the first teardown.
+    minutes: 5,
+    status: "ready",
+    when: "Your page gets visits but not sign-ups, or you want to see how a competitor's page holds up.",
+    level: "Anyone",
+    body: [],
+    product: "conversion-teardown",
+  },
+  {
     slug: "meta-ads",
     title: "Meta Ads Skill",
     kind: "setup",

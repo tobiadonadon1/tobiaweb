@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1358,6 +1358,61 @@ export const META_ADS: Product = {
   },
 };
 
+export const CONVERSION_TEARDOWN: Product = {
+  id: "conversion-teardown",
+  name: "Conversion Teardown",
+  description:
+    "A free skill for Claude Code: it scores any landing page out of 20 on 10 checks and writes the fixes that would win more sign-ups, with the new words ready to paste.",
+  priceCents: 0,
+  currency: "usd",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/conversion-teardown",
+  file: {
+    sealed: "conversion-teardown.zip.enc",
+    filename: "conversion-teardown.zip",
+    // The skill ships .mjs scripts, and Gmail refuses zips with scripts in them.
+    attach: false,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Conversion Teardown, free for Claude Code: paste any landing page, get a score out of 20 on 10 checks with the evidence quoted from the page, the fixes ranked with the new words written out, and a score card to post.",
+    kicker: "Skill · for Claude Code",
+    line: "Your landing page, out of 20.",
+    proof: "10 checks · every point quoted from the page",
+  },
+  contents: [
+    ["conversion-teardown/SKILL.md", "how Claude captures, scores and writes the fixes, from the link to the card"],
+    ["references/rubric.md", "the 10 checks and what earns 0, 1 or 2 on each"],
+    ["references/fixes.md", "the fix patterns, by check and by kind of page"],
+    ["scripts/capture.mjs", "opens the page on desktop and phone in your own Chrome and measures everything on it"],
+    ["scripts/report.mjs", "checks every quote against the page, then draws the report and the score card"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in it and type claude.",
+    "Type hi. Claude installs it; then type \"tear down\" and any link.",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code, type hi, then tear down any landing page.",
+    after: [
+      "Then, in any folder, type \"tear down\" and a link: yours, a competitor's, or a famous one like cal.com. About three minutes later you have the score, the evidence, the fixes written out and a card to post.",
+      "After that, ask it to fix the page in your code and score it again.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code, Node.js 18 or newer and Google Chrome or Microsoft Edge, on a Mac, Windows or Linux.",
+    next: [
+      ["Right after install", "Type \"tear down\" and any link. It photographs the page on desktop and phone, then scores it."],
+      ["About 3 minutes later", "The score out of 20, the 3 fixes to do this week, every fix with the new words, and the card."],
+      ["Then", "Ask it to fix the page in your code, rewrite the copy, or score every link in a reply thread."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1380,6 +1435,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "video-editor-pro": VIDEO_EDITOR_PRO,
   "1k-bot": ONE_K_BOT,
   "meta-ads": META_ADS,
+  "conversion-teardown": CONVERSION_TEARDOWN,
 };
 
 export function productById(id: unknown): Product | undefined {
