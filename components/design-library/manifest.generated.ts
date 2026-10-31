@@ -12,12 +12,12 @@ export const DESIGN_MANIFEST: Record<string, { title: string; description: strin
   },
   "now-playing": {
     "title": "Now playing",
-    "description": "A music widget with a drawn cover, the track, a scrubber and prev, play and next. Play and the time runs while the little equaliser moves; drag the scrubber to seek; skip between three tracks, each with its own cover. Left alone, it plays itself.",
+    "description": "A music widget with three painted covers, a scrubber and prev, play and next. Each track tints the player: the equaliser, the played part of the scrubber and a soft glow take its cover's colour. Drag to seek, skip between tracks. Left alone, it plays itself.",
     "free": false
   },
   "weather": {
     "title": "Weather",
-    "description": "A Lisbon weather card with the sun on its arc from sunrise to sunset. Drag the sun, or use the arrow keys, to scrub the day: the clock, the temperature and the sky's word follow it. Left alone, the sun drifts across the day and back.",
+    "description": "A Lisbon weather card where the light follows the sun. Drag it, or use the arrow keys: the sky behind the arc goes from morning blue to golden hour to a coral and violet dusk, and the clock, temperature and sky's word follow. Left alone, it plays the day.",
     "free": false
   },
   "batteries": {

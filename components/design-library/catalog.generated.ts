@@ -163,7 +163,7 @@ export const BLOCKS: Block[] = [
     "component": "NowPlaying",
     "title": "Now playing",
     "category": "Press",
-    "description": "A music widget with a drawn cover, the track, a scrubber and prev, play and next. Play and the time runs while the little equaliser moves; drag the scrubber to seek; skip between three tracks, each with its own cover. Left alone, it plays itself.",
+    "description": "A music widget with three painted covers, a scrubber and prev, play and next. Each track tints the player: the equaliser, the played part of the scrubber and a soft glow take its cover's colour. Drag to seek, skip between tracks. Left alone, it plays itself.",
     "free": false,
     "added": "2026-10-31",
     "order": 118,
@@ -190,7 +190,7 @@ export const BLOCKS: Block[] = [
         ]
       }
     ],
-    "howItWorks": "/* the equaliser: five 2px bars, each on its own beat; only while playing */\n.np-eq i { transform-origin: 50% 100%; transform: scaleY(var(--r)); }\n.np-eq i:nth-child(2) { --r: 1; --d: 700ms; --dl: -380ms; }\n.np[data-playing=\"true\"] .np-eq i {\n  animation: np-eq var(--d) ease-in-out var(--dl) infinite alternate;\n}\n@keyframes np-eq { from { transform: scaleY(.22) } to { transform: scaleY(1) } }\n/* autoplay pauses on pointerenter / keyboard focus, resumes 1.5s after leaving */",
+    "howItWorks": "/* each track carries its cover's main colour; the card just reads it */\n<div className=\"np\" style={{ \"--np-tint\": track.tint }}>\n.np-eq i, .np-fill { background: var(--np-tint); transition: background-color 700ms; }\n.np { box-shadow: …, 0 22px 48px -22px color-mix(in srgb, var(--np-tint) 55%, transparent); }\n/* covers are SVG: layered gradients, blur for haze, fractal noise for grain */\n<feTurbulence type=\"fractalNoise\" baseFrequency=\"1.9\" />\n<rect filter=\"url(#grain)\" style=\"mix-blend-mode: overlay\" />",
     "lines": 796,
     "sha": "cd92f36f22fb38a5"
   }, Component: B_now_playing },
@@ -199,7 +199,7 @@ export const BLOCKS: Block[] = [
     "component": "Weather",
     "title": "Weather",
     "category": "Drag",
-    "description": "A Lisbon weather card with the sun on its arc from sunrise to sunset. Drag the sun, or use the arrow keys, to scrub the day: the clock, the temperature and the sky's word follow it. Left alone, the sun drifts across the day and back.",
+    "description": "A Lisbon weather card where the light follows the sun. Drag it, or use the arrow keys: the sky behind the arc goes from morning blue to golden hour to a coral and violet dusk, and the clock, temperature and sky's word follow. Left alone, it plays the day.",
     "free": false,
     "added": "2026-10-31",
     "order": 117,
@@ -245,9 +245,9 @@ export const BLOCKS: Block[] = [
         ]
       }
     ],
-    "howItWorks": "// the arc is a half sine; the sun sits on it at t (0 = sunrise, 1 = sunset)\nconst at = (t) => ({ x: X0 + W * t, y: BASE - H * Math.sin(Math.PI * t) });\n// solid up to the sun, dotted after it (round caps on a 0-length dash = dots)\n<path d={arc(0, t)} stroke={accent} />\n<path d={arc(t, 1)} stroke=\"#c4c4bf\" strokeDasharray=\"0 5\" />\n// autoplay: t = (1 - cos φ) / 2, with φ recovered from wherever you left it\nlet φ = Math.acos(1 - 2 * t); if (dir < 0) φ = 2 * Math.PI - φ;",
+    "howItWorks": "// the sky band is one gradient whose colours are keyframed through the day\nconst L = lightAt(t); // horizon, upper sky, sun tone, glow\nbackground: linear-gradient(to bottom, transparent, ${L.upper}, ${L.horizon} 153px, …)\n// the sun walks a warm path round the colour wheel, not straight across it\nconst PATH = [sky, violet, coral, orange, amber, yellow];\nconst tone = pathAt(sunP(t)); // amber at golden hour, coral at sunset\n// the arc behind the sun: the two path colours before it, then the sun\n<linearGradient x1={X0} x2={sun.x}>…</linearGradient>",
     "lines": 543,
-    "sha": "c9ba4afa771e2c92"
+    "sha": "63bdf4f26ede435c"
   }, Component: B_weather },
   { ...{
     "slug": "batteries",
