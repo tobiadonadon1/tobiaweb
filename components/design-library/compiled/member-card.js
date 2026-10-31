@@ -1,139 +1,149 @@
 "use client";
 /* Construct · Design library: the compiled preview of "Member card". The source is for members. */
-import{useEffect as z,useRef as c}from"react";import{Fragment as R,jsx as n,jsxs as g}from"react/jsx-runtime";var a={rx:7,ry:-11,gx:22,gy:12};function C(h){let d=/^#?([0-9a-f]{6})$/i.exec(h.trim()),p=d?parseInt(d[1],16):728890,[x,b,f]=[p>>16&255,p>>8&255,p&255],l=(.2126*x+.7152*b+.0722*f)/255>.6,y=f>x+40&&f>150;return{light:l,ink:l?"#0b1f3a":"#faf8f2",a:"#e09a2b",b:"#d8452f",c:l?"#2b44c4":y?"#faf8f2":"#2b44c4"}}function D({name:h="Lena Fischer",tier:d="Ultimate",number:p="0412 2873 0019",since:x="Member since 2026",tone:b="#0b1f3a",glare:f=60}){let l=c(null),y=c(null),v=c({rx:{x:a.rx,v:0,t:a.rx},ry:{x:a.ry,v:0,t:a.ry},gx:{x:a.gx,v:0,t:a.gx},gy:{x:a.gy,v:0,t:a.gy},lift:{x:0,v:0,t:0}}),w=c(0),k=c(0),M=c(!1),u=C(b);z(()=>{let t=window.matchMedia("(prefers-reduced-motion: reduce)");M.current=t.matches;let r=()=>M.current=t.matches;return t.addEventListener("change",r),()=>{t.removeEventListener("change",r),cancelAnimationFrame(w.current)}},[]);let S=()=>{let t=l.current;if(!t)return;let{rx:r,ry:e,gx:o,gy:i,lift:s}=v.current;t.style.setProperty("--rx",`${r.x.toFixed(2)}deg`),t.style.setProperty("--ry",`${e.x.toFixed(2)}deg`),t.style.setProperty("--gx",`${o.x.toFixed(1)}%`),t.style.setProperty("--gy",`${i.x.toFixed(1)}%`),t.style.setProperty("--lift",s.x.toFixed(3)),t.style.setProperty("--tx",r.x.toFixed(2)),t.style.setProperty("--ty",e.x.toFixed(2))},N=t=>{let r=Math.min(.05,(t-k.current)/1e3);k.current=t;let e=v.current;for(;r>0;){let i=Math.min(r,.004166666666666667);r-=i;for(let[s,F,T]of[[e.rx,120,14],[e.ry,120,14],[e.gx,140,24],[e.gy,140,24],[e.lift,160,22]])s.v+=(F*(s.t-s.x)-T*s.v)*i,s.x+=s.v*i}S();let o=Object.values(e).some(i=>Math.abs(i.v)>.01||Math.abs(i.t-i.x)>.01);w.current=o?requestAnimationFrame(N):0},$=()=>{w.current||(k.current=performance.now(),w.current=requestAnimationFrame(N))},P=(t,r)=>{let{rx:e,ry:o,gx:i,gy:s,lift:F}=v.current;t=Math.max(-1,Math.min(1,t)),r=Math.max(-1,Math.min(1,r)),e.t=M.current?a.rx:-r*13,o.t=M.current?a.ry:t*17,i.t=50+t*46,s.t=50+r*46,F.t=1,$()},A=t=>{let r=y.current?.getBoundingClientRect();r&&P((t.clientX-r.left)/r.width*2-1,(t.clientY-r.top)/r.height*2-1)},m=()=>{let{rx:t,ry:r,gx:e,gy:o,lift:i}=v.current;t.t=a.rx,r.t=a.ry,e.t=a.gx,o.t=a.gy,i.t=0,$()},E=c({x:0,y:0});return g(R,{children:[n("style",{children:L}),g("div",{ref:l,className:"tc","data-light":u.light,style:{"--tone":b,"--fg":u.ink,"--pa":u.a,"--pb":u.b,"--pc":u.c,"--glare":Math.max(0,Math.min(100,f))/100,"--rx":`${a.rx}deg`,"--ry":`${a.ry}deg`,"--gx":`${a.gx}%`,"--gy":`${a.gy}%`},onPointerMove:t=>{t.pointerType==="touch"&&t.buttons===0||A(t)},onPointerDown:t=>t.pointerType==="touch"&&A(t),onPointerUp:t=>t.pointerType==="touch"&&m(),onPointerCancel:m,onPointerLeave:m,children:[n("span",{className:"tc-shadow","aria-hidden":!0}),g("div",{ref:y,className:"tc-card",tabIndex:0,role:"group","aria-roledescription":"membership card","aria-label":`Construct ${d} membership card. ${h}, number ${p}. ${x}.`,onFocus:t=>{t.currentTarget.matches(":focus-visible")&&(E.current={x:.55,y:-.45},P(.55,-.45))},onBlur:m,onKeyDown:t=>{let e=E.current;if(t.key==="ArrowLeft")e.x=Math.max(-1,e.x-.25);else if(t.key==="ArrowRight")e.x=Math.min(1,e.x+.25);else if(t.key==="ArrowUp")e.y=Math.max(-1,e.y-.25);else if(t.key==="ArrowDown")e.y=Math.min(1,e.y+.25);else if(t.key==="Escape"){m();return}else return;t.preventDefault(),P(e.x,e.y)},children:[n("span",{className:"tc-face","aria-hidden":!0,children:n("svg",{viewBox:"0 0 320 202",children:n("circle",{cx:"320",cy:"202",r:"96",fill:"var(--pb)"})})}),n("svg",{className:"tc-paper tc-z2",viewBox:"0 0 320 202","aria-hidden":!0,children:n("circle",{cx:"262",cy:"64",r:"38",fill:"var(--pa)"})}),n("svg",{className:"tc-paper tc-z3",viewBox:"0 0 320 202","aria-hidden":!0,children:n("path",{d:"M196 150 V118 A22 22 0 0 1 240 118 V150 Z",fill:"var(--pc)"})}),g("span",{className:"tc-words","aria-hidden":!0,children:[g("span",{className:"tc-brand",children:[n("svg",{width:"18",height:"18",viewBox:"0 0 18 18",children:n("path",{d:"M9 1.5a7.5 7.5 0 1 0 6.9 10.4h-4.2A3.6 3.6 0 1 1 11.7 6h4.2A7.5 7.5 0 0 0 9 1.5Z",fill:"currentColor"})}),"Construct"]}),g("span",{className:"tc-row",children:[n("span",{className:"tc-tier",children:d}),n("span",{className:"tc-since",children:x})]}),n("span",{className:"tc-name",children:h}),n("span",{className:"tc-num",children:p})]}),n("span",{className:"tc-glare","aria-hidden":!0})]})]})]})}var L=`
-.tc {
-  --tone: #0b1f3a;
-  --fg: #faf8f2;
-  --rx: 7deg; --ry: -11deg; --gx: 22%; --gy: 12%; --lift: 0;
-  --tx: 7; --ty: -11;
+import{useEffect as q,useRef as a}from"react";import{Fragment as ee,jsx as o,jsxs as d}from"react/jsx-runtime";var c={rx:6,ry:-10},F={rx:12,ry:16},V=8,H=(f,y)=>({gx:50+y/F.ry*48,gy:50-f/F.rx*48});function W({name:f="Lena Fischer",tier:y="Pro",number:A="0412 2873 0019",since:S="since 2026",label:R="Member",finish:U="black",glare:Z=50,autoplay:N=!0}){let b=a(null),C=a(null),m=H(c.rx,c.ry),v=a({rx:{x:c.rx,v:0,t:c.rx},ry:{x:c.ry,v:0,t:c.ry},gx:{x:m.gx,v:0,t:m.gx},gy:{x:m.gy,v:0,t:m.gy},lift:{x:0,v:0,t:0}}),u=a(0),$=a(0),x=a(!1),D=a(N),O=a(!1),w=a(!1),k=a(!1),M=a(0),E=a(!1),I=a(0),p=a(0),G=()=>D.current&&O.current&&!x.current&&!w.current&&!k.current&&!E.current,J=()=>{let e=b.current;if(!e)return;let{rx:r,ry:t,gx:i,gy:l,lift:n}=v.current;e.style.setProperty("--mc-rx",`${r.x.toFixed(2)}deg`),e.style.setProperty("--mc-ry",`${t.x.toFixed(2)}deg`),e.style.setProperty("--mc-gx",`${i.x.toFixed(1)}%`),e.style.setProperty("--mc-gy",`${l.x.toFixed(1)}%`),e.style.setProperty("--mc-lift",n.x.toFixed(3)),e.style.setProperty("--mc-tx",r.x.toFixed(2)),e.style.setProperty("--mc-ty",t.x.toFixed(2))},X=e=>{let r=Math.min(.05,(e-$.current)/1e3);$.current=e;let t=v.current,i=G();if(i){p.current=Math.min(1,p.current+r/1.6),I.current+=r;let n=p.current*p.current*(3-2*p.current),s=I.current/V*Math.PI*2,P=c.rx*(1-n)+Math.sin(s*2)*7*n,T=c.ry*(1-n)+Math.sin(s)*13*n,j=H(P,T);t.rx.t=P,t.ry.t=T,t.gx.t=j.gx,t.gy.t=j.gy,t.lift.t=.35*n}else p.current=0;for(;r>0;){let n=Math.min(r,.004166666666666667);r-=n;for(let[s,P,T]of[[t.rx,120,15],[t.ry,120,15],[t.gx,140,24],[t.gy,140,24],[t.lift,160,24]])s.v+=(P*(s.t-s.x)-T*s.v)*n,s.x+=s.v*n}J();let l=Object.values(t).some(n=>Math.abs(n.v)>.01||Math.abs(n.t-n.x)>.01);u.current=i||l?requestAnimationFrame(X):0},g=()=>{u.current||($.current=performance.now(),u.current=requestAnimationFrame(X))};q(()=>{D.current=N,g()},[N]),q(()=>{let e=window.matchMedia("(prefers-reduced-motion: reduce)");x.current=e.matches;let r=()=>{x.current=e.matches,g()};e.addEventListener("change",r);let t=new IntersectionObserver(([i])=>{O.current=i.isIntersecting,g()});return b.current&&t.observe(b.current),()=>{e.removeEventListener("change",r),t.disconnect(),clearTimeout(M.current),cancelAnimationFrame(u.current),u.current=0}},[]);let z=()=>{clearTimeout(M.current),E.current=!0},B=()=>{clearTimeout(M.current),!(w.current||k.current)&&(M.current=window.setTimeout(()=>{E.current=!1,g()},1500))},L=(e,r)=>{let{rx:t,ry:i,gx:l,gy:n,lift:s}=v.current;e=Math.max(-1,Math.min(1,e)),r=Math.max(-1,Math.min(1,r)),t.t=x.current?c.rx:-r*F.rx,i.t=x.current?c.ry:e*F.ry,l.t=50+e*48,n.t=50+r*48,s.t=1,g()},K=e=>{let r=C.current?.getBoundingClientRect();r&&L((e.clientX-r.left)/r.width*2-1,(e.clientY-r.top)/r.height*2-1)},h=()=>{let{rx:e,ry:r,gx:t,gy:i,lift:l}=v.current;e.t=c.rx,r.t=c.ry,t.t=m.gx,i.t=m.gy,l.t=0,g()},Y=a({x:0,y:0}),Q=Math.max(0,Math.min(100,Z))/100;return d(ee,{children:[o("style",{children:_}),d("div",{ref:b,className:"mc","data-finish":U==="white"?"white":"black",style:{"--mc-glare":Q,"--mc-rx":`${c.rx}deg`,"--mc-ry":`${c.ry}deg`,"--mc-gx":`${m.gx}%`,"--mc-gy":`${m.gy}%`},onPointerEnter:()=>{w.current=!0,z()},onPointerLeave:()=>{w.current=!1,h(),B()},onPointerMove:e=>{e.pointerType==="touch"&&e.buttons===0||K(e)},onPointerDown:e=>e.pointerType==="touch"&&K(e),onPointerUp:e=>e.pointerType==="touch"&&h(),onPointerCancel:h,onFocus:()=>{k.current=!0,z()},onBlur:e=>{e.currentTarget.contains(e.relatedTarget)||(k.current=!1,B())},children:[o("span",{className:"mc-shadow","aria-hidden":!0}),d("div",{ref:C,className:"mc-card",tabIndex:0,role:"group","aria-roledescription":"membership card","aria-label":`${y} ${R.toLowerCase()} card. ${f}, number ${A}, ${S}.`,onFocus:e=>{e.currentTarget.matches(":focus-visible")&&(Y.current={x:.5,y:-.4},L(.5,-.4))},onBlur:h,onKeyDown:e=>{let t=Y.current;if(e.key==="ArrowLeft")t.x=Math.max(-1,t.x-.25);else if(e.key==="ArrowRight")t.x=Math.min(1,t.x+.25);else if(e.key==="ArrowUp")t.y=Math.max(-1,t.y-.25);else if(e.key==="ArrowDown")t.y=Math.min(1,t.y+.25);else if(e.key==="Escape"){h();return}else return;e.preventDefault(),L(t.x,t.y)},children:[o("span",{className:"mc-glare","aria-hidden":!0}),d("span",{className:"mc-words","aria-hidden":!0,children:[o("span",{className:"mc-top",children:d("span",{className:"mc-label",children:[o("i",{className:"mc-dot"}),R]})}),o("span",{className:"mc-tier",children:y}),o("span",{className:"mc-name",children:f}),d("span",{className:"mc-foot",children:[o("span",{children:A}),o("span",{children:S})]})]}),o("span",{className:"mc-edge","aria-hidden":!0})]})]})]})}var _=`
+.mc {
+  --mc-bg: #111111;
+  --mc-fg: #ffffff;
+  --mc-dim: rgba(255, 255, 255, 0.5);
+  --mc-blue: #3d3df5;
+  --mc-spec: 255, 255, 255;
+  --mc-spec-k: 0.2;
+  --mc-edge-base: rgba(255, 255, 255, 0.07);
+  --mc-edge-hi: rgba(255, 255, 255, 0.55);
+  --mc-shade: 0, 0, 0;
+  --mc-shade-k: 0.34;
+  --mc-rx: 6deg; --mc-ry: -10deg; --mc-gx: 20%; --mc-gy: 25%; --mc-lift: 0;
+  --mc-tx: 6; --mc-ty: -10;
   position: relative;
   display: grid;
   place-items: center;
-  padding: 44px 40px;
-  perspective: 900px;
+  padding: 40px 30px;
+  perspective: 1000px;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
 }
+.mc[data-finish="white"] {
+  --mc-bg: #f8f8f6;
+  --mc-fg: #111111;
+  --mc-dim: #8a8a8a;
+  --mc-edge-base: rgba(17, 17, 17, 0.07);
+  --mc-edge-hi: rgba(255, 255, 255, 1);
+  --mc-shade-k: 0.14;
+}
 
-/* The shadow on the table: it slides opposite to the tilt and spreads as the card lifts. */
-.tc-shadow {
+/* The shadow on the table: slides opposite the tilt and softens as the card lifts. */
+.mc-shadow {
   position: absolute; left: 50%; top: 50%;
-  width: 290px; height: 170px;
-  margin: -85px 0 0 -145px;
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--tone) 55%, #0b1f3a);
-  opacity: calc(.5 - var(--lift) * .1);
-  filter: blur(calc(14px + var(--lift) * 8px));
+  width: 300px; height: 176px;
+  margin: -88px 0 0 -150px;
+  border-radius: 28px;
+  background: rgb(var(--mc-shade));
+  opacity: calc(var(--mc-shade-k) - var(--mc-lift) * 0.06);
+  filter: blur(calc(18px + var(--mc-lift) * 8px));
   transform:
-    translate(calc(var(--ty) * -1.2px), calc(var(--tx) * 1.2px + 18px + var(--lift) * 10px))
-    scale(calc(.92 + var(--lift) * .04));
+    translate(calc(var(--mc-ty) * -1px), calc(var(--mc-tx) * 1px + 20px + var(--mc-lift) * 8px))
+    scale(calc(0.94 + var(--mc-lift) * 0.03));
   pointer-events: none;
 }
-.tc[data-light="true"] .tc-shadow { background: #0b1f3a; opacity: calc(.22 - var(--lift) * .04); }
 
-.tc-card {
+.mc-card {
   position: relative;
-  width: 320px;
-  height: 202px;
-  border-radius: 18px;
-  transform-style: preserve-3d;
-  transform: rotateX(var(--rx)) rotateY(var(--ry)) translateZ(calc(var(--lift) * 14px));
-  color: var(--fg);
+  width: 340px;
+  max-width: calc(100vw - 48px);
+  aspect-ratio: 340 / 214;
+  border-radius: 20px;
+  background: var(--mc-bg);
+  color: var(--mc-fg);
+  transform: rotateX(var(--mc-rx)) rotateY(var(--mc-ry)) translateZ(calc(var(--mc-lift) * 10px));
+  box-shadow:
+    0 1px 1px rgba(var(--mc-shade), 0.06),
+    0 2px 6px rgba(var(--mc-shade), 0.06);
   outline: none;
   cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
-.tc-card:focus-visible { outline: 2px solid var(--tone); outline-offset: 5px; }
-.tc[data-light="true"] .tc-card:focus-visible { outline-color: #0b1f3a; }
+.mc-card:focus-visible { outline: 2px solid var(--mc-blue); outline-offset: 5px; }
 
-.tc-face {
+.mc-words {
   position: absolute; inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-  background:
-    radial-gradient(140% 120% at 0% 0%, rgba(255,255,255,.10), transparent 55%),
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.10)),
-    var(--tone);
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.14),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -1px 0 rgba(0,0,0,.25);
-}
-.tc-face svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.tc[data-light="true"] .tc-face {
-  background:
-    radial-gradient(140% 120% at 0% 0%, rgba(255,255,255,.7), transparent 55%),
-    linear-gradient(180deg, rgba(255,255,255,0), rgba(11,31,58,.05)),
-    var(--tone);
-  box-shadow: inset 0 0 0 1px rgba(11,31,58,.12), inset 0 1px 0 #fff;
-}
-
-/* Depth: each layer floats at its own height above the card. */
-.tc-paper {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  overflow: visible;
-  pointer-events: none;
-  filter: drop-shadow(0 3px 3px rgba(0,0,0,.22));
-}
-.tc-z2 { transform: translateZ(22px); filter: drop-shadow(0 5px 5px rgba(0,0,0,.25)); }
-.tc-z3 { transform: translateZ(36px); filter: drop-shadow(0 6px 6px rgba(0,0,0,.28)); }
-.tc[data-light="true"] .tc-paper { filter: drop-shadow(0 3px 3px rgba(11,31,58,.18)); }
-
-.tc-words {
-  position: absolute; inset: 0;
-  padding: 20px 22px;
+  padding: 20px 22px 19px;
   display: grid;
   grid-template-rows: auto auto 1fr auto auto;
-  justify-items: start;
-  transform: translateZ(16px);
   pointer-events: none;
 }
-.tc-brand {
+.mc-top { display: flex; justify-content: space-between; align-items: center; }
+.mc-label {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: 15px; font-weight: 650; letter-spacing: -0.01em;
+  font-size: 12.5px; font-weight: 450; letter-spacing: -0.005em;
+  color: var(--mc-dim);
 }
-.tc-row { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
-.tc-since { font-size: 10.5px; opacity: .66; white-space: nowrap; }
-.tc-tier {
-  padding: 3px 8px 3px;
-  border-radius: 999px;
-  font: 600 9.5px/1.2 ui-monospace, "SF Mono", Menlo, monospace;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--tone);
-  background: var(--fg);
+.mc-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--mc-blue);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mc-blue) 18%, transparent);
 }
-.tc-name {
+.mc-tier {
+  margin-top: 12px;
+  font-size: 46px; font-weight: 400; line-height: 1;
+  letter-spacing: -0.045em;
+  margin-left: -2px;
+}
+.mc-name {
   grid-row: 4;
-  font-size: 17px; font-weight: 600; letter-spacing: -0.015em;
-  white-space: nowrap;
+  font-size: 15px; font-weight: 500; letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.tc-num {
+.mc-foot {
   grid-row: 5;
-  margin-top: 5px;
-  font-size: 11px;
-  opacity: .72;
-  white-space: nowrap;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  margin-top: 7px;
+  display: flex; justify-content: space-between; gap: 12px;
+  font: 400 11px/1.2 ui-monospace, "SF Mono", Menlo, monospace;
   font-variant-numeric: tabular-nums;
-  letter-spacing: .06em;
+  letter-spacing: 0.04em;
+  color: var(--mc-dim);
+  white-space: nowrap;
 }
 
-/* The glare: a soft spot plus a faint band, both riding on --gx/--gy. */
-.tc-glare {
+/* The light: one soft specular spot that rides on --mc-gx/--mc-gy. */
+.mc-glare {
   position: absolute; inset: 0;
   border-radius: inherit;
-  transform: translateZ(1px);
   pointer-events: none;
-  opacity: calc(var(--glare) * (.7 + var(--lift) * .3));
-  background:
-    radial-gradient(circle at var(--gx) var(--gy), rgba(255,255,255,.55), rgba(255,255,255,.14) 30%, transparent 58%),
-    linear-gradient(115deg, transparent calc(var(--gx) - 30%), rgba(255,255,255,.10) var(--gx), transparent calc(var(--gx) + 30%));
+  opacity: calc(var(--mc-glare) * (0.75 + var(--mc-lift) * 0.25));
+  background: radial-gradient(
+    75% 95% at var(--mc-gx) var(--mc-gy),
+    rgba(var(--mc-spec), var(--mc-spec-k)),
+    rgba(var(--mc-spec), calc(var(--mc-spec-k) * 0.35)) 38%,
+    rgba(var(--mc-spec), 0) 72%
+  );
+}
+/* On the light finish a white spot can't show, so the far side dims instead. */
+.mc[data-finish="white"] .mc-glare {
+  background: radial-gradient(
+    120% 150% at var(--mc-gx) var(--mc-gy),
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0) 45%,
+    rgba(17, 17, 17, 0.07) 100%
+  );
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tc-card { transform: rotateX(7deg) rotateY(-11deg); }
-  .tc-shadow { transform: translate(10px, 28px) scale(.92); }
+/* The edge: a 1px ring, brightest on the side the light is on (masked to the border). */
+.mc-edge {
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 80% at var(--mc-gx) var(--mc-gy), var(--mc-edge-hi), transparent 70%),
+    linear-gradient(var(--mc-edge-base), var(--mc-edge-base));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
-`;export{D as default};
+.mc[data-finish="black"] .mc-edge { opacity: calc(0.35 + var(--mc-glare) * 0.65); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-card { transform: rotateX(6deg) rotateY(-10deg); }
+  .mc-shadow { transform: translate(10px, 26px) scale(0.94); }
+}
+`;export{W as default};
