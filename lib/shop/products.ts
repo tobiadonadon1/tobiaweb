@@ -1388,7 +1388,7 @@ export const CONVERSION_TEARDOWN: Product = {
     ["references/rubric.md", "the 10 checks and what earns 0, 1 or 2 on each"],
     ["references/fixes.md", "the fix patterns, by check and by kind of page"],
     ["scripts/capture.mjs", "opens the page on desktop and phone in your own Chrome and measures everything on it"],
-    ["scripts/report.mjs", "checks every quote against the page, then draws the report and the score card"],
+    ["scripts/report.mjs", "checks every quote against the page, then draws the report, the score card and the share step: the posters and the post, ready to copy"],
     ["scripts/share.mjs", "draws the score as a poster to share: wide for X, square for the feed, tall for Stories"],
   ],
   steps: [

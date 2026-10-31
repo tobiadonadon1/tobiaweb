@@ -242,8 +242,8 @@ export function ConversionTeardownPage() {
               Your score, ready to <span style={{ color: YELLOW }}>post.</span>
             </h2>
             <p className="max-w-[40ch] text-pretty text-[1.1rem] font-medium leading-[1.5] text-white/70 md:pb-2">
-              Every teardown also draws the score as a poster, in three shapes: wide for X and LinkedIn, square for the
-              feed, tall for Stories. Drag one into a post, or ask Claude to put it on your clipboard.
+              Every teardown ends with the score as a poster, in three shapes (wide for X and LinkedIn, square for the
+              feed, tall for Stories) and the post already written. Copy the words, add the poster, publish.
             </p>
           </div>
           <div className="mt-12 grid grid-cols-[9fr_5.06fr] items-end gap-3 sm:gap-5 md:mt-16 lg:grid-cols-[16fr_9fr_5.06fr]">
