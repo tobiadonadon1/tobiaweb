@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1414,6 +1414,70 @@ export const CONVERSION_TEARDOWN: Product = {
   },
 };
 
+/**
+ * MASCOT DESIGNER (2026-11-01): a free skill for Claude Code that designs a
+ * mascot for an iPhone, iPad, Mac app or a website, from what the app stands
+ * for, and ships it: 9 poses, the same mastered moves in SwiftUI and on the
+ * web, an Xcode asset catalog, a character sheet and a film. Drawn with the
+ * person's own OpenAI account; without one, it starts from 20 ready-made
+ * mascots (public/mascot-library, downloaded by the skill when used).
+ */
+export const MASCOT_DESIGNER: Product = {
+  id: "mascot-designer",
+  name: "Mascot Designer",
+  description:
+    "A free skill for Claude Code that designs a mascot for your app, with a reason to exist, and ships it: every pose, every move in SwiftUI and on the web, a character sheet and a film.",
+  priceCents: 0,
+  currency: "usd",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/mascot-designer",
+  file: {
+    sealed: "mascot-designer.zip.enc",
+    filename: "mascot-designer.zip",
+    // The skill ships .mjs scripts, and Gmail refuses zips with scripts in them.
+    attach: false,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Mascot Designer, free for Claude Code: it designs a mascot from what your app stands for, draws every pose, and ships the moves for SwiftUI and the web, with a film of it living in your app.",
+    kicker: "Skill · for Claude Code",
+    line: "A mascot with a reason to exist.",
+    proof: "9 poses · 9 moves · SwiftUI and web · a film",
+  },
+  contents: [
+    ["mascot-designer/SKILL.md", "the interview, the character brief, the concepts, the poses, the kit and the film, step by step"],
+    ["references/character.md", "how a mascot gets its meaning: the idea, shape language, colour, personality, the name"],
+    ["references/styles.md", "the six looks and when to choose each: soft clay, plush, fuzzy, designer toy, flat line, retro sticker"],
+    ["runtime/motion.json", "the moves, mastered once: one file that drives both the SwiftUI view and the web element"],
+    ["scripts/make.mjs", "draws the concepts and every pose with your OpenAI account, then cleans and lines them up"],
+    ["scripts/library.mjs", "the 20 ready-made mascots: matched to your app, renamed and recoloured to your brand"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in it and type claude.",
+    "Type hi. Claude installs it; then, in your app's folder, type \"make a mascot for my app\".",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code, type hi, then ask for a mascot.",
+    after: [
+      "Then, in your app's folder, type \"make a mascot for my app\". It asks four quick questions, designs the character, and shows you three concepts to pick from.",
+      "About ten minutes later you have the film, the character sheet, and the files for Xcode and the web.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code and Node.js 18 or newer, on a Mac, Windows or Linux. For a one-of-a-kind mascot, an OpenAI account (an API key, or ChatGPT through the Codex app); without one it starts from 20 ready-made mascots.",
+    next: [
+      ["Right after install", "In your app's folder, type \"make a mascot for my app\". Four quick questions, then three concepts."],
+      ["About ten minutes later", "Every pose, the film of it in an iPhone and a Mac app, the character sheet, and the files for Xcode and the web."],
+      ["Then", "Ask it to put the mascot in your app: onboarding, empty states, loading, success, errors."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1437,6 +1501,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "1k-bot": ONE_K_BOT,
   "meta-ads": META_ADS,
   "conversion-teardown": CONVERSION_TEARDOWN,
+  "mascot-designer": MASCOT_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

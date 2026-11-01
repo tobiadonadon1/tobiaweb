@@ -1145,6 +1145,33 @@ function ConversionTeardown() {
   );
 }
 
+/**
+ * MASCOT DESIGNER — a mascot cut from paper: a round coral body (Penny's
+ * colour, the page's hero), two ink eyes set low and wide for warmth, a
+ * sprout of two leaves on top, stubby feet, and confetti flecks in the
+ * page's candy colours (product/mascot-designer-page.tsx).
+ */
+function MascotDesigner() {
+  return (
+    <>
+      <Cut d={DISC} x={88} y={86} s={1.18} sy={1.1} fill={SHADE} />
+      <Cut d={FLECK} x={112} y={214} s={1.2} sy={0.8} fill="#d9543a" />
+      <Cut d={FLECK} x={176} y={214} s={1.2} sy={0.8} fill="#d9543a" />
+      <Cut d={DISC} x={82} y={80} s={1.18} sy={1.1} fill="#FF7A59" />
+      <Cut d={DISC} x={120} y={150} s={0.11} fill="#2B1640" />
+      <Cut d={DISC} x={186} y={150} s={0.11} fill="#2B1640" />
+      <Cut d={DISC} x={104} y={172} s={0.16} sy={0.1} fill="#ffb3a1" />
+      <Cut d={DISC} x={196} y={172} s={0.16} sy={0.1} fill="#ffb3a1" />
+      <Cut d={WEDGE} x={160} y={88} s={0.42} sy={0.3} rotate={-118} fill="#5aa33f" />
+      <Cut d={WEDGE} x={160} y={86} s={0.42} sy={0.3} rotate={-62} fill="#74bf4f" />
+      <Cut d={FLECK} x={40} y={70} s={0.5} rotate={20} fill="#FFD84D" />
+      <Cut d={FLECK} x={262} y={96} s={0.45} rotate={-30} fill="#7BD4FF" />
+      <Cut d={FLECK} x={250} y={40} s={0.38} rotate={50} fill="#C9B2FF" />
+      <Cut d={FLECK} x={52} y={128} s={0.34} rotate={-10} fill="#8BE3B0" />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1161,6 +1188,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "1k-bot": OneKBot,
   "meta-ads": MetaAds,
   "conversion-teardown": ConversionTeardown,
+  "mascot-designer": MascotDesigner,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,

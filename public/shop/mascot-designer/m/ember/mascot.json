@@ -1,0 +1,27 @@
+{
+  "name": "Ember",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5003,
+    "top": 0.3018,
+    "left": 0.3066,
+    "right": 0.7109
+  },
+  "shadow": {
+    "w": 0.3154
+  },
+  "colours": {
+    "body": "#f9912e",
+    "ink": "#37281b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#f9912e",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

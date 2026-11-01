@@ -1,0 +1,27 @@
+{
+  "name": "Chatty",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5003,
+    "top": 0.3018,
+    "left": 0.2207,
+    "right": 0.7783
+  },
+  "shadow": {
+    "w": 0.3957
+  },
+  "colours": {
+    "body": "#f52b1f",
+    "ink": "#371c1b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#f52b1f",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

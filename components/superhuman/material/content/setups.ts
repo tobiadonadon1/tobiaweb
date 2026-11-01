@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "mascot-designer",
+    title: "Mascot Designer",
+    kind: "setup",
+    summary: "A mascot for your app with a reason to exist: designed from what it stands for, every pose drawn, every move ready for SwiftUI and the web, and a film of it in your app.",
+    // Minutes from the download to the finished mascot and its film.
+    minutes: 15,
+    status: "ready",
+    when: "Your app needs a face: for onboarding, empty states, loading, wins and errors, or a brand people remember.",
+    level: "Anyone",
+    body: [],
+    product: "mascot-designer",
+  },
+  {
     slug: "conversion-teardown",
     title: "Conversion Teardown",
     kind: "setup",

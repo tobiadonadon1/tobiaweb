@@ -57,6 +57,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "1k-bot": { a: "#f2cd6b", b: "#f6f3ea", added: "2026-10-29" },
   "meta-ads": { a: "#f0a487", b: "#f6f1e8", added: "2026-10-30" },
   "conversion-teardown": { a: "#f5d84a", b: "#f7f4e6", added: "2026-10-31" },
+  "mascot-designer": { a: "#ff9e7a", b: "#fff4e6", added: "2026-11-01" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

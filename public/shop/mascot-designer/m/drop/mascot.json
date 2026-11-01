@@ -1,0 +1,27 @@
+{
+  "name": "Drop",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5007,
+    "top": 0.3018,
+    "left": 0.2471,
+    "right": 0.7539
+  },
+  "shadow": {
+    "w": 0.3953
+  },
+  "colours": {
+    "body": "#69c6ee",
+    "ink": "#1b2f37",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#69c6ee",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Luna",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5004,
+    "top": 0.3018,
+    "left": 0.2432,
+    "right": 0.9316
+  },
+  "shadow": {
+    "w": 0.494
+  },
+  "colours": {
+    "body": "#232446",
+    "ink": "#1b1b37",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#232446",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Toasty",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5004,
+    "top": 0.3008,
+    "left": 0.2305,
+    "right": 0.7988
+  },
+  "shadow": {
+    "w": 0.4433
+  },
+  "colours": {
+    "body": "#df9640",
+    "ink": "#372a1b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#df9640",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

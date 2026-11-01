@@ -1,0 +1,27 @@
+{
+  "name": "Bagsy",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5001,
+    "top": 0.3018,
+    "left": 0.2393,
+    "right": 0.7402
+  },
+  "shadow": {
+    "w": 0.366
+  },
+  "colours": {
+    "body": "#f8f2e7",
+    "ink": "#372d1b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#f8f2e7",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

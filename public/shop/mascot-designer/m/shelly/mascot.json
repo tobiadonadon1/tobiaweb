@@ -1,0 +1,27 @@
+{
+  "name": "Shelly",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5003,
+    "top": 0.3008,
+    "left": 0.293,
+    "right": 0.7207
+  },
+  "shadow": {
+    "w": 0.3336
+  },
+  "colours": {
+    "body": "#7caf8f",
+    "ink": "#1b3725",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#7caf8f",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

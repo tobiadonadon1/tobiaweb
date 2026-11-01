@@ -76,6 +76,8 @@ const META_ADS_ZIP = Buffer.from("PK\u0003\u0004 the meta ads skills " + "a".rep
 writeFileSync(path.join(cwd, "private", "meta-ads.zip.enc"), seal(META_ADS_ZIP, parseKey(fileKey)));
 const TEARDOWN_ZIP = Buffer.from("PK\u0003\u0004 the conversion teardown skill " + "t".repeat(3900));
 writeFileSync(path.join(cwd, "private", "conversion-teardown.zip.enc"), seal(TEARDOWN_ZIP, parseKey(fileKey)));
+const MASCOT_ZIP = Buffer.from("PK\u0003\u0004 the mascot designer skill " + "o".repeat(3900));
+writeFileSync(path.join(cwd, "private", "mascot-designer.zip.enc"), seal(MASCOT_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -283,7 +285,16 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(ctd.file.attach, false);
   assert.equal(forSale(ctd), false);
   assert.equal(ctd.stripeProductId, "none");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Conversion Teardown first, then the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  // Mascot Designer: a free skill for Claude Code, downloading at once, first on Setups.
+  const mascotD = productById("mascot-designer");
+  assert.equal(mascotD.href, entryHref("setups", "mascot-designer"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "mascot-designer")?.product, "mascot-designer");
+  assert.equal(mascotD.free, true);
+  assert.equal(mascotD.instant, true);
+  assert.equal(mascotD.file.attach, false);
+  assert.equal(forSale(mascotD), false);
+  assert.equal(mascotD.stripeProductId, "none");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["mascot-designer", "conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Mascot Designer first, then Conversion Teardown, the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
@@ -1116,6 +1127,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["1k-bot"].bytes, ONEK_ZIP.length);
   assert.equal(body.files["meta-ads"].bytes, META_ADS_ZIP.length);
   assert.equal(body.files["conversion-teardown"].bytes, TEARDOWN_ZIP.length);
+  assert.equal(body.files["mascot-designer"].bytes, MASCOT_ZIP.length);
   assert.equal(body.files["video-editor-pro"].bytes, VEP_ZIP.length);
   const raw = JSON.stringify(body);
   for (const secret of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_WEBHOOK_SECRET, process.env.RESEND_API_KEY, process.env.GMAIL_APP_PASSWORD, "abcdefghijklmnop", fileKey]) {

@@ -57,7 +57,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -172,9 +172,24 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
-  const t = tone === "ember"
+  const t = tone === "pop"
+    ? {
+        // Mascot Designer's candy pages: plum words, a white field, a puffy coral button.
+        ink: "text-[#2B1640]",
+        soft: "text-[rgba(43,22,64,0.75)]",
+        ask: "text-[rgba(43,22,64,0.9)]",
+        field: "border-[3px] border-[#2B1640] bg-white shadow-[0_6px_0_#2B1640] focus-within:border-[#2B1640]",
+        input: "text-[#2B1640] placeholder:text-[rgba(43,22,64,0.45)]",
+        ring: "focus-visible:outline-[#2B1640]",
+        check: "bg-[#2B1640] text-white",
+        error: "text-[#B3261E] font-semibold",
+        button: "bg-[#FF5C39] text-white hover:bg-[#ff6e4e]",
+        box: ["#2B1640", "#ffffff", "#2B1640", "#ffffff"],
+        boxText: "text-[#2B1640] font-medium",
+      }
+    : tone === "ember"
     ? {
         ink: "text-[#111111]",
         soft: "text-[rgba(17,17,17,0.78)]",

@@ -1,0 +1,27 @@
+{
+  "name": "Pebble",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5005,
+    "top": 0.3018,
+    "left": 0.2549,
+    "right": 0.749
+  },
+  "shadow": {
+    "w": 0.3854
+  },
+  "colours": {
+    "body": "#a58e78",
+    "ink": "#37281b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#a58e78",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

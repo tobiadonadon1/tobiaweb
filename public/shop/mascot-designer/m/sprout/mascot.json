@@ -1,0 +1,27 @@
+{
+  "name": "Sprout",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5004,
+    "top": 0.3008,
+    "left": 0.2715,
+    "right": 0.7422
+  },
+  "shadow": {
+    "w": 0.3671
+  },
+  "colours": {
+    "body": "#c26439",
+    "ink": "#37231b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#c26439",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

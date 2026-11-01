@@ -1,0 +1,27 @@
+{
+  "name": "Scout",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5002,
+    "top": 0.3018,
+    "left": 0.2764,
+    "right": 0.7402
+  },
+  "shadow": {
+    "w": 0.3618
+  },
+  "colours": {
+    "body": "#ce804d",
+    "ink": "#37261b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#ce804d",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Volt",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.501,
+    "top": 0.3018,
+    "left": 0.3359,
+    "right": 0.6563
+  },
+  "shadow": {
+    "w": 0.2498
+  },
+  "colours": {
+    "body": "#d5d83e",
+    "ink": "#37371b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#d5d83e",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

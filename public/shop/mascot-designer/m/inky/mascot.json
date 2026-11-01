@@ -1,0 +1,27 @@
+{
+  "name": "Inky",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.5003,
+    "top": 0.3018,
+    "left": 0.2227,
+    "right": 0.7783
+  },
+  "shadow": {
+    "w": 0.4334
+  },
+  "colours": {
+    "body": "#b08dc1",
+    "ink": "#2d1b37",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#b08dc1",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}

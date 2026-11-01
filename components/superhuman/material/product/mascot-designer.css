@@ -1,0 +1,77 @@
+/* ======================================================================
+ * MASCOT DESIGNER (mascot-designer-page.tsx, mascot-designer-live.tsx).
+ * Candy colours, bubble lettering, live mascots. Plum ink #2B1640.
+ * ==================================================================== */
+
+.md-page { --plum: #2B1640; --coral: #FF5C39; --sun: #FFD84D; --sky: #BFE6FF; --mint: #BDF2D5; --lilac: #E3D6FF; --peach: #FFE0CF; --cream: #FFF7EA; --pink: #FFD4E8;
+  color: var(--plum); font-family: var(--md-body), ui-rounded, system-ui, sans-serif; }
+
+/* Bubble lettering: puffy white letters, a plum outline, a candy extrusion under them. */
+.md-bubble {
+  font-family: var(--md-bubble), ui-rounded, system-ui, sans-serif;
+  font-weight: 400; letter-spacing: 0.01em; line-height: 0.98; color: #fff;
+  -webkit-text-stroke: 0.075em var(--plum); paint-order: stroke fill;
+  text-shadow: 0 0.06em 0 var(--plum), 0 0.1em 0 var(--plum), 0 0.13em 0 var(--plum), 0 0.2em 0.18em rgba(43, 22, 64, 0.22);
+  text-wrap: balance;
+}
+.md-bubble .c1 { color: #FFD84D; } .md-bubble .c2 { color: #FF8A6B; } .md-bubble .c3 { color: #7BD4FF; }
+.md-bubble .c4 { color: #8BE3B0; } .md-bubble .c5 { color: #C9B2FF; } .md-bubble .c6 { color: #FF9EC8; }
+
+.md-round { font-family: var(--md-round), ui-rounded, system-ui, sans-serif; }
+.md-kicker { font-family: var(--md-round), ui-rounded, system-ui, sans-serif; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* Candy chips (the moves playground). */
+.md-chip {
+  font-family: var(--md-round), ui-rounded, system-ui, sans-serif; font-weight: 600; font-size: 1.05rem;
+  padding: 0.62rem 1.05rem; border-radius: 999px; background: #fff; color: var(--plum);
+  border: 3px solid var(--plum); box-shadow: 0 4px 0 var(--plum);
+  transition: transform 140ms cubic-bezier(.3,1.6,.5,1), box-shadow 140ms, background 140ms;
+  cursor: pointer;
+}
+.md-chip:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--plum); }
+.md-chip:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--plum); }
+.md-chip-on { background: var(--coral); color: #fff; }
+.md-chip:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+
+/* Cards with a puffy edge. */
+.md-card { background: #fff; border: 3px solid var(--plum); border-radius: 2rem; box-shadow: 0 8px 0 var(--plum); }
+
+/* Number badges. */
+.md-num { display: grid; place-items: center; width: 3.1rem; height: 3.1rem; border-radius: 999px; background: var(--sun); border: 3px solid var(--plum); box-shadow: 0 4px 0 var(--plum);
+  font-family: var(--md-bubble), ui-rounded, system-ui, sans-serif; font-size: 1.45rem; color: var(--plum); }
+
+/* Hero: the world behind, mascots on the podiums. */
+.md-hero { background: linear-gradient(180deg, #74C4F6 0%, #8ECDF8 45%, #A6D7F8 70%, #FFE3C8 100%); }
+.md-stage { position: relative; width: max(100%, 980px); aspect-ratio: 1774 / 887; margin-left: 50%; transform: translateX(-50%); }
+.md-stage > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%); mask-image: linear-gradient(180deg, transparent 0%, #000 16%); }
+.md-stage mascot-view { position: absolute; cursor: pointer; }
+
+/* Little speech bubble. */
+.md-say { position: absolute; padding: 0.5rem 0.85rem; border-radius: 1.2rem; background: #fff; border: 3px solid var(--plum); box-shadow: 0 4px 0 var(--plum);
+  font-family: var(--md-round), ui-rounded, system-ui, sans-serif; font-weight: 600; font-size: 0.98rem; white-space: nowrap; color: var(--plum); animation: md-bob 2.4s ease-in-out infinite; }
+.md-say::after { content: ""; position: absolute; left: 1.2rem; bottom: -0.72rem; width: 1.1rem; height: 1.1rem; background: #fff; border-right: 3px solid var(--plum); border-bottom: 3px solid var(--plum); transform: rotate(45deg) skew(8deg, 8deg); border-bottom-right-radius: 4px; }
+@keyframes md-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+/* The shelf: 4 rows x 5 compartments, mascots inside. */
+.md-shelf { position: relative; aspect-ratio: var(--shelf-ar, 1.4); }
+.md-shelf > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+.md-shelf .slot { position: absolute; }
+.md-shelf .slot mascot-view { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 112%; cursor: pointer; }
+.md-shelf .slot b { position: absolute; left: 50%; bottom: -0.35rem; transform: translate(-50%, 100%); white-space: nowrap; }
+
+/* Dotted candy background. */
+.md-dots { background-image: radial-gradient(rgba(43, 22, 64, 0.09) 2px, transparent 2.6px); background-size: 28px 28px; }
+
+/* A section edge that wobbles like frosting. */
+.md-wave { display: block; width: 100%; height: 34px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .md-say { animation: none; }
+  .md-chip, .md-chip:hover, .md-chip:active { transition: none; transform: none; }
+}
+
+/* The puffy button (FreeClaim's, via buttonClassName). */
+.md-cta { border: 3px solid var(--plum) !important; box-shadow: 0 5px 0 var(--plum) !important; font-family: var(--md-round), ui-rounded, system-ui, sans-serif !important; font-weight: 700 !important; font-size: 1.15rem !important;
+  transition: transform 140ms cubic-bezier(.3,1.6,.5,1), box-shadow 140ms !important; }
+.md-cta:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--plum) !important; }
+.md-cta:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--plum) !important; }

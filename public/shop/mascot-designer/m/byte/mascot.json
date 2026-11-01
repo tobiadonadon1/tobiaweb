@@ -1,0 +1,27 @@
+{
+  "name": "Byte",
+  "ground": 0.94,
+  "anchors": {
+    "cx": 0.4953,
+    "top": 0.3018,
+    "left": 0.3174,
+    "right": 0.6787
+  },
+  "shadow": {
+    "w": 0.2818
+  },
+  "colours": {
+    "body": "#d9bca6",
+    "ink": "#37271b",
+    "accent": "#FFC93C",
+    "confetti": [
+      "#d9bca6",
+      "#FFC93C",
+      "#4CC9F0",
+      "#7BD88F",
+      "#FF4F7B",
+      "#FFFFFF"
+    ]
+  },
+  "ext": "webp"
+}
