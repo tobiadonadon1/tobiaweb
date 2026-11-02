@@ -57,7 +57,7 @@ const DECK = [
   "A poster: two cows look into a cardboard box, headline Out of the box, every word crisp. Made with GPT Image 2. 4K posters, text and all.",
   "Six women in red lie in a circle, a frame from a cherry drink commercial made with Seedance 2.5. 25M+ people already create with Higgsfield; 300M+ videos made.",
   "Make your first ad today. Start creating at higgsfield.ai. Seedance, Kling, GPT Image and more, in one place. Four more Higgsfield images.",
-].map((alt, i) => ({ src: S(`ad-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
+].map((alt, i) => ({ src: S(`ad-${String(i + 1).padStart(2, "0")}-v2.webp`), alt }));
 
 const FACTS: { title: string; body: string; source: string }[] = [
   { title: "Slide 2 is a second cover.", body: "Instagram shows it again to people who didn't swipe.", source: "Adam Mosseri, Oct 2024" },
@@ -95,11 +95,11 @@ export function CarouselDesignerPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <CarouselDesignerLoader
         cards={[
-          { src: S("ad-05-v1.webp"), bg: "#0F0E13" },
-          { src: S("ad-03-v1.webp"), bg: "#0F0E13" },
-          { src: S("ad-06-v1.webp"), bg: "#0F0E13" },
-          { src: S("ad-07-v1.webp"), bg: "#F2785C" },
-          { src: S("ad-01-v1.webp"), bg: "#0F0E13" },
+          { src: S("ad-05-v2.webp"), bg: "#0F0E13" },
+          { src: S("ad-03-v2.webp"), bg: "#0F0E13" },
+          { src: S("ad-06-v2.webp"), bg: "#0F0E13" },
+          { src: S("ad-07-v2.webp"), bg: "#F2785C" },
+          { src: S("ad-01-v2.webp"), bg: "#0F0E13" },
         ]}
       />
       <BackLink href={folderHref("setups")} label="Setups" />
@@ -134,14 +134,14 @@ export function CarouselDesignerPage() {
               <span className="cd-hero-shapes__pill" />
             </div>
             <div className="cd-fan" aria-hidden>
-              <Image src={S("ad-03-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
-              <Image src={S("ad-06-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
+              <Image src={S("ad-03-v2.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
+              <Image src={S("ad-06-v2.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
             </div>
             <div className="cd-phone">
               <video
                 className="block h-auto w-full"
-                src={S("feed-v5.mp4")}
-                poster={S("feed-v5.jpg")}
+                src={S("feed-v6.mp4")}
+                poster={S("feed-v6.jpg")}
                 autoPlay
                 muted
                 loop
@@ -216,7 +216,7 @@ export function CarouselDesignerPage() {
             </div>
             <figure className="self-center">
               <div className="overflow-hidden rounded-[1.6rem] bg-[#ECEAE5]">
-                <Image src={S("covers-v4.webp")} alt="Three covers the skill drew for the same ad, numbered 1 to 3: None of this was filmed; Make the ad. Skip the shoot; No crew. No camera. Just Higgsfield." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
+                <Image src={S("covers-v5.webp")} alt="Three covers the skill drew for the same ad, numbered 1 to 3: None of this was filmed; Make the ad. Skip the shoot; No crew. No camera. Just Higgsfield." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
               </div>
               <figcaption className="cd-kicker mt-4 opacity-70">Three covers · you pick</figcaption>
             </figure>
@@ -237,7 +237,7 @@ export function CarouselDesignerPage() {
               </p>
               <div className="cd-stack mt-10" aria-hidden>
                 <span className="cd-stack__disc" />
-                {["ad-02-v1.webp", "ad-04-v1.webp", "ad-07-v1.webp"].map((f) => (
+                {["ad-02-v2.webp", "ad-04-v2.webp", "ad-07-v2.webp"].map((f) => (
                   <Image key={f} src={S(f)} alt="" width={810} height={1013} sizes="14rem" />
                 ))}
               </div>
