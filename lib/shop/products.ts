@@ -1483,7 +1483,7 @@ export const MASCOT_DESIGNER: Product = {
  * designs social media carousels that sell (Instagram, LinkedIn, TikTok photo
  * mode, X threads), on what the research says converts: a hook that stops the
  * scroll, slide 2 as a second cover, one idea a slide, real proof, one ask.
- * Six looks in the person's brand colour; pictures drawn with their own
+ * Seven looks in the person's brand colour; pictures drawn with their own
  * OpenAI account, else a built-in art library (public/carousel-library,
  * downloaded by the skill when used). Checked against the rules, scored out of
  * 20 by a fresh critic, shown first in a phone feed.
@@ -1511,7 +1511,7 @@ export const CAROUSEL_DESIGNER: Product = {
       "Carousel Designer, free for Claude Code: answer four questions about what you sell and get a carousel built to convert, designed in your brand, scored out of 20, and shown in a phone feed before you post.",
     kicker: "Skill · for Claude Code",
     line: "Carousels that sell.",
-    proof: "4 questions · 6 looks · scored /20 · ready to post",
+    proof: "4 questions · 7 looks · scored /20 · ready to post",
   },
   contents: [
     ["carousel-designer/SKILL.md", "the four questions, the strategy, the covers, the render, the critic and the hand-over, step by step"],
@@ -1529,7 +1529,7 @@ export const CAROUSEL_DESIGNER: Product = {
   email: {
     preheader: "Your download link is inside. Unzip it, open it in Claude Code, type hi, then ask for a carousel.",
     after: [
-      "Then type \"make a carousel\". It asks five quick questions about what you sell, writes the deck, and shows you three covers to pick from.",
+      "Then type \"make a carousel\". It asks four quick questions about what you sell, writes the deck, and shows you three covers to pick from.",
       "A few minutes later you have the slides for every platform, the caption, and a video of it in a phone feed.",
     ],
   },
@@ -1537,7 +1537,7 @@ export const CAROUSEL_DESIGNER: Product = {
     needs:
       "You'll need Claude Code and Node.js 18 or newer, on a Mac, Windows or Linux. Pictures drawn just for you use your own OpenAI account (an API key, or ChatGPT through Codex); without one it still works.",
     next: [
-      ["Right after install", "Type \"make a carousel\". Five quick questions about what you sell."],
+      ["Right after install", "Type \"make a carousel\". Four quick questions about what you sell."],
       ["A few minutes later", "Pick your cover from three. Then the slides for every platform, the caption, the alt text and the DM script."],
       ["Before you post", "Watch it in a phone feed, with the critic's score out of 20 and what it fixed."],
     ],
