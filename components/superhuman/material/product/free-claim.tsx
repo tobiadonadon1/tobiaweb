@@ -57,7 +57,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -172,9 +172,24 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
-  const t = tone === "pop"
+  const t = tone === "swipe"
+    ? {
+        // Carousel Designer's paper page: ink words, a white field with an ink edge, a cobalt button.
+        ink: "text-[#111111]",
+        soft: "text-[rgba(17,17,17,0.72)]",
+        ask: "text-[rgba(17,17,17,0.88)]",
+        field: "border-2 border-[#111111] bg-white shadow-[0_18px_36px_-24px_rgba(30,25,15,0.5)] focus-within:border-[#2B4BFF]",
+        input: "text-[#111111] placeholder:text-[rgba(17,17,17,0.45)]",
+        ring: "focus-visible:outline-[#2B4BFF]",
+        check: "bg-[#111111] text-white",
+        error: "text-[#B3261E] font-semibold",
+        button: "bg-[#2B4BFF] text-white hover:bg-[#1f3df0]",
+        box: ["#111111", "#ffffff", "#111111", "#ffffff"],
+        boxText: "text-[#111111] font-medium",
+      }
+    : tone === "pop"
     ? {
         // Mascot Designer's candy pages: plum words, a white field, a puffy coral button.
         ink: "text-[#2B1640]",

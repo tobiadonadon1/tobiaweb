@@ -78,6 +78,8 @@ const TEARDOWN_ZIP = Buffer.from("PK\u0003\u0004 the conversion teardown skill "
 writeFileSync(path.join(cwd, "private", "conversion-teardown.zip.enc"), seal(TEARDOWN_ZIP, parseKey(fileKey)));
 const MASCOT_ZIP = Buffer.from("PK\u0003\u0004 the mascot designer skill " + "o".repeat(3900));
 writeFileSync(path.join(cwd, "private", "mascot-designer.zip.enc"), seal(MASCOT_ZIP, parseKey(fileKey)));
+const CAROUSEL_ZIP = Buffer.from("PK\u0003\u0004 the carousel designer skill " + "c".repeat(3900));
+writeFileSync(path.join(cwd, "private", "carousel-designer.zip.enc"), seal(CAROUSEL_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -294,7 +296,16 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(mascotD.file.attach, false);
   assert.equal(forSale(mascotD), false);
   assert.equal(mascotD.stripeProductId, "none");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["mascot-designer", "conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Mascot Designer first, then Conversion Teardown, the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  // Carousel Designer: a free skill for Claude Code, downloading at once, first on Setups.
+  const carD = productById("carousel-designer");
+  assert.equal(carD.href, entryHref("setups", "carousel-designer"));
+  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "carousel-designer")?.product, "carousel-designer");
+  assert.equal(carD.free, true);
+  assert.equal(carD.instant, true);
+  assert.equal(carD.file.attach, false);
+  assert.equal(forSale(carD), false);
+  assert.equal(carD.stripeProductId, "none");
+  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Carousel Designer first, then Mascot Designer, Conversion Teardown, the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
   assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));

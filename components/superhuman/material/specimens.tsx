@@ -1172,6 +1172,35 @@ function MascotDesigner() {
   );
 }
 
+/**
+ * CAROUSEL DESIGNER — a deck of slides cut from paper, fanned the way a
+ * carousel is read: ink at the back, the yellow cover in the middle, the
+ * cobalt slide on top (the page's action colour), a wedge for the swipe and
+ * three dots under them, the one in the lead filled
+ * (product/carousel-designer-page.tsx).
+ */
+function CarouselDesigner() {
+  const deck: [number, number, number, string][] = [
+    [34, 58, -11, INK],
+    [92, 44, -2, "#f2c919"],
+    [150, 56, 8, ULTRAMARINE],
+  ];
+  return (
+    <>
+      {deck.map(([x, y, r, fill]) => (
+        <g key={x}>
+          <Cut d={CARD} x={x + 7} y={y + 7} s={0.6} sy={1.1} fill={SHADE} rotate={r} />
+          <Cut d={CARD} x={x} y={y} s={0.6} sy={1.1} fill={fill} rotate={r} />
+        </g>
+      ))}
+      <Cut d={WEDGE} x={272} y={112} s={0.3} fill={VERMILION} />
+      <Cut d={DISC} x={128} y={238} s={0.09} fill={ULTRAMARINE} />
+      <Cut d={DISC} x={150} y={238} s={0.09} fill={SHADE} />
+      <Cut d={DISC} x={172} y={238} s={0.09} fill={SHADE} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1189,6 +1218,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "meta-ads": MetaAds,
   "conversion-teardown": ConversionTeardown,
   "mascot-designer": MascotDesigner,
+  "carousel-designer": CarouselDesigner,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,

@@ -1,0 +1,113 @@
+/* ======================================================================
+ * CAROUSEL DESIGNER (carousel-designer-page.tsx, -loader.tsx, -deck.tsx).
+ * Paper and ink, one cobalt for the action, the skill's own "bold" type.
+ * ==================================================================== */
+
+.cd-page { --paper: #F4F1EA; --ink: #111111; --cobalt: #2B4BFF; --sun: #FFDD1F; --band: #EAE5DA;
+  background: var(--paper); color: var(--ink); font-family: var(--cd-text), ui-sans-serif, system-ui, sans-serif; }
+
+.cd-display { font-family: var(--cd-display), ui-sans-serif, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.035em; word-spacing: 0.04em; line-height: 0.95; font-variation-settings: "opsz" 96; text-wrap: balance; }
+.cd-kicker { font-family: var(--cd-text), sans-serif; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.cd-source { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.5; }
+
+/* The accent, the way the skill marks a hook: a block of colour behind the word. */
+.cd-mark { background: linear-gradient(transparent 10%, var(--cobalt) 10%, var(--cobalt) 94%, transparent 94%); color: #fff; padding: 0 0.08em; margin: 0 -0.02em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cd-sun { color: var(--sun); }
+
+.cd-band { background: var(--band); }
+.cd-ink { background: var(--ink); color: var(--paper); }
+.cd-ink .cd-mark { color: #fff; }
+
+/* The button (FreeClaim's, via buttonClassName). */
+.cd-cta { font-family: var(--cd-display), sans-serif !important; font-weight: 800 !important; font-size: 1.12rem !important; letter-spacing: -0.01em;
+  transition: transform 160ms cubic-bezier(.3,1.5,.5,1), background-color 160ms !important; }
+.cd-cta:hover { transform: translateY(-2px); }
+.cd-cta:active { transform: translateY(1px); }
+
+/* --- the hero: a phone with the feed, two real slides fanned behind --- */
+.cd-phone { position: relative; z-index: 2; padding: 0.7rem; border-radius: 3.1rem; background: #0E0E10; box-shadow: 0 50px 90px -40px rgba(30, 25, 15, 0.55), inset 0 0 0 2px #2A2A2E; }
+.cd-phone video { border-radius: 2.45rem; background: #fff; aspect-ratio: 860 / 1656; }
+.cd-fan { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.cd-fan img { position: absolute; width: 62%; height: auto; border-radius: 0.6rem; box-shadow: 0 30px 60px -30px rgba(30, 25, 15, 0.45); }
+.cd-fan__a { left: -30%; top: 14%; transform: rotate(-9deg); }
+.cd-fan__b { right: -30%; top: 30%; transform: rotate(8deg); }
+@media (max-width: 640px) { .cd-fan { display: none; } }
+
+/* --- a slide-shaped card (the facts) --- */
+.cd-slide { display: flex; flex-direction: column; aspect-ratio: 4 / 5; padding: 1.5rem 1.5rem 1.4rem; background: #fff; border-radius: 0.4rem; box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 24px 40px -30px rgba(30,25,15,0.4); }
+.cd-slide:nth-child(2) { background: var(--sun); }
+.cd-slide:nth-child(3) { background: var(--ink); color: var(--paper); }
+.cd-slide:nth-child(4) { background: var(--cobalt); color: #fff; }
+.cd-slide__n { font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 3.4rem; line-height: 0.85; letter-spacing: -0.04em; }
+.cd-slide__n small { font-size: 0.36em; letter-spacing: 0; opacity: 0.5; margin-left: 0.1em; }
+@media (max-width: 639px) { .cd-slide { aspect-ratio: auto; min-height: 21rem; } }
+
+/* --- the deck: swipe it --- */
+.cd-deck__track { list-style: none; margin: 0 -1.25rem; padding: 0 1.25rem 0.5rem; display: grid; grid-auto-flow: column; grid-auto-columns: min(78vw, 24rem); column-gap: 1rem;
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 1.25rem; scrollbar-width: none; overscroll-behavior-x: contain; }
+.cd-deck__track::-webkit-scrollbar { display: none; }
+@media (min-width: 640px) { .cd-deck__track { margin: 0 -2rem; padding: 0 2rem 0.5rem; scroll-padding: 0 2rem; } }
+.cd-deck__slide { scroll-snap-align: start; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 30px 50px -36px rgba(30, 25, 15, 0.55); background: #fff; }
+.cd-deck__bar { display: flex; align-items: center; gap: 1.25rem; margin-top: 1.5rem; }
+.cd-deck__count { font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; min-width: 4.2rem; }
+.cd-deck__count i { font-style: normal; opacity: 0.4; }
+.cd-deck__dots { display: flex; gap: 0.4rem; flex: 1; }
+.cd-deck__dots i { width: 0.5rem; height: 0.5rem; border-radius: 99px; background: rgba(17,17,17,0.2); transition: width 200ms, background-color 200ms; }
+.cd-deck__dots i[data-on] { width: 1.6rem; background: var(--cobalt); }
+.cd-deck__arrows { display: flex; gap: 0.6rem; }
+.cd-deck__arrows button { width: 3.2rem; height: 3.2rem; border-radius: 99px; display: grid; place-items: center; background: var(--ink); color: var(--paper); transition: transform 140ms, opacity 140ms; }
+.cd-deck__arrows button svg { width: 1.4rem; height: 1.4rem; }
+.cd-deck__arrows button:hover:not(:disabled) { transform: translateY(-2px); }
+.cd-deck__arrows button:disabled { opacity: 0.25; cursor: default; }
+.cd-deck__arrows button:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+
+/* --- the five questions --- */
+.cd-chip { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1rem 0.6rem 0.6rem; border-radius: 99px; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.18); font-weight: 600; font-size: 1rem; }
+.cd-chip b { display: grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 99px; background: var(--sun); color: var(--ink); font-family: var(--cd-display), sans-serif; font-size: 0.95rem; }
+
+/* --- the looks --- */
+.cd-cover { border-radius: 0.5rem; overflow: hidden; box-shadow: 0 30px 50px -36px rgba(30, 25, 15, 0.55); transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
+.cd-cover:hover { transform: translateY(-6px) rotate(-1deg); }
+
+.cd-ready { display: flex; gap: 0.9rem; padding: 1.4rem 0; border-top: 2px solid var(--ink); }
+
+/* --- the close: three slides, stacked like a deck --- */
+.cd-stack { position: relative; height: 19rem; max-width: 30rem; }
+.cd-stack img { position: absolute; width: 13.5rem; height: auto; border-radius: 0.5rem; box-shadow: 0 30px 50px -30px rgba(30,25,15,0.55); }
+.cd-stack img:nth-child(1) { left: 0; top: 2.2rem; transform: rotate(-8deg); }
+.cd-stack img:nth-child(2) { left: 26%; top: 0.6rem; transform: rotate(3deg); }
+.cd-stack img:nth-child(3) { left: 52%; top: 2.8rem; transform: rotate(10deg); }
+@media (max-width: 480px) { .cd-stack { height: 15rem; } .cd-stack img { width: 10.5rem; } }
+
+/* ======================================================================
+ * THE OPENING (carousel-designer-loader.tsx): five slides are dealt into a
+ * fan, a thumb swipes the top one away, the paper lifts off. One 2.9 s clock.
+ * ==================================================================== */
+:root:has(.cd-load) { --cd-wait: 2.5s; }
+.cd-load { position: fixed; inset: 0; z-index: 2000; pointer-events: none; animation: cd-out 2.9s linear forwards; }
+.cd-load[data-done] { animation: cd-gone 280ms ease-out forwards; }
+@keyframes cd-out { 0%, 99% { visibility: visible; } 100% { visibility: hidden; } }
+@keyframes cd-gone { to { opacity: 0; visibility: hidden; } }
+.cd-load__sheet { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 2.2rem; background: #F4F1EA; pointer-events: auto;
+  animation: cd-lift 0.6s cubic-bezier(0.7, 0, 0.25, 1) 2.25s forwards; }
+@keyframes cd-lift { to { transform: translateY(-105%); } }
+.cd-load__stack { position: relative; width: min(40vw, 13.5rem); aspect-ratio: 4 / 5; }
+.cd-load__card { position: absolute; inset: 0; border-radius: 0.55rem; overflow: hidden; box-shadow: 0 30px 60px -30px rgba(30, 25, 15, 0.55);
+  transform: translate(var(--x), 0) rotate(var(--r)); animation: cd-deal 0.62s cubic-bezier(0.18, 0.9, 0.25, 1.08) var(--d) both; }
+.cd-load__card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@keyframes cd-deal { from { transform: translate(var(--x), 115vh) rotate(calc(var(--r) * -2.5)); } to { transform: translate(var(--x), 0) rotate(var(--r)); } }
+.cd-load__card--top { animation: cd-deal 0.62s cubic-bezier(0.18, 0.9, 0.25, 1.08) var(--d) both, cd-swipe 0.5s cubic-bezier(0.6, 0, 0.3, 1) 1.62s forwards; }
+@keyframes cd-swipe { from { transform: translate(0, 0) rotate(-1deg); } to { transform: translate(-150vw, -3vh) rotate(-22deg); } }
+.cd-load__thumb { position: absolute; z-index: 9; left: 70%; top: 58%; width: 3.6rem; height: 3.6rem; margin: -1.8rem 0 0 -1.8rem; border-radius: 99px;
+  background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0) 72%); box-shadow: 0 0 0 2px rgba(17,17,17,0.12);
+  opacity: 0; animation: cd-thumb 0.95s cubic-bezier(0.6, 0, 0.3, 1) 1.25s forwards; }
+@keyframes cd-thumb { 0% { opacity: 0; transform: scale(1.4); } 30% { opacity: 1; transform: scale(1); } 75% { opacity: 1; transform: translateX(-62vw); } 100% { opacity: 0; transform: translateX(-80vw); } }
+.cd-load__word { font-family: var(--cd-display), sans-serif; font-weight: 800; letter-spacing: -0.03em; font-size: 1.15rem; color: #111; opacity: 0; animation: cd-word 0.4s ease-out 0.75s forwards; }
+@keyframes cd-word { to { opacity: 1; } }
+body:has(.cd-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--cd-wait) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-load { display: none; }
+  .cd-cover, .cd-cta, .cd-deck__arrows button, .cd-deck__dots i { transition: none !important; }
+  .cd-cover:hover { transform: none; }
+}

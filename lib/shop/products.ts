@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer" | "carousel-designer";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1478,6 +1478,72 @@ export const MASCOT_DESIGNER: Product = {
   },
 };
 
+/**
+ * CAROUSEL DESIGNER (2026-11-02): a free skill for Claude Code that writes and
+ * designs social media carousels that sell (Instagram, LinkedIn, TikTok photo
+ * mode, X threads), on what the research says converts: a hook that stops the
+ * scroll, slide 2 as a second cover, one idea a slide, real proof, one ask.
+ * Six looks in the person's brand colour; pictures drawn with their own
+ * OpenAI account, else a built-in art library (public/carousel-library,
+ * downloaded by the skill when used). Checked against the rules, scored out of
+ * 20 by a fresh critic, shown first in a phone feed.
+ */
+export const CAROUSEL_DESIGNER: Product = {
+  id: "carousel-designer",
+  name: "Carousel Designer",
+  description:
+    "A free skill for Claude Code that writes and designs carousels that sell, for Instagram, LinkedIn, TikTok and X: five quick questions, a deck built on what converts, in your brand, checked before you post.",
+  priceCents: 0,
+  currency: "usd",
+  priceLabel: "Free",
+  href: "/projects/construct/material/setups/carousel-designer",
+  file: {
+    sealed: "carousel-designer.zip.enc",
+    filename: "carousel-designer.zip",
+    // The skill ships .mjs scripts, and Gmail refuses zips with scripts in them.
+    attach: false,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "Carousel Designer, free for Claude Code: answer five questions about what you sell and get a carousel built to convert, designed in your brand, scored out of 20, and shown in a phone feed before you post.",
+    kicker: "Skill · for Claude Code",
+    line: "Carousels that sell.",
+    proof: "5 questions · 6 looks · scored /20 · ready to post",
+  },
+  contents: [
+    ["carousel-designer/SKILL.md", "the five questions, the strategy, the covers, the render, the critic and the hand-over, step by step"],
+    ["references/playbook.md", "what converts: the one reader, the goal and its ask, seven structures, hooks, slide 2, the caption"],
+    ["references/evidence.md", "the research behind every rule, with its sources and how strong each one is"],
+    ["scripts/check.mjs", "checks the words against the rules before anything is drawn: the hook, the promise, the ask, the proof"],
+    ["scripts/render.mjs", "renders every slide at the exact size for each platform, fits the type and keeps it readable"],
+    ["scripts/preview.mjs", "films the carousel being swiped in a phone feed, so you see it before you post"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in it and type claude.",
+    "Type hi. Claude installs it; then type \"make a carousel\".",
+  ],
+  email: {
+    preheader: "Your download link is inside. Unzip it, open it in Claude Code, type hi, then ask for a carousel.",
+    after: [
+      "Then type \"make a carousel\". It asks five quick questions about what you sell, writes the deck, and shows you three covers to pick from.",
+      "A few minutes later you have the slides for every platform, the caption, and a video of it in a phone feed.",
+    ],
+  },
+  thanks: {
+    needs:
+      "You'll need Claude Code and Node.js 18 or newer, on a Mac, Windows or Linux. Pictures drawn just for you use your own OpenAI account (an API key, or ChatGPT through Codex); without one it still works.",
+    next: [
+      ["Right after install", "Type \"make a carousel\". Five quick questions about what you sell."],
+      ["A few minutes later", "Pick your cover from three. Then the slides for every platform, the caption, the alt text and the DM script."],
+      ["Before you post", "Watch it in a phone feed, with the critic's score out of 20 and what it fixed."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1502,6 +1568,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "meta-ads": META_ADS,
   "conversion-teardown": CONVERSION_TEARDOWN,
   "mascot-designer": MASCOT_DESIGNER,
+  "carousel-designer": CAROUSEL_DESIGNER,
 };
 
 export function productById(id: unknown): Product | undefined {

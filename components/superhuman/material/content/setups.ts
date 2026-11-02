@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "carousel-designer",
+    title: "Carousel Designer",
+    kind: "setup",
+    summary: "Carousels that sell: five questions about what you sell, a deck built on what converts, designed in your brand, scored out of 20 and shown in a phone feed before you post.",
+    // Minutes from the download to the first finished carousel.
+    minutes: 10,
+    status: "ready",
+    when: "You sell something and want posts that bring buyers, not just likes: on Instagram, LinkedIn, TikTok or X.",
+    level: "Anyone",
+    body: [],
+    product: "carousel-designer",
+  },
+  {
     slug: "mascot-designer",
     title: "Mascot Designer",
     kind: "setup",
