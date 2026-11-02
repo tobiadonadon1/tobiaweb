@@ -23,9 +23,9 @@ import "./carousel-designer.css";
  *
  * EVERYTHING SHOWN IS REAL OUTPUT: the feed film, the deck, the covers and
  * the looks are what the skill rendered. The example is an ad for Higgsfield,
- * the AI video studio (Tobia, second pass: "Higgsfield does video ads, not
- * shoes; no neon"): five of its camera moves, each shown with a frame from
- * Higgsfield's own example clip, and only numbers from its own site.
+ * the AI creative suite (Tobia, third pass: "we're advertising Higgsfield"):
+ * a product-led ad, its own showcase work card after card (from its
+ * homepage), one promise each, 25M+ creators from its site, "Start creating".
  */
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--cd-display", display: "swap", axes: ["opsz"] });
@@ -50,31 +50,20 @@ const JSON_LD = {
 
 /** The deck on the page: the slides as rendered, with the alt text the skill wrote for them. */
 const DECK = [
-  "Cover on a video still: 5 camera moves that look expensive. For brands making video ads. A woman in a red robe among white horses, mountains behind.",
-  "Move 1, Higgsfield preset Road Rush: low tracking sells speed. A dark SUV on a winding autumn road. For cars, bikes, travel.",
-  "Move 2, preset Dolly Right: a slow dolly makes it premium. A rider in black beside a motorbike against a white wall.",
-  "Move 3, preset Car Grip: a car mount puts them inside. A woman's face in a car's side mirror at night, city lights behind.",
-  "Move 4, preset 360 Orbit: a full orbit shows every side. A woman in a gold patterned headscarf, eyes closed.",
-  "Move 5, preset Eyes In: a slow push-in ends on a face. A close-up of a woman's eyes. Your last shot.",
-  "50+ moves like these, ready on Higgsfield. Source: higgsfield.ai/camera-controls; 300M+ videos made there, higgsfield.ai/about.",
-  "All 50+ moves, with examples. Comment MOVES and we'll DM you the link to every camera move. Four of the frames in a grid.",
-].map((alt, i) => ({ src: S(`hv-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
+  "Cover: a young man by the sea with a live octopus on his head, made with Higgsfield. None of this was filmed.",
+  "A giant woman crouches over a drift track as a tiny race car spins smoke, a frame from a Seedance 2.5 video. Cinematic video from one prompt.",
+  "A Vazu dragon lychee soda can with lychees and a splash, made with Marketing Studio. Your product, ready to post.",
+  "Glossy pink lips in macro, a frame from a 30-second lip gloss commercial made with Seedance 2.5. A 30-second spot, no studio.",
+  "A poster: two cows look into a cardboard box, headline Out of the box, every word crisp. Made with GPT Image 2. 4K posters, text and all.",
+  "Six women in red lie in a circle, a frame from a cherry drink commercial made with Seedance 2.5. 25M+ people already create with Higgsfield; 300M+ videos made.",
+  "Make your first ad today. Start creating at higgsfield.ai. Seedance, Kling, GPT Image and more, in one place. Four more Higgsfield images.",
+].map((alt, i) => ({ src: S(`ad-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
 
 const FACTS: { title: string; body: string; source: string }[] = [
   { title: "Slide 2 is a second cover.", body: "Instagram shows it again to people who didn't swipe.", source: "Adam Mosseri, Oct 2024" },
   { title: "Sends reach new people.", body: "They weigh most for people who don't follow you.", source: "Adam Mosseri, Jan 2025" },
   { title: "One ask converts.", body: "One DM button: 32%. Three buttons: 2%.", source: "Inrō, 798k conversations" },
   { title: "The cover keeps its promise.", body: "Say six, show six. A script counts.", source: "Instagram guidelines" },
-];
-
-const LOOKS: { id: string; name: string; line: string; fresh?: boolean }[] = [
-  { id: "pop", name: "Pop", line: "Colour, photos, few words.", fresh: true },
-  { id: "bold", name: "Bold", line: "A poster in your colour." },
-  { id: "editorial", name: "Editorial", line: "A good magazine." },
-  { id: "scrapbook", name: "Scrapbook", line: "Paper, tape, cut-outs." },
-  { id: "studio", name: "Studio", line: "A product launch." },
-  { id: "midnight", name: "Midnight", line: "Dark, with a glow." },
-  { id: "note", name: "Note", line: "Reads like a person." },
 ];
 
 const ASKS = ["What it sells", "Who it's for", "What they should do", "One real result"];
@@ -106,11 +95,11 @@ export function CarouselDesignerPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <CarouselDesignerLoader
         cards={[
-          { src: S("hv-07-v1.webp"), bg: "#E9774F" },
-          { src: S("hv-03-v1.webp"), bg: "#1E1A2B" },
-          { src: S("hv-05-v1.webp"), bg: "#1E1A2B" },
-          { src: S("hv-08-v1.webp"), bg: "#4F46C8" },
-          { src: S("hv-01-v1.webp"), bg: "#1E1A2B" },
+          { src: S("ad-05-v1.webp"), bg: "#0F0E13" },
+          { src: S("ad-03-v1.webp"), bg: "#0F0E13" },
+          { src: S("ad-06-v1.webp"), bg: "#0F0E13" },
+          { src: S("ad-07-v1.webp"), bg: "#F2785C" },
+          { src: S("ad-01-v1.webp"), bg: "#0F0E13" },
         ]}
       />
       <BackLink href={folderHref("setups")} label="Setups" />
@@ -145,20 +134,20 @@ export function CarouselDesignerPage() {
               <span className="cd-hero-shapes__pill" />
             </div>
             <div className="cd-fan" aria-hidden>
-              <Image src={S("hv-04-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
-              <Image src={S("hv-07-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
+              <Image src={S("ad-03-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
+              <Image src={S("ad-06-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
             </div>
             <div className="cd-phone">
               <video
                 className="block h-auto w-full"
-                src={S("feed-v4.mp4")}
-                poster={S("feed-v4.jpg")}
+                src={S("feed-v5.mp4")}
+                poster={S("feed-v5.jpg")}
                 autoPlay
                 muted
                 loop
                 playsInline
                 preload="metadata"
-                aria-label="The carousel the skill made for Higgsfield, in a phone feed: a thumb swipes from the cover, 5 camera moves that look expensive, through five video frames from Higgsfield's own examples (Road Rush, Dolly, Car Grip, 360 Orbit, Eyes In), to 50+ moves ready on Higgsfield and the ask: comment MOVES."
+                aria-label="The ad the skill made for Higgsfield, in a phone feed: a thumb swipes from the cover, None of this was filmed, through Higgsfield's own work (a Seedance 2.5 video, a Marketing Studio product ad, a 30-second commercial, a GPT Image 2 poster) to 25M+ people and the ask: start creating."
               />
             </div>
           </figure>
@@ -227,7 +216,7 @@ export function CarouselDesignerPage() {
             </div>
             <figure className="self-center">
               <div className="overflow-hidden rounded-[1.6rem] bg-[#ECEAE5]">
-                <Image src={S("covers-v3.webp")} alt="Three covers the skill drew for the same carousel, numbered 1 to 3: 5 camera moves that look expensive; The camera isn't moving; 5 moves directors use." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
+                <Image src={S("covers-v4.webp")} alt="Three covers the skill drew for the same ad, numbered 1 to 3: None of this was filmed; Make the ad. Skip the shoot; No crew. No camera. Just Higgsfield." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
               </div>
               <figcaption className="cd-kicker mt-4 opacity-70">Three covers · you pick</figcaption>
             </figure>
@@ -235,48 +224,7 @@ export function CarouselDesignerPage() {
         </div>
       </section>
 
-      {/* 05. SEVEN LOOKS. */}
-      <section aria-labelledby="cd-looks" className="relative">
-        <div className="mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-28 md:pt-24">
-          <h2 id="cd-looks" className="cd-display text-[clamp(2.8rem,7vw,5.6rem)]">
-            Seven looks. <mark className="cd-mark cd-mark--violet">Your colour.</mark>
-          </h2>
-          <ul className="mt-12 grid list-none grid-cols-2 gap-x-4 gap-y-8 p-0 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
-            {LOOKS.map((l) => (
-              <li key={l.id} className="relative">
-                <div className="cd-cover">
-                  <Image src={S(`looks-${l.id}-${l.id === "pop" ? "v2" : "v1"}.webp`)} alt={`A cover in the ${l.name} look, made by the skill.`} width={810} height={1013} sizes="(min-width: 1024px) 18rem, 45vw" className="block h-auto w-full" />
-                </div>
-                {l.fresh && <span className="cd-new">New</span>}
-                <h3 className="cd-display mt-4 text-[1.5rem]">{l.name}</h3>
-                <p className="mt-0.5 text-[0.98rem] font-medium opacity-70">{l.line}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 06. READY TO POST. */}
-      <section aria-labelledby="cd-ready" className="cd-cobalt relative overflow-hidden">
-        <Ring className="cd-shape cd-shape--ready" />
-        <div className="relative mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-24 md:pt-24">
-          <h2 id="cd-ready" className="cd-display max-w-[14ch] text-[clamp(2.8rem,7vw,5.6rem)]">
-            Ready to <mark className="cd-mark cd-mark--peach">post.</mark>
-          </h2>
-          <ul className="mt-10 flex max-w-[52rem] list-none flex-wrap gap-3 p-0">
-            {READY.map((k) => (
-              <li key={k} className="cd-ready">
-                <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5 flex-none">
-                  <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                {k}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* 07. THE CLOSE. */}
+      {/* 05. THE CLOSE: any style, ready to post, get it. */}
       <section id={CLOSE_ID} aria-labelledby="cd-close-title" className="relative scroll-mt-28">
         <div className="mx-auto max-w-[80rem] px-5 pb-28 pt-16 sm:px-8 md:pb-36 md:pt-24">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-20">
@@ -284,9 +232,12 @@ export function CarouselDesignerPage() {
               <h2 id="cd-close-title" className="cd-display max-w-[11ch] text-[clamp(3rem,8vw,6.2rem)]">
                 Your next post, <mark className="cd-mark">sorted.</mark>
               </h2>
+              <p className="mt-6 max-w-[30ch] text-pretty text-[1.2rem] font-semibold leading-[1.4]">
+                Any style you want. Name it, or show it a post you love.
+              </p>
               <div className="cd-stack mt-10" aria-hidden>
                 <span className="cd-stack__disc" />
-                {["hv-02-v1.webp", "hv-07-v1.webp", "hv-08-v1.webp"].map((f) => (
+                {["ad-02-v1.webp", "ad-04-v1.webp", "ad-07-v1.webp"].map((f) => (
                   <Image key={f} src={S(f)} alt="" width={810} height={1013} sizes="14rem" />
                 ))}
               </div>
@@ -300,6 +251,16 @@ export function CarouselDesignerPage() {
                   </li>
                 ))}
               </ol>
+              <ul className="mt-8 flex list-none flex-wrap gap-2 p-0" aria-label="What you get">
+                {READY.map((k) => (
+                  <li key={k} className="cd-ready">
+                    <svg viewBox="0 0 24 24" aria-hidden className="h-4 w-4 flex-none">
+                      <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    {k}
+                  </li>
+                ))}
+              </ul>
               <div id="claim" className="mt-10 scroll-mt-28">
                 <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="swipe" align="start" prompt={false} quiet buttonClassName="cd-cta" />
                 <p className="mt-4 max-w-[46ch] text-pretty text-[0.95rem] leading-[1.5] opacity-70">
