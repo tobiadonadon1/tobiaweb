@@ -1492,7 +1492,7 @@ export const CAROUSEL_DESIGNER: Product = {
   id: "carousel-designer",
   name: "Carousel Designer",
   description:
-    "A free skill for Claude Code that writes and designs carousels that sell, for Instagram, LinkedIn, TikTok and X: five quick questions, a deck built on what converts, in your brand, checked before you post.",
+    "A free skill for Claude Code that writes and designs carousels that sell, for Instagram, LinkedIn, TikTok and X: four quick questions, a deck built on what converts, in your brand, checked before you post.",
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
@@ -1508,13 +1508,13 @@ export const CAROUSEL_DESIGNER: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Carousel Designer, free for Claude Code: answer five questions about what you sell and get a carousel built to convert, designed in your brand, scored out of 20, and shown in a phone feed before you post.",
+      "Carousel Designer, free for Claude Code: answer four questions about what you sell and get a carousel built to convert, designed in your brand, scored out of 20, and shown in a phone feed before you post.",
     kicker: "Skill · for Claude Code",
     line: "Carousels that sell.",
-    proof: "5 questions · 6 looks · scored /20 · ready to post",
+    proof: "4 questions · 6 looks · scored /20 · ready to post",
   },
   contents: [
-    ["carousel-designer/SKILL.md", "the five questions, the strategy, the covers, the render, the critic and the hand-over, step by step"],
+    ["carousel-designer/SKILL.md", "the four questions, the strategy, the covers, the render, the critic and the hand-over, step by step"],
     ["references/playbook.md", "what converts: the one reader, the goal and its ask, seven structures, hooks, slide 2, the caption"],
     ["references/evidence.md", "the research behind every rule, with its sources and how strong each one is"],
     ["scripts/check.mjs", "checks the words against the rules before anything is drawn: the hook, the promise, the ask, the proof"],

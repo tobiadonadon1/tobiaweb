@@ -57,7 +57,7 @@ const DECK = [
   "Reason 6: on a phone, the button is below the fold. A phone where the Start free trial button sits under the first screen.",
   "cal.com scored 14 out of 20 in a Conversion Teardown on 31 October 2026: strong headline and button, points lost on proof, the form and doubts.",
   "Score your page out of 20. Comment TEARDOWN and I'll DM you the free Claude Code skill that opens your page, scores it and writes the fixes.",
-].map((alt, i) => ({ src: S(`teardown-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
+].map((alt, i) => ({ src: S(`teardown-${String(i + 1).padStart(2, "0")}-${i === 1 ? "v2" : "v1"}.webp`), alt }));
 
 const FACTS: { title: string; body: string; source: string }[] = [
   {
@@ -91,7 +91,7 @@ const LOOKS: { id: string; name: string; line: string }[] = [
   { id: "note", name: "Note", line: "Reads like a person, not an ad." },
 ];
 
-const ASKS = ["What it sells", "Who it's for", "What they should do", "Where you post", "The pictures"];
+const ASKS = ["What it sells", "Who it's for", "What they should do", "One real result"];
 
 const READY: [string, string][] = [
   ["Every size", "4:5 for Instagram and LinkedIn, 9:16 for TikTok, a thread for X."],
@@ -139,7 +139,7 @@ export function CarouselDesignerPage() {
               Carousels that <mark className="cd-mark">sell.</mark>
             </h1>
             <p className="mt-7 max-w-[34ch] text-pretty text-[1.2rem] font-medium leading-[1.45] sm:text-[1.32rem]">
-              Answer five questions about what you sell. Get a carousel built on what converts, in your colours,
+              Answer four questions about what you sell. Get a carousel built on what converts, in your colours,
               scored out of 20, and shown in a phone feed before you post.
             </p>
             <div id={HERO_ID} className="mt-9 scroll-mt-28">
@@ -156,8 +156,8 @@ export function CarouselDesignerPage() {
             <div className="cd-phone">
               <video
                 className="block h-auto w-full"
-                src={S("feed-v1.mp4")}
-                poster={S("feed-v1.jpg")}
+                src={S("feed-v2.mp4")}
+                poster={S("feed-v2.jpg")}
                 autoPlay
                 muted
                 loop
@@ -215,13 +215,13 @@ export function CarouselDesignerPage() {
         </div>
       </section>
 
-      {/* 04. FIVE QUESTIONS, THREE COVERS. */}
+      {/* 04. FOUR QUESTIONS, THREE COVERS. */}
       <section aria-labelledby="cd-how" className="cd-ink">
         <div className="mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-28 md:pt-24">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
             <div>
               <h2 id="cd-how" className="cd-display text-[clamp(2.7rem,7vw,5.4rem)]">
-                Five questions. <span className="cd-sun">Then pick your cover.</span>
+                Four questions. <span className="cd-sun">Then pick your cover.</span>
               </h2>
               <ul className="mt-10 flex list-none flex-wrap gap-2.5 p-0">
                 {ASKS.map((a, i) => (
@@ -231,7 +231,7 @@ export function CarouselDesignerPage() {
                 ))}
               </ul>
               <p className="mt-8 max-w-[40ch] text-pretty text-[1.1rem] leading-[1.55] opacity-80">
-                It reads your site first, so most answers are one tap. Then it writes ten hooks, keeps the three strongest,
+                It reads your site first, so most answers are one tap, and it asks for one real result, a review or a number, because proof is what sells. Then it writes ten hooks, keeps the three strongest,
                 and draws them as covers for you to choose.
               </p>
             </div>
