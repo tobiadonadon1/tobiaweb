@@ -17,14 +17,15 @@ import "./carousel-designer.css";
  * THE LOOK (Tobia, 2026-11-02, second pass): "a little more colourful, more
  * shapes, less text, especially in the subtitles", and catchier examples
  * "with the colour, more image, not so much text". The page now reads like
- * the skill's "pop" look: flat bands of colour (ink, lime, violet, cobalt),
+ * the skill's "pop" look: flat bands of colour (ink, peach, indigo, cobalt),
  * big flat shapes, one line under each headline, and the real slides as the
  * pictures.
  *
  * EVERYTHING SHOWN IS REAL OUTPUT: the feed film, the deck, the covers and
  * the looks are what the skill rendered. The example is an ad for Higgsfield,
- * using only what Higgsfield's own site says (25M+ users, Marketing Studio's
- * formats).
+ * the AI video studio (Tobia, second pass: "Higgsfield does video ads, not
+ * shoes; no neon"): five of its camera moves, each shown with a frame from
+ * Higgsfield's own example clip, and only numbers from its own site.
  */
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--cd-display", display: "swap", axes: ["opsz"] });
@@ -49,15 +50,15 @@ const JSON_LD = {
 
 /** The deck on the page: the slides as rendered, with the alt text the skill wrote for them. */
 const DECK = [
-  "Cover on lime green: One photo. Four ads. For brands with a product. A white and lime sneaker on a big black circle.",
-  "No studio, no model: a phone photo is enough. An ordinary phone shot of the sneaker on a cluttered kitchen table.",
-  "Ad 1, product shot, for your shop page: the sneaker floating above a lime cube on black.",
-  "Ad 2, UGC, for Reels and TikTok: a woman on a city kerb at golden hour wearing the sneakers.",
-  "Ad 3, cinematic, for the launch: the sneaker splashing through a puddle on a wet neon street at night.",
-  "Ad 4, poster, for the feed: a pair of the sneakers from above on hot violet with hard shadows.",
-  "25M+ people create with Higgsfield. Source: higgsfield.ai/about.",
-  "First ad, today. Comment ADS and we'll DM you the link to Marketing Studio. Under it, the four ads side by side: product, UGC, cinematic, poster.",
-].map((alt, i) => ({ src: S(`hf-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
+  "Cover on a video still: 5 camera moves that look expensive. For brands making video ads. A woman in a red robe among white horses, mountains behind.",
+  "Move 1, Higgsfield preset Road Rush: low tracking sells speed. A dark SUV on a winding autumn road. For cars, bikes, travel.",
+  "Move 2, preset Dolly Right: a slow dolly makes it premium. A rider in black beside a motorbike against a white wall.",
+  "Move 3, preset Car Grip: a car mount puts them inside. A woman's face in a car's side mirror at night, city lights behind.",
+  "Move 4, preset 360 Orbit: a full orbit shows every side. A woman in a gold patterned headscarf, eyes closed.",
+  "Move 5, preset Eyes In: a slow push-in ends on a face. A close-up of a woman's eyes. Your last shot.",
+  "50+ moves like these, ready on Higgsfield. Source: higgsfield.ai/camera-controls; 300M+ videos made there, higgsfield.ai/about.",
+  "All 50+ moves, with examples. Comment MOVES and we'll DM you the link to every camera move. Four of the frames in a grid.",
+].map((alt, i) => ({ src: S(`hv-${String(i + 1).padStart(2, "0")}-v1.webp`), alt }));
 
 const FACTS: { title: string; body: string; source: string }[] = [
   { title: "Slide 2 is a second cover.", body: "Instagram shows it again to people who didn't swipe.", source: "Adam Mosseri, Oct 2024" },
@@ -67,7 +68,7 @@ const FACTS: { title: string; body: string; source: string }[] = [
 ];
 
 const LOOKS: { id: string; name: string; line: string; fresh?: boolean }[] = [
-  { id: "pop", name: "Pop", line: "Colour, shapes, few words.", fresh: true },
+  { id: "pop", name: "Pop", line: "Colour, photos, few words.", fresh: true },
   { id: "bold", name: "Bold", line: "A poster in your colour." },
   { id: "editorial", name: "Editorial", line: "A good magazine." },
   { id: "scrapbook", name: "Scrapbook", line: "Paper, tape, cut-outs." },
@@ -90,15 +91,11 @@ const STEPS: React.ReactNode[] = [
   </>,
 ];
 
-/** Flat shapes, the way the pop look draws them. Decoration only. */
-function Burst({ className, points = 12 }: { className?: string; points?: number }) {
-  const d = Array.from({ length: points * 2 }, (_, j) => {
-    const a = (Math.PI * j) / points, r = j % 2 ? 36 : 50;
-    return `${(50 + r * Math.cos(a)).toFixed(1)},${(50 + r * Math.sin(a)).toFixed(1)}`;
-  }).join(" ");
+/** A soft ring, the way the calm pop look draws its shapes. Decoration only. */
+function Ring({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 100" aria-hidden className={className}>
-      <polygon points={d} fill="currentColor" />
+      <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" strokeWidth="14" />
     </svg>
   );
 }
@@ -109,11 +106,11 @@ export function CarouselDesignerPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <CarouselDesignerLoader
         cards={[
-          { src: S("hf-07-v1.webp"), bg: "#7B3FF2" },
-          { src: S("hf-06-v1.webp"), bg: "#7B3FF2" },
-          { src: S("hf-03-v1.webp"), bg: "#131517" },
-          { src: S("hf-08-v1.webp"), bg: "#D1FE17" },
-          { src: S("hf-01-v1.webp"), bg: "#D1FE17" },
+          { src: S("hv-07-v1.webp"), bg: "#E9774F" },
+          { src: S("hv-03-v1.webp"), bg: "#1E1A2B" },
+          { src: S("hv-05-v1.webp"), bg: "#1E1A2B" },
+          { src: S("hv-08-v1.webp"), bg: "#4F46C8" },
+          { src: S("hv-01-v1.webp"), bg: "#1E1A2B" },
         ]}
       />
       <BackLink href={folderHref("setups")} label="Setups" />
@@ -144,24 +141,24 @@ export function CarouselDesignerPage() {
           <figure className="relative mx-auto w-full max-w-[19rem] sm:max-w-[23rem] lg:max-w-[25rem]">
             <div className="cd-hero-shapes" aria-hidden>
               <span className="cd-hero-shapes__disc" />
-              <Burst className="cd-hero-shapes__burst" />
+              <Ring className="cd-hero-shapes__burst" />
               <span className="cd-hero-shapes__pill" />
             </div>
             <div className="cd-fan" aria-hidden>
-              <Image src={S("hf-04-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
-              <Image src={S("hf-06-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
+              <Image src={S("hv-04-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__a" />
+              <Image src={S("hv-07-v1.webp")} alt="" width={810} height={1013} sizes="16rem" className="cd-fan__b" />
             </div>
             <div className="cd-phone">
               <video
                 className="block h-auto w-full"
-                src={S("feed-v3.mp4")}
-                poster={S("feed-v3.jpg")}
+                src={S("feed-v4.mp4")}
+                poster={S("feed-v4.jpg")}
                 autoPlay
                 muted
                 loop
                 playsInline
                 preload="metadata"
-                aria-label="The carousel the skill made for Higgsfield, in a phone feed: a thumb swipes from the lime cover, One photo. A week of ads., through a phone photo of a sneaker and four ad formats, to 25M+ people and the ask: comment ADS."
+                aria-label="The carousel the skill made for Higgsfield, in a phone feed: a thumb swipes from the cover, 5 camera moves that look expensive, through five video frames from Higgsfield's own examples (Road Rush, Dolly, Car Grip, 360 Orbit, Eyes In), to 50+ moves ready on Higgsfield and the ask: comment MOVES."
               />
             </div>
           </figure>
@@ -171,11 +168,11 @@ export function CarouselDesignerPage() {
       {/* 02. SWIPE ONE: the real deck. */}
       <section aria-labelledby="cd-deck" className="cd-ink relative overflow-hidden">
         <span className="cd-shape cd-shape--deck-a" aria-hidden />
-        <Burst className="cd-shape cd-shape--deck-b" />
+        <Ring className="cd-shape cd-shape--deck-b" />
         <div className="relative mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-28 md:pt-24">
           <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
             <h2 id="cd-deck" className="cd-display text-[clamp(2.8rem,7vw,5.6rem)]">
-              Swipe <mark className="cd-mark cd-mark--lime">one.</mark>
+              Swipe <mark className="cd-mark cd-mark--peach">one.</mark>
             </h2>
             <p className="text-[1.15rem] font-semibold opacity-80 md:pb-3">An ad for Higgsfield, made with the skill.</p>
           </div>
@@ -212,7 +209,7 @@ export function CarouselDesignerPage() {
       </section>
 
       {/* 04. FOUR QUESTIONS, THREE COVERS. */}
-      <section aria-labelledby="cd-how" className="cd-lime relative overflow-hidden">
+      <section aria-labelledby="cd-how" className="cd-peach relative overflow-hidden">
         <span className="cd-shape cd-shape--how" aria-hidden />
         <div className="relative mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-28 md:pt-24">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
@@ -230,7 +227,7 @@ export function CarouselDesignerPage() {
             </div>
             <figure className="self-center">
               <div className="overflow-hidden rounded-[1.6rem] bg-[#ECEAE5]">
-                <Image src={S("covers-v2.webp")} alt="Three covers the skill drew for the same carousel, numbered 1 to 3: One photo. Four ads; Stop paying for shoots; Phone photo, four ways." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
+                <Image src={S("covers-v3.webp")} alt="Three covers the skill drew for the same carousel, numbered 1 to 3: 5 camera moves that look expensive; The camera isn't moving; 5 moves directors use." width={1764} height={801} sizes="(min-width: 1024px) 46rem, 92vw" className="block h-auto w-full" />
               </div>
               <figcaption className="cd-kicker mt-4 opacity-70">Three covers · you pick</figcaption>
             </figure>
@@ -248,7 +245,7 @@ export function CarouselDesignerPage() {
             {LOOKS.map((l) => (
               <li key={l.id} className="relative">
                 <div className="cd-cover">
-                  <Image src={S(`looks-${l.id}-v1.webp`)} alt={`A cover in the ${l.name} look, made by the skill.`} width={810} height={1013} sizes="(min-width: 1024px) 18rem, 45vw" className="block h-auto w-full" />
+                  <Image src={S(`looks-${l.id}-${l.id === "pop" ? "v2" : "v1"}.webp`)} alt={`A cover in the ${l.name} look, made by the skill.`} width={810} height={1013} sizes="(min-width: 1024px) 18rem, 45vw" className="block h-auto w-full" />
                 </div>
                 {l.fresh && <span className="cd-new">New</span>}
                 <h3 className="cd-display mt-4 text-[1.5rem]">{l.name}</h3>
@@ -261,10 +258,10 @@ export function CarouselDesignerPage() {
 
       {/* 06. READY TO POST. */}
       <section aria-labelledby="cd-ready" className="cd-cobalt relative overflow-hidden">
-        <Burst className="cd-shape cd-shape--ready" points={14} />
+        <Ring className="cd-shape cd-shape--ready" />
         <div className="relative mx-auto max-w-[80rem] px-5 pb-20 pt-16 sm:px-8 md:pb-24 md:pt-24">
           <h2 id="cd-ready" className="cd-display max-w-[14ch] text-[clamp(2.8rem,7vw,5.6rem)]">
-            Ready to <mark className="cd-mark cd-mark--lime">post.</mark>
+            Ready to <mark className="cd-mark cd-mark--peach">post.</mark>
           </h2>
           <ul className="mt-10 flex max-w-[52rem] list-none flex-wrap gap-3 p-0">
             {READY.map((k) => (
@@ -289,7 +286,7 @@ export function CarouselDesignerPage() {
               </h2>
               <div className="cd-stack mt-10" aria-hidden>
                 <span className="cd-stack__disc" />
-                {["hf-05-v1.webp", "hf-06-v1.webp", "hf-08-v1.webp"].map((f) => (
+                {["hv-02-v1.webp", "hv-07-v1.webp", "hv-08-v1.webp"].map((f) => (
                   <Image key={f} src={S(f)} alt="" width={810} height={1013} sizes="14rem" />
                 ))}
               </div>

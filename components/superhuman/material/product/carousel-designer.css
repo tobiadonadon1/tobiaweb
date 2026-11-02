@@ -1,10 +1,10 @@
 /* ======================================================================
  * CAROUSEL DESIGNER (carousel-designer-page.tsx, -loader.tsx, -deck.tsx).
  * Second pass (2026-11-02): the skill's "pop" look on the page. Paper, ink,
- * cobalt for the action, lime and violet for colour, flat shapes, few words.
+ * cobalt for the action, peach and indigo for colour (no neon), flat shapes, few words.
  * ==================================================================== */
 
-.cd-page { --paper: #F4F1EA; --ink: #121212; --cobalt: #2B4BFF; --lime: #D1FE17; --violet: #7B3FF2; --band: #EAE5DA;
+.cd-page { --paper: #F4F1EA; --ink: #121212; --cobalt: #2B4BFF; --peach: #F2B08E; --peach-soft: #F6DDCD; --violet: #5B50D6; --band: #EAE5DA;
   background: var(--paper); color: var(--ink); font-family: var(--cd-text), ui-sans-serif, system-ui, sans-serif; }
 
 .cd-display { font-family: var(--cd-display), ui-sans-serif, system-ui, sans-serif; font-weight: 800; letter-spacing: -0.035em; word-spacing: 0.04em; line-height: 0.95; font-variation-settings: "opsz" 96; text-wrap: balance; }
@@ -13,18 +13,18 @@
 
 /* The accent, the way the skill marks a hook: a block of colour behind the word. */
 .cd-mark { background: linear-gradient(transparent 10%, var(--cobalt) 10%, var(--cobalt) 94%, transparent 94%); color: #fff; padding: 0 0.08em; margin: 0 -0.02em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-.cd-mark--lime { background-image: linear-gradient(transparent 10%, var(--lime) 10%, var(--lime) 94%, transparent 94%); color: var(--ink); }
+.cd-mark--peach { background-image: linear-gradient(transparent 10%, var(--peach) 10%, var(--peach) 94%, transparent 94%); color: var(--ink); }
 .cd-mark--violet { background-image: linear-gradient(transparent 10%, var(--violet) 10%, var(--violet) 94%, transparent 94%); color: #fff; }
-.cd-mark--ink { background-image: linear-gradient(transparent 10%, var(--ink) 10%, var(--ink) 94%, transparent 94%); color: var(--lime); }
+.cd-mark--ink { background-image: linear-gradient(transparent 10%, var(--ink) 10%, var(--ink) 94%, transparent 94%); color: var(--peach); }
 
 .cd-ink { background: var(--ink); color: var(--paper); }
-.cd-lime { background: var(--lime); color: var(--ink); }
+.cd-peach { background: var(--peach-soft); color: var(--ink); }
 .cd-cobalt { background: var(--cobalt); color: #fff; }
 
 /* Stickers: the small labels, the way the slides set them. */
-.cd-sticker { display: inline-block; padding: 0.5rem 0.95rem 0.45rem; border-radius: 99px; background: var(--ink); color: var(--lime); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.cd-sticker { display: inline-block; padding: 0.5rem 0.95rem 0.45rem; border-radius: 99px; background: var(--ink); color: var(--peach); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .cd-pill { display: inline-flex; align-items: center; padding: 0.45rem 0.95rem; border-radius: 99px; font-weight: 700; font-size: 0.92rem; background: #fff; color: var(--ink); box-shadow: inset 0 0 0 2px var(--ink); }
-.cd-pill[data-c="1"] { background: var(--lime); }
+.cd-pill[data-c="1"] { background: var(--peach); }
 .cd-pill[data-c="2"] { background: var(--violet); color: #fff; box-shadow: none; }
 .cd-pill[data-c="3"] { background: var(--ink); color: #fff; box-shadow: none; }
 .cd-pill--lg { font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; padding: 0.7rem 1.25rem; }
@@ -40,9 +40,9 @@
 /* --- flat shapes (decoration only) --- */
 .cd-shape { position: absolute; pointer-events: none; }
 .cd-shape--deck-a { width: 24rem; height: 24rem; border-radius: 50%; background: var(--violet); right: -12rem; bottom: -12rem; }
-.cd-shape--deck-b { width: 9rem; height: 9rem; color: var(--lime); left: -2.5rem; bottom: 2rem; }
-.cd-shape--how { width: 24rem; height: 12rem; border-radius: 12rem 12rem 0 0; background: var(--violet); left: -6rem; bottom: -1px; }
-.cd-shape--ready { width: 15rem; height: 15rem; color: var(--lime); right: -3rem; top: -3rem; animation: cd-spin 40s linear infinite; }
+.cd-shape--deck-b { width: 9rem; height: 9rem; color: var(--peach); left: -2.5rem; bottom: 2rem; }
+.cd-shape--how { width: 16rem; height: 8rem; border-radius: 8rem 8rem 0 0; background: var(--violet); left: -5rem; bottom: -1px; }
+.cd-shape--ready { width: 15rem; height: 15rem; color: var(--peach); right: -3rem; top: -3rem; animation: cd-spin 40s linear infinite; }
 @keyframes cd-spin { to { transform: rotate(360deg); } }
 @media (max-width: 640px) {
   .cd-shape--deck-b { display: none; }
@@ -53,7 +53,7 @@
 
 /* --- the hero: a phone with the feed, two slides fanned behind, shapes under it all --- */
 .cd-hero-shapes { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-.cd-hero-shapes__disc { position: absolute; left: 50%; top: 50%; width: 132%; aspect-ratio: 1; border-radius: 50%; background: var(--lime); transform: translate(-50%, -46%); }
+.cd-hero-shapes__disc { position: absolute; left: 50%; top: 50%; width: 132%; aspect-ratio: 1; border-radius: 50%; background: var(--peach); transform: translate(-50%, -46%); }
 .cd-hero-shapes__burst { position: absolute; width: 34%; color: var(--violet); left: -16%; top: -4%; animation: cd-spin 50s linear infinite; }
 .cd-hero-shapes__pill { position: absolute; width: 58%; height: 13%; border-radius: 99px; background: var(--cobalt); right: -22%; bottom: 6%; transform: rotate(-14deg); }
 .cd-phone { position: relative; z-index: 2; padding: 0.7rem; border-radius: 3.1rem; background: #0E0E10; box-shadow: 0 50px 90px -40px rgba(30, 25, 15, 0.55), inset 0 0 0 2px #2A2A2E; }
@@ -66,13 +66,13 @@
 
 /* --- a slide-shaped card (the facts), each on its own colour --- */
 .cd-slide { position: relative; overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 4 / 5; padding: 1.5rem 1.5rem 1.4rem; background: #fff; border-radius: 1.2rem; }
-.cd-slide::after { content: ""; position: absolute; width: 9rem; height: 9rem; border-radius: 50%; right: -3rem; top: -3rem; background: var(--lime); }
+.cd-slide::after { content: ""; position: absolute; width: 9rem; height: 9rem; border-radius: 50%; right: -3rem; top: -3rem; background: var(--peach); }
 .cd-slide > * { position: relative; z-index: 1; }
-.cd-slide:nth-child(2) { background: var(--lime); } .cd-slide:nth-child(2)::after { background: var(--ink); border-radius: 0 0 0 9rem; right: -1px; top: -1px; width: 7rem; height: 7rem; }
-.cd-slide:nth-child(3) { background: var(--violet); color: #fff; } .cd-slide:nth-child(3)::after { background: var(--lime); border-radius: 99px; width: 11rem; height: 4rem; transform: rotate(-20deg); top: 1.4rem; right: -3rem; }
+.cd-slide:nth-child(2) { background: var(--peach); } .cd-slide:nth-child(2)::after { background: var(--ink); border-radius: 0 0 0 9rem; right: -1px; top: -1px; width: 7rem; height: 7rem; }
+.cd-slide:nth-child(3) { background: var(--violet); color: #fff; } .cd-slide:nth-child(3)::after { background: var(--peach); border-radius: 99px; width: 11rem; height: 4rem; transform: rotate(-20deg); top: 1.4rem; right: -3rem; }
 .cd-slide:nth-child(4) { background: var(--ink); color: var(--paper); } .cd-slide:nth-child(4)::after { background: var(--cobalt); }
-.cd-slide__n { display: grid; place-items: center; width: 3.6rem; height: 3.6rem; border-radius: 50%; background: var(--ink); color: var(--lime); font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.02em; }
-.cd-slide:nth-child(4) .cd-slide__n { background: var(--lime); color: var(--ink); }
+.cd-slide__n { display: grid; place-items: center; width: 3.6rem; height: 3.6rem; border-radius: 50%; background: var(--ink); color: var(--peach); font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.02em; }
+.cd-slide:nth-child(4) .cd-slide__n { background: var(--peach); color: var(--ink); }
 @media (max-width: 639px) { .cd-slide { aspect-ratio: auto; min-height: 17rem; } }
 
 /* --- the deck: swipe it --- */
@@ -86,17 +86,17 @@
 .cd-deck__count i { font-style: normal; opacity: 0.4; }
 .cd-deck__dots { display: flex; gap: 0.4rem; flex: 1; }
 .cd-deck__dots i { width: 0.5rem; height: 0.5rem; border-radius: 99px; background: currentColor; opacity: 0.25; transition: width 200ms, background-color 200ms, opacity 200ms; }
-.cd-deck__dots i[data-on] { width: 1.6rem; background: var(--lime); opacity: 1; }
+.cd-deck__dots i[data-on] { width: 1.6rem; background: var(--peach); opacity: 1; }
 .cd-deck__arrows { display: flex; gap: 0.6rem; }
-.cd-deck__arrows button { width: 3.2rem; height: 3.2rem; border-radius: 99px; display: grid; place-items: center; background: var(--lime); color: var(--ink); transition: transform 140ms, opacity 140ms; }
+.cd-deck__arrows button { width: 3.2rem; height: 3.2rem; border-radius: 99px; display: grid; place-items: center; background: var(--peach); color: var(--ink); transition: transform 140ms, opacity 140ms; }
 .cd-deck__arrows button svg { width: 1.4rem; height: 1.4rem; }
 .cd-deck__arrows button:hover:not(:disabled) { transform: translateY(-2px); }
 .cd-deck__arrows button:disabled { opacity: 0.25; cursor: default; }
-.cd-deck__arrows button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+.cd-deck__arrows button:focus-visible { outline: 3px solid var(--peach); outline-offset: 3px; }
 
 /* --- the four questions --- */
 .cd-chip { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1.05rem 0.6rem 0.6rem; border-radius: 99px; background: var(--ink); color: #fff; font-weight: 700; font-size: 1rem; }
-.cd-chip b { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 99px; background: var(--lime); color: var(--ink); font-family: var(--cd-display), sans-serif; font-size: 0.95rem; }
+.cd-chip b { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: 99px; background: var(--peach); color: var(--ink); font-family: var(--cd-display), sans-serif; font-size: 0.95rem; }
 
 /* --- the looks --- */
 .cd-cover { border-radius: 0.6rem; overflow: hidden; box-shadow: 0 30px 50px -36px rgba(30, 25, 15, 0.55); transition: transform 260ms cubic-bezier(.2,.8,.2,1); }
@@ -106,7 +106,7 @@
 /* --- ready to post: stickers --- */
 .cd-ready { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.8rem 1.25rem 0.8rem 1rem; border-radius: 99px; background: #fff; color: var(--ink); font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
 .cd-ready svg { color: var(--cobalt); }
-.cd-ready:nth-child(3n+2) { background: var(--lime); }
+.cd-ready:nth-child(3n+2) { background: var(--peach); }
 .cd-ready:nth-child(3n+2) svg { color: var(--ink); }
 .cd-ready:nth-child(4n+3) { transform: rotate(-1.5deg); }
 
@@ -118,7 +118,7 @@
 .cd-stack img:nth-of-type(2) { left: 26%; top: 0.6rem; transform: rotate(3deg); }
 .cd-stack img:nth-of-type(3) { left: 52%; top: 2.8rem; transform: rotate(10deg); }
 @media (max-width: 480px) { .cd-stack { height: 15rem; } .cd-stack img { width: 10.5rem; } .cd-stack__disc { width: 11rem; height: 11rem; } }
-.cd-step { display: grid; place-items: center; flex: none; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--lime); font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.05rem; transform: translateY(0.35rem); }
+.cd-step { display: grid; place-items: center; flex: none; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--peach); font-family: var(--cd-display), sans-serif; font-weight: 800; font-size: 1.05rem; transform: translateY(0.35rem); }
 
 /* ======================================================================
  * THE OPENING (carousel-designer-loader.tsx): five slides are dealt into a
@@ -129,7 +129,7 @@
 .cd-load[data-done] { animation: cd-gone 280ms ease-out forwards; }
 @keyframes cd-out { 0%, 99% { visibility: visible; } 100% { visibility: hidden; } }
 @keyframes cd-gone { to { opacity: 0; visibility: hidden; } }
-.cd-load__sheet { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 2.2rem; background: #D1FE17; pointer-events: auto;
+.cd-load__sheet { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 2.2rem; background: #F2ECE4; pointer-events: auto;
   animation: cd-lift 0.6s cubic-bezier(0.7, 0, 0.25, 1) 2.25s forwards; }
 @keyframes cd-lift { to { transform: translateY(-105%); } }
 .cd-load__stack { position: relative; width: min(40vw, 13.5rem); aspect-ratio: 4 / 5; }
