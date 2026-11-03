@@ -2,7 +2,7 @@
 /**
  * BUILD THE DESIGN LIBRARY.
  *
- *   node scripts/design-build.mjs            every block in ~/Desktop/construct-design/blocks
+ *   node scripts/design-build.mjs            every block in ~/Desktop/tobiaweb-private/construct-design/blocks
  *   node scripts/design-build.mjs --check    validate only, write nothing
  *   node scripts/design-build.mjs --lenient  skip a block that does not pass yet (while building)
  *
@@ -33,7 +33,7 @@ import * as esbuild from "esbuild";
 import { parseKey, seal, unseal } from "../lib/shop/seal.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
-const SRC = path.resolve(process.env.DESIGN_SRC || path.join(os.homedir(), "Desktop/construct-design/blocks"));
+const SRC = path.resolve(process.env.DESIGN_SRC || path.join(os.homedir(), "Desktop/tobiaweb-private/construct-design/blocks"));
 const COMPILED = path.join(root, "components/design-library/compiled");
 const SEALED = path.join(root, "private/design");
 const CATALOG = path.join(root, "components/design-library/catalog.generated.ts");

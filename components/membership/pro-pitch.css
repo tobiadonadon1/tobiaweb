@@ -142,6 +142,36 @@
 }
 .pp-perks li.pp-more { color: rgb(255, 190, 130); font-weight: 600; }
 
+/* THE METER: one tile per skill. This one alone, pearl among empty slots;
+   Pro's row lights up tile by tile, ember, once the card is open. */
+.pp-meter {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px 12px;
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+.pp-ml { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: rgba(255, 248, 242, 0.6); white-space: nowrap; }
+.pp-ml-pro { color: rgb(255, 190, 130); }
+.pp-mn { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; color: rgba(255, 248, 242, 0.6); }
+.pp-mn-pro { color: #fff; }
+.pp-tiles { display: flex; gap: 3px; }
+.pp-tiles i { flex: 1; height: 14px; border-radius: 3.5px; background: rgba(255, 255, 255, 0.07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.pp-tiles i[data-on] { background: linear-gradient(180deg, #fffaf3, #d9cfc1); box-shadow: 0 0 10px rgba(255, 250, 243, 0.35); }
+.pp-tiles-all i {
+  background: linear-gradient(180deg, #ffb08a, #e05a34 60%, #b5341f);
+  box-shadow: inset 0 1px 0 rgba(255, 230, 210, 0.55), 0 0 8px rgba(240, 110, 60, 0.35);
+  opacity: 0.12;
+  transform: scaleY(0.6);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(0.35s + var(--i) * 40ms);
+}
+.pp-veil[data-open="true"] .pp-tiles-all i { opacity: 1; transform: none; }
+
 .pp-row { display: flex; gap: 8px; }
 .pp-row form { display: contents; }
 
@@ -275,6 +305,9 @@
   .pp-sub { font-size: 14px; }
   .pp-perks li { font-size: 12.5px; }
   .pp-alt { padding: 0 14px 0 12px; }
+  .pp-meter { padding: 12px 13px; gap: 8px 10px; }
+  .pp-tiles { gap: 2px; }
+  .pp-tiles i { height: 12px; border-radius: 3px; }
 }
 /* A phone: the two plans stack, Pro on top. */
 @media (max-width: 440px) {
@@ -282,6 +315,6 @@
   .pp-alt { justify-content: center; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pp-dim, .pp-card, .pp-cta, .pp-alt, .pp-skip { transition: none; }
+  .pp-dim, .pp-card, .pp-cta, .pp-alt, .pp-skip, .pp-tiles-all i { transition: none; }
   .pp-cta::after { animation: none; }
 }

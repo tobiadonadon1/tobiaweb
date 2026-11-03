@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Crown, LoaderCircle, Mail, ShoppingBag, X } from "lucide-react";
 import { useMember } from "@/components/account/use-member";
-import { PLANS, money } from "@/lib/membership/tiers";
-import { productById, type Product } from "@/lib/shop/products";
+import { PLANS, levelOf, money } from "@/lib/membership/tiers";
+import { PRODUCTS, productById, type Product } from "@/lib/shop/products";
 import "./pro-pitch.css";
 
 /**
@@ -18,6 +18,11 @@ import "./pro-pitch.css";
  * send me Duo Designer" or "Just buy Grok Army · €15". Taking that, or
  * closing the card, carries on exactly as before, and the card doesn't come
  * back on that button until the page is loaded again.
+ *
+ * Above the buttons, the difference drawn instead of said: a row of one
+ * tile for every skill, only this one lit, and under it Pro's row, every
+ * tile lighting up (Tobia, 2026-10-26: "very minimal, but speaks louder than
+ * words").
  *
  * Only for people without a paid plan: signed out, or on Free. A Pro,
  * Ultimate or Universal member never sees it. While the site is still
@@ -99,6 +104,31 @@ function copyFor(product: Product) {
       (more > 0 && more <= 1000 ? ` For ${money(more, "eur")} more than this one.` : ""),
     skip: `Just buy ${product.name} · ${price}`,
   };
+}
+
+/** One tile per skill Pro includes: this one alone, then all of them. */
+function Meter({ product }: { product: Product }) {
+  const skills = Object.values(PRODUCTS).filter((p) => levelOf(p) !== "exclusive");
+  const here = Math.max(0, skills.findIndex((p) => p.id === product.id));
+  const n = skills.length;
+  return (
+    <div className="pp-meter" role="img" aria-label={`${product.name} alone: 1 skill. Pro: all ${n}.`}>
+      <span className="pp-ml">This one</span>
+      <span className="pp-tiles">
+        {skills.map((p, i) => (
+          <i key={p.id} data-on={i === here || undefined} />
+        ))}
+      </span>
+      <span className="pp-mn">1</span>
+      <span className="pp-ml pp-ml-pro">{PLANS.pro.name}</span>
+      <span className="pp-tiles pp-tiles-all">
+        {skills.map((p, i) => (
+          <i key={p.id} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+      </span>
+      <span className="pp-mn pp-mn-pro">{n}</span>
+    </div>
+  );
 }
 
 function JoinForm({ tier, className, children }: { tier: "pro" | "ultimate"; className: string; children: React.ReactNode }) {
@@ -221,6 +251,7 @@ function ProPitch({ product, onContinue, onClose }: { product: Product; onContin
             <li>Live Q&amp;A with me</li>
             <li className="pp-more">and more</li>
           </ul>
+          <Meter product={product} />
           <div className="pp-row">
             <JoinForm tier="pro" className="pp-cta">
               Join {pro.name}

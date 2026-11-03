@@ -5,7 +5,7 @@
  *   node scripts/training-build.mjs
  *
  * For every sheet listed in lib/training/sheets.ts, takes the printed PDF and
- * its page picture from ~/Desktop/construct-training (set TRAINING_SRC to use
+ * its page picture from ~/Desktop/tobiaweb-private/construct-training (set TRAINING_SRC to use
  * another folder) and writes:
  *
  *   private/training/<id>.pdf.enc    the PDF, sealed with SHOP_FILE_KEY (the repo is public)
@@ -14,7 +14,7 @@
  *
  * A PDF is only re-sealed when it changed (its hash is kept beside it in
  * private/training/hashes.json), so a rebuild doesn't rewrite every file.
- * Print a sheet first: node ~/Desktop/construct-training/tools/print.mjs <id>
+ * Print a sheet first: node ~/Desktop/tobiaweb-private/construct-training/tools/print.mjs <id>
  */
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -24,7 +24,7 @@ import path from "node:path";
 import { parseKey, seal, unseal } from "../lib/shop/seal.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
-const SRC = path.resolve(process.env.TRAINING_SRC || path.join(os.homedir(), "Desktop/construct-training"));
+const SRC = path.resolve(process.env.TRAINING_SRC || path.join(os.homedir(), "Desktop/tobiaweb-private/construct-training"));
 const SEALED = path.join(root, "private/training");
 const PICTURES = path.join(root, "public/training");
 

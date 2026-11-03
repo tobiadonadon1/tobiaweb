@@ -1,6 +1,6 @@
 /**
  * THE TRAINING SHEETS: one-page cheat sheets for members, printed from HTML
- * (sources in ~/Desktop/construct-training) and sealed into
+ * (sources in ~/Desktop/tobiaweb-private/construct-training) and sealed into
  * private/training/<id>.pdf.enc with SHOP_FILE_KEY, like the shop's files,
  * because the repository is public. The small picture of each page is
  * public/training/<id>.webp.
