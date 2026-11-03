@@ -17,6 +17,7 @@ import {
   h2,
   isSectionId,
   MOVED,
+  GroupSection,
   LiveSection,
   Locked,
   LockMark,
@@ -43,7 +44,7 @@ import {
  *   Overview         the plan, what's new since the last visit (small), then
  *                    a tile for every section with its next step
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
- *   With me          Live Q&A, Direct messaging (Telegram)
+ *   With me          Live Q&A, Direct messaging (Telegram), the members' group (Telegram)
  *   Ultimate         1-on-1 call (Calendly), Custom skills (with the requests board), Network
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
  *                    and every other plan, up or down, each one click away
@@ -166,7 +167,7 @@ export function MemberPanel({
   const section = sectionById(active);
   const unlock = needs(section, tier);
   // Sections drawn from /api/membership/perks; the rest work without it.
-  const fromPerks = !unlock && ["skills", "masterclass", "design", "training", "live", "telegram", "calls", "network"].includes(active);
+  const fromPerks = !unlock && ["skills", "masterclass", "design", "training", "live", "telegram", "group", "calls", "network"].includes(active);
   const notLoaded =
     perksState === "failed" || perksState === "signed-out" ? (
       <LoadFailed signedOut={perksState === "signed-out"} onRetry={() => setPerksState("loading")} />
@@ -277,6 +278,8 @@ export function MemberPanel({
             <LiveSection ids={ids} perks={perks} />
           ) : active === "telegram" ? (
             <TelegramSection ids={ids} perks={perks} />
+          ) : active === "group" ? (
+            <GroupSection ids={ids} perks={perks} />
           ) : active === "calls" ? (
             <CallsSection ids={ids} perks={perks} />
           ) : active === "custom" ? (
@@ -451,6 +454,7 @@ function Overview({
     training: count("training") ? plural(count("training"), "video or file", "videos and files") : "Coming shortly",
     live: `Next: ${qaDate(nextQa().at, "short")} · on YouTube`,
     telegram: links.telegram ? "Message me directly" : soon,
+    group: links.group ? "Join the members' group" : soon,
     calls: links.calls ? "Book on Calendly" : soon,
     custom: "Ask for a skill, vote on what's next",
     network: links.network ? "Open the network" : "Coming soon",

@@ -15,12 +15,13 @@ import { sealedLink } from "@/lib/membership/contact";
  * public repository, so the only way to them is through this check.
  *
  *   MEMBERS_TELEGRAM_URL   Telegram DMs              Pro and up
+ *   MEMBERS_GROUP_URL      the members' Telegram group Pro and up
  *   MEMBERS_QA_URL         bi-monthly group Q&A      Pro and up
  *   MEMBERS_WORKSHOP_URL   bi-monthly workshop       Ultimate and up
  *   MEMBERS_CALLS_URL      1-on-1 booking page       Ultimate and up
  *   MEMBERS_NETWORK_URL    the members' network      Ultimate and up
  *
- * Telegram (with its QR code) and the call have sealed defaults
+ * Telegram (with its QR code), the group and the call have sealed defaults
  * (lib/membership/contact.ts), so they work with no variable set; the
  * variable still wins if it is.
  */
@@ -29,6 +30,7 @@ export const dynamic = "force-dynamic";
 
 const LINKS: [Perk, string][] = [
   ["telegram", "MEMBERS_TELEGRAM_URL"],
+  ["group", "MEMBERS_GROUP_URL"],
   ["qa", "MEMBERS_QA_URL"],
   ["workshop", "MEMBERS_WORKSHOP_URL"],
   ["calls", "MEMBERS_CALLS_URL"],
@@ -53,6 +55,7 @@ export async function GET(request: Request) {
     links.telegram ||= sealed?.url ?? null;
     telegramQr = sealed?.qr ?? null;
   }
+  if (hasPerk(tier, "group")) links.group ||= (await sealedLink("group"))?.url ?? null;
   if (hasPerk(tier, "calls")) links.calls ||= (await sealedLink("calls"))?.url ?? null;
 
   // Rows above the plan (an Ultimate-only lesson, seen by Pro) come back

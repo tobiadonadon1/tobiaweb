@@ -14,6 +14,7 @@ import {
   LayoutGrid,
   LayoutTemplate,
   LoaderCircle,
+  MessagesSquare,
   Lock,
   Package,
   PlayCircle,
@@ -53,6 +54,7 @@ export type SectionId =
   | "training"
   | "live"
   | "telegram"
+  | "group"
   | "calls"
   | "custom"
   | "network"
@@ -89,6 +91,7 @@ export const SECTIONS: Section[] = [
   { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
   { id: "telegram", name: "Direct messaging", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
+  { id: "group", name: "Members' group", icon: MessagesSquare, perk: "group", about: "The members' group chat on Telegram: ask, share what you ship, get feedback.", match: /group chat/ },
   { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me.", match: /1-on-1/ },
   { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, and a say in what I build next.", match: /custom skills/i },
   { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship.", match: /network/i },
@@ -99,7 +102,7 @@ export const SECTIONS: Section[] = [
 export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
   { label: null, ids: ["overview"] },
   { label: "Library", ids: ["skills", "masterclass", "design", "training"] },
-  { label: "With me", ids: ["live", "telegram"] },
+  { label: "With me", ids: ["live", "telegram", "group"] },
   { label: "Ultimate", ids: ["calls", "custom", "network"] },
   { label: "Account", ids: ["billing"] },
 ];
@@ -281,6 +284,51 @@ export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | nu
         </div>
       ) : (
         <LinkCard icon={Send} url={null} label="" pending="Lands here soon." />
+      )}
+    </section>
+  );
+}
+
+export function GroupSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  const url = perks?.links.group;
+  return (
+    <section aria-labelledby={`${ids}-group`}>
+      <SectionHead id={`${ids}-group`} title="The members' group" line="One chat for every member, on Telegram. Ask, share what you ship, get feedback." />
+      {url ? (
+        // the group's way in, in a soft Telegram blue: a few chat lines, then the button
+        <div className="relative mt-7 overflow-hidden rounded-[2rem] bg-[radial-gradient(120%_130%_at_100%_0%,#cfe9f8_0%,transparent_70%),linear-gradient(200deg,#eef7fc_0%,#fffdf9_100%)] p-6 md:p-10">
+          <MessagesSquare aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-56 w-56 -rotate-6 text-[#2AA3D6]/10" strokeWidth={1.2} />
+          <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-[30rem]">
+              <div className="flex items-center gap-3">
+                <span className="grid h-14 w-14 flex-none place-items-center rounded-full bg-[linear-gradient(135deg,#37AEE2_0%,#1E96C8_100%)] text-white shadow-[0_10px_24px_-12px_rgba(30,150,200,0.8)]">
+                  <Users aria-hidden className="h-6 w-6" />
+                </span>
+                <div>
+                  <p className="text-[1.1rem] font-semibold leading-tight">Construct members</p>
+                  <p className={`text-[0.9rem] ${soft}`}>Group on Telegram · members only</p>
+                </div>
+              </div>
+              <div className="mt-6 flex flex-col gap-2">
+                <p className="w-fit max-w-full rounded-[1.4rem] rounded-tl-[0.4rem] bg-white px-5 py-3 text-[1rem] leading-[1.45] shadow-[0_10px_30px_-16px_rgba(11,31,58,0.35)]">
+                  Welcome in. Say hi and tell us what you&rsquo;re building.
+                </p>
+              </div>
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#2AA3D6] px-6 py-3.5 text-[1rem] font-semibold text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
+              >
+                <Send aria-hidden className="h-4 w-4" />
+                Join the group
+              </a>
+              <p className={`mt-4 text-[0.88rem] ${soft}`}>Opens in Telegram. The invite is for you, so please keep it to yourself.</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <LinkCard icon={MessagesSquare} url={null} label="" pending="Lands here soon." />
       )}
     </section>
   );

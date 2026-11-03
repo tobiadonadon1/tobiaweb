@@ -43,15 +43,16 @@ export type Perk =
   | "workshop" // bi-monthly live workshop
   | "calls" // 1-on-1 calls
   | "telegram" // direct contact on Telegram
+  | "group" // the members' group chat on Telegram
   | "network" // the members' network
   | "commission" // a skill built for them (paid separately)
   | "requests"; // ask for skills and vote on what's next
 
 const PERKS: Record<Tier, Perk[]> = {
   free: [],
-  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram"],
-  ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
-  universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
+  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram", "group"],
+  ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "group", "network", "commission", "requests"],
+  universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "group", "network", "commission", "requests"],
 };
 
 export const hasPerk = (tier: Tier, perk: Perk) => PERKS[tier].includes(perk);
@@ -93,6 +94,7 @@ export const PLANS: Record<PaidTier, Plan> = {
       "Selected training videos and resources",
       "Live group Q&A, twice a month",
       "Direct messaging with me on Telegram",
+      "The members' group chat on Telegram",
     ],
   },
   ultimate: {

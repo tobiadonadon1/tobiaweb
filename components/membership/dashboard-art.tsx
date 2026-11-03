@@ -83,6 +83,7 @@ const TILE_LOOK: Record<string, Look> = {
   training: SHELF_LOOK.training,
   live: SHELF_LOOK.live,
   telegram: { a: "#bfe0f6", b: "#eef7fc" },
+  group: { a: "#c4ecf2", b: "#eefafb" },
   calls: { a: "#d9c8ff", b: "#f5f0ff" },
   custom: { a: "#ffe08f", b: "#fff8e3" },
   network: SHELF_LOOK.network,
