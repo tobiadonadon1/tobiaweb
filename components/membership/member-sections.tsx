@@ -306,7 +306,7 @@ export function GroupSection({ ids, perks }: { ids: string; perks: Perks | null 
                 </span>
                 <div>
                   <p className="text-[1.1rem] font-semibold leading-tight">Construct members</p>
-                  <p className={`text-[0.9rem] ${soft}`}>Group on Telegram · members only</p>
+                  <p className={`text-[0.9rem] ${soft}`}>Members-only Telegram group</p>
                 </div>
               </div>
               <div className="mt-6 flex flex-col gap-2">
