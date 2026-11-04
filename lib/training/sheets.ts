@@ -1,5 +1,5 @@
 /**
- * THE TRAINING SHEETS: one-page cheat sheets for members, printed from HTML
+ * THE TRAINING SHEETS: cheat sheets and guides for members, printed from HTML
  * (sources in ~/Desktop/tobiaweb-private/construct-training) and sealed into
  * private/training/<id>.pdf.enc with SHOP_FILE_KEY, like the shop's files,
  * because the repository is public. The small picture of each page is
@@ -12,18 +12,25 @@
  *   pro       open to Pro and Ultimate ("selected training")
  *   ultimate  Ultimate only; Pro sees it in the list, locked
  *
+ * A sheet with `masterclass` set is a lesson to read: it shows on the
+ * Masterclass too (the dashboard's shelf and the page, in that track's row).
+ *
  * To add one: print it, seal it (npm run seal -- <pdf> private/training/<id>.pdf.enc),
  * add its picture, and add it here. Newest last.
  */
 export type Sheet = {
   id: string;
   /** Which row it sits in: how to get the most from one of my skills, or Claude Code itself. */
-  group: "skills" | "claude";
+  group: "skills" | "claude" | "x";
   title: string;
   /** One line: what it lets you do. */
   summary: string;
   tier: "pro" | "ultimate";
   added: string;
+  /** More than one page: a guide, not a cheat sheet. */
+  pages?: number;
+  /** Also a Masterclass lesson, in this track (components/masterclass/tracks.ts). */
+  masterclass?: string;
 };
 
 export const SHEETS: Sheet[] = [
@@ -122,6 +129,16 @@ export const SHEETS: Sheet[] = [
     summary: "The pre-flight checklist: checks, secrets, deploy, domain, Stripe from test to live, and the first hour after launch.",
     tier: "ultimate",
     added: "2026-10-23",
+  },
+  {
+    id: "x-marketing-masterclass",
+    group: "x",
+    title: "Twitter Marketing Masterclass",
+    summary: "How to actually grow on X: lead magnets, articles, distribution, and what I'd do starting from zero.",
+    tier: "pro",
+    added: "2026-11-03",
+    pages: 7,
+    masterclass: "launch",
   },
 ];
 

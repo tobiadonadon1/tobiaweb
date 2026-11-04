@@ -14,7 +14,6 @@ import {
   LayoutGrid,
   LayoutTemplate,
   LoaderCircle,
-  MessagesSquare,
   Lock,
   Package,
   PlayCircle,
@@ -54,7 +53,6 @@ export type SectionId =
   | "training"
   | "live"
   | "telegram"
-  | "group"
   | "calls"
   | "custom"
   | "network"
@@ -86,15 +84,14 @@ export type Section = {
 export const SECTIONS: Section[] = [
   { id: "overview", name: "Overview", icon: LayoutGrid, about: "Everything your plan opens." },
   { id: "skills", name: "Skills", icon: Package, about: "Every skill, paid and free, ready to download." },
-  { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "In-depth lessons, 10 to 20 minutes each. Made for members, never on YouTube.", match: /Masterclass/ },
+  { id: "masterclass", name: "Masterclass", icon: GraduationCap, perk: "masterclass", about: "In-depth lessons, to watch or to read. Made for members, never on YouTube.", match: /Masterclass/ },
   { id: "design", name: "Design", icon: LayoutTemplate, perk: "design", about: "Interactive components you copy into your site.", match: /^Design/ },
-  { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training videos and resources.", match: /training/i },
+  { id: "training", name: "Training", icon: PlayCircle, perk: "training", about: "Training sheets, videos and resources.", match: /training/i },
   { id: "live", name: "Live Q&A", icon: Radio, perk: "qa", about: "A live group Q&A with me, twice a month.", match: /Q&A/ },
   { id: "telegram", name: "Direct messaging", icon: Send, perk: "telegram", about: "Direct messaging with me on Telegram.", match: /Telegram/ },
-  { id: "group", name: "Members' group", icon: MessagesSquare, perk: "group", about: "The members' group chat on Telegram: ask, share what you ship, get feedback.", match: /group chat/ },
   { id: "calls", name: "1-on-1 call", icon: CalendarClock, perk: "calls", about: "A private 1-on-1 call with me.", match: /1-on-1/ },
   { id: "custom", name: "Custom skills", icon: WandSparkles, perk: "commission", about: "Skills built to your spec, and a say in what I build next.", match: /custom skills/i },
-  { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship.", match: /network/i },
+  { id: "network", name: "Network", icon: Users, perk: "network", about: "A private network of builders who ship, on Telegram.", match: /network/i },
   { id: "billing", name: "Plan & billing", icon: CreditCard, about: "Your plan, your card and your invoices." },
 ];
 
@@ -102,15 +99,15 @@ export const SECTIONS: Section[] = [
 export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
   { label: null, ids: ["overview"] },
   { label: "Library", ids: ["skills", "masterclass", "design", "training"] },
-  { label: "With me", ids: ["live", "telegram", "group"] },
+  { label: "With me", ids: ["live", "telegram"] },
   { label: "Ultimate", ids: ["calls", "custom", "network"] },
   { label: "Account", ids: ["billing"] },
 ];
 
 export const sectionById = (id: SectionId) => SECTIONS.find((s) => s.id === id)!;
 export const isSectionId = (v: string): v is SectionId => SECTIONS.some((s) => s.id === v);
-/** Old links: the requests board now lives under Custom skills. */
-export const MOVED: Record<string, SectionId> = { requests: "custom" };
+/** Old links: the requests board now lives under Custom skills, the old group under Network. */
+export const MOVED: Record<string, SectionId> = { requests: "custom", group: "network" };
 
 /** The plan that opens a section: null when this tier already has it. */
 export function needs(section: Section, tier: Tier): PaidTier | null {
@@ -289,51 +286,6 @@ export function TelegramSection({ ids, perks }: { ids: string; perks: Perks | nu
   );
 }
 
-export function GroupSection({ ids, perks }: { ids: string; perks: Perks | null }) {
-  const url = perks?.links.group;
-  return (
-    <section aria-labelledby={`${ids}-group`}>
-      <SectionHead id={`${ids}-group`} title="The members' group" line="One chat for every member, on Telegram. Ask, share what you ship, get feedback." />
-      {url ? (
-        // the group's way in, in a soft Telegram blue: a few chat lines, then the button
-        <div className="relative mt-7 overflow-hidden rounded-[2rem] bg-[radial-gradient(120%_130%_at_100%_0%,#cfe9f8_0%,transparent_70%),linear-gradient(200deg,#eef7fc_0%,#fffdf9_100%)] p-6 md:p-10">
-          <MessagesSquare aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-56 w-56 -rotate-6 text-[#2AA3D6]/10" strokeWidth={1.2} />
-          <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-[30rem]">
-              <div className="flex items-center gap-3">
-                <span className="grid h-14 w-14 flex-none place-items-center rounded-full bg-[linear-gradient(135deg,#37AEE2_0%,#1E96C8_100%)] text-white shadow-[0_10px_24px_-12px_rgba(30,150,200,0.8)]">
-                  <Users aria-hidden className="h-6 w-6" />
-                </span>
-                <div>
-                  <p className="text-[1.1rem] font-semibold leading-tight">Construct members</p>
-                  <p className={`text-[0.9rem] ${soft}`}>Members-only Telegram group</p>
-                </div>
-              </div>
-              <div className="mt-6 flex flex-col gap-2">
-                <p className="w-fit max-w-full rounded-[1.4rem] rounded-tl-[0.4rem] bg-white px-5 py-3 text-[1rem] leading-[1.45] shadow-[0_10px_30px_-16px_rgba(11,31,58,0.35)]">
-                  Welcome in. Say hi and tell us what you&rsquo;re building.
-                </p>
-              </div>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#2AA3D6] px-6 py-3.5 text-[1rem] font-semibold text-white transition-transform duration-200 hover:scale-[1.03] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ink)]"
-              >
-                <Send aria-hidden className="h-4 w-4" />
-                Join the group
-              </a>
-              <p className={`mt-4 text-[0.88rem] ${soft}`}>Opens in Telegram. The invite is for you, so please keep it to yourself.</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <LinkCard icon={MessagesSquare} url={null} label="" pending="Lands here soon." />
-      )}
-    </section>
-  );
-}
-
 export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null }) {
   return (
     <section aria-labelledby={`${ids}-calls`}>
@@ -362,13 +314,34 @@ export function CallsSection({ ids, perks }: { ids: string; perks: Perks | null 
 }
 
 export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | null }) {
+  const url = perks?.links.network;
   return (
     <section aria-labelledby={`${ids}-network`}>
-      <SectionHead id={`${ids}-network`} title="The network" />
-      {perks?.links.network ? (
-        <LinkCard icon={Users} url={perks.links.network} label="Open the network" pending="">
-          <p className="text-[1.05rem] font-medium">Members only.</p>
-        </LinkCard>
+      <SectionHead id={`${ids}-network`} title="The network" line="Builders who ship, in one Telegram group. Ask, share what you made, get feedback from people doing the same." />
+      {url ? (
+        // the network's way in, on its own soft blue: who's in it, a first line, then the button
+        <div className="relative mt-7 overflow-hidden rounded-[2rem] bg-[radial-gradient(120%_130%_at_100%_0%,#c9d3ff_0%,transparent_70%),linear-gradient(200deg,#eff2ff_0%,#fffdf9_100%)] p-6 md:p-10">
+          <Users aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-56 w-56 -rotate-6 text-[#2440ff]/10" strokeWidth={1.2} />
+          <div className="relative max-w-[30rem]">
+            <div className="flex items-center gap-3">
+              <span className="grid h-14 w-14 flex-none place-items-center rounded-full bg-[var(--ink)] text-[var(--paper)] shadow-[0_10px_24px_-12px_rgba(11,31,58,0.8)]">
+                <Users aria-hidden className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="text-[1.1rem] font-semibold leading-tight">The Construct network</p>
+                <p className={`text-[0.9rem] ${soft}`}>Ultimate members, on Telegram</p>
+              </div>
+            </div>
+            <p className="mt-6 w-fit max-w-full rounded-[1.4rem] rounded-tl-[0.4rem] bg-white px-5 py-3 text-[1rem] leading-[1.45] shadow-[0_10px_30px_-16px_rgba(11,31,58,0.35)]">
+              Welcome in. Say hi and tell us what you&rsquo;re building.
+            </p>
+            <a href={url} target="_blank" rel="noopener noreferrer" className={`${inkButton} mt-7`}>
+              <Send aria-hidden className="h-4 w-4" />
+              Join the network
+            </a>
+            <p className={`mt-4 text-[0.88rem] ${soft}`}>Opens in Telegram. The invite is for you, so please keep it to yourself.</p>
+          </div>
+        </div>
       ) : (
         <ComingSoon shelf="network" />
       )}
@@ -661,17 +634,17 @@ export function ShelfSection({
 }) {
   const s = SHELVES[shelf];
   const all = (perks?.training ?? []).filter((t) => t.shelf === shelf);
-  // Training sheets (one-page PDFs) are drawn as pages; everything else is a row.
+  // Sheets and guides (PDFs) are drawn as pages; everything else is a row.
   const sheets = all.filter((t) => t.kind === "sheet");
   const rows = all.filter((t) => t.kind !== "sheet");
   const anyLocked = all.some((t) => t.locked);
   const line =
     shelf === "training"
       ? tier === "pro"
-        ? "One-page sheets to keep next to your screen."
+        ? "Sheets and guides to keep next to your screen."
         : "Every sheet, every video, every file."
       : shelf === "masterclass"
-        ? "In-depth lessons, 10 to 20 minutes. Never on YouTube."
+        ? "In-depth lessons, to watch or to read. Never on YouTube."
         : "Interactive components. Pick one, take its code.";
   return (
     <section aria-labelledby={`${ids}-${shelf}`}>
@@ -696,6 +669,7 @@ export function ShelfSection({
             [
               ["skills", "Skill sheets"],
               ["claude", "Claude Code"],
+              ["x", "Grow on X"],
             ] as const
           ).map(([group, name]) => {
             const list = sheets.filter((t) => (t.group ?? "claude") === group);

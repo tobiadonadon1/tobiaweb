@@ -37,22 +37,21 @@ export type Perk =
   | "premium-skills" // premium skills included
   | "exclusive-skills" // Ultimate-only skills
   | "training" // the training library (how much: `trainingReach`)
-  | "masterclass" // the shelf's Masterclass: in-depth video lessons
+  | "masterclass" // the shelf's Masterclass: in-depth lessons, on video and on paper
   | "design" // the shelf's Design: the component library
   | "qa" // bi-monthly live group Q&A
   | "workshop" // bi-monthly live workshop
   | "calls" // 1-on-1 calls
   | "telegram" // direct contact on Telegram
-  | "group" // the members' group chat on Telegram
-  | "network" // the members' network
+  | "network" // the members' network (a Telegram group)
   | "commission" // a skill built for them (paid separately)
   | "requests"; // ask for skills and vote on what's next
 
 const PERKS: Record<Tier, Perk[]> = {
   free: [],
-  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram", "group"],
-  ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "group", "network", "commission", "requests"],
-  universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "group", "network", "commission", "requests"],
+  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram"],
+  ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
+  universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
 };
 
 export const hasPerk = (tier: Tier, perk: Perk) => PERKS[tier].includes(perk);
@@ -89,12 +88,11 @@ export const PLANS: Record<PaidTier, Plan> = {
       "All free skills and guides",
       "Every premium skill, included",
       "Unique skills at member pricing",
-      "Masterclass: in-depth video lessons, 10 to 20 minutes, never on YouTube",
+      "Masterclass: in-depth lessons, on video and on paper, never on YouTube",
       "Design: the library of interactive components, to copy into your site",
       "Selected training videos and resources",
       "Live group Q&A, twice a month",
       "Direct messaging with me on Telegram",
-      "The members' group chat on Telegram",
     ],
   },
   ultimate: {

@@ -57,13 +57,8 @@ for (const id of ids) {
     failed = true;
     continue;
   }
+  // print.mjs already fails a sheet that isn't one page; a guide (`pages` in sheets.ts) is longer.
   const plain = readFileSync(pdf);
-  const pages = (plain.toString("latin1").match(/\/Type\s*\/Page[^s]/g) || []).length;
-  if (pages !== 1) {
-    console.error(`✗ ${id}: ${pages} pages; a sheet is one page`);
-    failed = true;
-    continue;
-  }
   const sha = createHash("sha256").update(plain).digest("hex").slice(0, 16);
   const out = path.join(SEALED, `${id}.pdf.enc`);
   if (hashes[id] !== sha || !existsSync(out)) {

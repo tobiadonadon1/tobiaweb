@@ -4,7 +4,7 @@ import { parseKey, unseal } from "@/lib/shop/seal";
 
 /**
  * MY PRIVATE LINKS, for members: Telegram (with its QR code), the
- * members' group invite and the Calendly page for the 1-on-1 call. The Telegram ones carry my phone number
+ * network's Telegram invite and the Calendly page for the 1-on-1 call. The Telegram ones carry my phone number
  * and the booking page is Ultimate's, and the repository is public, so they
  * are committed sealed (private/members/<name>.json.enc, with SHOP_FILE_KEY,
  * like the products) and only /api/membership/perks opens them, for a plan

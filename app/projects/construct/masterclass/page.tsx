@@ -4,7 +4,7 @@ import { MasterclassPage } from "@/components/masterclass/masterclass-page";
 
 export const metadata: Metadata = {
   title: "Masterclass · Construct",
-  description: "In-depth lessons, 10 to 20 minutes each, on building, designing, launching and selling your first product. Never on YouTube. For Construct Pro and Ultimate.",
+  description: "In-depth lessons, on video and on paper, on building, designing, launching and selling your first product. Never on YouTube. For Construct Pro and Ultimate.",
   alternates: { canonical: "/projects/construct/masterclass" },
 };
 

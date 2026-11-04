@@ -3,11 +3,12 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, Play } from "lucide-react";
+import { Download, FileText, Lock, Play } from "lucide-react";
 import { useMember } from "@/components/account/use-member";
 import { JOIN_HREF } from "@/components/account/links";
 import { hasPerk } from "@/lib/membership/tiers";
 import { LESSONS, clock, type Lesson as SiteLesson } from "@/lib/masterclass/lessons";
+import { SHEETS, type Sheet } from "@/lib/training/sheets";
 import { TRACKS } from "./tracks";
 
 /**
@@ -22,6 +23,10 @@ import { TRACKS } from "./tracks";
  * answers a member whose plan opens the Masterclass (or who bought the skill
  * the lesson comes with); anyone else sees the cover and the way in.
  *
+ * A LESSON TO READ (a guide in lib/training/sheets.ts with `masterclass`
+ * set) sits in its track's row as a page, not a video: read it in the
+ * browser or download it, through /api/membership/file (the same plan check).
+ *
  * Every subject still has its grey "Coming soon" frames next to what's out:
  * the room is being filled, and it should look like it.
  *
@@ -29,11 +34,14 @@ import { TRACKS } from "./tracks";
  * somewhere else) still show in "Latest" for members, as before.
  */
 
-type DbLesson = { id: string; title: string; summary: string | null; url: string | null; locked: boolean; shelf: string };
+type DbLesson = { id: string; title: string; summary: string | null; kind: string; url: string | null; locked: boolean; shelf: string };
+
+/** The lessons to read, newest first like the rest. */
+const DOCS = SHEETS.filter((s) => s.masterclass).reverse();
 type Access = "checking" | "open" | "locked";
 
 const PER_ROW = 6;
-const TABS = ["Home", "Videos", "Playlists"] as const;
+const TABS = ["Home", "Lessons", "Playlists"] as const;
 type Tab = (typeof TABS)[number];
 
 export function MasterclassPage() {
@@ -52,8 +60,8 @@ export function MasterclassPage() {
     fetch("/api/membership/perks", { cache: "no-store", credentials: "same-origin" })
       .then((r) => r.json())
       .then((r: { ok?: boolean; training?: DbLesson[] }) => {
-        // A lesson that plays here is already on top; its dashboard row only points back to it.
-        if (alive && r.ok) setLessons((r.training ?? []).filter((t) => t.shelf === "masterclass" && !t.url?.includes("?watch=")));
+        // A lesson that plays here is already on top, and one to read is in its row: their dashboard rows only point back.
+        if (alive && r.ok) setLessons((r.training ?? []).filter((t) => t.shelf === "masterclass" && t.kind !== "sheet" && !t.url?.includes("?watch=")));
       })
       .catch(() => {});
     return () => {
@@ -97,7 +105,7 @@ export function MasterclassPage() {
   // Signed out (proxy.ts normally stops that before the page): nothing plays.
   const accessOf = (slug: string): Access => (member === null ? "locked" : (access[slug] ?? "checking"));
   const real = lessons ?? [];
-  const count = LESSONS.length + real.length;
+  const count = LESSONS.length + DOCS.length + real.length;
 
   return (
     <div className="mx-auto w-full max-w-[80rem] px-5 pb-28 pt-24 md:px-8 md:pt-28">
@@ -124,14 +132,14 @@ export function MasterclassPage() {
             Masterclass · {count} {count === 1 ? "lesson" : "lessons"} · more being filmed · members only
           </p>
           <p className="mt-2 max-w-[60ch] text-[0.95rem] leading-[1.5] text-black/70">
-            How I build, design, launch and sell. Never on YouTube.
+            How I build, design, launch and sell, on video and on paper. Never on YouTube.
           </p>
           {member && !plan ? (
             <Link
               href={`${JOIN_HREF}#pro`}
               className="mt-4 inline-flex rounded-full bg-[#0a0a0a] px-5 py-2.5 text-[0.92rem] font-semibold text-white transition-colors hover:bg-black/80"
             >
-              Watch with Pro
+              Open with Pro
             </Link>
           ) : null}
         </div>
@@ -165,28 +173,35 @@ export function MasterclassPage() {
           ) : null}
           {TRACKS.map((t) => {
             const out = LESSONS.filter((l) => l.track === t.id);
+            const docs = DOCS.filter((d) => d.masterclass === t.id);
             return (
               <Shelf key={t.id} title={t.title} line={t.line}>
                 {out.map((l) => (
                   <LessonCard key={l.slug} lesson={l} onWatch={() => watch(l)} playing={l.slug === current.slug} />
                 ))}
-                {Array.from({ length: PER_ROW - out.length }, (_, i) => (
+                {docs.map((d) => (
+                  <DocCard key={d.id} doc={d} open={plan} />
+                ))}
+                {Array.from({ length: PER_ROW - out.length - docs.length }, (_, i) => (
                   <Video key={i} title="Coming soon" meta={t.title} />
                 ))}
               </Shelf>
             );
           })}
         </div>
-      ) : tab === "Videos" ? (
+      ) : tab === "Lessons" ? (
         <ul className="mt-8 grid list-none grid-cols-1 gap-x-4 gap-y-8 p-0 sm:grid-cols-2 lg:grid-cols-4">
           {LESSONS.map((l) => (
             <LessonCard key={l.slug} lesson={l} onWatch={() => watch(l)} grid />
+          ))}
+          {DOCS.map((d) => (
+            <DocCard key={d.id} doc={d} open={plan} grid />
           ))}
           {real.map((l) => (
             <Video key={l.id} title={l.title} meta={l.summary ?? "Masterclass"} url={l.locked ? null : l.url} grid />
           ))}
           {TRACKS.flatMap((t) =>
-            Array.from({ length: PER_ROW - LESSONS.filter((l) => l.track === t.id).length }, (_, i) => (
+            Array.from({ length: PER_ROW - LESSONS.filter((l) => l.track === t.id).length - DOCS.filter((d) => d.masterclass === t.id).length }, (_, i) => (
               <Video key={`${t.id}-${i}`} title="Coming soon" meta={t.title} grid />
             )),
           )}
@@ -195,13 +210,14 @@ export function MasterclassPage() {
         <ul className="mt-8 grid list-none grid-cols-1 gap-x-4 gap-y-8 p-0 sm:grid-cols-2 lg:grid-cols-4">
           {TRACKS.map((t) => {
             const out = LESSONS.filter((l) => l.track === t.id);
+            const docs = DOCS.filter((d) => d.masterclass === t.id).length;
             const body = (
               <>
                 <div className="relative">
                   <div className="absolute inset-x-3 -top-1.5 h-3 rounded-t-[0.7rem] bg-black/10" aria-hidden />
                   {out[0] ? <Cover lesson={out[0]} /> : <Thumb label="Coming soon" />}
                   <span className="absolute bottom-2 right-2 rounded-[0.35rem] bg-black/75 px-1.5 py-0.5 text-[0.75rem] font-semibold text-white">
-                    {out.length ? `${out.length} out · more coming` : `${PER_ROW} videos`}
+                    {out.length + docs ? `${out.length + docs} out · more coming` : `${PER_ROW} lessons`}
                   </span>
                 </div>
                 <p className="mt-3 text-[1rem] font-semibold leading-snug">{t.title}</p>
@@ -521,6 +537,56 @@ function LessonCard({ lesson, onWatch, playing = false, grid = false }: { lesson
           Lesson {String(lesson.number).padStart(2, "0")} · {lesson.duration}
         </p>
       </button>
+    </li>
+  );
+}
+
+/**
+ * A LESSON TO READ: its first page on paper, how long it is, and two ways in
+ * (read it in the browser, or keep the PDF). Without the plan, the page is
+ * blurred and the way in is Pro.
+ */
+function DocCard({ doc, open, grid = false }: { doc: Sheet; open: boolean; grid?: boolean }) {
+  const file = `/api/membership/file?id=${doc.id}`;
+  return (
+    <li className={grid ? "" : rowItem}>
+      <a
+        href={open ? file : `${JOIN_HREF}#pro`}
+        {...(open ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        aria-label={open ? `Read ${doc.title} (PDF)` : `${doc.title}: opens with Pro`}
+        className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0a0a0a]"
+      >
+        <div className="relative aspect-video w-full overflow-hidden rounded-[0.8rem] bg-[#e7e4dc]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={open ? `${file}&picture=1` : `/training/${doc.id}-locked.webp`}
+            alt=""
+            loading="lazy"
+            className={`absolute left-1/2 top-[14%] w-[46%] -translate-x-1/2 rounded-t-[0.3rem] shadow-[0_12px_30px_-12px_rgba(0,0,0,0.45)] transition-transform duration-500 group-hover:-translate-y-1 ${open ? "" : "opacity-60"}`}
+          />
+          <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-[0.35rem] bg-black/80 px-1.5 py-0.5 text-[0.75rem] font-semibold text-white">
+            {open ? <FileText aria-hidden className="h-3 w-3" /> : <Lock aria-hidden className="h-3 w-3" />}
+            {doc.pages ?? 1} {doc.pages === 1 || !doc.pages ? "page" : "pages"}
+          </span>
+        </div>
+        <p className="mt-3 line-clamp-2 text-[0.98rem] font-semibold leading-snug">{doc.title}</p>
+        <p className="mt-1 line-clamp-2 text-[0.85rem] text-black/55">{doc.summary}</p>
+      </a>
+      <p className="mt-2 flex items-center gap-4 text-[0.85rem] font-semibold">
+        {open ? (
+          <>
+            <a href={file} target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:underline">
+              Read
+            </a>
+            <a href={`${file}&download=1`} className="inline-flex items-center gap-1 text-black/60 underline-offset-4 hover:text-black hover:underline">
+              <Download aria-hidden className="h-3.5 w-3.5" />
+              Download
+            </a>
+          </>
+        ) : (
+          <span className="text-black/55">Included in Pro and Ultimate</span>
+        )}
+      </p>
     </li>
   );
 }
