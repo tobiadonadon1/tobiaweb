@@ -99,8 +99,8 @@ export const SECTIONS: Section[] = [
 export const GROUPS: { label: string | null; ids: SectionId[] }[] = [
   { label: null, ids: ["overview"] },
   { label: "Library", ids: ["skills", "masterclass", "design", "training"] },
-  { label: "With me", ids: ["live", "telegram"] },
-  { label: "Ultimate", ids: ["calls", "custom", "network"] },
+  { label: "With me", ids: ["live", "telegram", "network"] },
+  { label: "Ultimate", ids: ["calls", "custom"] },
   { label: "Account", ids: ["billing"] },
 ];
 
@@ -329,7 +329,7 @@ export function NetworkSection({ ids, perks }: { ids: string; perks: Perks | nul
               </span>
               <div>
                 <p className="text-[1.1rem] font-semibold leading-tight">The Construct network</p>
-                <p className={`text-[0.9rem] ${soft}`}>Ultimate members, on Telegram</p>
+                <p className={`text-[0.9rem] ${soft}`}>Members only, on Telegram</p>
               </div>
             </div>
             <p className="mt-6 w-fit max-w-full rounded-[1.4rem] rounded-tl-[0.4rem] bg-white px-5 py-3 text-[1rem] leading-[1.45] shadow-[0_10px_30px_-16px_rgba(11,31,58,0.35)]">

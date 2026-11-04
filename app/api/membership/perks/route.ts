@@ -18,7 +18,7 @@ import { sealedLink } from "@/lib/membership/contact";
  *   MEMBERS_QA_URL         bi-monthly group Q&A      Pro and up
  *   MEMBERS_WORKSHOP_URL   bi-monthly workshop       Ultimate and up
  *   MEMBERS_CALLS_URL      1-on-1 booking page       Ultimate and up
- *   MEMBERS_NETWORK_URL    the members' network      Ultimate and up
+ *   MEMBERS_NETWORK_URL    the members' network      Pro and up
  *
  * Telegram (with its QR code), the network (its Telegram group) and the call have sealed defaults
  * (lib/membership/contact.ts), so they work with no variable set; the

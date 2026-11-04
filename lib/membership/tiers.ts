@@ -49,7 +49,7 @@ export type Perk =
 
 const PERKS: Record<Tier, Perk[]> = {
   free: [],
-  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram"],
+  pro: ["premium-skills", "training", "masterclass", "design", "qa", "workshop", "telegram", "network"],
   ultimate: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
   universal: ["premium-skills", "exclusive-skills", "training", "masterclass", "design", "qa", "workshop", "calls", "telegram", "network", "commission", "requests"],
 };
@@ -93,6 +93,7 @@ export const PLANS: Record<PaidTier, Plan> = {
       "Selected training videos and resources",
       "Live group Q&A, twice a month",
       "Direct messaging with me on Telegram",
+      "The network: builders who ship, on Telegram",
     ],
   },
   ultimate: {
@@ -101,7 +102,7 @@ export const PLANS: Record<PaidTier, Plan> = {
     priceCents: 5900,
     currency: "eur",
     lookupKey: "construct_ultimate_monthly",
-    line: "Everything in Pro, plus 1-on-1 access, a private community and a voice in the roadmap.",
+    line: "Everything in Pro, plus 1-on-1 access, custom skills and a voice in the roadmap.",
     includes: [
       "Everything in Pro",
       "Unique skills at a deep discount, with some included",
@@ -109,7 +110,6 @@ export const PLANS: Record<PaidTier, Plan> = {
       "The complete training library",
       "A private 1-on-1 call with me",
       "Custom skills built to your spec (billed separately)",
-      "A private network of builders who ship",
       "Request new skills and vote on the roadmap",
     ],
   },

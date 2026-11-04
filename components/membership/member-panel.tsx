@@ -43,8 +43,8 @@ import {
  *   Overview         the plan, what's new since the last visit (small), then
  *                    a tile for every section with its next step
  *   Library          Skills (Paid and Free tabs), Masterclass, Design, Training
- *   With me          Live Q&A, Direct messaging (Telegram)
- *   Ultimate         1-on-1 call (Calendly), Custom skills (with the requests board), Network
+ *   With me          Live Q&A, Direct messaging (Telegram), Network (Telegram)
+ *   Ultimate         1-on-1 call (Calendly), Custom skills (with the requests board)
  *   Account          Plan & billing: the plan card, Stripe's billing portal,
  *                    and every other plan, up or down, each one click away
  *
@@ -564,7 +564,7 @@ function Overview({
           <PlanBadge tier={nextUp} />
           {nextUp === "pro"
             ? "opens every premium skill, Masterclass, Design, training, the live Q&A and Telegram."
-            : "adds the 1-on-1 call, custom skills, the network and the roadmap."}
+            : "adds the 1-on-1 call, custom skills and the roadmap."}
           <a href="#billing" className={quiet}>
             See {planName(nextUp)}
           </a>
