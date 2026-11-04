@@ -17,8 +17,8 @@ import { StickyBuy } from "./sticky-buy";
  * deep sea slate for the button, a low apricot sun behind the phones; sentence-case Figtree, centred. The reels are
  * the colour; the page stays out of their way.
  *
- * 2.1 (same day): "New in 2.1" after the hero sells the change in four before/now cards (only Grok Bot, one
- * question, ready-made shots, weak reels blocked), so the upgrade reads as what it is, not a minor version.
+ * PLAIN VALUE (same day): Grok Bot alone makes the reels now. "What you get" after the hero says it in four plain
+ * cards; still called 2.0 (Tobia: "keep it 2.0"), and nothing on the page is technical.
  *
  * THE ORDER, SHORT (Tobia, 2026-11-04: "it looks very complex to run this, but it's not"): the hero (name, one line,
  * the button, three reels on the horizon); one line in, one film out; 1.0 vs 2.0 (the blind test); the close (three
@@ -49,20 +49,19 @@ const REELS = [
 /** The blind test, 2026-11-04: the same three lines through 1.0 and 2.0, scored /20 by critics who didn't know which
  *  version made which. FILLED FROM THE TEST'S RESULTS. */
 const COMPARE: [string, string, string][] = [
-  ["Critic score, blind, out of 20", "14.3", "18.0"],
-  ["Won its head-to-head", "0 of 3", "3 of 3"],
-  ["One line to a checked reel", "25–39 min", "9–14 min"],
-  ["Final picture", "540×960", "1080×1920"],
-  ["Checks on the real file", "4", "15"],
-  ["Music", "synthesized", "real musicians"],
-];
-/** What 2.1 changed for the buyer (2026-11-04). "Before" is 2.0 as it shipped that morning; every "now" is in the
- *  2.1 Director file and kit. */
-const NEW_IN: { k: string; before: string; now: string; note: string }[] = [
-  { k: "What you need", before: "Grok Bot + a Claude plan + a terminal", now: "Grok Bot", note: "Connect Claude any time and Claude draws and scores every reel, for the best quality." },
-  { k: "Getting started", before: "4 questions and a sign-in token", now: "1 question", note: "What your account is about. It picks the style and the topic, and your first reel comes in the same chat." },
-  { k: "Every shot", before: "written from scratch, every reel", now: "12 ready-made shots", note: "Characters that act, places, counters, comparisons, lists, routes: tested pieces, so reels come out faster and steadier." },
-  { k: "A weak reel", before: "a warning", now: "blocked", note: "No hook on the first frame, a subject too small to see, text too small to read: it fixes them before you ever see the reel." },
+  ["Score from blind critics, out of 20", "14.3", "18.0"],
+  ["Won the head-to-head", "0 of 3", "3 of 3"],
+  ["Time to a finished reel", "25–39 min", "9–14 min"],
+  ["Video quality", "Standard", "Full HD"],
+  ["What you need", "Grok + Claude", "Grok Bot"],
+  ["Music", "Computer-made", "Real musicians"],
+]
+/** What the buyer gets, in plain words (Tobia, 2026-11-04: "nothing too technical, just straight-up value"). */
+const VALUE: { k: string; title: string; text: string }[] = [
+  { k: "01", title: "Only Grok Bot", text: "No other app and nothing to install on your computer. The voice and the music are built in." },
+  { k: "02", title: "One question", text: "Tell it what your account is about. It picks the style and the topic, and your first reel arrives in the same chat." },
+  { k: "03", title: "A finished reel", text: "The story, the drawings, the voice, the music and the captions. Plus the cover and the caption to post it with." },
+  { k: "04", title: "You say OK", text: "You see every reel first. Say OK, or say what to change in one sentence. Nothing is posted without you." },
 ];
 
 const STEPS: React.ReactNode[] = [
@@ -166,7 +165,7 @@ export function ReelBotPage() {
         <div className="mx-auto flex max-w-[76rem] flex-col items-center px-5 pb-16 pt-28 text-center sm:px-8 md:pb-20 md:pt-32">
           <div className="rb-rise" style={{ "--i": 0 } as React.CSSProperties}>
             <Mono className="inline-block whitespace-nowrap rounded-full bg-white/55 px-3.5 py-1.5 text-[#2F4858] ring-1 ring-[#2F4858]/10">
-              New · 2.1<span className="hidden sm:inline"> · Only Grok Bot needed</span>
+              New · 2.0<span className="hidden sm:inline"> · Only Grok Bot needed</span>
             </Mono>
           </div>
           <h1
@@ -208,25 +207,20 @@ export function ReelBotPage() {
         </div>
       </section>
 
-      {/* 01b. NEW IN 2.1: before and now, plainly. */}
-      <section aria-labelledby="rb-new">
+      {/* 01b. WHAT YOU GET: four plain cards. */}
+      <section aria-labelledby="rb-get">
         <div className="mx-auto max-w-[76rem] px-5 pt-20 sm:px-8 md:pt-28">
-          <Heading
-            id="rb-new"
-            kicker="New in 2.1"
-            aside="The reels won a blind test in 2.0. 2.1 makes them easy to get: no second subscription, no terminal, one question."
-          >
-            Now it needs only Grok Bot.
+          <Heading id="rb-get" kicker="What you get" aside="No drawing, no filming, no editing. You give it a topic; it gives you a reel.">
+            Simple from the first message.
           </Heading>
           <ul className="mt-12 grid list-none grid-cols-1 gap-5 p-0 md:mt-16 md:grid-cols-2">
-            {NEW_IN.map((n) => (
-              <li key={n.k} className="rounded-[1.6rem] bg-white p-6 ring-1 ring-black/[0.05] sm:p-8">
-                <Mono className="text-[#2F4858]/70">{n.k}</Mono>
-                <p className="m-0 mt-4 text-[1rem] leading-[1.4] text-[#22272E]/45 line-through decoration-[#22272E]/25">{n.before}</p>
-                <p className="m-0 mt-1 text-[clamp(1.9rem,3.6vw,2.6rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#2F4858]">
-                  {n.now}
+            {VALUE.map((v) => (
+              <li key={v.k} className="rounded-[1.6rem] bg-white p-6 ring-1 ring-black/[0.05] sm:p-8">
+                <Mono className="text-[#2F4858]/70">{v.k}</Mono>
+                <p className="m-0 mt-3 text-[clamp(1.9rem,3.6vw,2.6rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#2F4858]">
+                  {v.title}
                 </p>
-                <p className="m-0 mt-3 max-w-[44ch] text-pretty text-[1rem] leading-[1.55] text-[#22272E]/65">{n.note}</p>
+                <p className="m-0 mt-3 max-w-[44ch] text-pretty text-[1.02rem] leading-[1.55] text-[#22272E]/65">{v.text}</p>
               </li>
             ))}
           </ul>
@@ -239,7 +233,7 @@ export function ReelBotPage() {
           <Heading
             id="rb-styles"
             kicker="One line in"
-            aside="It writes the story, voices it, draws every shot, checks the file and has a second Claude score it out of 20. You only see it when it's good."
+            aside="Each one with its own story, its own twist and its own music. These three were made from the lines above them."
           >
             One line in. One film out.
           </Heading>
@@ -262,7 +256,7 @@ export function ReelBotPage() {
             ))}
           </ul>
           <p className="mt-6 max-w-[64ch] text-pretty text-[0.95rem] leading-[1.55] text-[#22272E]/55">
-            Each made by a Claude session that had never seen the kit, following the file alone.
+            Each made from that one line. Not touched by hand.
           </p>
         </div>
       </section>
@@ -273,15 +267,15 @@ export function ReelBotPage() {
           <Heading
             id="rb-vs"
             kicker="What changed"
-            aside="The same three lines through both versions. Critics scored every reel without knowing which version made it."
+            aside="We gave the same three ideas to both versions. Critics scored the reels without knowing which was which."
           >
-            1.0 vs 2.0, scored blind.
+            Better than 1.0, in a blind test.
           </Heading>
           <div className="mt-12 rounded-[1.6rem] bg-white p-5 ring-1 ring-black/[0.05] sm:p-8 md:mt-16">
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-black/10">
-                  <th className="pb-4 pr-4 font-normal"><Mono className="text-[#22272E]/50">Same three lines</Mono></th>
+                  <th className="pb-4 pr-4 font-normal"><Mono className="text-[#22272E]/50">Same three ideas</Mono></th>
                   <th className="w-[26%] pb-4 pr-3 font-normal sm:w-[20%]"><Mono className="text-[#22272E]/50">1.0</Mono></th>
                   <th className="w-[26%] pb-4 font-normal sm:w-[20%]"><Mono className="text-[#2F4858]">2.0</Mono></th>
                 </tr>
@@ -320,7 +314,7 @@ export function ReelBotPage() {
             </div>
             <div className="self-end rounded-[1.6rem] bg-white/70 p-6 ring-1 ring-black/[0.05] backdrop-blur-sm sm:p-8">
               <p className="m-0 text-[1.15rem] font-semibold leading-[1.35] tracking-[-0.01em]">
-                Reel Bot Factory 2.1 · {PRODUCT.priceLabel}
+                Reel Bot Factory 2.0 · {PRODUCT.priceLabel}
               </p>
               <p className="m-0 mt-2 text-[0.98rem] leading-[1.5] text-[#22272E]/65">
                 The Director for your Grok Bot and the kit it draws with. Instant download.

@@ -615,7 +615,7 @@ test("webhook: a Reel Bot purchase gets its own email, as a link, and the link s
   assert.ok(!/\u2014/.test(m.text + m.html), "no em dashes");
   const dl = await download(new Request(link));
   assert.equal(dl.status, 200);
-  assert.match(dl.headers.get("content-disposition"), /filename="Reel Bot Factory 2.1.zip"/);
+  assert.match(dl.headers.get("content-disposition"), /filename="Reel Bot Factory 2.0.zip"/);
   assert.deepEqual(Buffer.from(await dl.arrayBuffer()), REEL_ZIP);
 });
 

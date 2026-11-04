@@ -1104,7 +1104,8 @@ export const SHORTS_ANIMATOR: Product = {
  * and START HERE.txt. Built in ~/Desktop/tobiaweb-private/reel-bot with `sh build.sh <v>`, sealed with
  * `npm run seal -- dist/reel-bot-factory-<v>.zip private/reel-bot.zip.enc`. The music library the kit
  * fetches (CC0) is public at public/reel-bot/music. Premium level: included with Pro and Ultimate.
- * 2.1 (2026-11-04): only Grok Bot needed (it builds reels from the kit's recipes); Claude is an optional upgrade.
+ * Same day: only Grok Bot needed (it builds reels from the kit's recipes); Claude is an optional upgrade. Still sold as 2.0
+ * (Tobia: "keep it 2.0"); every buyer-facing line is plain value, nothing technical.
  * Stripe: prod_ReelBotFactory, made by Tobia on 2026-11-04 with the 2.0 description and the square dusk image
  * (Desktop/Reel Bot Factory 2.0 - Stripe.png). Checkout charges $10 inline (price_data); the product's own
  * default price in Stripe (EUR 10) is not used by the site.
@@ -1113,14 +1114,14 @@ export const REEL_BOT: Product = {
   id: "reel-bot",
   name: "Reel Bot Factory",
   description:
-    "A Grok Bot that turns one line into a finished animated reel for Reels, TikTok and Shorts. It writes the story, draws every shot with a tested kit, voices it, checks the file and sends it for your OK. Only Grok Bot needed; connect Claude for the best quality.",
+    "A Grok Bot that turns one line into a finished animated reel for Reels, TikTok and Shorts. It writes the story, draws it, adds the voice and the music, and sends it to you for your OK. All you need is Grok Bot.",
   priceCents: 1000,
   currency: "usd",
   priceLabel: money(1000, "usd"),
   href: "/projects/construct/material/skills/reel-bot",
   file: {
     sealed: "reel-bot.zip.enc",
-    filename: "Reel Bot Factory 2.1.zip",
+    filename: "Reel Bot Factory 2.0.zip",
     // The kit inside ships scripts (.py, .sh), and Gmail refuses those zips: always a link.
     attach: false,
   },
@@ -1128,40 +1129,37 @@ export const REEL_BOT: Product = {
   stripeProductId: "prod_ReelBotFactory",
   share: {
     description:
-      "Reel Bot Factory 2.1 is a Grok Bot that makes 20 to 60 second animated reels for Reels, TikTok and Shorts. Give it a topic: it writes the brief, builds every shot from a tested kit (characters that act, places, light, camera, seven looks), voices it, checks the real file, scores it out of 20 and sends it to you for your OK. Only Grok Bot needed; Claude is an optional upgrade.",
-    kicker: "Grok Bot · 2.1",
+      "Reel Bot Factory 2.0 is a Grok Bot that makes animated reels for Reels, TikTok and Shorts. Give it a topic and it writes the story, draws it, adds the voice and the music, and sends you the finished reel for your OK. All you need is Grok Bot.",
+    kicker: "Grok Bot · 2.0",
     line: "A Grok Bot that makes your animated reels.",
-    proof: "Scored before you see it · nothing posted without your OK",
+    proof: "You see every reel first · nothing posted without your OK",
     theme: "dark",
-    // The page's dusk, the three 2.0 reels, no price.
-    image: "/shop/reel-bot/share.png",
   },
   contents: [
-    ["reel-bot-factory.md", "the Director: one question to start, topics, the brief, making and checking each reel, the routine, the weekly review"],
-    ["reel-director-kit-2.1.0.tar.gz", "the kit: 12 ready-made shots, characters that act, seven looks, voice, real music, 15 checks. Also a Claude Code skill"],
-    ["START HERE.txt", "the three steps, and how to use the kit straight from Claude Code"],
+    ["reel-bot-factory.md", "the Director: the bot itself, for your Grok Bot"],
+    ["reel-director-kit-2.0.0.tar.gz", "the studio it makes your reels with: characters, places, voice, music"],
+    ["START HERE.txt", "three steps to your first reel"],
   ],
   steps: [
-    "Unzip the folder. It holds two files for your Grok Bot.",
-    "Create a new Grok Bot called Director and attach both files.",
-    "Say \"Make my first reel from this file\". It asks you one question, then makes your first reel.",
+    "Unzip the folder.",
+    "In Grok Bot, make a new Bot called Director and attach both files.",
+    "Say \"Make my first reel from this file\". It asks what your account is about, then makes your first reel.",
   ],
   email: {
-    preheader: "Your Reel Bot Factory 2.1. Give both files to a new Grok Bot called Director.",
+    preheader: "Your Reel Bot Factory 2.0 is ready. Three steps to your first reel.",
     stepsIntro: "Where to start:",
     after: [
-      "It asks you one question (what your account is about), sets up its studio and makes your first reel: the brief, every shot built with the kit, the checks on the real file and a score out of 20. Want the best quality? Connect Claude later and Claude draws and scores every reel.",
-      "Nothing is posted under your name until you approve it.",
+      "It asks you one question, then sends you your first reel in the same chat.",
+      "Like it? Say OK and you get the full-quality video, the cover and the caption. Nothing is posted without your OK.",
     ],
     footnote: "Reel Bot Factory is an independent Grok Bot, not made by xAI or Anthropic.",
   },
   thanks: {
-    needs:
-      "You'll need Grok Bot. That's it: a free voice is built in. Optional upgrades: Claude (it draws and scores every reel) and ElevenLabs (premium voices).",
+    needs: "All you need is Grok Bot. The voice and the music are built in.",
     next: [
-      ["The first reel", "In the same chat: one question, then about 20 minutes to install the kit and make a 30-second reel."],
-      ["Every reel", "A preview, its score out of 20 and its weak spots. You approve before the full-quality version is made."],
-      ["Every day, if you like", "A routine: it picks the next topic, makes the preview and asks you."],
+      ["Your first reel", "In the same chat: one question, then your reel."],
+      ["Every reel", "You see it first. Say OK, or tell it what to change in one sentence."],
+      ["A reel a day, if you like", "It picks the next topic, makes the reel and asks you each time."],
     ],
   },
 };

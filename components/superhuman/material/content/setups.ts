@@ -137,9 +137,9 @@ export const SETUPS: MaterialEntry[] = [
   },
   {
     slug: "reel-bot",
-    title: "Reel Bot Factory 2.1",
+    title: "Reel Bot Factory 2.0",
     kind: "setup",
-    summary: "Two files to a Grok Bot, and it makes your animated reels with a tested kit: the brief, the voice, the video, checked and scored out of 20 before you see it. Only Grok Bot needed; Claude makes them even better.",
+    summary: "A Grok Bot that makes your animated reels. Give it a topic: it writes the story, draws it, adds the voice and the music, and sends you the finished reel for your OK.",
     // Minutes from the download to the bot working on its first reel.
     minutes: 5,
     status: "ready",
