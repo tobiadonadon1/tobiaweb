@@ -1134,6 +1134,8 @@ export const REEL_BOT: Product = {
     line: "A Grok Bot that makes your animated reels.",
     proof: "You see every reel first · nothing posted without your OK",
     theme: "dark",
+    // The page's dusk, its three reels, Grok + Claude, no price. Its own file name so apps that cached the old card fetch it fresh.
+    image: "/shop/reel-bot/share-grok-claude.png",
   },
   contents: [
     ["reel-bot-factory.md", "the Director: the bot itself, for your Grok Bot"],
