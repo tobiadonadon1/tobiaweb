@@ -69,7 +69,7 @@ const JSON_LD = {
   description: PRODUCT.share.description,
   applicationCategory: "MultimediaApplication",
   operatingSystem: "Grok Bot",
-  image: abs(`/shop/${PRODUCT.id}/card`),
+  image: abs(PRODUCT.share.image ?? `/shop/${PRODUCT.id}/card`),
   url: abs(PRODUCT.href),
   author: { "@type": "Person", name: "Tobia Donadon" },
   offers: {

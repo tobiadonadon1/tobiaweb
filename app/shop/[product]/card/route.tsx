@@ -107,9 +107,10 @@ export async function GET(
           </div>
 
           <div style={{ display: "flex", alignItems: "center" }}>
+            {/* A product with its own share picture keeps the price off its banners, this one included. */}
             <div
               style={{
-                display: "flex",
+                display: product.share.image ? "none" : "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 height: 64,
@@ -128,7 +129,7 @@ export async function GET(
             <div
               style={{
                 display: "flex",
-                marginLeft: 26,
+                marginLeft: product.share.image ? 0 : 26,
                 fontSize: 25,
                 letterSpacing: "0.02em",
                 color: soft(0.64),

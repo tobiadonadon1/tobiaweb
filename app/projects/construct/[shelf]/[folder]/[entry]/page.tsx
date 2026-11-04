@@ -91,12 +91,14 @@ export async function generateMetadata({
   if (entry.product) {
     const product = PRODUCTS[entry.product];
     const description = product.share.description;
-    const card = {
-      url: `/shop/${product.id}/card`,
-      width: 1200,
-      height: 630,
-      alt: `${product.name}. ${product.share.line} ${priceText(product)}.`,
-    };
+    const card = product.share.image
+      ? { url: product.share.image, width: 1200, height: 630, alt: `${product.name}. ${product.share.line}` }
+      : {
+          url: `/shop/${product.id}/card`,
+          width: 1200,
+          height: 630,
+          alt: `${product.name}. ${product.share.line} ${priceText(product)}.`,
+        };
     return {
       // `absolute`: the product name leads the browser tab on its own.
       title: { absolute: `${product.name} · ${product.share.kicker.replace(" · ", " ")}` },

@@ -85,6 +85,11 @@ export type Product = {
     proof: string;
     /** The share card's ground: the site's paper by default, or black for a page that is. */
     theme?: "dark";
+    /**
+     * A designed 1200 x 630 picture (a path under public/) that replaces the generated card when the link is
+     * shared. No price on it and none in its alt text (Tobia, 2026-11-04: the price doesn't belong on the banner).
+     */
+    image?: string;
   };
   /**
    * The delivery email, after the three setup steps. `preheader` is the
@@ -1127,6 +1132,8 @@ export const REEL_BOT: Product = {
     line: "A Grok Bot that makes your animated reels.",
     proof: "Scored before you see it · nothing posted without your OK",
     theme: "dark",
+    // The page's dusk, the three 2.0 reels, no price.
+    image: "/shop/reel-bot/share.png",
   },
   contents: [
     ["reel-bot-factory.md", "the Director: setup, the four questions, topics, the brief, the gates, the routine, the weekly review"],
