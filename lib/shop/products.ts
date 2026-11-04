@@ -1099,13 +1099,15 @@ export const SHORTS_ANIMATOR: Product = {
  * and START HERE.txt. Built in ~/Desktop/tobiaweb-private/reel-bot with `sh build.sh <v>`, sealed with
  * `npm run seal -- dist/reel-bot-factory-<v>.zip private/reel-bot.zip.enc`. The music library the kit
  * fetches (CC0) is public at public/reel-bot/music. Premium level: included with Pro and Ultimate.
- * Stripe: prod_ReelBotFactory, created by the first checkout.
+ * Stripe: prod_ReelBotFactory, made by Tobia on 2026-11-04 with this description and the square dusk image
+ * (Desktop/Reel Bot Factory 2.0 - Stripe.png). Checkout charges $10 inline (price_data); the product's own
+ * default price in Stripe (EUR 10) is not used by the site.
  */
 export const REEL_BOT: Product = {
   id: "reel-bot",
   name: "Reel Bot Factory",
   description:
-    "A Grok Bot that makes animated vertical reels with Claude: it picks the topic, writes the brief, has Claude draw every shot with a tested kit, measures the file, has a second Claude score it, and sends it for your OK.",
+    "A Grok Bot that turns one line into a finished animated reel for Reels, TikTok and Shorts, with Claude writing, drawing and voicing every shot. A second Claude scores every reel before you see it, and nothing is posted without your OK.",
   priceCents: 1000,
   currency: "usd",
   priceLabel: money(1000, "usd"),
@@ -1116,7 +1118,7 @@ export const REEL_BOT: Product = {
     // The kit inside ships scripts (.py, .sh), and Gmail refuses those zips: always a link.
     attach: false,
   },
-  // A fixed id: the first checkout finds it missing in Stripe and creates it.
+  // Exists in Stripe (live), so checkout never needs to create it.
   stripeProductId: "prod_ReelBotFactory",
   share: {
     description:
