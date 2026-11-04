@@ -7,7 +7,6 @@ import { folderHref } from "../material-data";
 import { BuyForm } from "./buy-form";
 import { LEAD, botShape } from "./grok-army-bots";
 import { Film } from "./motion-designer-film";
-import { DirectorRig } from "./reel-bot-director";
 import { ReelBotLoader } from "./reel-bot-loader";
 import { StickyBuy } from "./sticky-buy";
 
@@ -18,8 +17,7 @@ import { StickyBuy } from "./sticky-buy";
  * THE POSTER FAMILY (Tobia, 2026-10-26, after a first version that was a dark,
  * centred column: "nobody's going to read this"): Motion Designer's and Web
  * Designer Pro's page in its own colour. A violet field, the name huge and
- * left, three reels playing on phones, shot by the bot as a director behind
- * a film camera (reel-bot-director.tsx),
+ * left, three reels playing on phones (the director rig was taken off the hero, 2026-11-04),
  * one short line; then the three styles as colour tiles, five tiles for what
  * the bot does, the close.
  *
@@ -403,9 +401,8 @@ export function ReelBotPage() {
               <Phone className="rb-stack__side">
                 <Reel id="octopus" label="Three Hearts, an explainer reel with a voice" quiet />
               </Phone>
-              <DirectorRig className="rb-stack__rig" />
             </div>
-            <figcaption className="mt-20 text-right lg:mt-16">
+            <figcaption className="mt-8 text-right">
               <Mono className="text-white/80">Grok Bot directs · Claude draws with the kit</Mono>
             </figcaption>
           </figure>
