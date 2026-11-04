@@ -17,6 +17,9 @@ import { StickyBuy } from "./sticky-buy";
  * deep sea slate for the button, a low apricot sun behind the phones; sentence-case Figtree, centred. The reels are
  * the colour; the page stays out of their way.
  *
+ * THE HERO'S SIDE REELS (Tobia, same day): the kite told without words and the cleaner octopus, the
+ * Reel Bot renders of those same two lines (kite-v1, octopus-v1); the middle stays The Last Watch.
+ *
  * PLAIN VALUE (same day): Grok Bot alone makes the reels now. "What you get" after the hero says it in four plain
  * cards; still called 2.0 (Tobia: "keep it 2.0"), and nothing on the page is technical.
  *
@@ -121,11 +124,11 @@ function Phone({ children, className = "" }: { children: React.ReactNode; classN
   );
 }
 
-function Reel({ id, label, eager = false, quiet = false }: { id: string; label: string; eager?: boolean; quiet?: boolean }) {
+function Reel({ id, label, eager = false, quiet = false, v = "v2" }: { id: string; label: string; eager?: boolean; quiet?: boolean; v?: string }) {
   return (
     <Film
-      src={S(`${id}-v2.mp4`)}
-      poster={S(`${id}-v2.jpg`)}
+      src={S(`${id}-${v}.mp4`)}
+      poster={S(`${id}-${v}.jpg`)}
       label={label}
       eager={eager}
       className="h-full w-full"
@@ -191,13 +194,13 @@ export function ReelBotPage() {
           <figure className="rb-rise m-0 mt-14 w-full md:mt-16" style={{ "--i": 4 } as React.CSSProperties}>
             <div className="rb-row">
               <Phone className="rb-row__side">
-                <Reel id="kite" label="The Long Way Home, a papercraft reel" quiet />
+                <Reel id="kite" v="v1" label="A lost kite, a papercraft reel told without words" quiet />
               </Phone>
               <Phone className="rb-row__mid">
                 <Reel id="lighthouse" label="The Last Watch, a noir reel" eager />
               </Phone>
               <Phone className="rb-row__side">
-                <Reel id="octopus" label="Three Hearts, an explainer reel with a voice" quiet />
+                <Reel id="octopus" v="v1" label="Why an octopus has three hearts, an explainer reel" quiet />
               </Phone>
             </div>
             <figcaption className="mt-7">
