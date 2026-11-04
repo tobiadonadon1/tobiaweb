@@ -1,0 +1,189 @@
+{
+  "noir-detective": {
+    "file": "noir-detective.mp3",
+    "mood": "noir",
+    "about": "Grand piano, upright-style bass, brushed drums and a brass section: a 1940s-50s detective/mystery cue. Noir stories, case files, 'here's what really happened' reels.",
+    "bpm": 120,
+    "duration": 34.75,
+    "loops": false,
+    "source": "Noir_Song_Short8.wav by bainmack — https://freesound.org/people/bainmack/sounds/579829/",
+    "licence": "CC0",
+    "sha256": "eff76fecf137487dd9e168ef30e1e310ec1c2c511445f37435e69bc0f5c91d55"
+  },
+  "noir-rusted-maid": {
+    "file": "noir-rusted-maid.mp3",
+    "mood": "noir",
+    "about": "Dark neo-noir jazz loop, piano and saxophone, smoky and late-night. Noir hooks, mysteries, short reels (loop it for longer ones).",
+    "bpm": null,
+    "duration": 30.84,
+    "loops": true,
+    "source": "(Jazz Loop) Rusted Maid by plasterbrain — https://freesound.org/people/plasterbrain/sounds/464923/",
+    "licence": "CC0",
+    "sha256": "cd0847f5fe77d2c0703a2ade783c1a0cce8cbbc4abd2ef5372eb34e520a9fb97"
+  },
+  "warm-12-string": {
+    "file": "warm-12-string.mp3",
+    "mood": "warm",
+    "about": "Solo 12-string acoustic guitar, 90s-style chords and sweeping arpeggios, no drums; fades in. Papercraft and personal stories, slow warm explainers.",
+    "bpm": null,
+    "duration": 74.21,
+    "loops": false,
+    "source": "simple 1990s acoustic guitar tune - looping riff by Johnmode — https://freesound.org/people/Johnmode/sounds/827095/",
+    "licence": "CC0",
+    "sha256": "9583825d1a3ec0beeb9e4ead9dc98777fe683fae84def7f888b8e6a5df496c19"
+  },
+  "warm-ukulele": {
+    "file": "warm-ukulele.mp3",
+    "mood": "warm",
+    "about": "Solo ukulele, a simple fingerpicked pattern recorded live; gentle and handmade. Papercraft stories, cosy how-tos, small-business reels.",
+    "bpm": null,
+    "duration": 97.97,
+    "loops": true,
+    "source": "ukulele.wav by _steef — https://freesound.org/people/_steef/sounds/173122/",
+    "licence": "CC0",
+    "sha256": "c665f83210dfed484a92ccddff493080eb5abaaf76bd10f8b0b27434b0f2c3a4"
+  },
+  "bright-full-of-energy": {
+    "file": "bright-full-of-energy.mp3",
+    "mood": "bright",
+    "about": "Pizzicato strings, glockenspiel, vibraphone and tuba: a curious 'off on an adventure' motif. Quirky explainers, 'how it works' reels, playful openings.",
+    "bpm": null,
+    "duration": 34.78,
+    "loops": false,
+    "source": "Full of Energy by code_box — https://freesound.org/people/code_box/sounds/520192/",
+    "licence": "CC0",
+    "sha256": "9bc802f91390488ef5b45ce155d30811dca3df16920a8c2a53e7e971fc914408"
+  },
+  "bright-happy-guitar": {
+    "file": "bright-happy-guitar.mp3",
+    "mood": "bright",
+    "about": "Acoustic guitar over a light, groovy drum loop; cheerful and playful. Explainers, product walk-throughs, tips lists. ~3 s of silence at the end.",
+    "bpm": null,
+    "duration": 121.0,
+    "loops": false,
+    "source": "Happy Commercial Music by Seth_Makes_Sounds — https://freesound.org/people/Seth_Makes_Sounds/sounds/674939/",
+    "licence": "CC0",
+    "sha256": "59a00b39de60869fbfb5fca56e5cd84339fcf87603e21f0305293fe889bb9cf4"
+  },
+  "laid-back": {
+    "file": "laid-back.mp3",
+    "mood": "bright",
+    "about": "Laid-back electronic beat with more movement. Product demos, punchy explainers.",
+    "bpm": 90,
+    "duration": 64.13,
+    "loops": false,
+    "source": "Laid Back Electronic Beat by Seth_Makes_Sounds — https://freesound.org/people/Seth_Makes_Sounds/sounds/716499/",
+    "licence": "CC0",
+    "sha256": "72219c10c6c4cc926481e10d0bd5204a5eadd1ead5fe39d6aae1201ccd9e205d"
+  },
+  "wonder-emotional-piano": {
+    "file": "wonder-emotional-piano.mp3",
+    "mood": "wonder",
+    "about": "Emotional solo piano joined by strings; slow and tender, leaning sad. Reflective stories, before/after, heartfelt endings. Music ends at ~57 s.",
+    "bpm": null,
+    "duration": 64.04,
+    "loops": false,
+    "source": "Awesome Emotional Piano by Endersniper123 — https://freesound.org/people/Endersniper123/sounds/215767/",
+    "licence": "CC0",
+    "sha256": "7a734b90ca84038cadf1ed712b5e8b58a64a69dd897bc599ac7e51fdf2a080af"
+  },
+  "wonder-slow-cinematic": {
+    "file": "wonder-slow-cinematic.mp3",
+    "mood": "wonder",
+    "about": "Slow semi-epic piano with strings and soft pads; wide and emotional. Reveals, big-picture moments, endings. ~2 s tail of silence.",
+    "bpm": null,
+    "duration": 53.15,
+    "loops": false,
+    "source": "Slow Cinematic Music.wav by DeVern — https://freesound.org/people/DeVern/sounds/384202/",
+    "licence": "CC0",
+    "sha256": "95d18be9c0483058baaa0e5b731e5e78fe8918ca618400b5b7f9ff00cf015593"
+  },
+  "tension-documentary": {
+    "file": "tension-documentary.mp3",
+    "mood": "tension",
+    "about": "Steady pulsing strings and arpeggios, nervous and mysterious but not horror; very even level. Investigations, 'the problem' acts, data reveals.",
+    "bpm": null,
+    "duration": 119.28,
+    "loops": false,
+    "source": "Thriller Documentary Pack #1 by dekstromoramid — https://freesound.org/people/dekstromoramid/sounds/435370/",
+    "licence": "CC0",
+    "sha256": "7f0d3234705517c3feceabdc4b8343795bc6cb0fbf6ca4f63e13bdff810a17d0"
+  },
+  "tension-orchestral": {
+    "file": "tension-orchestral.mp3",
+    "mood": "tension",
+    "about": "Orchestral suspense: dark clusters and a driving 120 bpm pulse, a chase/snooping feel. Cliff-hangers, stakes, countdowns. Music ends at ~84 s (7 s silent tail).",
+    "bpm": 120,
+    "duration": 90.49,
+    "loops": false,
+    "source": "Orchestral Suspense Loop 1 by awrmacd — https://freesound.org/people/awrmacd/sounds/387223/",
+    "licence": "CC0",
+    "sha256": "597f5943593aa1a423ae07032918b2180663cc6fc931d8d1e18412202917c7f6"
+  },
+  "hopeful-upright-piano": {
+    "file": "hopeful-upright-piano.mp3",
+    "mood": "hopeful",
+    "about": "Improvised uplifting piano in C major on a real (slightly out-of-tune) upright, natural room reverb. Hopeful turns, gentle endings, honest founder stories.",
+    "bpm": null,
+    "duration": 41.32,
+    "loops": false,
+    "source": "Lighthearted piano tune excerpt by jay_mar — https://freesound.org/people/jay_mar/sounds/567165/",
+    "licence": "CC0",
+    "sha256": "70131432f8f6e43eace06004f660cf778de9959960833d8067c3834987967bd6"
+  },
+  "hopeful-wonders": {
+    "file": "hopeful-wonders.mp3",
+    "mood": "hopeful",
+    "about": "Acoustic guitar, drums, strings and keys that build towards cheer and awe. Rising arcs, 'it worked' turns, launches. Trimmed to the first 119 s (53 bars) with a 4 s fade.",
+    "bpm": 107,
+    "duration": 118.88,
+    "loops": false,
+    "source": "Wonders [cinematic background music][107 bpm] by Seth_Makes_Sounds — https://freesound.org/people/Seth_Makes_Sounds/sounds/814843/",
+    "licence": "CC0",
+    "sha256": "10cede79d49c5de2cdca49b0fd39d06a609a80cb80f8da345c31711c03b7233b"
+  },
+  "holy-water": {
+    "file": "holy-water.mp3",
+    "mood": "lofi",
+    "about": "Darker hip-hop instrumental with a heavy sub; moody. Serious or reflective lo-fi reels.",
+    "bpm": 87.5,
+    "duration": 57.04,
+    "loops": false,
+    "source": "Holy Water | Hiphop Instrumental by kontraamusic — https://freesound.org/people/kontraamusic/sounds/787544/",
+    "licence": "CC0",
+    "sha256": "27ea3fea6f704efd1dcc06e78e2b72d02b871d442afa553620cd8e12d4ad6fe2"
+  },
+  "last-winter": {
+    "file": "last-winter.mp3",
+    "mood": "lofi",
+    "about": "Sub-heavy hip-hop instrumental, steady and calm. Talking reels, lo-fi vlogs, calm explainers.",
+    "bpm": 72,
+    "duration": 57.46,
+    "loops": false,
+    "source": "Last Winter | Hiphop Instrumental by kontraamusic — https://freesound.org/people/kontraamusic/sounds/788482/",
+    "licence": "CC0",
+    "sha256": "a13497c22d31caaaff5d078e63008ab933952fd59d745a66accb25fd542dcd6e"
+  },
+  "lofi-loop": {
+    "file": "lofi-loop.mp3",
+    "mood": "lofi",
+    "about": "Classic lofi hip-hop loop, warm and soft. Aesthetic edits, study/cosy reels.",
+    "bpm": 80,
+    "duration": 30.0,
+    "loops": true,
+    "source": "Lofi Hip Hop Loop by TheWandermiles — https://freesound.org/people/TheWandermiles/sounds/708776/",
+    "licence": "CC0",
+    "sha256": "fbb52809a251cb0c003fb8d512bd3af50203fcfaf0d1d1fd95af81fe59bc9c65"
+  },
+  "space": {
+    "file": "space.mp3",
+    "mood": "lofi",
+    "about": "Spacious hip-hop instrumental, airy top, deep low end. Polished, night-time or aesthetic reels.",
+    "bpm": 80,
+    "duration": 57.46,
+    "loops": false,
+    "source": "Space | Hiphop Instrumental by kontraamusic — https://freesound.org/people/kontraamusic/sounds/788425/",
+    "licence": "CC0",
+    "sha256": "cd5fdfff0e60d907426f42d9ec888de3d8bfc8b5657f4214278338f8f15494cb"
+  }
+}

@@ -1092,60 +1092,66 @@ export const SHORTS_ANIMATOR: Product = {
 };
 
 /**
- * REEL BOT FACTORY (id reel-bot, kept so links stay put), a free Grok Bot: one Markdown file a Grok Bot works from to make
- * animated vertical videos with Claude (it writes the brief, makes the voice,
- * drives the browser to a Claude project, downloads, checks and hands over).
- * The file: Tobia's pipeline.md, sealed as private/reel-bot.md.enc with
- * `npm run seal -- reel-bot.md`. Reseal whenever the file changes.
+ * REEL BOT FACTORY 2.0 (id reel-bot, kept so links stay put), $10 (Tobia, 2026-11-04; free before):
+ * a Grok Bot, the Director, that makes animated vertical reels with Claude and the Reel Director kit.
+ * The download: "Reel Bot Factory 2.0" folder with reel-bot-factory.md (the Director), the kit tarball
+ * (the Director installs it from the attachment and checks its sha256; it is NOT published anywhere)
+ * and START HERE.txt. Built in ~/Desktop/tobiaweb-private/reel-bot with `sh build.sh <v>`, sealed with
+ * `npm run seal -- dist/reel-bot-factory-<v>.zip private/reel-bot.zip.enc`. The music library the kit
+ * fetches (CC0) is public at public/reel-bot/music. Premium level: included with Pro and Ultimate.
+ * Stripe: prod_ReelBotFactory, created by the first checkout.
  */
 export const REEL_BOT: Product = {
   id: "reel-bot",
   name: "Reel Bot Factory",
   description:
-    "A free Grok Bot that makes animated vertical videos with Claude: it writes the brief, records the voice, has Claude animate every frame in code, checks the file and hands it to you.",
-  priceCents: 0,
-  currency: "eur",
-  priceLabel: "Free",
+    "A Grok Bot that makes animated vertical reels with Claude: it picks the topic, writes the brief, has Claude draw every shot with a tested kit, measures the file, has a second Claude score it, and sends it for your OK.",
+  priceCents: 1000,
+  currency: "usd",
+  priceLabel: money(1000, "usd"),
   href: "/projects/construct/material/setups/reel-bot",
   file: {
-    sealed: "reel-bot.md.enc",
-    filename: "reel-bot-factory.md",
-    // One Markdown file, which Gmail is happy to carry: it arrives attached.
-    attach: true,
+    sealed: "reel-bot.zip.enc",
+    filename: "Reel Bot Factory 2.0.zip",
+    // The kit inside ships scripts (.py, .sh), and Gmail refuses those zips: always a link.
+    attach: false,
   },
-  free: true,
-  instant: true,
-  stripeProductId: "none",
+  // A fixed id: the first checkout finds it missing in Stripe and creates it.
+  stripeProductId: "prod_ReelBotFactory",
   share: {
     description:
-      "Reel Bot Factory is a free Grok Bot that makes 20 to 70 second animated videos for Reels, TikTok and Shorts. Pick a style and a topic: it writes the brief, records the voiceover, has Claude draw and animate every frame in code, checks the finished MP4 and sends it to you for your OK.",
-    kicker: "Grok Bot · free",
+      "Reel Bot Factory 2.0 is a Grok Bot that makes 20 to 70 second animated reels for Reels, TikTok and Shorts. Give it a topic: it writes the brief, has Claude draw every shot with a tested kit (characters that walk and talk, light, camera, seven looks), voices it, measures the real file, has a second Claude score it out of 20 and sends it to you for your OK.",
+    kicker: "Grok Bot · 2.0",
     line: "A Grok Bot that makes your animated reels.",
-    proof: "One file · nothing posted without your OK",
+    proof: "Scored before you see it · nothing posted without your OK",
     theme: "dark",
   },
-  contents: [["reel-bot-factory.md", "the whole bot: the pipeline, the brief it writes, the voice, the checks, the styles that work"]],
+  contents: [
+    ["reel-bot-factory.md", "the Director: setup, the four questions, topics, the brief, the gates, the routine, the weekly review"],
+    ["reel-director-kit-2.0.0.tar.gz", "the kit Claude draws with: characters, camera, seven looks, voice, real music, 15 checks. Also a Claude Code skill"],
+    ["START HERE.txt", "the three steps, and how to use the kit straight from Claude Code"],
+  ],
   steps: [
-    "Download reel-bot-factory.md.",
-    "Create a new Grok Bot and attach the file.",
-    "Say \"Make my first reel from this file\", with a style and a topic.",
+    "Unzip the folder. It holds two files for your Grok Bot.",
+    "Create a new Grok Bot called Director and attach both files.",
+    "Say \"Make my first reel from this file\".",
   ],
   email: {
-    preheader: "Your Grok Bot is attached. Give it to a new Grok Bot with a style and a topic.",
+    preheader: "Your Reel Bot Factory 2.0. Give both files to a new Grok Bot called Director.",
     stepsIntro: "Where to start:",
     after: [
-      "It writes the brief, makes the voiceover, opens a chat in your Claude project and has Claude animate the video in code. Then it downloads the MP4, checks it and sends it to you with an honest list of weak spots.",
+      "It asks you four quick questions and for a Claude sign-in token, sets up its studio, and makes your first reel: the brief, Claude drawing every shot with the kit, the voice, the checks on the real file, a score out of 20 from a second Claude.",
       "Nothing is posted under your name until you approve it.",
     ],
     footnote: "Reel Bot Factory is an independent Grok Bot, not made by xAI or Anthropic.",
   },
   thanks: {
     needs:
-      "You'll need Grok Bot (with its own computer and browser) and a Claude plan with room to spare (Max recommended). For videos that talk, an ElevenLabs account for the voice.",
+      "You'll need Grok Bot (any paid plan) and a Claude plan (Pro works; Max for a reel a day). ElevenLabs is optional: a free voice is built in.",
     next: [
-      ["The first reel", "About 25 to 40 minutes of Claude's time, for 30 to 60 seconds of video."],
-      ["Every reel", "It shows you the file and its weak spots. You approve before anything is posted."],
-      ["Every day, if you like", "A routine: it picks the next topic, makes the reel and sends it to you."],
+      ["The first reel", "Usually within an hour of adding the Claude token: 10 to 25 minutes of Claude's time for a 30-second reel."],
+      ["Every reel", "A preview, its score out of 20 and its weak spots. You approve before the full-quality version is made."],
+      ["Every day, if you like", "A routine: it picks the next topic, makes the preview and asks you."],
     ],
   },
 };

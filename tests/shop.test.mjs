@@ -68,8 +68,8 @@ const MOTION_ZIP = Buffer.from("PK\u0003\u0004 the motion graphics skill " + "m"
 writeFileSync(path.join(cwd, "private", "motion-designer.zip.enc"), seal(MOTION_ZIP, parseKey(fileKey)));
 const SHORTS_ZIP = Buffer.from("PK\u0003\u0004 the animated shorts skill " + "s".repeat(3900));
 writeFileSync(path.join(cwd, "private", "shorts-animator.zip.enc"), seal(SHORTS_ZIP, parseKey(fileKey)));
-const REEL_MD = Buffer.from("# Automated Short-Video Pipeline\n" + "r".repeat(3900));
-writeFileSync(path.join(cwd, "private", "reel-bot.md.enc"), seal(REEL_MD, parseKey(fileKey)));
+const REEL_ZIP = Buffer.from("PK\u0003\u0004 the reel director and its kit " + "r".repeat(3900));
+writeFileSync(path.join(cwd, "private", "reel-bot.zip.enc"), seal(REEL_ZIP, parseKey(fileKey)));
 const ONEK_ZIP = Buffer.from("PK\u0003\u0004 the 1k bot and the challenge " + "k".repeat(3900));
 writeFileSync(path.join(cwd, "private", "1k-bot.zip.enc"), seal(ONEK_ZIP, parseKey(fileKey)));
 const META_ADS_ZIP = Buffer.from("PK\u0003\u0004 the meta ads skills " + "a".repeat(3900));
@@ -253,13 +253,16 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(vep.free, undefined);
   assert.equal(vep.file.attach, false);
   assert.equal(forSale(vep), vep.stripeProductId.startsWith("prod_"));
-  // Reel Bot: a free Grok Bot, one Markdown file, free for an email, beside Grok Army.
+  // Reel Bot Factory 2.0: $10 (free before 2.0), the Director and its kit in one zip, beside Grok Army.
   const rb = productById("reel-bot");
   assert.equal(rb.href, entryHref("setups", "reel-bot"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "reel-bot")?.product, "reel-bot");
-  assert.equal(rb.free, true);
-  assert.equal(forSale(rb), false);
-  assert.equal(rb.stripeProductId, "none");
+  assert.equal(rb.free, undefined);
+  assert.equal(rb.priceCents, 1000);
+  assert.equal(rb.currency, "usd");
+  assert.equal(rb.priceLabel, "$10");
+  assert.equal(rb.file.attach, false, "the kit ships scripts: never attached");
+  assert.equal(forSale(rb), true);
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
   assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
   assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
@@ -585,17 +588,42 @@ test("free: The $1K Bot downloads its zip at once, and emails it attached", asyn
   assert.ok(mail().some((m) => m.message.to === "dk@example.com"), "the email goes too");
 });
 
-test("free: Reel Bot downloads its Markdown file at once, and emails it attached", async () => {
+test("free: Reel Bot is paid now, so the free route refuses it", async () => {
   const res = await ask({ product: "reel-bot", email: "cy@example.com" }, "203.0.113.79");
-  assert.equal(res.status, 200);
-  const body = await res.json();
-  assert.equal(body.ok, true);
-  const dl = await download(new Request(body.download));
+  assert.notEqual(res.status, 200);
+  assert.equal(mail().length, 0, "nothing is sent");
+});
+
+test("webhook: a Reel Bot purchase gets its own email, as a link, and the link serves the zip", async () => {
+  const id = purchase({ product: "reel-bot", name: "Grace Hopper" });
+  const res = await webhook(signedEvent(id));
+  assert.equal((await res.json()).delivery, "sent");
+  assert.equal(mail().length, 1, "one send");
+  const m = mail()[0].message;
+  assert.equal(m.subject, "Your copy of Reel Bot Factory");
+  assert.equal(m.attachments.length, 0, "the kit ships scripts, so never attached");
+  const link = `${ORIGIN}/api/download?session_id=${id}`;
+  assert.ok(m.text.includes(link) && m.html.includes(link));
+  assert.ok(/Director/.test(m.text) && /both files/.test(m.text), "the steps: a bot called Director, both files");
+  assert.ok(!/TypeSafe|Launchr|masterclass/i.test(m.text), "none of another product's copy");
+  assert.ok(!/\u2014/.test(m.text + m.html), "no em dashes");
+  const dl = await download(new Request(link));
   assert.equal(dl.status, 200);
-  assert.match(dl.headers.get("content-type"), /^text\/markdown/);
-  assert.match(dl.headers.get("content-disposition"), /filename="reel-bot-factory.md"/);
-  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), REEL_MD);
-  assert.ok(mail().some((m) => m.message.to === "cy@example.com"), "the email goes too");
+  assert.match(dl.headers.get("content-disposition"), /filename="Reel Bot Factory 2.0.zip"/);
+  assert.deepEqual(Buffer.from(await dl.arrayBuffer()), REEL_ZIP);
+});
+
+test("checkout: Reel Bot opens a $10 checkout on its own Stripe product", async () => {
+  const { REEL_BOT } = await import("../lib/shop/products.ts");
+  const res = await buy("reel-bot");
+  assert.equal(res.status, 303);
+  assert.match(res.headers.get("location"), /^https:\/\/checkout\.stripe\.com\//);
+  const params = globalThis.__stripe.createdSessions.at(-1);
+  assert.equal(params.line_items[0].price_data.unit_amount, 1000);
+  assert.equal(params.line_items[0].price_data.currency, "usd");
+  assert.equal(params.line_items[0].price_data.product, REEL_BOT.stripeProductId);
+  assert.equal(params.metadata.product, "reel-bot");
+  assert.equal(params.success_url, `${ORIGIN}${REEL_BOT.href}/thanks?session_id={CHECKOUT_SESSION_ID}`);
 });
 
 test("free: Jev Crypto Analyst sends its own file, and its link never opens Launchr", async () => {
@@ -1134,7 +1162,7 @@ test("health: reports a configured shop without printing a secret", async () => 
   assert.equal(body.files["video-editor"].bytes, EDITOR_ZIP.length);
   assert.equal(body.files["motion-designer"].bytes, MOTION_ZIP.length);
   assert.equal(body.files["shorts-animator"].bytes, SHORTS_ZIP.length);
-  assert.equal(body.files["reel-bot"].bytes, REEL_MD.length);
+  assert.equal(body.files["reel-bot"].bytes, REEL_ZIP.length);
   assert.equal(body.files["1k-bot"].bytes, ONEK_ZIP.length);
   assert.equal(body.files["meta-ads"].bytes, META_ADS_ZIP.length);
   assert.equal(body.files["conversion-teardown"].bytes, TEARDOWN_ZIP.length);

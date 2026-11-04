@@ -4,7 +4,7 @@ import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
 import { REEL_BOT as PRODUCT } from "@/lib/shop/products";
 import { folderHref } from "../material-data";
-import { FreeClaim } from "./free-claim";
+import { BuyForm } from "./buy-form";
 import { LEAD, botShape } from "./grok-army-bots";
 import { Film } from "./motion-designer-film";
 import { DirectorRig } from "./reel-bot-director";
@@ -12,7 +12,7 @@ import { ReelBotLoader } from "./reel-bot-loader";
 import { StickyBuy } from "./sticky-buy";
 
 /**
- * REEL BOT, a free Grok Bot: one Markdown file (Tobia's pipeline) that a
+ * REEL BOT, a $10 Grok Bot (free before 2.0): the Director file (with its kit) that a
  * Grok Bot works from to make animated vertical videos with Claude.
  *
  * THE POSTER FAMILY (Tobia, 2026-10-26, after a first version that was a dark,
@@ -26,13 +26,17 @@ import { StickyBuy } from "./sticky-buy";
  * THE OPENING (reel-bot-loader.tsx) ends in the bot's eye, which lights up in
  * this violet, so the camera arrives in the hero.
  *
- * WHAT IS REAL: the three reels were made the way the file has them made: a
- * written brief (style, shots, twist, sound), then Claude drawing every frame
- * in Python and rendering with ffmpeg, the sound synthesized in code. The
- * contact sheet is that noir reel's own frames, one a second; the ffprobe
- * lines are its real numbers; the weak spots are its real ones. They were
- * made by Claude in a Claude Code session from those briefs, not by a Grok
- * Bot run, and the caption says "the way Reel Bot makes them", nothing more.
+ * 2.0 (2026-11-04, Tobia: "make a 2.0, significantly better"): the Director
+ * file runs a tested kit (characters, camera, light, seven looks, voice, music,
+ * checks on the real file) instead of having Claude write a renderer each time.
+ *
+ * WHAT IS REAL: the three reels are the 2.0 trial reels. Each was made from
+ * one line (the "asked" text, word for word) by a fresh Claude session that
+ * had never seen the kit, following the skill alone, then rendered at
+ * 1080x1920; nobody touched them by hand. The brief lines, the contact sheet,
+ * the check numbers and the weak spots are those reels' own. COMPARE holds the
+ * blind 1.0-vs-2.0 test (same three lines through both versions, scored by
+ * critics who didn't know which made which); its numbers are the test's.
  */
 
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--rb-archivo", display: "swap" });
@@ -48,43 +52,69 @@ const PINK = "#FFB8D9";
 const ORANGE = "#FF6A2B";
 const INK = "#111111";
 const CREAM = "#F1EEE6";
+const CREAM2 = "#E9E4D8";
 const BUTTON = "bg-[#5B3DF6] text-white shadow-[0_18px_40px_-18px_rgba(91,61,246,0.8)] hover:bg-[#4a2ee6]";
+/** On the violet field the buy button is lime, so the one thing to press is the brightest thing there. */
+const BUTTON_ON_VIOLET = "bg-[#E4FF4F] text-[#111] shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] hover:bg-[#d8f43a]";
 
 const REELS = [
   {
-    id: "last-light",
+    id: "lighthouse",
     n: "01",
     style: "Noir",
-    title: "The Last Light",
-    asked: "Rainy Art Deco noir. A man walks into the lamp light. One window lights up.",
+    title: "The Last Watch",
+    asked: "A lighthouse keeper's last night before the lighthouse is automated.",
+    len: "29 s",
     bg: "#0E2230",
     fg: "#F2D9A8",
   },
   {
-    id: "paper-boat",
+    id: "kite",
     n: "02",
     style: "Papercraft",
-    title: "The Paper Boat",
-    asked: "Cut paper at sunrise. A paper boat sails in, and a red bird lands on it.",
-    bg: "#8FD0EE",
+    title: "The Long Way Home",
+    asked: "A lost paper kite finds its way home.",
+    len: "28 s",
+    bg: "#F2A98A",
     fg: INK,
   },
   {
-    id: "day-on-mars",
+    id: "octopus",
     n: "03",
     style: "Explainer",
-    title: "A Day on Mars",
-    asked: "A flat 2D explainer with captions: how much longer a day on Mars is.",
+    title: "Three Hearts",
+    asked: "Why octopuses have three hearts.",
+    len: "32 s · a voice",
     bg: "#211D5C",
     fg: "#FFFFFF",
   },
 ] as const;
 
+/** The blind test, 2026-11-04: the same three lines through 1.0 and 2.0, scored /20 by critics who didn't know which
+ *  version made which (reel-bot/trials/ab in tobiaweb-private). FILLED FROM THE TEST'S RESULTS, nothing rounded up. */
+const COMPARE = {
+  rows: [
+    ["Critic score, blind, out of 20", "14.3", "18.0"],
+    ["Won its head-to-head", "0 of 3", "3 of 3"],
+    ["One line to a checked reel", "25–39 min", "9–14 min"],
+    ["Final picture", "540×960", "1080×1920"],
+    ["Checks on the real file", "4", "15"],
+    ["Music", "synthesized", "real musicians"],
+  ] as [string, string, string][],
+};
+const CRITIC_TITLE = "the-last-watch";
+const CRITIC_TOTAL = "18";
+const CRITIC_ROWS: [string, number][] = [
+  ["hook", 2], ["story", 2], ["sound off", 2], ["shots", 2], ["motion", 1],
+  ["subjects", 2], ["look", 1], ["text", 2], ["sound", 2], ["ending", 2],
+];
+
 const STEPS: React.ReactNode[] = [
-  <>Download reel-bot-factory.md.</>,
-  <>Create a new Grok Bot and attach the file.</>,
+  <>Unzip the download: two files, both for your Grok Bot.</>,
+  <>Create a new Grok Bot called Director and attach both files.</>,
   <>
-    Say <q className="font-semibold">Make my first reel</q>, with a style and a topic.
+    Say <q className="font-semibold">Make my first reel from this file</q>. It asks you four quick questions, then sets
+    itself up.
   </>,
 ];
 
@@ -100,12 +130,27 @@ const JSON_LD = {
   author: { "@type": "Person", name: "Tobia Donadon" },
   offers: {
     "@type": "Offer",
-    price: "0",
+    price: (PRODUCT.priceCents / 100).toFixed(2),
     priceCurrency: PRODUCT.currency.toUpperCase(),
     availability: "https://schema.org/InStock",
     url: abs(PRODUCT.href),
   },
 };
+
+/** The buy button: a real form to /api/checkout; signed out or on Free, the first press opens the Pro card. */
+function Buy({ reportErrors = false }: { reportErrors?: boolean }) {
+  return (
+    <BuyForm
+      productId={PRODUCT.id}
+      price={PRODUCT.priceLabel}
+      label={`Get it · ${PRODUCT.priceLabel}`}
+      tone="ink"
+      align="start"
+      reportErrors={reportErrors}
+      buttonClassName={BUTTON_ON_VIOLET}
+    />
+  );
+}
 
 function Mono({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -124,8 +169,8 @@ function Phone({ children, className = "" }: { children: React.ReactNode; classN
 function Reel({ id, label, eager = false, quiet = false }: { id: string; label: string; eager?: boolean; quiet?: boolean }) {
   return (
     <Film
-      src={S(`${id}-v1.mp4`)}
-      poster={S(`${id}-v1.jpg`)}
+      src={S(`${id}-v2.mp4`)}
+      poster={S(`${id}-v2.jpg`)}
       label={label}
       eager={eager}
       className="h-full w-full"
@@ -172,15 +217,15 @@ function Tile({
 /** Tile 01: the brief it wrote for The Last Light, as it was written. */
 function BriefProof() {
   const lines: [string, string][] = [
-    ["Style", "flat painted noir, Art Deco, one light per shot"],
-    ["Shot 1", "0–5.4 s · rainy skyline, a man walks into the lamp"],
-    ["Shot 2", "5.4–8 s · low angle up his tower, every window dark"],
-    ["Twist", "one window lights. Someone waves."],
-    ["Sound", "rain, a low pad, footsteps, a warm chord on the light"],
+    ["Hook", "\u201cTomorrow, a machine takes his light.\u201d"],
+    ["Shot 2", "2.6–5 s · his logbook rolls up to 14,610 nights"],
+    ["Shot 4", "7.6–10 s · the machine's dial nears midnight"],
+    ["Turn", "20 s · the sea answers: every boat flashes back"],
+    ["Ending", "he waves from the gallery; it loops to frame 0"],
   ];
   return (
     <dl className="m-0 w-full rounded-[1.1rem] bg-[#111] p-5 text-[#ECEAE3] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.6)] sm:p-6">
-      <Mono className="text-[#ECEAE3]/60">brief · the-last-light.txt</Mono>
+      <Mono className="text-[#ECEAE3]/60">brief · the-last-watch.md</Mono>
       {lines.map(([k, v]) => (
         <div key={k} className="mt-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 font-[family-name:var(--rb-mono)] text-[0.88rem] leading-[1.45]">
           <dt className="text-[#E4FF4F]">{k}</dt>
@@ -196,62 +241,88 @@ function CaptionProof() {
   return (
     <div className="w-full">
       <p className="inline-flex flex-wrap gap-x-[0.3em] rounded-[1.4rem] bg-[#0a0c24] px-6 py-4 font-[family-name:var(--rb-archivo)] text-[clamp(1.8rem,4vw,2.6rem)] font-black text-white [font-variation-settings:'wdth'_80]">
-        <span>A</span>
-        <span>day</span>
-        <span>on</span>
-        <span className="text-[#FFD24D]">Mars</span>
+        <span>An</span>
+        <span>octopus</span>
+        <span>has</span>
+        <span className="text-[#FFD24D]">three</span>
       </p>
       <p className="mt-4 font-[family-name:var(--rb-mono)] text-[0.85rem] font-semibold leading-[1.5]">
-        2 to 4 words at a time · cut on each word&rsquo;s start
+        1 to 3 words at a time · the spoken word lit · clear of the apps&rsquo; buttons
       </p>
     </div>
   );
 }
 
-/** Tile 03: the one instruction Claude gets, and the frames it checks. */
+/** Tile 03: what Claude is asked, and the frames it drew (The Last Watch, one every 2.5 s). */
 function ClaudeProof() {
   return (
     <div className="w-full">
       <blockquote className="m-0 max-w-[46ch] rounded-[1.1rem] bg-white/10 p-5 font-[family-name:var(--rb-mono)] text-[0.95rem] leading-[1.55] sm:p-6">
-        &ldquo;Follow the attached brief. Build the 540x960 preview only and show it to me.&rdquo;
+        &ldquo;MODE: maker. Make the reel in brief.md. Look at the frames twice, render the preview, fix every FAIL.&rdquo;
       </blockquote>
       <figure className="m-0 mt-5">
         <div className="-mx-5 overflow-x-auto px-5 [scrollbar-width:none] sm:mx-0 sm:px-0">
           <Image
-            src={S("contact-sheet-v1.jpg")}
-            alt="Eight frames of The Last Light, one a second: the skyline, the man walking into the lamp light, the tower, the lit window."
-            width={1482}
-            height={320}
+            src={S("contact-sheet-v2.jpg")}
+            alt="Twelve frames of The Last Watch, one every 2.5 seconds: the lighthouse, the logbook, the lamp lit, the machine's dial, the keeper's face, the gallery, the empty sea, the boats' lights, the keeper waving, the lighthouse again."
+            width={2226}
+            height={332}
             unoptimized
             className="block h-auto w-[44rem] max-w-none rounded-[0.8rem] sm:w-full sm:max-w-full"
           />
         </div>
         <figcaption className="mt-3">
-          <Mono className="opacity-80">Its contact sheet · one frame a second, checked twice</Mono>
+          <Mono className="opacity-80">The Last Watch · one frame every 2.5 s</Mono>
         </figcaption>
       </figure>
     </div>
   );
 }
 
-/** Tile 04: what it measured on the finished file (the real numbers of The Last Light). */
+/** Tile 04: what the kit measured on the finished file (Three Hearts, its real numbers). */
 function CheckProof() {
   const rows: [string, string][] = [
-    ["video", "h264 · 540×960 · 24 fps"],
-    ["audio", "aac · 44.1 kHz · stereo"],
-    ["length", "8.00 s"],
-    ["size", "1.0 MB"],
+    ["picture", "1080×1920 · 30 fps · H.264"],
+    ["loudness", "−16.0 LUFS · peak −1.5 dBTP"],
+    ["voice", "heard back: 0% word error"],
+    ["captions", "on the word: 0 ms off"],
+    ["screen", "clear of the apps' buttons"],
   ];
   return (
     <div className="w-full rounded-[1.1rem] bg-white/[0.07] p-5 font-[family-name:var(--rb-mono)] text-[0.9rem] leading-[1.6] sm:p-6">
-      <p className="m-0 text-white/60">$ ffprobe the-last-light.mp4</p>
+      <p className="m-0 text-white/60">$ reel check three-hearts</p>
       {rows.map(([k, v]) => (
-        <p key={k} className="m-0 grid grid-cols-[4.5rem_minmax(0,1fr)_auto] gap-3">
+        <p key={k} className="m-0 grid grid-cols-[5.5rem_minmax(0,1fr)_auto] gap-3">
           <span className="text-white/60">{k}</span>
           <span>{v}</span>
           <span className="text-[#E4FF4F]">✓</span>
         </p>
       ))}
+      <p className="m-0 mt-2 text-white/60">15 checks · PASS</p>
+    </div>
+  );
+}
+
+/** Tile 05: the critic's score card (COMPARE.score: the blind test's mean for 2.0). */
+function CriticProof() {
+  const rows: [string, number][] = CRITIC_ROWS;
+  return (
+    <div className="w-full rounded-[1.1rem] bg-white p-5 text-[#111] shadow-[0_30px_60px_-34px_rgba(0,0,0,0.5)] sm:p-6">
+      <div className="flex items-baseline justify-between">
+        <Mono className="opacity-60">critic · {CRITIC_TITLE}</Mono>
+        <span className="font-[family-name:var(--rb-archivo)] text-[2.2rem] font-black leading-none">
+          {CRITIC_TOTAL}
+          <span className="text-[1rem] opacity-50">/20</span>
+        </span>
+      </div>
+      <ul className="m-0 mt-3 grid list-none grid-cols-2 gap-x-5 gap-y-1 p-0 font-[family-name:var(--rb-mono)] text-[0.82rem]">
+        {rows.map(([k, v]) => (
+          <li key={k} className="flex justify-between border-b border-black/10 py-1">
+            <span>{k}</span>
+            <span aria-label={`${v} of 2`}>{"●".repeat(v)}{"○".repeat(2 - v)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -265,13 +336,13 @@ function AskProof() {
           {botShape(LEAD)}
         </svg>
         <div className="rounded-[1.3rem] rounded-bl-[0.3rem] bg-white p-4 text-[0.98rem] font-medium leading-[1.45] text-[#111] shadow-[0_20px_40px_-24px_rgba(0,0,0,0.5)]">
-          <p className="m-0 font-bold">The Last Light is ready.</p>
-          <p className="m-0 mt-1.5">Weak spots: the walk is a slide with a bob, and the man is small in the wide shot.</p>
-          <p className="m-0 mt-1.5">Post it?</p>
+          <p className="m-0 font-bold">The Last Watch · 29 s · critic {CRITIC_TOTAL}/20</p>
+          <p className="m-0 mt-1.5">Weak spots: midnight is a small light on a phone, and the close-up holds a pose.</p>
+          <p className="m-0 mt-1.5">Say OK for full quality, or tell me what to change.</p>
         </div>
       </div>
       <div className="mt-3 flex gap-2 pl-[3.25rem]">
-        <span className="rounded-full bg-[#111] px-4 py-2 text-[0.9rem] font-semibold text-white">Post it</span>
+        <span className="rounded-full bg-[#111] px-4 py-2 text-[0.9rem] font-semibold text-white">OK</span>
         <span className="rounded-full border-2 border-[#111] px-4 py-2 text-[0.9rem] font-semibold">Change it</span>
       </div>
     </div>
@@ -289,7 +360,7 @@ export function ReelBotPage() {
         <div className="mx-auto grid min-h-[100svh] max-w-[90rem] grid-cols-1 gap-y-10 px-5 pb-14 pt-24 sm:px-8 md:pt-28 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
           <div className="rb-rise flex items-start justify-between gap-4 lg:col-span-2" style={{ "--i": 0 } as React.CSSProperties}>
             <Mono>
-              Free<span className="hidden sm:inline"> · it downloads at once</span>
+              2.0 · {PRODUCT.priceLabel}<span className="hidden sm:inline"> · instant download</span>
             </Mono>
             <Mono className="hidden text-center md:block">Animated reels · no drawing, no filming, no editing</Mono>
             <Mono className="text-right">
@@ -305,34 +376,37 @@ export function ReelBotPage() {
             >
               <span className="block">Reel Bot</span>
               <span className="block" style={{ color: LIME }}>
-                Factory.
+                Factory 2.0
               </span>
             </h1>
             <p className="rb-rise mt-7 text-[clamp(1.3rem,2.2vw,1.7rem)] font-semibold leading-[1.25]" style={{ "--i": 2 } as React.CSSProperties}>
               Give it a topic. Get a finished reel.
             </p>
             <div id={HERO_ID} className="rb-rise mt-7 max-w-[30rem] scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
-              <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="violet" align="start" />
+              <Buy reportErrors />
+              <p className="mt-4 max-w-[38ch] text-pretty text-[0.95rem] leading-[1.5] text-white/75">
+                {PRODUCT.priceLabel} once, instant download. Included with Pro.
+              </p>
             </div>
           </div>
 
           <figure className="rb-rise rb-stack m-0 self-end pt-14 lg:pt-0" style={{ "--i": 2 } as React.CSSProperties}>
             <div className="rb-stack__row">
               <Phone className="rb-stack__side">
-                <Reel id="paper-boat" label="The Paper Boat, a papercraft reel" quiet />
+                <Reel id="kite" label="The Long Way Home, a papercraft reel" quiet />
               </Phone>
               <div className="rb-stack__mid">
                 <Phone>
-                  <Reel id="last-light" label="The Last Light, a noir reel" eager />
+                  <Reel id="lighthouse" label="The Last Watch, a noir reel" eager />
                 </Phone>
               </div>
               <Phone className="rb-stack__side">
-                <Reel id="day-on-mars" label="A Day on Mars, an explainer reel" quiet />
+                <Reel id="octopus" label="Three Hearts, an explainer reel with a voice" quiet />
               </Phone>
               <DirectorRig className="rb-stack__rig" />
             </div>
             <figcaption className="mt-20 text-right lg:mt-16">
-              <Mono className="text-white/80">Grok Bot directs · Claude draws every frame</Mono>
+              <Mono className="text-white/80">Grok Bot directs · Claude draws with the kit</Mono>
             </figcaption>
           </figure>
         </div>
@@ -349,7 +423,7 @@ export function ReelBotPage() {
               </h2>
             </div>
             <p className="max-w-[38ch] text-pretty text-[1.12rem] font-medium leading-[1.5] text-[rgba(17,17,17,0.66)] md:pb-3">
-              One line in, eight seconds out. Each with its own story, its own twist and its own sound.
+              One line in, a 30-second film out. Each with its own story, its own turn and its own sound.
             </p>
           </div>
 
@@ -360,7 +434,7 @@ export function ReelBotPage() {
                   <Mono className="opacity-80">
                     {r.n} · {r.style}
                   </Mono>
-                  <Mono className="opacity-70">8 s · with sound</Mono>
+                  <Mono className="opacity-70">{r.len}</Mono>
                 </div>
                 <h3 className="mt-3 font-[family-name:var(--rb-archivo)] text-[clamp(2rem,3.4vw,2.8rem)] font-black uppercase leading-[0.92] tracking-[-0.02em] [font-variation-settings:'wdth'_70]">
                   {r.title}
@@ -373,9 +447,44 @@ export function ReelBotPage() {
             ))}
           </ul>
           <p className="mt-6 max-w-[64ch] text-pretty text-[0.98rem] leading-[1.5] text-[rgba(17,17,17,0.62)]">
-            Made the way Reel Bot Factory makes them: a written brief, then Claude drawing every frame in Python, composing the
-            sound in code and rendering with ffmpeg. No stock, nothing traced.
+            Each made from that one line by a Claude session that had never seen the kit, following the file alone. Not touched
+            by hand. Drawn, voiced and scored in code: no stock, nothing traced.
           </p>
+        </div>
+      </section>
+
+      {/* 002b. 1.0 VS 2.0: the blind test, as a plain table on ink. */}
+      <section aria-labelledby="rb-vs" className="text-white" style={{ background: INK }}>
+        <div className="mx-auto max-w-[90rem] px-5 pb-20 pt-20 sm:px-8 md:pb-28 md:pt-28">
+          <div className="grid grid-cols-1 items-end gap-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+            <div>
+              <Mono className="opacity-60">What changed</Mono>
+              <h2 id="rb-vs" className="mt-3 max-w-[12ch] font-[family-name:var(--rb-archivo)] text-[clamp(3rem,8.5vw,7.5rem)] font-black uppercase leading-[0.86] tracking-[-0.03em] [font-variation-settings:'wdth'_68]">
+                1.0 vs <span style={{ color: LIME }}>2.0.</span>
+              </h2>
+            </div>
+            <p className="max-w-[40ch] text-pretty text-[1.12rem] font-medium leading-[1.5] text-white/70 md:pb-3">
+              The same three lines through both versions. Critics scored every reel without knowing which version made it.
+            </p>
+          </div>
+          <table className="mt-12 w-full border-collapse text-left md:mt-16">
+            <thead>
+              <tr className="border-b border-white/25">
+                <th className="py-4 pr-4 font-normal"><Mono className="text-white/60">Same three lines</Mono></th>
+                <th className="w-[25%] py-4 pr-3 font-normal sm:w-[22%]"><Mono className="text-white/60">1.0</Mono></th>
+                <th className="w-[25%] py-4 font-normal sm:w-[22%]"><Mono className="text-[#E4FF4F]">2.0</Mono></th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE.rows.map(([k, a, b]) => (
+                <tr key={k} className="border-b border-white/15 align-baseline">
+                  <td className="py-4 pr-3 text-[0.95rem] leading-[1.3] text-white/80 sm:text-[1.05rem]">{k}</td>
+                  <td className="py-4 pr-4 font-[family-name:var(--rb-archivo)] text-[clamp(1rem,2.4vw,1.9rem)] font-black text-white/55">{a}</td>
+                  <td className="py-4 font-[family-name:var(--rb-archivo)] text-[clamp(1rem,2.4vw,1.9rem)] font-black" style={{ color: LIME }}>{b}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -398,16 +507,19 @@ export function ReelBotPage() {
             <Tile n="01" title="It writes the brief." text="Style, characters, every shot with its time, a twist, an ending and the sound." bg={LIME} fg={INK}>
               <BriefProof />
             </Tile>
-            <Tile n="02" title="It gives it a voice." text="ElevenLabs reads the script, and every word gets its time, so captions land on the word." bg={PINK} fg={INK}>
+            <Tile n="02" title="It gives it a voice." text="ElevenLabs, or a free voice built in. Every word gets its time, so captions and mouths land on it." bg={PINK} fg={INK}>
               <CaptionProof />
             </Tile>
-            <Tile n="03" title="Claude draws every frame." text="It opens a chat in your Claude project, hands over the brief, and Claude draws, scores and renders it." bg={VIOLET} fg="#fff">
+            <Tile n="03" title="Claude draws it with a kit." text="Characters that walk and talk, light, camera moves, seven looks. Claude spends its time on the story, not on rebuilding a renderer." bg={VIOLET} fg="#fff">
               <ClaudeProof />
             </Tile>
-            <Tile n="04" title="It checks the file." text="Downloads the MP4 and measures it before you ever see it." bg={INK} fg="#fff" wide>
+            <Tile n="04" title="It measures the real file." text="Loudness, peaks, the voice heard back, captions on the word, nothing under the apps' buttons." bg={INK} fg="#fff">
               <CheckProof />
             </Tile>
-            <Tile n="05" title="Then it asks you." text="With an honest list of weak spots. Nothing posts until you say so." bg={ORANGE} fg={INK}>
+            <Tile n="05" title="A fresh critic scores it." text="A second Claude that didn't make it scores it out of 20. Under 16, it goes back for fixes." bg={CREAM2} fg={INK}>
+              <CriticProof />
+            </Tile>
+            <Tile n="06" title="Then it asks you." text="With an honest list of weak spots. Nothing posts until you say so." bg={ORANGE} fg={INK}>
               <AskProof />
             </Tile>
           </ol>
@@ -434,14 +546,22 @@ export function ReelBotPage() {
                 ))}
               </ol>
               <div className="mt-10">
-                <FreeClaim productId={PRODUCT.id} reveal="Get it for free" tone="violet" align="start" prompt={false} />
+                <ul className="m-0 mb-8 list-none p-0">
+                  {(PRODUCT.contents ?? []).map(([name, what]) => (
+                    <li key={name} className="grid grid-cols-1 gap-1 border-t border-white/15 py-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] sm:gap-4">
+                      <span className="break-all font-[family-name:var(--rb-mono)] text-[0.85rem] text-[#E4FF4F]">{name}</span>
+                      <span className="text-[0.95rem] leading-[1.45] text-white/75">{what}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Buy />
                 <p className="mt-4 max-w-[46ch] text-pretty text-[0.95rem] leading-[1.5] text-white/75">{PRODUCT.thanks.needs}</p>
               </div>
             </div>
           </div>
           <p className="mt-16 max-w-[70ch] text-pretty text-[0.9rem] leading-[1.6] text-white/60">
-            It runs on your own Grok Bot, Claude and ElevenLabs plans. Reel Bot Factory is an independent Grok Bot, not made by
-            xAI or Anthropic.
+            It runs on your own Grok Bot and Claude plans (ElevenLabs optional). Reel Bot Factory is an independent Grok Bot, not
+            made by xAI or Anthropic.
           </p>
         </div>
       </section>
@@ -452,9 +572,7 @@ export function ReelBotPage() {
         price={PRODUCT.priceLabel}
         heroId={HERO_ID}
         closeId={CLOSE_ID}
-        href="#claim"
-        label="Get it for free"
-        note="Free, downloads at once"
+        note="Director + kit · instant download"
         buttonClassName={BUTTON}
       />
       {/* Last, on purpose: the metal's gradient is defined by the first disc

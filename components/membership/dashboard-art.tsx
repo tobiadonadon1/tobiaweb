@@ -52,7 +52,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "video-editor": { a: "#ffc9a8", b: "#f2eeff", added: "2026-10-21" },
   "motion-designer": { a: "#ffb08c", b: "#fff1e8", added: "2026-10-23" },
   "shorts-animator": { a: "#a9bdf0", b: "#fdf3d8", added: "2026-10-25" },
-  "reel-bot": { a: "#d6d6d4", b: "#f3f3f1", added: "2026-10-26" },
+  "reel-bot": { a: "#d6d6d4", b: "#f3f3f1", added: "2026-11-04" },
   "video-editor-pro": { a: "#c9b37e", b: "#eef0f5", added: "2026-10-27" },
   "1k-bot": { a: "#f2cd6b", b: "#f6f3ea", added: "2026-10-29" },
   "meta-ads": { a: "#f0a487", b: "#f6f1e8", added: "2026-10-30" },

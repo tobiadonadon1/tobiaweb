@@ -92,7 +92,8 @@ function copyFor(product: Product) {
     };
   }
   const price = money(product.priceCents, product.currency);
-  const more = pro - product.priceCents;
+  // Only compare prices in the same currency: Pro is in euros, and "€9 more" against a dollar price is wrong.
+  const more = product.currency === "eur" ? pro - product.priceCents : 0;
   return {
     title: (
       <>
