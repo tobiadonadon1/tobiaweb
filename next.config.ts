@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
   // existing link or indexed result lands on the new page instead of a 404.
   async redirects() {
     return [
+      /* Short link to the Construct shelf. Temporary, like /98c below. */
+      { source: "/construct", destination: "/projects/construct#shelf", permanent: false },
       /* The short link for posts. Temporary on purpose: it is a campaign
          address that may point somewhere else later, and a 301 would be
          cached by every browser that ever followed it. */
