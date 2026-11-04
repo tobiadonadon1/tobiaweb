@@ -17,6 +17,9 @@ import { StickyBuy } from "./sticky-buy";
  * deep sea slate for the button, a low apricot sun behind the phones; sentence-case Figtree, centred. The reels are
  * the colour; the page stays out of their way.
  *
+ * 2.1 (same day): "New in 2.1" after the hero sells the change in four before/now cards (only Grok Bot, one
+ * question, ready-made shots, weak reels blocked), so the upgrade reads as what it is, not a minor version.
+ *
  * THE ORDER, SHORT (Tobia, 2026-11-04: "it looks very complex to run this, but it's not"): the hero (name, one line,
  * the button, three reels on the horizon); one line in, one film out; 1.0 vs 2.0 (the blind test); the close (three
  * steps and the button). The six steps with their proofs and "who does what" were cut: the page sells the reels.
@@ -53,12 +56,21 @@ const COMPARE: [string, string, string][] = [
   ["Checks on the real file", "4", "15"],
   ["Music", "synthesized", "real musicians"],
 ];
+/** What 2.1 changed for the buyer (2026-11-04). "Before" is 2.0 as it shipped that morning; every "now" is in the
+ *  2.1 Director file and kit. */
+const NEW_IN: { k: string; before: string; now: string; note: string }[] = [
+  { k: "What you need", before: "Grok Bot + a Claude plan + a terminal", now: "Grok Bot", note: "Connect Claude any time and Claude draws and scores every reel, for the best quality." },
+  { k: "Getting started", before: "4 questions and a sign-in token", now: "1 question", note: "What your account is about. It picks the style and the topic, and your first reel comes in the same chat." },
+  { k: "Every shot", before: "written from scratch, every reel", now: "12 ready-made shots", note: "Characters that act, places, counters, comparisons, lists, routes: tested pieces, so reels come out faster and steadier." },
+  { k: "A weak reel", before: "a warning", now: "blocked", note: "No hook on the first frame, a subject too small to see, text too small to read: it fixes them before you ever see the reel." },
+];
+
 const STEPS: React.ReactNode[] = [
   <>Unzip the download: two files, both for your Grok Bot.</>,
   <>Create a new Grok Bot called Director and attach both files.</>,
   <>
-    Say <q className="font-semibold">Make my first reel from this file</q>. It asks you four quick questions, then sets
-    itself up.
+    Say <q className="font-semibold">Make my first reel from this file</q>. It asks you one question, then makes your
+    first reel.
   </>,
 ];
 
@@ -154,7 +166,7 @@ export function ReelBotPage() {
         <div className="mx-auto flex max-w-[76rem] flex-col items-center px-5 pb-16 pt-28 text-center sm:px-8 md:pb-20 md:pt-32">
           <div className="rb-rise" style={{ "--i": 0 } as React.CSSProperties}>
             <Mono className="inline-block whitespace-nowrap rounded-full bg-white/55 px-3.5 py-1.5 text-[#2F4858] ring-1 ring-[#2F4858]/10">
-              New · 2.0<span className="hidden sm:inline"> · A Grok Bot, drawn by Claude</span>
+              New · 2.1<span className="hidden sm:inline"> · Only Grok Bot needed</span>
             </Mono>
           </div>
           <h1
@@ -193,6 +205,31 @@ export function ReelBotPage() {
               <Mono className="text-[#22272E]/55">Three reels it made · each from one line · not touched by hand</Mono>
             </figcaption>
           </figure>
+        </div>
+      </section>
+
+      {/* 01b. NEW IN 2.1: before and now, plainly. */}
+      <section aria-labelledby="rb-new">
+        <div className="mx-auto max-w-[76rem] px-5 pt-20 sm:px-8 md:pt-28">
+          <Heading
+            id="rb-new"
+            kicker="New in 2.1"
+            aside="The reels won a blind test in 2.0. 2.1 makes them easy to get: no second subscription, no terminal, one question."
+          >
+            Now it needs only Grok Bot.
+          </Heading>
+          <ul className="mt-12 grid list-none grid-cols-1 gap-5 p-0 md:mt-16 md:grid-cols-2">
+            {NEW_IN.map((n) => (
+              <li key={n.k} className="rounded-[1.6rem] bg-white p-6 ring-1 ring-black/[0.05] sm:p-8">
+                <Mono className="text-[#2F4858]/70">{n.k}</Mono>
+                <p className="m-0 mt-4 text-[1rem] leading-[1.4] text-[#22272E]/45 line-through decoration-[#22272E]/25">{n.before}</p>
+                <p className="m-0 mt-1 text-[clamp(1.9rem,3.6vw,2.6rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#2F4858]">
+                  {n.now}
+                </p>
+                <p className="m-0 mt-3 max-w-[44ch] text-pretty text-[1rem] leading-[1.55] text-[#22272E]/65">{n.note}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -283,7 +320,7 @@ export function ReelBotPage() {
             </div>
             <div className="self-end rounded-[1.6rem] bg-white/70 p-6 ring-1 ring-black/[0.05] backdrop-blur-sm sm:p-8">
               <p className="m-0 text-[1.15rem] font-semibold leading-[1.35] tracking-[-0.01em]">
-                Reel Bot Factory 2.0 · {PRODUCT.priceLabel}
+                Reel Bot Factory 2.1 · {PRODUCT.priceLabel}
               </p>
               <p className="m-0 mt-2 text-[0.98rem] leading-[1.5] text-[#22272E]/65">
                 The Director for your Grok Bot and the kit it draws with. Instant download.
