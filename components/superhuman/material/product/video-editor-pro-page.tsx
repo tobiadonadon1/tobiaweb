@@ -128,7 +128,7 @@ export function VideoEditorProPage() {
     <main className={`vep-page ${archivo.variable} ${serif.variable} ${mono.variable} relative overflow-x-clip`} style={{ background: GROUND, color: CREAM }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <VideoEditorProLoader />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 01. THE VALUE, AT ONCE: what it does, what you get, the price. */}
       <section aria-labelledby="vep-title" className="relative isolate overflow-hidden">

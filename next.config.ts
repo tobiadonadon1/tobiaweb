@@ -39,7 +39,14 @@ const nextConfig: NextConfig = {
       /* The short link for posts. Temporary on purpose: it is a campaign
          address that may point somewhere else later, and a 301 would be
          cached by every browser that ever followed it. */
-      { source: "/98c", destination: "/projects/construct/material/setups/the-98c-trade", permanent: false },
+      { source: "/98c", destination: "/projects/construct/material/skills/the-98c-trade", permanent: false },
+      /* Setups closed on 2026-11-04 and everything in it moved to Skills, one list of every skill, free and paid.
+         Each old page (and its /thanks, which old receipts link to) lands on the same page under Skills, query
+         string and all. The slugs are named, so a future Setups can reuse the folder. The folder itself goes to
+         Skills for now, temporarily, because Setups will open again with something new in it. */
+      { source: "/projects/construct/material/setups/:slug(carousel-designer|mascot-designer|conversion-teardown|meta-ads|1k-bot|video-editor-pro|web-designer-pro|app-designer-pro|grok-army|reel-bot|the-98c-trade|launchr|jev-crypto-analyst)", destination: "/projects/construct/material/skills/:slug", statusCode: 308 },
+      { source: "/projects/construct/material/setups/:slug(carousel-designer|mascot-designer|conversion-teardown|meta-ads|1k-bot|video-editor-pro|web-designer-pro|app-designer-pro|grok-army|reel-bot|the-98c-trade|launchr|jev-crypto-analyst)/:rest+", destination: "/projects/construct/material/skills/:slug/:rest+", statusCode: 308 },
+      { source: "/projects/construct/material/setups", destination: "/projects/construct/material/skills", permanent: false },
       { source: "/projects/sole", destination: "/projects/mynd", statusCode: 301 },
       /* Viral Machine went free and moved to Skills on its launch day. */
       { source: "/projects/construct/material/setups/viral-machine", destination: "/projects/construct/material/skills/viral-machine", statusCode: 301 },

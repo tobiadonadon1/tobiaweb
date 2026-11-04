@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { DownloadGate } from "./download-gate";
-import { BuyForm } from "./product/buy-form";
-import { PRODUCTS } from "@/lib/shop/products";
+import { levelOf } from "@/lib/membership/tiers";
+import { PRODUCTS, type Product } from "@/lib/shop/products";
 import { Specimen } from "./specimens";
-import { entryHref } from "./material-data";
+import { entryHref, isNew } from "./material-data";
 import type { MaterialEntry, MaterialFolder } from "./material-types";
 
 /**
@@ -37,11 +37,31 @@ import type { MaterialEntry, MaterialFolder } from "./material-types";
  * here shows two equal buttons in one column.
  */
 
+/**
+ * A PAID SKILL'S PILL SAYS WHAT A MEMBER PAYS, NOT THE PRICE (Tobia, 2026-11-04: "it should say free if on Pro,
+ * free if on Ultimate. Otherwise, in small text, $5, $10"). The price is in the foot, small. The pill goes to the
+ * skill's page, where the buying happens: a checkout from a card skipped the page that sells it.
+ */
+function memberLine(product: Product): string {
+  switch (levelOf(product)) {
+    case "premium":
+      return "Free with Pro";
+    case "exclusive":
+      return "Ultimate only";
+    case "unique":
+      return product.memberPrice?.ultimate === 0 ? "Free with Ultimate" : "Less with Pro";
+  }
+}
+
+const PILL =
+  "group/get inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]";
+
 function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntry }) {
   const href = entryHref(folder.id, entry.slug);
   const download = entry.link?.download ? entry.link : undefined;
   // A skill with a price: the pill buys instead of downloading.
   const product = entry.product ? PRODUCTS[entry.product] : undefined;
+  const fresh = folder.id === "skills" && isNew(entry.slug);
 
   return (
     <li className="flex flex-col border-b border-r border-[var(--hairline)] bg-[var(--paper)] p-6 md:p-8">
@@ -50,10 +70,17 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         href={href}
         className="group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
       >
-        <Specimen
-          id={entry.slug}
-          className="h-auto w-full transition-transform duration-[600ms] ease-out group-hover:-translate-y-1.5"
-        />
+        <div className="relative">
+          <Specimen
+            id={entry.slug}
+            className="h-auto w-full transition-transform duration-[600ms] ease-out group-hover:-translate-y-1.5"
+          />
+          {fresh ? (
+            <span className="absolute left-0 top-0 rounded-full bg-[var(--accent-clay-text)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[var(--paper)]">
+              New
+            </span>
+          ) : null}
+        </div>
 
         <h2 className="mt-6 font-serif text-[clamp(1.5rem,2.6vw,1.95rem)] leading-[1.06] tracking-[-0.03em] text-[var(--ink)] transition-colors duration-[600ms] ease-out group-hover:text-[var(--accent-clay)]">
           {entry.title}
@@ -78,22 +105,12 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
           {product ? (
             <>
-              {product.free ? (
-                // Given away for an email: the product page, from its top (its
-                // hero has the same button). Jumping straight to the form
-                // landed people halfway down a page they hadn't seen yet. A
-                // checkout button here would say "Buy · Free", and Stripe
-                // refuses a free product anyway.
-                <Link
-                  href={href}
-                  className="group/get inline-flex items-center gap-2.5 rounded-full bg-[var(--accent-clay-text)] px-5 py-2.5 text-[0.95rem] font-medium text-[var(--paper)] transition-transform duration-200 hover:scale-[1.03] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-clay)]"
-                >
-                  {product.onPage ? "Try it" : "Get it free"}
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/get:translate-x-0.5" />
-                </Link>
-              ) : (
-                <BuyForm productId={product.id} price={product.priceLabel} compact />
-              )}
+              {/* Free or paid, the pill goes to the product page, from its top (its hero has the button). Jumping
+                  straight to a form or a checkout landed people on something they hadn't seen yet. */}
+              <Link href={href} className={PILL}>
+                {product.free ? (product.onPage ? "Try it" : "Get it free") : memberLine(product)}
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/get:translate-x-0.5" />
+              </Link>
               <Link
                 href={href}
                 className="group/read relative inline-flex items-center after:absolute after:inset-x-0 after:-inset-y-2.5 after:content-[''] gap-1.5 border-b border-[var(--hairline-strong)] pb-1 text-[0.9rem] text-[color:rgba(11,31,58,0.72)] transition-colors duration-[600ms] ease-out hover:border-[var(--accent-clay)] hover:text-[var(--accent-clay-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-clay)]"
@@ -131,7 +148,8 @@ function Column({ folder, entry }: { folder: MaterialFolder; entry: MaterialEntr
         </div>
 
         <p className="mt-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[color:rgba(11,31,58,0.62)]">
-          {product && !product.onPage ? `${product.priceLabel} · ` : ""}{entry.kind === "guide" && product ? "PDF" : `${entry.minutes} min`} · {entry.level}
+          {product && !product.onPage ? (product.free ? "Free · " : `Or ${product.priceLabel} once · `) : ""}
+          {entry.kind === "guide" && product ? "PDF" : `${entry.minutes} min`} · {entry.level}
         </p>
       </div>
     </li>

@@ -161,8 +161,8 @@ export const SHELF: ShelfFamily[] = [
     tier: "free",
     open: true,
     tag: "Free",
-    // Counted, not rounded: skills.ts, guides.ts and setups.ts.
-    line: "Four skills, three guides, and three setups that set themselves up.",
+    // Since 2026-11-04 every skill, free and paid, is on one list (Skills); Setups is closed.
+    line: "Every skill I make, free and paid, the newest first, and the guides.",
     // Two things here have a price, so the promise names what it covers.
     status: "Free unless it shows a price.",
     cta: "Open the material",

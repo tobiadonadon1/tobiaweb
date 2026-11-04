@@ -147,7 +147,7 @@ export function ReelBotPage() {
       style={{ background: "var(--rb-mist)" }}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" tone="paper" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="paper" />
 
       {/* 01. THE HERO: dusk, the name, one line, the button, three reels on the horizon. */}
       <section aria-labelledby="rb-title" className="rb-sky relative isolate overflow-hidden">

@@ -316,7 +316,7 @@ export function MetaAdsPage() {
   return (
     <main className={`${archivo.variable} ${mono.variable} relative overflow-x-clip bg-white text-black`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 001. THE POSTER: the rule, the button, the film. */}
       <section aria-labelledby="mad-title" className="relative isolate overflow-hidden text-white" style={{ background: BLACK }}>

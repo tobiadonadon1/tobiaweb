@@ -41,14 +41,67 @@ import { CONFIGURATION } from "./content/configuration";
  * the pieces inside it.
  */
 
+/**
+ * WHEN EACH SKILL CAME OUT, by slug: the day it first went on the shelf (from git), or the day of a release that
+ * made it new again (Reel Bot Factory 2.0). Skills lists newest first from this, and the newest wear "New".
+ * A NEW SKILL GETS A LINE HERE: tests/shop.test.mjs fails for any entry on Skills without one.
+ */
+export const RELEASED: Record<string, string> = {
+  "reel-bot": "2026-11-04",
+  "carousel-designer": "2026-11-02",
+  "mascot-designer": "2026-11-01",
+  "conversion-teardown": "2026-10-31",
+  "meta-ads": "2026-10-30",
+  "1k-bot": "2026-10-29",
+  "video-editor-pro": "2026-10-26",
+  "shorts-animator": "2026-10-25",
+  "motion-designer": "2026-10-23",
+  "video-editor": "2026-10-21",
+  "duo-designer": "2026-10-19",
+  "web-designer-pro": "2026-10-16",
+  "viral-machine": "2026-10-15",
+  "copycat-detective": "2026-10-12",
+  "app-designer-pro": "2026-10-12",
+  "grok-army": "2026-10-10",
+  "app-launcher": "2026-10-09",
+  "web-designer": "2026-10-05",
+  "app-designer": "2026-10-03",
+  "jev-crypto-analyst": "2026-09-28",
+  "launchr": "2026-09-25",
+  "the-98c-trade": "2026-09-23",
+  "product-manager": "2026-09-03",
+  "code-reviewer": "2026-09-03",
+  "art-director": "2026-09-03",
+};
+
+/** How long a skill wears "New", in days from its release. The page is built at deploy, so it's as of the last one. */
+export const NEW_FOR_DAYS = 7;
+
+export function isNew(slug: string, now: Date = new Date()): boolean {
+  const day = RELEASED[slug];
+  if (!day) return false;
+  return now.getTime() - Date.parse(`${day}T00:00:00Z`) < NEW_FOR_DAYS * 86_400_000;
+}
+
+/**
+ * SKILLS: EVERY ONE, FREE AND PAID, NEWEST FIRST (Tobia, 2026-11-04). The free skills that set themselves up and the
+ * paid ones used to sit in Setups, and Skills opened on the September three, so the newest work was a click away from
+ * where people landed. Now there is one list and the only difference between two cards is free or paid.
+ * Ties keep their order in the content files.
+ */
+const ALL_SKILLS = [...SKILLS, ...SETUPS]
+  .map((entry, i) => ({ entry, i }))
+  .sort((a, b) => (RELEASED[b.entry.slug] ?? "").localeCompare(RELEASED[a.entry.slug] ?? "") || a.i - b.i)
+  .map(({ entry }) => entry);
+
 const SKILLS_FOLDER: MaterialFolder = {
   id: "skills",
   name: "Skills",
-  line: "Four roles you put into the agent for the length of a job.",
+  line: "Every skill, free and paid, the newest first.",
   lede: "",
   intro: [],
   accent: "clay",
-  entries: SKILLS,
+  entries: ALL_SKILLS,
 };
 
 const GUIDES_FOLDER: MaterialFolder = {
@@ -81,22 +134,20 @@ const VIDEOS_FOLDER: MaterialFolder = {
 };
 
 /**
- * SETUPS, OPEN, AND THE ONE FOLDER THAT COSTS SOMETHING.
- *
- * It was drawn blurred with "Five written. Not open." over five notes about
- * configuration. It opens now with a different job: finished folders you open
- * in Claude Code that build themselves, starting with The 98¢ Trade. The name
- * fits better than it did before, since "a setup" is exactly what you get. The
- * five notes moved to CONFIGURATION, parked below with their routes intact.
+ * SETUPS, CLOSED AGAIN (Tobia, 2026-11-04: "Setups should be blocked right now because I don't know what to put in
+ * it"). Everything it held moved to Skills, and its old addresses redirect there (next.config.ts). It stays in the
+ * grid, blurred, with no route of its own until it has something new in it.
  */
 const SETUPS_FOLDER: MaterialFolder = {
   id: "setups",
   name: "Setups",
   line: "Finished folders you open in Claude Code. They set themselves up.",
   lede: "",
+  locked: true,
+  soon: "Being planned. Nothing in it yet.",
   intro: [],
   accent: "sky",
-  entries: SETUPS,
+  entries: [],
 };
 
 /* ---------------------------------------------------------------- *
@@ -147,14 +198,13 @@ const TOOLS_FOLDER: MaterialFolder = {
 export const MATERIAL_ROOM_FOLDERS: MaterialFolder[] = [
   SKILLS_FOLDER,
   GUIDES_FOLDER,
-  SETUPS_FOLDER,
 ];
 
-/** Drawn blurred in the grid. Not links, not indexed. */
-export const MATERIAL_LOCKED_FOLDERS: MaterialFolder[] = [VIDEOS_FOLDER];
+/** Drawn blurred in the grid. Not links, not indexed. Setups has no route at all while it's closed. */
+export const MATERIAL_LOCKED_FOLDERS: MaterialFolder[] = [SETUPS_FOLDER, VIDEOS_FOLDER];
 
 /**
- * THE GRID, reading order. Three you can open, then one you cannot. The
+ * THE GRID, reading order. Two you can open, then two you cannot. The
  * reading order is the point: the eye lands on something it can use before it
  * lands on something it has to wait for.
  */
@@ -240,7 +290,8 @@ export function folderCount(folder: MaterialFolder): {
   // folder whose unfinished pieces are ALL waiting on a camera; a folder of
   // half-written drafts must not inherit the video folder's sentence.
   // A folder of setups counts setups: "1 piece" reads wrong on a product.
-  const noun = folder.entries.every((e) => e.kind === "setup") ? "setup" : "piece";
+  const noun =
+    folder.id === "skills" ? "skill" : folder.entries.every((e) => e.kind === "setup") ? "setup" : "piece";
   const label =
     ready === total
       ? `${total} ${noun}${total === 1 ? "" : "s"}`

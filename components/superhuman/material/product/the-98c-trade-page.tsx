@@ -117,7 +117,7 @@ export function The98cTradePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
       />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 1. WHAT IT IS. The button is inside the first screen on a phone. */}
       <header className="mx-auto flex max-w-3xl flex-col items-center px-6 pb-20 pt-24 text-center md:pb-28 md:pt-32">

@@ -116,7 +116,7 @@ export async function POST(request: Request) {
   const product = productById(form?.get("product"));
 
   if (!product) {
-    return Response.redirect(`${origin}/projects/construct/material/setups`, 303);
+    return Response.redirect(`${origin}/projects/construct/material/skills`, 303);
   }
   // Given away, not sold: never open a checkout for it.
   if (product.free) {

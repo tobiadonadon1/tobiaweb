@@ -54,7 +54,7 @@ export function JevAnalystPage() {
   return (
     <main className="relative overflow-x-clip bg-[#050507] text-[#f4f2ec]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 1. THE PROMISE, THE APP, THE FORM. All on the first screen. */}
       <section aria-labelledby="jev-title" className="relative">

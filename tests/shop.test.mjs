@@ -219,9 +219,9 @@ test("health: a product not on sale yet, with no sealed file, is pending and doe
 });
 
 test("the product, its page and its folder entry agree", async () => {
-  const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
-  assert.equal(THE_98C_TRADE.href, entryHref("setups", "the-98c-trade"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "the-98c-trade")?.product, "the-98c-trade");
+  const { entryHref, FOLDER_BY_ID, MATERIAL_LOCKED_FOLDERS, RELEASED } = await import("../components/superhuman/material/material-data.ts");
+  assert.equal(THE_98C_TRADE.href, entryHref("skills", "the-98c-trade"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "the-98c-trade")?.product, "the-98c-trade");
   assert.equal(THE_98C_TRADE.priceCents, 500);
   assert.equal(THE_98C_TRADE.priceLabel, "€5");
   assert.equal(THE_98C_TRADE.currency, "eur");
@@ -230,7 +230,7 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(productById("motion-director"), undefined);
   const mdz = productById("motion-designer");
   assert.equal(mdz.href, entryHref("skills", "motion-designer"));
-  assert.equal(FOLDER_BY_ID.skills.entries.findIndex((e) => e.slug === "motion-designer"), 3, "in Motion Director's place, the fourth card");
+  assert.ok(FOLDER_BY_ID.skills.entries.some((e) => e.slug === "motion-designer"), "on Skills, in release order");
   assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "motion-designer")?.product, "motion-designer");
   assert.equal(mdz.free, true);
   assert.equal(forSale(mdz), false);
@@ -247,16 +247,16 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(sa.file.attach, false);
   // Video Editor Pro: €5, a setup, never attached (it ships scripts); not sold until its Stripe product exists.
   const vep = productById("video-editor-pro");
-  assert.equal(vep.href, entryHref("setups", "video-editor-pro"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "video-editor-pro")?.product, "video-editor-pro");
+  assert.equal(vep.href, entryHref("skills", "video-editor-pro"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "video-editor-pro")?.product, "video-editor-pro");
   assert.equal(vep.priceCents, 1500);
   assert.equal(vep.free, undefined);
   assert.equal(vep.file.attach, false);
   assert.equal(forSale(vep), vep.stripeProductId.startsWith("prod_"));
   // Reel Bot Factory 2.0: $10 (free before 2.0), the Director and its kit in one zip, beside Grok Army.
   const rb = productById("reel-bot");
-  assert.equal(rb.href, entryHref("setups", "reel-bot"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "reel-bot")?.product, "reel-bot");
+  assert.equal(rb.href, entryHref("skills", "reel-bot"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "reel-bot")?.product, "reel-bot");
   assert.equal(rb.free, undefined);
   assert.equal(rb.priceCents, 1000);
   assert.equal(rb.currency, "usd");
@@ -264,27 +264,27 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(rb.file.attach, false, "the kit ships scripts: never attached");
   assert.equal(forSale(rb), true);
   // Launchr: a setup, sold, on the Stripe product Tobia made, at €12.
-  assert.equal(LAUNCHR.href, entryHref("setups", "launchr"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "launchr")?.product, "launchr");
+  assert.equal(LAUNCHR.href, entryHref("skills", "launchr"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "launchr")?.product, "launchr");
   // The $1K Bot: a free Grok Bot (the bot file and the challenge's instructions), first on Setups.
   const okb = productById("1k-bot");
-  assert.equal(okb.href, entryHref("setups", "1k-bot"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "1k-bot")?.product, "1k-bot");
+  assert.equal(okb.href, entryHref("skills", "1k-bot"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "1k-bot")?.product, "1k-bot");
   assert.equal(okb.free, true);
   assert.equal(forSale(okb), false);
   assert.equal(okb.stripeProductId, "none");
   // The Meta Ads Skill: three free skills for Claude Code, downloading at once, first on Setups.
   const mad = productById("meta-ads");
-  assert.equal(mad.href, entryHref("setups", "meta-ads"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "meta-ads")?.product, "meta-ads");
+  assert.equal(mad.href, entryHref("skills", "meta-ads"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "meta-ads")?.product, "meta-ads");
   assert.equal(mad.free, true);
   assert.equal(mad.instant, true);
   assert.equal(forSale(mad), false);
   assert.equal(mad.stripeProductId, "none");
   // Conversion Teardown: a free skill for Claude Code, downloading at once, first on Setups.
   const ctd = productById("conversion-teardown");
-  assert.equal(ctd.href, entryHref("setups", "conversion-teardown"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "conversion-teardown")?.product, "conversion-teardown");
+  assert.equal(ctd.href, entryHref("skills", "conversion-teardown"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "conversion-teardown")?.product, "conversion-teardown");
   assert.equal(ctd.free, true);
   assert.equal(ctd.instant, true);
   assert.equal(ctd.file.attach, false);
@@ -292,8 +292,8 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(ctd.stripeProductId, "none");
   // Mascot Designer: a free skill for Claude Code, downloading at once, first on Setups.
   const mascotD = productById("mascot-designer");
-  assert.equal(mascotD.href, entryHref("setups", "mascot-designer"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "mascot-designer")?.product, "mascot-designer");
+  assert.equal(mascotD.href, entryHref("skills", "mascot-designer"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "mascot-designer")?.product, "mascot-designer");
   assert.equal(mascotD.free, true);
   assert.equal(mascotD.instant, true);
   assert.equal(mascotD.file.attach, false);
@@ -301,34 +301,40 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(mascotD.stripeProductId, "none");
   // Carousel Designer: a free skill for Claude Code, downloading at once, first on Setups.
   const carD = productById("carousel-designer");
-  assert.equal(carD.href, entryHref("setups", "carousel-designer"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "carousel-designer")?.product, "carousel-designer");
+  assert.equal(carD.href, entryHref("skills", "carousel-designer"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "carousel-designer")?.product, "carousel-designer");
   assert.equal(carD.free, true);
   assert.equal(carD.instant, true);
   assert.equal(carD.file.attach, false);
   assert.equal(forSale(carD), false);
   assert.equal(carD.stripeProductId, "none");
-  assert.deepEqual(FOLDER_BY_ID.setups.entries.map((e) => e.slug), ["carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot", "video-editor-pro", "web-designer-pro", "app-designer-pro", "grok-army", "reel-bot", "the-98c-trade", "launchr", "jev-crypto-analyst"], "Carousel Designer first, then Mascot Designer, Conversion Teardown, the Meta Ads Skill, the $1K Bot, Video Editor Pro, Web Designer Pro, App Designer Pro, Grok Army, Reel Bot beside it, the 98¢ Trade, Launchr, Jev");
+  // One list since 2026-11-04: Skills holds every skill, free and paid, newest first; Setups is closed and empty.
+  const skillSlugs = FOLDER_BY_ID.skills.entries.map((e) => e.slug);
+  assert.deepEqual(skillSlugs.slice(0, 6), ["reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot"], "the newest first");
+  assert.deepEqual(skillSlugs.slice(-3), ["art-director", "product-manager", "code-reviewer"], "the September three last, in their own order");
+  for (const e of FOLDER_BY_ID.skills.entries) assert.ok(RELEASED[e.slug], `${e.slug} has a release date`);
+  assert.equal(FOLDER_BY_ID.setups, undefined, "Setups has no route while it is closed");
+  assert.ok(MATERIAL_LOCKED_FOLDERS.some((f) => f.id === "setups" && f.entries.length === 0), "Setups is drawn locked and empty");
   // Web Designer Pro: a setup, sold at €5 once on the Stripe product Tobia made ("Web Design 2.0").
   const wdp = productById("web-designer-pro");
-  assert.equal(wdp.href, entryHref("setups", "web-designer-pro"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "web-designer-pro")?.product, "web-designer-pro");
+  assert.equal(wdp.href, entryHref("skills", "web-designer-pro"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "web-designer-pro")?.product, "web-designer-pro");
   assert.equal(wdp.stripeProductId, "prod_VRir0B4DJgdsn9");
   assert.equal(wdp.priceCents, 500);
   assert.equal(wdp.priceLabel, "€5");
   assert.equal(wdp.file.attach, false, "the skill ships scripts, so the email carries a link");
   // App Designer Pro: a setup, sold at €5 on the Stripe product Tobia made.
   const pro = productById("app-designer-pro");
-  assert.equal(pro.href, entryHref("setups", "app-designer-pro"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "app-designer-pro")?.product, "app-designer-pro");
+  assert.equal(pro.href, entryHref("skills", "app-designer-pro"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "app-designer-pro")?.product, "app-designer-pro");
   assert.equal(pro.stripeProductId, "prod_VQa83vPcURQp2m");
   assert.equal(pro.priceCents, 500);
   assert.equal(pro.priceLabel, "€5");
   assert.equal(pro.file.attach, false, "the skill ships scripts, so the email carries a link");
   // Grok Army: a setup, its page and its entry agree.
   const ga = productById("grok-army");
-  assert.equal(ga.href, entryHref("setups", "grok-army"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "grok-army")?.product, "grok-army");
+  assert.equal(ga.href, entryHref("skills", "grok-army"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "grok-army")?.product, "grok-army");
   assert.equal(LAUNCHR.priceCents, 1200);
   assert.equal(LAUNCHR.priceLabel, "€12");
   assert.equal(LAUNCHR.stripeProductId, "none");
@@ -629,8 +635,8 @@ test("checkout: Reel Bot opens a $10 checkout on its own Stripe product", async 
 test("free: Jev Crypto Analyst sends its own file, and its link never opens Launchr", async () => {
   const { JEV_CRYPTO_ANALYST } = await import("../lib/shop/products.ts");
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
-  assert.equal(JEV_CRYPTO_ANALYST.href, entryHref("setups", "jev-crypto-analyst"));
-  assert.equal(FOLDER_BY_ID.setups.entries.find((e) => e.slug === "jev-crypto-analyst")?.product, "jev-crypto-analyst");
+  assert.equal(JEV_CRYPTO_ANALYST.href, entryHref("skills", "jev-crypto-analyst"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "jev-crypto-analyst")?.product, "jev-crypto-analyst");
 
   const res = await ask({ product: "jev-crypto-analyst", email: "trader@example.com" }, "203.0.113.40");
   assert.equal(res.status, 200);
@@ -680,7 +686,7 @@ test("free: Web Designer is a skill beside App Designer, sent as a link, never a
   const skills = FOLDER_BY_ID.skills.entries;
   assert.equal(skills.find((e) => e.slug === "web-designer")?.product, "web-designer");
   // Right after App Designer on the rack: the next card on a phone.
-  assert.equal(skills.findIndex((e) => e.slug === "web-designer"), skills.findIndex((e) => e.slug === "app-designer") + 1);
+  assert.ok(skills.findIndex((e) => e.slug === "web-designer") < skills.findIndex((e) => e.slug === "app-designer"), "newer, so above it");
   // It ships scripts, and Gmail refuses a zip that holds them.
   assert.equal(WEB_DESIGNER.file.attach, false);
 
@@ -706,7 +712,7 @@ test("free: App Launcher opens a new row on the rack, sent as a link, its comman
   assert.equal(APP_LAUNCHER.href, entryHref("skills", "app-launcher"));
   const skills = FOLDER_BY_ID.skills.entries;
   assert.equal(skills.find((e) => e.slug === "app-launcher")?.product, "app-launcher");
-  assert.equal(skills.findIndex((e) => e.slug === "app-launcher"), skills.findIndex((e) => e.slug === "web-designer") + 1);
+  assert.ok(skills.findIndex((e) => e.slug === "app-launcher") < skills.findIndex((e) => e.slug === "web-designer"), "newer, so above it");
   assert.equal(APP_LAUNCHER.file.attach, false);
 
   const res = await ask({ product: "app-launcher", email: "launch@example.com" }, "203.0.113.71");
@@ -733,7 +739,7 @@ test("free: Viral Machine is given for an email, its file attached, never a chec
   const { entryHref, FOLDER_BY_ID } = await import("../components/superhuman/material/material-data.ts");
   assert.equal(VIRAL_MACHINE.href, entryHref("skills", "viral-machine"));
   const skills = FOLDER_BY_ID.skills.entries;
-  assert.equal(skills.findIndex((e) => e.slug === "viral-machine"), 8, "it closes the third row of the rack");
+  assert.ok(skills.some((e) => e.slug === "viral-machine"), "on Skills, in release order");
   assert.equal(VIRAL_MACHINE.free, true);
   assert.equal(forSale(VIRAL_MACHINE), false);
 
@@ -757,9 +763,9 @@ test("free: Duo Designer opens the fourth row, sent as a link for an email, at o
   const skills = FOLDER_BY_ID.skills.entries;
   assert.equal(skills.find((e) => e.slug === "duo-designer")?.product, "duo-designer");
   // The tenth card: the rack is three wide, so it starts the fourth row.
-  assert.equal(skills.findIndex((e) => e.slug === "duo-designer"), 9);
-  assert.equal(skills.at(-2)?.slug, "video-editor", "Video Editor follows it on the fourth row");
-  assert.equal(skills.at(-1)?.slug, "shorts-animator", "Shorts Animator closes the fourth row");
+  assert.ok(skills.some((e) => e.slug === "duo-designer"), "on Skills, in release order");
+  assert.ok(skills.findIndex((e) => e.slug === "video-editor") < skills.findIndex((e) => e.slug === "duo-designer"), "Video Editor is newer, so above it");
+  assert.ok(skills.findIndex((e) => e.slug === "shorts-animator") < skills.findIndex((e) => e.slug === "video-editor"), "Shorts Animator is newer still");
   assert.equal(DUO_DESIGNER.free, true);
   assert.equal(DUO_DESIGNER.accountOnly, undefined, "an email is enough, no account needed");
   assert.equal(forSale(DUO_DESIGNER), false);
@@ -831,7 +837,7 @@ test("free: Copycat Detective sits beside App Launcher, free with an account, ne
   assert.equal(COPYCAT_DETECTIVE.href, entryHref("skills", "copycat-detective"));
   const skills = FOLDER_BY_ID.skills.entries;
   assert.equal(skills.find((e) => e.slug === "copycat-detective")?.product, "copycat-detective");
-  assert.equal(skills.findIndex((e) => e.slug === "copycat-detective"), skills.findIndex((e) => e.slug === "app-launcher") + 1);
+  assert.ok(skills.findIndex((e) => e.slug === "copycat-detective") < skills.findIndex((e) => e.slug === "app-launcher"), "newer, so above it");
   assert.equal(COPYCAT_DETECTIVE.free, true);
   assert.equal(COPYCAT_DETECTIVE.file.attach, false);
   // Its own words never call anyone a copycat beyond its name, and never promise a verdict.
@@ -1139,7 +1145,7 @@ test("forSale: only a paid product with a real Stripe product id", async () => {
 test("checkout: an unknown product goes back to the folder", async () => {
   const res = await buy("free-money");
   assert.equal(res.status, 303);
-  assert.equal(res.headers.get("location"), `${ORIGIN}/projects/construct/material/setups`);
+  assert.equal(res.headers.get("location"), `${ORIGIN}/projects/construct/material/skills`);
 });
 
 /* ================================================================== *

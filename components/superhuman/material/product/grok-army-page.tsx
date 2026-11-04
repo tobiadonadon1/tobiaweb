@@ -107,7 +107,7 @@ export function GrokArmyPage() {
   return (
     <main className="ga-page relative overflow-x-clip bg-[var(--ga-ground)] text-[var(--ga-ink)]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 1. WHAT IT IS, AND THE BUTTON, centred, then the banner: the whole
           crowd of bots heading for one word, and the word keeps changing. */}

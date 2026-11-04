@@ -228,7 +228,7 @@ export function OneKBotPage() {
       style={{ background: INK }}
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 001. THE POSTER: the promise in four words, and what lands every morning. */}
       <section aria-labelledby="okb-title" className="okb-hero relative isolate overflow-hidden">

@@ -78,7 +78,7 @@ export function MascotDesignerPage() {
   return (
     <main className={`md-page ${bubble.variable} ${round.variable} ${body.variable} relative overflow-x-clip`} style={{ background: "#FFF7EA" }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 001. THE WORLD: the bubble title, the button, mascots on the podiums. */}
       <section aria-labelledby="md-title" className="md-hero relative isolate overflow-hidden">

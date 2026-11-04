@@ -357,7 +357,7 @@ export function WebDesignerProPage() {
     <main className={`wdp-page ${archivo.variable} ${mono.variable} relative overflow-x-clip bg-[#ECEAE3] text-[#111]`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <WebDesignerProIntro />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 001. THE POSTER: the name, Tobia, and the button. The title and the
           portrait are both sized from the viewport (globals.css .wdp-title,

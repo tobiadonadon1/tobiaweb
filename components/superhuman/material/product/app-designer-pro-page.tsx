@@ -145,7 +145,7 @@ export function AppDesignerProPage() {
     <main className="adp-page relative overflow-x-clip bg-[var(--paper)] text-[var(--ink)]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <ProIntro words={SIX.map(({ word, bg, fg }) => ({ word, bg, fg }))} />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 1. THE NAME AND THE BUTTON, under the six stickers. */}
       <section aria-labelledby="adp-title" className="relative">

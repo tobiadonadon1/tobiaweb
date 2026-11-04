@@ -147,7 +147,7 @@ export const THE_98C_TRADE: Product = {
   priceCents: 500,
   currency: "eur",
   priceLabel: money(500, "eur"),
-  href: "/projects/construct/material/setups/the-98c-trade",
+  href: "/projects/construct/material/skills/the-98c-trade",
   file: {
     sealed: "the-98c-trade.zip.enc",
     filename: "the-98c-trade.zip",
@@ -192,7 +192,7 @@ export const LAUNCHR: Product = {
   priceCents: 1200,
   currency: "eur",
   priceLabel: money(1200, "eur"),
-  href: "/projects/construct/material/setups/launchr",
+  href: "/projects/construct/material/skills/launchr",
   file: {
     sealed: "launchr.zip.enc",
     filename: "launchr.zip",
@@ -247,7 +247,7 @@ export const JEV_CRYPTO_ANALYST: Product = {
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/jev-crypto-analyst",
+  href: "/projects/construct/material/skills/jev-crypto-analyst",
   file: {
     sealed: "jev-crypto-analyst.zip.enc",
     filename: "jev-crypto-analyst.zip",
@@ -656,7 +656,7 @@ export const GROK_ARMY: Product = {
   priceCents: 1500,
   currency: "eur",
   priceLabel: money(1500, "eur"),
-  href: "/projects/construct/material/setups/grok-army",
+  href: "/projects/construct/material/skills/grok-army",
   file: {
     sealed: "grok-army.zip.enc",
     filename: "grok-army.zip",
@@ -713,7 +713,7 @@ export const APP_DESIGNER_PRO: Product = {
   priceCents: 500,
   currency: "eur",
   priceLabel: money(500, "eur"),
-  href: "/projects/construct/material/setups/app-designer-pro",
+  href: "/projects/construct/material/skills/app-designer-pro",
   file: {
     sealed: "app-designer-pro.zip.enc",
     filename: "app-designer-pro.zip",
@@ -822,7 +822,7 @@ export const WEB_DESIGNER_PRO: Product = {
   priceCents: 500,
   currency: "eur",
   priceLabel: money(500, "eur"),
-  href: "/projects/construct/material/setups/web-designer-pro",
+  href: "/projects/construct/material/skills/web-designer-pro",
   file: {
     sealed: "web-designer-pro.zip.enc",
     filename: "web-designer-pro.zip",
@@ -1116,7 +1116,7 @@ export const REEL_BOT: Product = {
   priceCents: 1000,
   currency: "usd",
   priceLabel: money(1000, "usd"),
-  href: "/projects/construct/material/setups/reel-bot",
+  href: "/projects/construct/material/skills/reel-bot",
   file: {
     sealed: "reel-bot.zip.enc",
     filename: "Reel Bot Factory 2.0.zip",
@@ -1195,7 +1195,7 @@ export const VIDEO_EDITOR_PRO: Product = {
   priceCents: 1500,
   currency: "eur",
   priceLabel: money(1500, "eur"),
-  href: "/projects/construct/material/setups/video-editor-pro",
+  href: "/projects/construct/material/skills/video-editor-pro",
   file: {
     stored: "video-editor-pro.zip",
     filename: "Video Editor Pro.zip",
@@ -1260,7 +1260,7 @@ export const ONE_K_BOT: Product = {
   priceCents: 0,
   currency: "eur",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/1k-bot",
+  href: "/projects/construct/material/skills/1k-bot",
   file: {
     sealed: "1k-bot.zip.enc",
     filename: "The 1K Bot.zip",
@@ -1326,7 +1326,7 @@ export const META_ADS: Product = {
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/meta-ads",
+  href: "/projects/construct/material/skills/meta-ads",
   file: {
     sealed: "meta-ads.zip.enc",
     filename: "meta-ads.zip",
@@ -1381,7 +1381,7 @@ export const CONVERSION_TEARDOWN: Product = {
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/conversion-teardown",
+  href: "/projects/construct/material/skills/conversion-teardown",
   file: {
     sealed: "conversion-teardown.zip.enc",
     filename: "conversion-teardown.zip",
@@ -1445,7 +1445,7 @@ export const MASCOT_DESIGNER: Product = {
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/mascot-designer",
+  href: "/projects/construct/material/skills/mascot-designer",
   file: {
     sealed: "mascot-designer.zip.enc",
     filename: "mascot-designer.zip",
@@ -1511,7 +1511,7 @@ export const CAROUSEL_DESIGNER: Product = {
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
-  href: "/projects/construct/material/setups/carousel-designer",
+  href: "/projects/construct/material/skills/carousel-designer",
   file: {
     sealed: "carousel-designer.zip.enc",
     filename: "carousel-designer.zip",

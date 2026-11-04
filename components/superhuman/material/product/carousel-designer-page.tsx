@@ -102,7 +102,7 @@ export function CarouselDesignerPage() {
           { src: S("ad-01-v2.webp"), bg: "#0F0E13" },
         ]}
       />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 01. THE COVER: what it is, the button, the carousel in a feed. */}
       <section aria-labelledby="cd-title" className="relative">

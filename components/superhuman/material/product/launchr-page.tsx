@@ -56,7 +56,7 @@ export function LaunchrPage() {
   return (
     <main className="relative overflow-x-clip bg-[#050507] text-[#f4f2ec]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" tone="ink" />
+      <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
       {/* 1. WHAT IT MAKES. */}
       <LaunchrStage />

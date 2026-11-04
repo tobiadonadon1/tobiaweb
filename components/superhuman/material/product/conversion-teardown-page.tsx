@@ -101,7 +101,7 @@ export function ConversionTeardownPage() {
   return (
     <main className={`${archivo.variable} ${mono.variable} relative overflow-x-clip text-[#0B0B0B]`} style={{ background: PAPER }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
-      <BackLink href={folderHref("setups")} label="Setups" />
+      <BackLink href={folderHref("skills")} label="Skills" />
 
       {/* 001. THE POSTER: the promise, the button, a real card. */}
       <section aria-labelledby="ct-title" className="relative isolate border-b-[3px] border-[#0B0B0B]" style={{ background: YELLOW }}>
