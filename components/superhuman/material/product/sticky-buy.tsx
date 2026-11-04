@@ -101,6 +101,7 @@ export function StickyBuy({
             price={price}
             compact
             soon={soon}
+            label={label}
             buttonClassName={buttonClassName}
             className="shrink-0"
           />

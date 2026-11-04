@@ -53,12 +53,12 @@ const COMPARE: [string, string, string][] = [
   ["Won the head-to-head", "0 of 3", "3 of 3"],
   ["Time to a finished reel", "25–39 min", "9–14 min"],
   ["Video quality", "Standard", "Full HD"],
-  ["What you need", "Grok + Claude", "Grok Bot"],
+  ["AI tools you need", "2", "1"],
   ["Music", "Computer-made", "Real musicians"],
 ]
 /** What the buyer gets, in plain words (Tobia, 2026-11-04: "nothing too technical, just straight-up value"). */
 const VALUE: { k: string; title: string; text: string }[] = [
-  { k: "01", title: "Only Grok Bot", text: "No other app and nothing to install on your computer. The voice and the music are built in." },
+  { k: "01", title: "One AI does it all", text: "Your Grok Bot writes, draws, voices and checks every reel. Nothing to install. Have Claude too? It can join in for even better reels." },
   { k: "02", title: "One question", text: "Tell it what your account is about. It picks the style and the topic, and your first reel arrives in the same chat." },
   { k: "03", title: "A finished reel", text: "The story, the drawings, the voice, the music and the captions. Plus the cover and the caption to post it with." },
   { k: "04", title: "You say OK", text: "You see every reel first. Say OK, or say what to change in one sentence. Nothing is posted without you." },
@@ -98,7 +98,7 @@ function Buy({ reportErrors = false, align = "center" }: { reportErrors?: boolea
     <BuyForm
       productId={PRODUCT.id}
       price={PRODUCT.priceLabel}
-      label={`Get it · ${PRODUCT.priceLabel}`}
+      label="Start making reels"
       tone="paper"
       align={align}
       reportErrors={reportErrors}
@@ -165,7 +165,7 @@ export function ReelBotPage() {
         <div className="mx-auto flex max-w-[76rem] flex-col items-center px-5 pb-16 pt-28 text-center sm:px-8 md:pb-20 md:pt-32">
           <div className="rb-rise" style={{ "--i": 0 } as React.CSSProperties}>
             <Mono className="inline-block whitespace-nowrap rounded-full bg-white/55 px-3.5 py-1.5 text-[#2F4858] ring-1 ring-[#2F4858]/10">
-              New · 2.0<span className="hidden sm:inline"> · Only Grok Bot needed</span>
+              New · 2.0<span className="hidden sm:inline"> · One AI, a whole reel studio</span>
             </Mono>
           </div>
           <h1
@@ -184,7 +184,7 @@ export function ReelBotPage() {
           <div id={HERO_ID} className="rb-rise mt-8 scroll-mt-28" style={{ "--i": 3 } as React.CSSProperties}>
             <Buy reportErrors />
             <p className="mt-4 text-[0.95rem] leading-[1.5] text-[#22272E]/60">
-              {PRODUCT.priceLabel} once · instant download · included with Pro
+              Instant download · yours to keep · included with Pro
             </p>
           </div>
 
@@ -338,7 +338,8 @@ export function ReelBotPage() {
         price={PRODUCT.priceLabel}
         heroId={HERO_ID}
         closeId={CLOSE_ID}
-        note="Director + kit · instant download"
+        note={`${PRODUCT.priceLabel} one-time · instant download`}
+        label="Start making reels"
         buttonClassName={BUTTON}
       />
       <ReelBotLoader />

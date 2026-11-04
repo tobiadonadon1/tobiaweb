@@ -1114,7 +1114,7 @@ export const REEL_BOT: Product = {
   id: "reel-bot",
   name: "Reel Bot Factory",
   description:
-    "A Grok Bot that turns one line into a finished animated reel for Reels, TikTok and Shorts. It writes the story, draws it, adds the voice and the music, and sends it to you for your OK. All you need is Grok Bot.",
+    "A Grok Bot that turns one line into a finished animated reel for Reels, TikTok and Shorts. It writes the story, draws it, adds the voice and the music, and sends it to you for your OK.",
   priceCents: 1000,
   currency: "usd",
   priceLabel: money(1000, "usd"),
@@ -1129,7 +1129,7 @@ export const REEL_BOT: Product = {
   stripeProductId: "prod_ReelBotFactory",
   share: {
     description:
-      "Reel Bot Factory 2.0 is a Grok Bot that makes animated reels for Reels, TikTok and Shorts. Give it a topic and it writes the story, draws it, adds the voice and the music, and sends you the finished reel for your OK. All you need is Grok Bot.",
+      "Reel Bot Factory 2.0 is a Grok Bot that makes animated reels for Reels, TikTok and Shorts. Give it a topic and it writes the story, draws it, adds the voice and the music, and sends you the finished reel for your OK.",
     kicker: "Grok Bot · 2.0",
     line: "A Grok Bot that makes your animated reels.",
     proof: "You see every reel first · nothing posted without your OK",
@@ -1155,7 +1155,7 @@ export const REEL_BOT: Product = {
     footnote: "Reel Bot Factory is an independent Grok Bot, not made by xAI or Anthropic.",
   },
   thanks: {
-    needs: "All you need is Grok Bot. The voice and the music are built in.",
+    needs: "It runs in your Grok Bot, with the voice and the music built in. Have Claude too? It can join in for even better reels.",
     next: [
       ["Your first reel", "In the same chat: one question, then your reel."],
       ["Every reel", "You see it first. Say OK, or tell it what to change in one sentence."],
