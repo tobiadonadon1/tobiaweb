@@ -3526,15 +3526,20 @@ html[data-adp-intro="done"] .sa-page { --sa-wait: 0s; }
 }
 
 /* ------------------------------------------------------------------ *
- * REEL BOT (reel-bot-page.tsx, reel-bot-loader.tsx). The opening is one
- * bot, Pixar's lamp style: the metal disc hops G, R, over the O to K, looks
- * back, squashes the O flat and takes its place. It peeks, blinks, opens its
- * eyes and they light up in the page's violet; it glances left and right at
- * you, and the camera flies into its right eye, which IS the violet hero.
- * One 5.4 s clock for every part (generated from seconds, so the
- * percentages are moments on it). Plays on every visit.
+ * REEL BOT (reel-bot-page.tsx, reel-bot-loader.tsx). Dusk, quietly
+ * (Tobia, 2026-11-04: "something more chill… beautiful but simple"): a
+ * powder-blue to sand sky, deep sea slate for the one button, a low
+ * apricot sun. The opening is a 9:16 frame drawn in one line; a horizon
+ * crosses it, the sun rises, and the frame grows into the hero (2.6 s).
  * ------------------------------------------------------------------ */
-:root:has(.rb-load) { --rb-wait: 5s; }
+.rb-page {
+  --rb-ink: #22272e;
+  --rb-slate: #2f4858;
+  --rb-sun: #e7a68a;
+  --rb-mist: #f3f3f0;
+  --rb-sky: linear-gradient(180deg, #d8e0e8 0%, #e5e1e4 48%, #efe5db 100%);
+}
+:root:has(.rb-load) { --rb-wait: 2.05s; }
 :root[data-rb-intro="done"] { --rb-wait: 0s; }
 
 .rb-load {
@@ -3544,192 +3549,61 @@ html[data-adp-intro="done"] .sa-page { --sa-wait: 0s; }
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: radial-gradient(120% 80% at 50% 62%, #1a1a1c 0%, #0b0b0c 60%, #050505 100%);
-  color: #f4f4f2;
-  animation: rb-out 5.4s linear forwards;
+  background: linear-gradient(180deg, #d8e0e8 0%, #e5e1e4 48%, #efe5db 100%);
+  animation: rb-out 2.6s linear forwards;
 }
 .rb-load[data-done] { animation: rb-lift 320ms ease-out forwards; }
 @keyframes rb-out {
-  0.00%, 94.81% { opacity: 1; }
-  100.00% { opacity: 0; visibility: hidden; pointer-events: none; }
+  0%, 80% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; pointer-events: none; }
 }
-@keyframes rb-lift {
-  to { opacity: 0; visibility: hidden; pointer-events: none; }
-}
+@keyframes rb-lift { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
-/* The stage: 2:1, everything inside measured in its own width (cqw). The
-   zoom's origin is the bot's right eye once it sits in the O (50.5 + 0.695
-   x 24 across, 26 + 0.337 x 24 down, of 100 x 50), and the zoom slides that
-   eye to the middle of the screen as it flies in. */
 .rb-load__stage {
-  --w: min(86vw, 44rem);
-  --cap: 23.1cqw;
-  position: relative;
-  width: var(--w);
-  aspect-ratio: 2 / 1;
-  container-type: inline-size;
-  transform-origin: 67.2% 68.2%;
-  animation: rb-zoom 5.4s both;
-}
-@keyframes rb-zoom {
-  0.00%, 86.30% { scale: 1; translate: 0 0; animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.45); }
-  97.22%, 100.00% { scale: 150; translate: calc(var(--w) * -0.172) calc(var(--w) * -0.091); }
-}
-
-/* A soft spotlight on the floor, which the bot is the star of. */
-.rb-load__stage::before {
-  content: "";
-  position: absolute;
-  inset: auto -30% -14% -30%;
-  height: 40%;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.08), transparent 70%);
-  pointer-events: none;
-}
-
-/* GROK: four equal cells, each letter trimmed to its cap height so its
-   top is where the bot lands. */
-.rb-load__word {
-  position: absolute;
-  inset: auto 0 0 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  align-items: end;
+  justify-items: center;
+  gap: 1.4rem;
+  transform-origin: 50% 40%;
+  animation: rb-grow 0.85s cubic-bezier(0.7, 0, 0.84, 0) 1.7s both;
 }
-.rb-load__l {
-  justify-self: center;
-  font-size: 32cqw;
-  font-weight: 800;
-  line-height: 0.72;
-  letter-spacing: 0;
-  text-box: trim-both cap alphabetic;
-  transform-origin: 50% 100%;
+@keyframes rb-grow { to { scale: 9; opacity: 0; } }
+.rb-load__frame { width: min(30vw, 8.5rem); overflow: visible; }
+.rb-load__line {
+  fill: none;
+  stroke: #2f4858;
+  stroke-width: 1.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: rb-draw 0.95s cubic-bezier(0.65, 0, 0.35, 1) 0.1s forwards;
 }
-@keyframes rb-letter-in {
-  from { opacity: 0; translate: 0 0.25em; }
+.rb-load__fill { fill: #f4ede6; opacity: 0; animation: rb-fade 0.6s ease-out 0.6s forwards; }
+.rb-load__horizon {
+  stroke: #2f4858;
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: rb-draw 0.6s cubic-bezier(0.65, 0, 0.35, 1) 0.55s forwards;
 }
-.rb-load__l--0 { animation: rb-letter-in 520ms var(--ga-spring) both, rb-press-g 5.4s both; }
-.rb-load__l--1 { animation: rb-letter-in 520ms var(--ga-spring) 70ms both, rb-press-r 5.4s both; }
-.rb-load__l--2 { animation: rb-letter-in 520ms var(--ga-spring) 140ms both, rb-press-o 5.4s both; }
-.rb-load__l--3 { animation: rb-letter-in 520ms var(--ga-spring) 210ms both, rb-press-k 5.4s both; }
-@keyframes rb-press-g {
-  0.00%, 18.52% { scale: 1; }
-  19.63% { scale: 1.05 0.86; }
-  22.22%, 100.00% { scale: 1; }
+.rb-load__sea { fill: #dfe5ea; opacity: 0; animation: rb-fade 0.5s ease-out 0.75s forwards; }
+.rb-load__sun { fill: #e7a68a; opacity: 0; translate: 0 34px; animation: rb-rise-sun 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards; }
+.rb-load__name {
+  margin: 0;
+  font-family: var(--rb-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #2f4858;
+  opacity: 0;
+  animation: rb-fade 0.6s ease-out 0.95s forwards;
 }
-@keyframes rb-press-r {
-  0.00%, 28.70% { scale: 1; }
-  29.81% { scale: 1.05 0.86; }
-  32.41%, 100.00% { scale: 1; }
-}
-@keyframes rb-press-k {
-  0.00%, 38.89% { scale: 1; }
-  40.00% { scale: 1.05 0.86; }
-  42.59%, 100.00% { scale: 1; }
-}
-@keyframes rb-press-o {
-  0.00%, 54.63% { scale: 1; opacity: 1; }
-  57.78% { scale: 1.3 0.02; opacity: 1; }
-  58.89%, 100.00% { scale: 1.3 0; opacity: 0; }
-}
+@keyframes rb-draw { to { stroke-dashoffset: 0; } }
+@keyframes rb-fade { to { opacity: 1; } }
+@keyframes rb-rise-sun { from { opacity: 1; } to { opacity: 1; translate: 0 0; } }
 
-/* The bot: across (and which way it faces) on the outside, up and down and
-   its squash and stretch on the inside. */
-.rb-load__bot {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 24cqw;
-  height: 24cqw;
-  animation: rb-x 5.4s both, rb-face 5.4s both;
-}
-@keyframes rb-x {
-  0.00%, 10.19% { translate: -80cqw 0; }
-  18.52%, 21.30% { translate: 0.5cqw 0; }
-  28.70%, 31.48% { translate: 25.5cqw 0; }
-  38.89%, 46.30% { translate: 75.5cqw 0; }
-  54.63%, 100.00% { translate: 50.5cqw 0; }
-}
-@keyframes rb-face {
-  0.00%, 40.00% { scale: 1 1; }
-  42.59%, 58.70% { scale: -1 1; }
-  61.30%, 100.00% { scale: 1 1; }
-}
-.rb-load__face {
-  width: 100%;
-  height: 100%;
-  transform-origin: 50% 98%;
-  animation: rb-y 5.4s both, rb-squash 5.4s both;
-}
-@keyframes rb-y {
-  0.00%, 10.19% { translate: 0 0; animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1); }
-  14.35% { translate: 0 calc(-1 * var(--cap) - 16cqw); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4); }
-  18.52%, 21.30% { translate: 0 calc(-1 * var(--cap)); animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1); }
-  25.00% { translate: 0 calc(-1 * var(--cap) - 10cqw); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4); }
-  28.70%, 31.48% { translate: 0 calc(-1 * var(--cap)); animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1); }
-  35.19% { translate: 0 calc(-1 * var(--cap) - 18cqw); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4); }
-  38.89%, 46.30% { translate: 0 calc(-1 * var(--cap)); animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1); }
-  50.37% { translate: 0 calc(-1 * var(--cap) - 20cqw); animation-timing-function: cubic-bezier(0.5, 0, 0.75, 0.4); }
-  54.63% { translate: 0 calc(-1 * var(--cap)); animation-timing-function: cubic-bezier(0.4, 0, 0.9, 0.6); }
-  57.78%, 100.00% { translate: 0 0; }
-}
-@keyframes rb-squash {
-  0.00%, 10.19% { scale: 1 1; }
-  11.85% { scale: 0.9 1.12; }
-  16.67% { scale: 1 1; }
-  18.52% { scale: 1.2 0.78; }
-  20.37% { scale: 1 1; }
-  21.30% { scale: 1.08 0.9; }
-  22.59% { scale: 0.92 1.1; }
-  26.85% { scale: 1 1; }
-  28.70% { scale: 1.18 0.8; }
-  30.74% { scale: 1.06 0.92; }
-  32.04% { scale: 0.9 1.14; }
-  37.04% { scale: 1 1; }
-  38.89% { scale: 1.2 0.78; }
-  41.30% { scale: 1 1; }
-  45.19% { scale: 1.1 0.86; }
-  47.22% { scale: 0.88 1.16; }
-  52.78%, 54.63% { scale: 1 1; }
-  57.78% { scale: 1.25 0.74; }
-  60.00% { scale: 0.96 1.05; }
-  61.85%, 71.11% { scale: 1 1; }
-  72.59% { scale: 0.94 1.09; }
-  75.19%, 100.00% { scale: 1 1; }
-}
-
-/* The eyes: shut while it hops. A peek, a blink, then wide open, and they
-   light up violet. Then a glance left, right, and straight at you. */
-.rb-load .rb-load__face .ga-eyes {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: rb-eyes 5.4s both, rb-glance 5.4s both;
-}
-.rb-load .rb-load__face .ga-eyes rect {
-  animation: rb-eye-light 5.4s both;
-}
-@keyframes rb-eyes {
-  0.00%, 62.96% { scale: 1 0.1; }
-  64.81%, 65.93% { scale: 1 0.5; }
-  67.41%, 70.37% { scale: 1 0.1; }
-  72.22% { scale: 1 1.18; }
-  74.07%, 100.00% { scale: 1 1; }
-}
-@keyframes rb-glance {
-  0.00%, 75.56% { translate: 0 0; }
-  77.04%, 79.63% { translate: -5px 1px; }
-  81.48%, 83.70% { translate: 5px -1px; }
-  85.19%, 100.00% { translate: 0 0; }
-}
-@keyframes rb-eye-light {
-  0.00%, 71.11% { fill: #050505; }
-  73.33%, 100.00% { fill: #5b3df6; }
-}
-
-/* The page wakes up as the camera arrives: it settles from a touch closer. */
-.rb-rise { animation: rb-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--rb-wait, 0s) + var(--i, 0) * 80ms) both; }
+.rb-rise { animation: rb-rise 1s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--rb-wait, 0s) + var(--i, 0) * 90ms) both; }
 @keyframes rb-rise {
-  from { opacity: 0; scale: 1.05; }
-  to { opacity: 1; scale: 1; }
+  from { opacity: 0; translate: 0 14px; }
+  to { opacity: 1; translate: 0 0; }
 }
 body:has(.rb-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--rb-wait) backwards; }
 
@@ -3739,56 +3613,43 @@ body:has(.rb-load) [data-site-nav] { animation: adp-nav-in 400ms ease-out var(--
   .rb-rise { animation: adp-fade 400ms ease-out both; }
 }
 
-/* The poster. */
-.rb-title { font-size: clamp(3.4rem, 16vw, 9rem); font-variation-settings: "wdth" 100; }
-@media (min-width: 1024px) { .rb-title { font-size: clamp(5.5rem, 8.6vw, 9.4rem); } }
+/* The sky, and the sun low behind the phones. */
+.rb-sky { background: var(--rb-sky); }
+.rb-sky::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 70%;
+  background: radial-gradient(38% 42% at 50% 78%, rgba(231, 166, 138, 0.38), transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.rb-title { font-size: clamp(3.1rem, 12.5vw, 7.6rem); }
+
 .rb-phone {
   aspect-ratio: 9 / 18.4;
-  border-radius: 2.4rem;
-  background: #050608;
-  padding: 0.5rem;
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.16), 0 40px 80px -30px rgba(0, 0, 0, 0.7);
+  border-radius: 2.2rem;
+  background: #1b1f24;
+  padding: 0.45rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 40px 70px -40px rgba(34, 39, 46, 0.55), 0 12px 24px -18px rgba(34, 39, 46, 0.35);
 }
-.rb-phone__screen { position: relative; height: 100%; overflow: hidden; border-radius: 1.95rem; background: #000; }
+.rb-phone__screen { position: relative; height: 100%; overflow: hidden; border-radius: 1.8rem; background: #000; }
 .rb-phone__screen video { object-fit: cover; }
 
-/* Three phones, the middle one forward with the bot sitting on it. */
-.rb-stack__row { display: flex; align-items: flex-end; justify-content: center; }
-.rb-stack__mid { position: relative; z-index: 2; width: min(44vw, 16.5rem); }
-.rb-stack__side { width: min(34vw, 12.5rem); opacity: 0.96; }
-.rb-stack__side:first-child { margin-right: -2.2rem; translate: 0 -1.2rem; rotate: -5deg; }
-.rb-stack__side:last-child { margin-left: -2.2rem; translate: 0 -1.2rem; rotate: 5deg; }
-/* The director at the camera, low and to the left of the takes, its beam on them. */
-.rb-stack__row { position: relative; }
-.rb-stack__rig { position: absolute; z-index: 4; left: -15%; bottom: -15%; width: 58%; filter: drop-shadow(0 18px 22px rgba(10, 0, 50, 0.45)); }
-.rb-beam { mix-blend-mode: screen; }
-@media (max-width: 1023px) { .rb-stack__rig { left: -6%; bottom: -16%; width: 64%; } }
-@media (prefers-reduced-motion: no-preference) {
-  .rb-reel { transform-box: fill-box; transform-origin: center; animation: rb-spin 2.6s linear infinite; }
-  .rb-reel + .rb-reel { animation-duration: 2.1s; }
-  .rb-rec { animation: rb-rec 1.2s steps(1) infinite; }
-  .rb-beam { animation: rb-beam 3.2s ease-in-out infinite; }
-  .rb-page .rb-rig .ga-eyes { transform-box: fill-box; transform-origin: center; animation: rb-blink 4.4s infinite; }
-}
-@keyframes rb-spin { to { rotate: 360deg; } }
-@keyframes rb-rec { 50% { opacity: 0.15; } }
-@keyframes rb-beam { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } 62% { opacity: 0.7; } }
-@keyframes rb-blink {
-  0%, 46%, 52%, 100% { scale: 1 1; }
-  49% { scale: 1 0.1; }
-}
-/* Grok Army's spring, for the loader and the perched bot (this page isn't .ga-page). */
-.rb-page { --ga-spring: linear(0, 0.42 9%, 0.84 21%, 1.02 33%, 1.05 41%, 1.01 55%, 0.99 70%, 1); }
-/* The Pro card's "Just send me Reel Bot Factory": its default lilac glass
-   vanished on this page's violet, so here it is plain white with black
-   words: clear, and still quieter than Join Pro. */
+/* Three phones in a row on the horizon, the middle one a little larger. */
+.rb-row { display: flex; align-items: flex-end; justify-content: center; gap: clamp(0.6rem, 2.4vw, 1.75rem); }
+.rb-row__mid { width: clamp(9rem, 38vw, 16rem); }
+.rb-row__side { width: clamp(7rem, 27vw, 12.5rem); }
+
+/* The Pro card's "Just send me Reel Bot Factory", calm on this page. */
 body:has(.rb-page) .pp-skip {
-  color: #111111;
+  color: #22272e;
   font-weight: 600;
   background: #ffffff;
-  box-shadow: 0 10px 24px -16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 24px -16px rgba(34, 39, 46, 0.45);
 }
-body:has(.rb-page) .pp-skip:hover { background: #f1eee6; }
+body:has(.rb-page) .pp-skip:hover { background: #f3f3f0; }
 
 /* ------------------------------------------------------------------ *
  * VIDEO EDITOR PRO (video-editor-pro-page.tsx, video-editor-pro-loader.tsx).

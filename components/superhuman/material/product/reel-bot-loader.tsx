@@ -1,26 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LEAD, botShape } from "./grok-army-bots";
 
 /**
- * THE OPENING: ONE BOT, AND THE WORD GROK.
+ * THE OPENING: A FRAME AT DUSK.
  *
- * Tobia's brief (2026-10-26): Grok Army's page, but this time just one bot,
- * a little like Pixar's lamp. The metal disc hops in with its eyes shut,
- * from G to R, over the O to K, looks back, jumps on the O and squashes it
- * flat, and lands in its place: GR(bot)K. Then it opens its eyes, and the
- * camera flies into the right one. The slot eye is cut through the metal,
- * as dark as the page, so going into it is going into the site.
+ * Tobia (2026-11-04): the old opening (Grok Army's metal bot hopping over
+ * GROK) was too close to the other bot pages. This one is quiet and short:
+ * a 9:16 frame draws itself in one line, a horizon crosses it, a low sun
+ * rises inside, the name fades in under it, and the frame grows past the
+ * edges of the screen into the hero, which is the same dusk.
  *
- * CSS alone runs it (globals.css, REEL BOT), so it plays from the first
- * paint and ends by itself after about four and a half seconds. Script only
- * steps it aside on any scroll, key or tap. It plays once a visit (the
- * page's inline script hides it on the way back, reel-bot-page.tsx), and
- * reduced motion skips it. Decoration over a page that is already there,
- * so it is hidden from assistive tech.
+ * CSS alone runs it (globals.css, REEL BOT), about 2.6 s, so it plays from
+ * the first paint and ends by itself. Script only steps it aside on any
+ * scroll, key or tap. Reduced motion skips it. Decoration over a page that is
+ * already there, so it is hidden from assistive tech.
  */
-
 export function ReelBotLoader() {
   const [done, setDone] = useState(false);
 
@@ -31,13 +26,12 @@ export function ReelBotLoader() {
     };
     const events = ["wheel", "touchmove", "keydown", "pointerdown"] as const;
     for (const e of events) window.addEventListener(e, finish, { once: true, passive: true });
-    // Once it has played out, stop listening: a late "finish" restarted the
-    // fade from fully shown, and for its 320 ms the invisible layer swallowed
-    // the click that caused it (the first tap on the page's button did nothing).
+    // Once it has played out, stop listening, so a late "finish" can't
+    // restart a fade over a page that is already in use.
     const end = window.setTimeout(() => {
       for (const e of events) window.removeEventListener(e, finish);
       document.documentElement.dataset.rbIntro = "done";
-    }, 5400);
+    }, 2800);
     return () => {
       window.clearTimeout(end);
       for (const e of events) window.removeEventListener(e, finish);
@@ -47,20 +41,21 @@ export function ReelBotLoader() {
   return (
     <div className="rb-load" data-done={done || undefined} aria-hidden>
       <div className="rb-load__stage">
-        <div className="rb-load__word">
-          {["G", "R", "O", "K"].map((l, i) => (
-            <span key={l} className={`rb-load__l rb-load__l--${i}`}>
-              {l}
-            </span>
-          ))}
-        </div>
-        <div className="rb-load__bot">
-          <div className="rb-load__face">
-            <svg viewBox="0 0 100 100" className="block h-full w-full overflow-visible">
-              {botShape(LEAD)}
-            </svg>
-          </div>
-        </div>
+        <svg viewBox="0 0 90 160" className="rb-load__frame">
+          <defs>
+            <clipPath id="rb-load-clip">
+              <rect x="1" y="1" width="88" height="158" rx="11" />
+            </clipPath>
+          </defs>
+          <rect className="rb-load__fill" x="1" y="1" width="88" height="158" rx="11" />
+          <g clipPath="url(#rb-load-clip)">
+            <circle className="rb-load__sun" cx="45" cy="104" r="15" />
+            <rect className="rb-load__sea" x="0" y="104" width="90" height="60" />
+            <line className="rb-load__horizon" x1="0" y1="104" x2="90" y2="104" pathLength={1} />
+          </g>
+          <rect className="rb-load__line" x="1" y="1" width="88" height="158" rx="11" pathLength={1} />
+        </svg>
+        <p className="rb-load__name">Reel Bot Factory</p>
       </div>
     </div>
   );
