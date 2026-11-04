@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 import { flatSpecimenSvg } from "@/components/superhuman/material/specimen-svg";
 import { hostGrotesk } from "@/lib/og-font";
@@ -35,6 +37,13 @@ export async function GET(
 ) {
   const product = productById((await params).product);
   if (!product) return new Response("Not found", { status: 404 });
+
+  // A product with its own designed picture (share.image) serves that here too, so a chat app that cached this
+  // card's address before the picture existed shows the picture once it refreshes (Tobia, 2026-11-04).
+  if (product.share.image) {
+    const png = await readFile(path.join(process.cwd(), "public", product.share.image.replace(/^\//, "")));
+    return new Response(new Uint8Array(png), { headers: { "content-type": "image/png" } });
+  }
 
   const [regular, medium] = await Promise.all([hostGrotesk(400), hostGrotesk(500)]);
   const fonts = [
