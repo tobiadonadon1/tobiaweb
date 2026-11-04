@@ -13,7 +13,7 @@
  *   ultimate  Ultimate only; Pro sees it in the list, locked
  *
  * A sheet with `masterclass` set is a lesson to read: it shows on the
- * Masterclass too (the dashboard's shelf and the page, in that track's row).
+ * Masterclass too (the dashboard's shelf and the page), with its sections.
  *
  * To add one: print it, seal it (npm run seal -- <pdf> private/training/<id>.pdf.enc),
  * add its picture, and add it here. Newest last.
@@ -29,8 +29,8 @@ export type Sheet = {
   added: string;
   /** More than one page: a guide, not a cheat sheet. */
   pages?: number;
-  /** Also a Masterclass lesson, in this track (components/masterclass/tracks.ts). */
-  masterclass?: string;
+  /** Also a Masterclass lesson to read, with its sections: [page, title]. */
+  masterclass?: [number, string][];
 };
 
 export const SHEETS: Sheet[] = [
@@ -138,7 +138,16 @@ export const SHEETS: Sheet[] = [
     tier: "pro",
     added: "2026-11-03",
     pages: 7,
-    masterclass: "launch",
+    masterclass: [
+      [3, "Nobody cares about your growth tricks"],
+      [3, "Lead magnets are still one of the easiest ways to grow"],
+      [4, "Articles are probably the biggest opportunity on X"],
+      [4, "One article can become multiple viral posts"],
+      [5, "Don't sell directly in your tweets"],
+      [6, "Treat X like a distribution channel"],
+      [6, "What I'd do if I started from zero"],
+      [7, "A final thing"],
+    ],
   },
 ];
 

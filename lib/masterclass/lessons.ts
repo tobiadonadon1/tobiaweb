@@ -21,8 +21,6 @@ export type Lesson = {
   number: number;
   title: string;
   line: string;
-  /** Which row of the page it belongs to (tracks.ts). */
-  track: string;
   /** Length, said once ("7:24") and in seconds for the player. */
   duration: string;
   seconds: number;
@@ -48,7 +46,6 @@ export const LESSONS: Lesson[] = [
     number: 1,
     title: "Raw clip to finished reel",
     line: "Video Editor Pro, start to finish: the storyboard, the first cut in four minutes, notes on any frame in the creative studio, and how it learns your style.",
-    track: "edit",
     duration: "7:24",
     seconds: 444,
     stored: "masterclass/01-video-editor-pro.mp4",
@@ -67,6 +64,21 @@ export const LESSONS: Lesson[] = [
     added: "2026-10-27",
     product: "video-editor-pro",
   },
+];
+
+/**
+ * START HERE: the lessons I'd hand a new member first, in that order, by
+ * slug (a lesson above) or sheet id (a lesson to read, lib/training/sheets.ts).
+ */
+export const START_HERE = ["video-editor-pro", "x-marketing-masterclass"];
+
+/** What's being made next: a title and one line, no dates. */
+export const COMING: { title: string; line: string }[] = [
+  { title: "Build an app", line: "From an idea to a working app, with Claude doing the typing." },
+  { title: "Design it properly", line: "Screens that look made by a designer, not generated." },
+  { title: "Launch on the App Store", line: "From the review audit to the launch kit." },
+  { title: "Skills and agents that do real work", line: "Claude Code, skills and agents, set up once." },
+  { title: "Sell what you make", line: "Skills, guides and memberships people pay for." },
 ];
 
 export const lessonBySlug = (slug: unknown) => LESSONS.find((l) => l.slug === slug);
