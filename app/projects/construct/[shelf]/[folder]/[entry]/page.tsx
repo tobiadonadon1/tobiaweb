@@ -17,6 +17,7 @@ import { MetaAdsPage } from "@/components/superhuman/material/product/meta-ads-p
 import { ConversionTeardownPage } from "@/components/superhuman/material/product/conversion-teardown-page";
 import { MascotDesignerPage } from "@/components/superhuman/material/product/mascot-designer-page";
 import { CarouselDesignerPage } from "@/components/superhuman/material/product/carousel-designer-page";
+import { DoneCheckerPage } from "@/components/superhuman/material/product/done-checker-page";
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { DuoDesignerPage } from "@/components/superhuman/material/product/duo-designer-page";
 import { VideoEditorPage } from "@/components/superhuman/material/product/video-editor-page";
@@ -177,6 +178,7 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "conversion-teardown": ConversionTeardownPage,
   "mascot-designer": MascotDesignerPage,
   "carousel-designer": CarouselDesignerPage,
+  "done-checker": DoneCheckerPage,
   "duo-designer": DuoDesignerPage,
   "video-editor": VideoEditorPage,
   "motion-designer": MotionDesignerPage,

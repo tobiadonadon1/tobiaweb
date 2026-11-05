@@ -1201,6 +1201,36 @@ function CarouselDesigner() {
   );
 }
 
+/**
+ * DONE CHECKER — a receipt torn off the roll: paper with ink lines, a green
+ * tick against each proven line, and a red rubber stamp across the bottom,
+ * the page's own stamp (product/done-checker-page.tsx).
+ */
+function DoneChecker() {
+  const lines: [number, number][] = [
+    [92, 0.3],
+    [120, 0.24],
+    [148, 0.28],
+  ];
+  return (
+    <>
+      <Cut d={CARD} x={128} y={34} s={0.7} sy={1.68} fill={SHADE} rotate={4} />
+      <Cut d={CARD} x={120} y={26} s={0.7} sy={1.68} fill="#faf8f2" rotate={4} />
+      <Cut d={BAR} x={150} y={56} s={0.3} sy={0.55} fill={INK} rotate={4} />
+      {lines.map(([y, w]) => (
+        <g key={y}>
+          <Cut d={FLECK} x={146 - (y - 56) * 0.07} y={y} s={0.3} fill={FOREST} rotate={4} />
+          <Cut d={BAR} x={164 - (y - 56) * 0.07} y={y + 2} s={w} sy={0.38} fill={INK} opacity={0.82} rotate={4} />
+        </g>
+      ))}
+      <Cut d={CARD} x={150} y={190} s={0.6} sy={0.4} fill={VERMILION} rotate={-11} />
+      <Cut d={CARD} x={158} y={194} s={0.52} sy={0.3} fill="#faf8f2" rotate={-11} />
+      <Cut d={BAR} x={170} y={200} s={0.3} sy={0.5} fill={VERMILION} rotate={-11} />
+      <Cut d={BAR} x={172} y={216} s={0.2} sy={0.4} fill={VERMILION} opacity={0.7} rotate={-11} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1219,6 +1249,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "conversion-teardown": ConversionTeardown,
   "mascot-designer": MascotDesigner,
   "carousel-designer": CarouselDesigner,
+  "done-checker": DoneChecker,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,
