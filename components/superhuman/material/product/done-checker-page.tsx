@@ -24,8 +24,9 @@ import "./done-checker.css";
  * terminal and the numbers under them come from the test run of 5 Nov 2026
  * (Claude Code adding a signup to a small app with the guard on: it said it
  * was finished, was sent back, and came back with 9 of 9 proven). The receipt
- * near the end is the one this page earned before it went live. Long lines are
- * shortened, never changed in meaning. No claim about how often agents lie.
+ * near the end is the one this page earned once it was live (PARTLY DONE, 9 of
+ * 11: what no one could run here is on it). Long lines are shortened, never
+ * changed in meaning. No claim about how often agents lie.
  */
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], axes: ["opsz", "wdth"], variable: "--dc-display", display: "swap" });
@@ -109,7 +110,13 @@ const STEPS: { n: string; title: string; body: string; shows: string[] }[] = [
  * THE RECEIPT THIS PAGE EARNED. The page went live first without it (a receipt can only be made once the page is
  * proven and live); then the real receipt was pictured and added. null hides the section, never a stand-in.
  */
-const OWN_RECEIPT: { src: string; id: string; verdict: string; date: string } | null = null;
+const OWN_RECEIPT: { src: string; id: string; verdict: string; proven: string; date: string } | null = {
+  src: "/shop/done-checker/receipt-site-a66014.webp",
+  id: "a66014",
+  verdict: "PARTLY DONE",
+  proven: "9 of 11",
+  date: "5 Nov 2026",
+};
 
 const VERDICTS = [
   { stamp: "Done", cls: "dc-stamp-green", line: "Everything you asked for, proven, on the code as it is now." },
@@ -386,20 +393,35 @@ export function DoneCheckerPage() {
                 This page had to prove it too.
               </h2>
               <p className="mt-6 max-w-[42ch] text-pretty text-[1.1rem] font-medium leading-[1.55] text-[var(--ink)]/78">
-                It was built by Claude Code with Done Checker on. Before it went live it ran the site&rsquo;s tests, types,
-                lint and build, opened itself on a desktop and a phone, and a second agent checked it cold. This is the
-                receipt it earned.
+                Claude Code built it with Done Checker on. It ran the site&rsquo;s tests, types, lint and build, opened the
+                page on a desktop and a phone, claimed the download on the live site, and a second agent checked it all
+                cold.
+              </p>
+              <p className="mt-5 max-w-[42ch] text-pretty text-[1.1rem] font-medium leading-[1.55] text-[var(--ink)]/78">
+                It came back{" "}
+                <span className={`dc-stamp dc-stamp-amber mx-0.5 inline-block -rotate-[3deg] align-[0.1em] text-[0.82em] ${H} [font-variation-settings:'opsz'_96,'wdth'_80]`}>
+                  Partly done
+                </span>
+                , {OWN_RECEIPT.proven}{" "}proven. Nobody here could open a real Codex session or a Windows PC, so the receipt
+                says so instead of rounding up. That&rsquo;s the job.
+              </p>
+              <p className={`mt-6 ${MONO} text-[0.74rem] text-[var(--soft)]`}>
+                Receipt {OWN_RECEIPT.id} · {OWN_RECEIPT.date} · scroll it
               </p>
             </div>
             <figure className="m-0">
-              <div className="mx-auto max-w-[34rem] -rotate-[1.2deg]">
+              <div
+                tabIndex={0}
+                aria-label="The receipt this page earned. Scrollable."
+                className="mx-auto h-[min(46rem,78svh)] max-w-[34rem] overflow-y-auto overscroll-contain rounded-[0.5rem] [scrollbar-width:thin] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--ink)]"
+              >
                 <Image
                   src={OWN_RECEIPT.src}
-                  alt={`The Done Checker receipt for building this page (${OWN_RECEIPT.verdict}, receipt ${OWN_RECEIPT.id}, ${OWN_RECEIPT.date}): each requirement with its proof, the checks, the diff, red flags, the second opinion and what was not checked.`}
-                  width={1200}
-                  height={2400}
+                  alt={`The Done Checker receipt for building this page (${OWN_RECEIPT.verdict}, ${OWN_RECEIPT.proven} proven, receipt ${OWN_RECEIPT.id}, ${OWN_RECEIPT.date}): each requirement with its proof, the checks, the diff, red flags, the second opinion, what was not checked and the decisions left to the owner.`}
+                  width={1000}
+                  height={7140}
                   sizes="(min-width: 1024px) 34rem, 100vw"
-                  className="block h-auto w-full drop-shadow-[0_24px_30px_rgba(60,45,15,0.28)]"
+                  className="block h-auto w-full"
                 />
               </div>
             </figure>
