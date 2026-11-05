@@ -1574,7 +1574,7 @@ export const AGENT_SUPERVISOR: Product = {
   id: "agent-supervisor",
   name: "Agent Supervisor",
   description:
-    "A free skill for Claude Code and Codex: your agent can't say it's done until it proves it. It runs the tests, catches faked work, opens the page and gets a second agent to check.",
+    "A free skill for Claude Code and Codex that supervises your agent's work like a picky human would: it opens every screen, looks for what's off (AI-looking design included), uses it, runs the tests, and fixes it before you see it.",
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
@@ -1590,13 +1590,14 @@ export const AGENT_SUPERVISOR: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Agent Supervisor, free for Claude Code and Codex: your AI agent can't say it's done until it proves it. Tests run, faked work caught, the page opened on desktop and phone, a second agent checking.",
+      "Agent Supervisor, free for Claude Code and Codex: it checks your agent's work like a picky human would, so you don't have to explain it twice. Every screen opened on desktop and phone, what's off found and fixed, the code proven.",
     kicker: "Skill · for Claude Code and Codex",
-    line: "No proof, no done.",
-    proof: "tests · faked work caught · a real browser · a second agent",
+    line: "Your AI agent, supervised.",
+    proof: "looks like a human · calls out AI-looking design · uses it · proves the code",
   },
   contents: [
     ["agent-supervisor/SKILL.md", "what done means at the start, the proof at the end, step by step"],
+    ["references/eyes.md", "the eyes pass: every screen looked at like a picky human, AI-looking design included"],
     ["references/lies.md", "the ways \"done\" gets faked, and how each one is caught"],
     ["references/verifier.md", "the brief for the second agent, who checks the work cold"],
     ["scripts/done.mjs", "runs the checks, reads the diff, opens pages in a real browser, writes the report"],

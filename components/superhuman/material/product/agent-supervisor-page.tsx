@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { FlaskConical, MonitorSmartphone, ScanSearch, UsersRound } from "lucide-react";
+import { Eye, FlaskConical, MousePointerClick, ScanFace } from "lucide-react";
 import { BackLink } from "@/components/ui/back-link";
 import { abs } from "@/lib/site";
 import { AGENT_SUPERVISOR as PRODUCT } from "@/lib/shop/products";
@@ -12,7 +12,10 @@ import "./agent-supervisor.css";
 
 /**
  * AGENT SUPERVISOR (was Done Checker), a free skill for Claude Code and Codex:
- * the agent can't say it's done until it proves it.
+ * it checks the agent's work like a picky human would, so you don't have to
+ * explain things twice. Tobia, third pass: the pain isn't "all tests pass",
+ * it's "I verified it, the UI looks great, it doesn't look AI" and then it
+ * does; "any UX problems?" "No." and then there are.
  *
  * THE LOOK (Tobia, 2026-11-05, second pass, with a reference): royal purple
  * #723CD6 with texture (ribbed glass over a grain), white writing, white
@@ -22,10 +25,13 @@ import "./agent-supervisor.css";
  * want receipts". The opening loader is the product in two seconds: four
  * checks close a ring, a gold tick, "Proven."
  *
- * THE DEMO IS REAL: Claude Code adding a signup to a small app with the guard
- * on (5 Nov 2026). It said it was finished, was sent back, and came back with
- * 10 tests passing, no faked work, the page opened, and a fresh agent agreeing
- * on 9 of 9.
+ * Cards are tinted purple glass, not clear: a clear card over the gold sun
+ * washed its words out (Tobia's screenshot). Every word is solid white.
+ *
+ * THE DEMO IS REAL: building the first version of this page (5 Nov 2026). The
+ * agent said it looked great on desktop and phone; the fresh agent opened it
+ * on a phone and found the opening playing off-screen; it was fixed and
+ * looked at again.
  */
 
 const sans = Geist({ subsets: ["latin"], variable: "--as-sans", display: "swap" });
@@ -48,13 +54,14 @@ const JSON_LD = {
 };
 
 const DOES = [
-  { Icon: FlaskConical, title: "Runs it all", body: "Tests, types, lint, build. Every time." },
-  { Icon: ScanSearch, title: "Catches the fakes", body: "Skipped tests, stubs, swallowed errors." },
-  { Icon: MonitorSmartphone, title: "Opens the page", body: "On desktop and a real phone screen." },
-  { Icon: UsersRound, title: "Asks a second agent", body: "One that never saw the work checks it cold." },
+  { Icon: Eye, title: "Looks like a human", body: "Opens every screen on desktop and phone, and hunts for what’s off." },
+  { Icon: ScanFace, title: "Calls out AI-looking design", body: "Clipped text, clumsy spacing, generic layouts. Named, then fixed." },
+  { Icon: MousePointerClick, title: "Uses it like you would", body: "Presses the buttons, fills the forms wrong, sees what happens." },
+  { Icon: FlaskConical, title: "Proves the code works", body: "Runs your tests and build. Catches skipped tests and fake fixes." },
 ];
 
-const PHRASE = ["Stop", "being", "your", "agent’s", "QA."];
+/** The scroll stop. The last two words land in gold. */
+const PHRASE = ["“It", "looks", "great,”", "it", "said.", "It", "didn’t."];
 
 const STEPS = ["Get it free", "Type claude, then hi", "Say yes to the guard"];
 
@@ -81,12 +88,12 @@ export function AgentSupervisorPage() {
                 Free skill for Claude Code &amp; Codex
               </p>
               <h1 id="as-title" className="as-h1 mt-7">
-                No proof,
+                <span className="whitespace-nowrap">Your AI agent,</span>
                 <br />
-                <span className="as-gold">no done.</span>
+                <span className="as-gold">supervised.</span>
               </h1>
-              <p className="mt-6 max-w-[32ch] text-pretty text-[1.15rem] leading-[1.5] text-white/80 sm:text-[1.25rem]">
-                Your AI agent can&rsquo;t say it&rsquo;s finished until it proves it.
+              <p className="mt-6 max-w-[34ch] text-pretty text-[1.15rem] leading-[1.5] text-white sm:text-[1.25rem]">
+                It checks your agent&rsquo;s work like a picky human would, so you don&rsquo;t have to explain it twice.
               </p>
               <div id={HERO_ID} className="mt-9 scroll-mt-28">
                 <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="violet" align="start" quiet buttonClassName="as-cta" />
@@ -95,12 +102,14 @@ export function AgentSupervisorPage() {
             <AgentSupervisorDemo />
           </div>
 
-          <ul className="as-row mt-16 grid list-none grid-cols-2 p-0 lg:mt-20 lg:grid-cols-4">
+          <ul className="mt-14 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
             {DOES.map(({ Icon, title, body }) => (
-              <li key={title}>
-                <Icon aria-hidden className="h-[1.1rem] w-[1.1rem] text-[var(--as-gold)]" strokeWidth={1.7} />
-                <h2 className="mt-3 text-[1rem] font-medium tracking-[-0.01em]">{title}</h2>
-                <p className="mt-1 text-[0.88rem] leading-[1.45] text-white/65">{body}</p>
+              <li key={title} className="as-glass as-tile">
+                <span className="as-icon" aria-hidden>
+                  <Icon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.8} />
+                </span>
+                <h2 className="mt-5 text-[1.08rem] font-semibold leading-[1.2] tracking-[-0.015em] text-white">{title}</h2>
+                <p className="mt-1.5 text-[0.93rem] leading-[1.45] text-white">{body}</p>
               </li>
             ))}
           </ul>
@@ -108,10 +117,10 @@ export function AgentSupervisorPage() {
       </section>
 
       {/* 02. THE SCROLL STOP. */}
-      <section aria-label="Stop being your agent’s QA" className="as-stop">
+      <section aria-label="“It looks great,” it said. It didn’t." className="as-stop">
         <p className="as-phrase">
           {PHRASE.map((w, i) => (
-            <span key={w} className="as-word" style={{ "--i": i } as React.CSSProperties}>
+            <span key={w} className={`as-word${i >= PHRASE.length - 2 ? " as-word--gold" : ""}`} style={{ "--i": i } as React.CSSProperties}>
               {w}{" "}
             </span>
           ))}
@@ -123,15 +132,13 @@ export function AgentSupervisorPage() {
         <div className="mx-auto grid max-w-[78rem] grid-cols-1 gap-4 px-5 pb-28 sm:px-8 md:grid-cols-2 md:pb-36">
           <div className="as-glass as-vs">
             <p className="as-label">Without it</p>
-            <p className="as-vs__say">&ldquo;Done! All tests pass.&rdquo;</p>
-            <p className="text-white/70">Then you find the bug.</p>
+            <p className="as-vs__say">&ldquo;Verified. The UI looks great.&rdquo;</p>
+            <p className="text-white">Then you find five things wrong, and explain them all.</p>
           </div>
           <div className="as-glass as-vs as-vs--with">
             <p className="as-label as-label--gold">With it</p>
-            <p className="as-vs__say">
-              Done <span className="text-white/45">·</span> <span className="as-gold">9/9 proven</span>
-            </p>
-            <p className="text-white/70">Or it tells you exactly what&rsquo;s missing.</p>
+            <p className="as-vs__say">&ldquo;On a phone, one thing was off. Fixed, and checked again.&rdquo;</p>
+            <p className="text-white">You see it once it&rsquo;s right.</p>
           </div>
         </div>
       </section>
@@ -140,8 +147,10 @@ export function AgentSupervisorPage() {
       <section id={CLOSE_ID} aria-labelledby="as-close-title" className="relative scroll-mt-28">
         <div className="mx-auto max-w-[78rem] px-5 pb-36 sm:px-8 md:pb-44">
           <div className="as-glass as-close">
-            <h2 id="as-close-title" className="as-h2 mx-auto max-w-[14ch] text-center">
-              Ship work that&rsquo;s <span className="as-gold">actually done.</span>
+            <h2 id="as-close-title" className="as-h2 mx-auto text-center">
+              Say it once.
+              <br />
+              <span className="as-gold">It gets checked.</span>
             </h2>
             <ol className="mx-auto mt-9 flex list-none flex-wrap justify-center gap-2.5 p-0">
               {STEPS.map((s, i) => (
@@ -154,7 +163,7 @@ export function AgentSupervisorPage() {
             <div id="claim" className="mt-10 flex scroll-mt-28 justify-center">
               <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="violet" prompt={false} quiet buttonClassName="as-cta" />
             </div>
-            <p className="mx-auto mt-6 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white/60">
+            <p className="mx-auto mt-6 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white">
               Free. Claude Code or Codex, Node 18+ and git. Mac, Windows or Linux.
             </p>
           </div>

@@ -67,15 +67,16 @@
 .as-glass {
   position: relative;
   border-radius: 28px;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.22));
+  /* Tinted, not clear: over the gold sun a clear card washed its words out. */
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.07) 45%, rgba(255, 255, 255, 0.12)), rgba(84, 36, 178, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.32);
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.55),
     inset -1px -1px 0 rgba(255, 255, 255, 0.12),
     inset 0 0 30px rgba(255, 255, 255, 0.06),
     0 30px 70px -28px rgba(30, 6, 90, 0.6);
-  -webkit-backdrop-filter: blur(24px) saturate(125%);
-  backdrop-filter: blur(24px) saturate(125%);
+  -webkit-backdrop-filter: blur(34px) saturate(120%);
+  backdrop-filter: blur(34px) saturate(120%);
 }
 .as-glass::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
@@ -84,8 +85,8 @@
 
 /* ── Type ────────────────────────────────────────────────────────────────── */
 .as-h1 {
-  font-size: clamp(3.6rem, 9.6vw, 7.6rem);
-  line-height: 0.95;
+  font-size: clamp(3.1rem, 6.4vw, 6rem);
+  line-height: 0.98;
   font-weight: 400;
   letter-spacing: -0.055em;
 }
@@ -97,7 +98,7 @@
   text-wrap: balance;
 }
 .as-gold { color: var(--as-gold); text-shadow: 0 0 34px rgba(237, 177, 88, 0.45); }
-.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.7); }
+.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; }
 .as-label--gold { color: var(--as-gold); }
 
 .as-pill {
@@ -119,13 +120,13 @@
   box-shadow: 0 12px 36px -10px rgba(237, 177, 88, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* The four things it does: one quiet row along the bottom of the first screen. */
-.as-row { border-top: 1px solid rgba(255, 255, 255, 0.24); }
-.as-row li { padding: 1.4rem 1.2rem 0 0; }
-.as-row li + li { padding-left: 1.2rem; border-left: 1px solid rgba(255, 255, 255, 0.18); }
-@media (max-width: 1023px) {
-  .as-row li:nth-child(3) { padding-left: 0; border-left: 0; }
-  .as-row li:nth-child(n + 3) { margin-top: 0.4rem; }
+/* The four things it does: a liquid-glass card each. */
+.as-tile { padding: 1.3rem 1.3rem 1.4rem; border-radius: 24px; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s; }
+.as-tile:hover { transform: translateY(-4px); border-color: rgba(237, 177, 88, 0.7); }
+.as-icon {
+  display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 14px;
+  color: var(--as-ink); background: var(--as-gold);
+  box-shadow: 0 8px 24px -8px rgba(237, 177, 88, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* The hero settles in as the opening lifts. Only a move, never hidden. */
@@ -170,7 +171,7 @@
 .as-load__labels {
   position: relative; height: 1.6rem; width: 14rem; text-align: center;
   font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
 }
 .as-load__labels span { position: absolute; inset: 0; opacity: 0; animation: as-label 0.32s linear calc(0.24s + var(--i) * 0.3s) both; }
 @keyframes as-label {
@@ -189,16 +190,16 @@
 @media (min-width: 1024px) { .as-demo { justify-self: end; } }
 .as-demo__bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.95rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
 .as-demo__bar i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.45); }
-.as-demo__bar span { margin-left: auto; font-family: var(--as-mono), monospace; font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); }
+.as-demo__bar span { margin-left: auto; font-family: var(--as-mono), monospace; font-size: 0.72rem; color: #fff; }
 .as-demo__body { position: relative; padding: 1.35rem 1.35rem 1.4rem; }
 .as-demo__said { margin: 0; display: grid; gap: 0.35rem; }
-.as-demo__who { font-family: var(--as-mono), monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.75); }
+.as-demo__who { font-family: var(--as-mono), monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; }
 .as-demo__quote {
   justify-self: start; padding: 0.7rem 0.95rem; border-radius: 16px 16px 16px 6px;
   background: rgba(255, 255, 255, 0.94); color: var(--as-ink); font-size: 1.02rem; line-height: 1.4;
   animation: as-doubt 0.5s ease 0.5s both;
 }
-@keyframes as-doubt { to { background: rgba(255, 255, 255, 0.24); color: rgba(255, 255, 255, 0.85); } }
+@keyframes as-doubt { to { background: rgba(255, 255, 255, 0.18); color: #fff; } }
 .as-demo__prove {
   display: inline-flex; align-items: center; gap: 0.5rem; margin: 0.85rem 0 0;
   padding: 0.38rem 0.8rem; border-radius: 999px; font-size: 0.86rem; font-weight: 600;
@@ -234,8 +235,14 @@
 }
 @keyframes as-show { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
 .as-demo__k { color: #fff; }
+.as-demo__rows li[data-warn] .as-demo__check { background: #fff; }
+.as-demo__rows li[data-warn] .as-demo__v { color: var(--as-gold); font-weight: 600; }
+.as-demo__note {
+  grid-column: 2 / -1; margin-top: -0.2rem; font-size: 0.84rem; color: #fff;
+  animation: as-show 0.25s ease calc(1.95s + var(--i) * 0.65s) both;
+}
 .as-demo__v {
-  justify-self: end; font-family: var(--as-mono), monospace; font-size: 0.82rem; color: rgba(255, 255, 255, 0.8);
+  justify-self: end; font-family: var(--as-mono), monospace; font-size: 0.82rem; color: #fff;
   animation: as-show 0.25s ease calc(1.85s + var(--i) * 0.65s) both;
 }
 .as-demo__done {
@@ -246,21 +253,21 @@
   animation: as-pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 4.15s both;
 }
 .as-demo__done span { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; }
-.as-demo__done b { font-family: var(--as-mono), monospace; font-size: 0.95rem; color: var(--as-ink); background: var(--as-gold); padding: 0.15rem 0.55rem; border-radius: 999px; }
+.as-demo__done b { font-size: 0.8rem; font-weight: 600; color: var(--as-ink); background: var(--as-gold); padding: 0.15rem 0.55rem; border-radius: 999px; }
 
 /* Held at the start until the card is on screen, then played once. */
-.as-demo :is(.as-demo__quote, .as-demo__prove, .as-demo__rows li, .as-demo__spin, .as-demo__check, .as-demo__check path, .as-demo__v, .as-demo__done) { animation-play-state: paused; }
-.as-demo[data-play] :is(.as-demo__quote, .as-demo__prove, .as-demo__rows li, .as-demo__spin, .as-demo__check, .as-demo__check path, .as-demo__v, .as-demo__done) { animation-play-state: running; }
+.as-demo :is(.as-demo__quote, .as-demo__prove, .as-demo__rows li, .as-demo__spin, .as-demo__check, .as-demo__check path, .as-demo__v, .as-demo__note, .as-demo__done) { animation-play-state: paused; }
+.as-demo[data-play] :is(.as-demo__quote, .as-demo__prove, .as-demo__rows li, .as-demo__spin, .as-demo__check, .as-demo__check path, .as-demo__v, .as-demo__note, .as-demo__done) { animation-play-state: running; }
 
 /* ── The scroll stop ─────────────────────────────────────────────────────── */
 .as-stop { display: grid; place-items: center; min-height: 72svh; padding: 4rem 1.25rem; }
 @media (min-width: 1024px) { .as-stop { min-height: 92svh; padding: 6rem 1.25rem; } }
 .as-phrase {
-  margin: 0; max-width: 11ch; text-align: center; text-wrap: balance;
-  font-size: clamp(3.4rem, 12vw, 10.5rem); line-height: 0.95; font-weight: 400; letter-spacing: -0.06em;
+  margin: 0; max-width: 13ch; text-align: center; text-wrap: balance;
+  font-size: clamp(3rem, 9.5vw, 8.4rem); line-height: 0.95; font-weight: 400; letter-spacing: -0.06em;
 }
 .as-word { display: inline-block; white-space: pre; }
-.as-word:last-child { color: var(--as-gold); text-shadow: 0 0 60px rgba(237, 177, 88, 0.5); }
+.as-word--gold { color: var(--as-gold); text-shadow: 0 0 60px rgba(237, 177, 88, 0.5); }
 @supports (animation-timeline: view()) {
   .as-word {
     animation: as-word linear both;
@@ -294,7 +301,7 @@
   .as-page *, .as-page *::before { animation: none !important; transition: none !important; }
   .as-demo__spin { display: none; }
   .as-demo__check path { stroke-dashoffset: 0; }
-  .as-demo__quote { background: rgba(255, 255, 255, 0.24); color: rgba(255, 255, 255, 0.85); }
+  .as-demo__quote { background: rgba(255, 255, 255, 0.18); color: #fff; }
 }
 @media (scripting: none) {
   .as-load { display: none; }

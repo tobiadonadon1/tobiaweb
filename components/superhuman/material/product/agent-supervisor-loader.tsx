@@ -5,14 +5,14 @@ import { useEffect, useState } from "react";
 /**
  * THE OPENING: FOUR CHECKS CLOSE A RING.
  *
- * Tests, faked work, the browser, a second agent: each lights a quarter of a
- * ring, the ring closes, a tick draws, "Proven." Then the glass lifts off the
+ * Opens it, looks at it, uses it, proves it: each lights a quarter of a ring
+ * while a gold sun swells behind, the ring closes, a tick draws, "Checked." Then the glass lifts off the
  * page. CSS alone runs it (agent-supervisor.css, about 2.7 s) from the first
  * paint; script only steps it aside early on a scroll, key or tap. Reduced
  * motion skips it. Decoration over a page that is already there, so it is
  * hidden from assistive tech.
  */
-const CHECKS = ["tests", "faked work", "browser", "second agent"];
+const CHECKS = ["opens it", "looks at it", "uses it", "proves it"];
 
 export function AgentSupervisorLoader() {
   const [done, setDone] = useState(false);
@@ -54,7 +54,7 @@ export function AgentSupervisorLoader() {
               {c}
             </span>
           ))}
-          <span className="as-load__proven">Proven.</span>
+          <span className="as-load__proven">Checked.</span>
         </div>
       </div>
     </div>

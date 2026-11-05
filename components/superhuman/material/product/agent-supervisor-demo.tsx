@@ -3,18 +3,18 @@
 import { useEffect, useRef } from "react";
 
 /**
- * THE PROOF, PLAYED ONCE WHEN IT'S ON SCREEN. A real run (5 Nov 2026):
- * Claude Code added a signup to a small app and said it was finished; the
- * guard sent it back; it came back proven. The CSS sequence waits for
- * data-play, which is set the first time the card is in view (after the
- * opening loader on a desktop, on scroll on a phone). Without script or with
- * reduced motion it shows the final state.
+ * THE SUPERVISOR AT WORK, PLAYED ONCE WHEN IT'S ON SCREEN. A real moment
+ * (5 Nov 2026, building the first version of this page): the agent said the
+ * page looked great on desktop and phone; fresh eyes opened it on a phone and
+ * found the opening playing off-screen; it was fixed and looked at again.
+ * The CSS sequence waits for data-play, set the first time the card is in
+ * view. Without script or with reduced motion it shows the final state.
  */
-const ROWS: [string, string][] = [
-  ["Tests", "10 passed"],
-  ["Faked work", "none found"],
-  ["Browser", "desktop + phone"],
-  ["Second agent", "agrees, 9 of 9"],
+const ROWS: { k: string; v: string; warn?: boolean }[] = [
+  { k: "Opened it", v: "desktop + phone" },
+  { k: "Looked like a person", v: "1 thing off", warn: true },
+  { k: "Fixed it", v: "looked again" },
+  { k: "Second agent", v: "agrees" },
 ];
 
 export function AgentSupervisorDemo() {
@@ -36,39 +36,45 @@ export function AgentSupervisorDemo() {
   }, []);
 
   return (
-    <div ref={ref} className="as-demo as-glass" role="img" aria-label="Claude Code says: Done. Signup is in and all 10 tests pass. Agent Supervisor answers: prove it. Tests: 10 passed. Faked work: none found. Browser: desktop and phone. Second agent: agrees, 9 of 9. Proven.">
+    <div
+      ref={ref}
+      className="as-demo as-glass"
+      role="img"
+      aria-label="The agent says: Done, the page looks great on desktop and phone. Agent Supervisor: show me. Opened it on desktop and phone. Looked like a person: one thing off, on a phone the opening played off-screen. Fixed it and looked again. A second agent agrees. Supervised: fixed before you saw it."
+    >
       <div className="as-demo__bar" aria-hidden>
         <i />
         <i />
         <i />
-        <span>claude · signup</span>
+        <span>claude · landing page</span>
       </div>
       <div className="as-demo__body" aria-hidden>
         <p className="as-demo__said">
           <span className="as-demo__who">Agent</span>
-          <span className="as-demo__quote">Done. Signup is in and all 10 tests pass.</span>
+          <span className="as-demo__quote">Done. The page looks great on desktop and phone.</span>
         </p>
         <p className="as-demo__prove">
           <span className="as-dot" />
-          Prove it.
+          Show me.
         </p>
         <ul className="as-demo__rows">
-          {ROWS.map(([k, v], i) => (
-            <li key={k} style={{ "--i": i } as React.CSSProperties}>
+          {ROWS.map(({ k, v, warn }, i) => (
+            <li key={k} data-warn={warn || undefined} style={{ "--i": i } as React.CSSProperties}>
               <span className="as-demo__state">
                 <span className="as-demo__spin" />
                 <svg viewBox="0 0 20 20" className="as-demo__check">
-                  <path d="M5.5 10.5 L8.6 13.4 L14.5 6.8" pathLength={1} />
+                  {warn ? <path d="M10 5.5 L10 11.2 M10 14.4 L10 14.6" pathLength={1} /> : <path d="M5.5 10.5 L8.6 13.4 L14.5 6.8" pathLength={1} />}
                 </svg>
               </span>
               <span className="as-demo__k">{k}</span>
               <span className="as-demo__v">{v}</span>
+              {warn && <span className="as-demo__note">Phone: the opening played off-screen</span>}
             </li>
           ))}
         </ul>
         <p className="as-demo__done">
-          <span>Proven</span>
-          <b>9/9</b>
+          <span>Supervised</span>
+          <b>fixed before you saw it</b>
         </p>
       </div>
     </div>

@@ -18,11 +18,11 @@ export const SETUPS: MaterialEntry[] = [
     slug: "agent-supervisor",
     title: "Agent Supervisor",
     kind: "setup",
-    summary: "Your AI agent can't say it's done until it proves it: tests run, faked work caught, the page opened, a second agent checking.",
+    summary: "Your AI agent, supervised: it checks the work like a picky human would, opens every screen, finds what's off and fixes it, so you don't explain it twice.",
     // Minutes from the download to the guard being on.
     minutes: 2,
     status: "ready",
-    when: "Claude Code or Codex keeps telling you it's finished, and you keep finding out it isn't.",
+    when: "Your agent says it looks great and has no UX problems, and you keep finding out it doesn't.",
     level: "Anyone",
     body: [],
     product: "agent-supervisor",
