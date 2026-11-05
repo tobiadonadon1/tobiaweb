@@ -59,7 +59,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "conversion-teardown": { a: "#f5d84a", b: "#f7f4e6", added: "2026-10-31" },
   "mascot-designer": { a: "#ff9e7a", b: "#fff4e6", added: "2026-11-01" },
   "carousel-designer": { a: "#8fa0ff", b: "#f4f1ea", added: "2026-11-02" },
-  "agent-supervisor": { a: "#3ee6a0", b: "#eaf3f7", added: "2026-11-05" },
+  "agent-supervisor": { a: "#723CD6", b: "#f3eefc", added: "2026-11-05" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

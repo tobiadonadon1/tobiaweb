@@ -1,135 +1,176 @@
-/* AGENT SUPERVISOR (agent-supervisor-page.tsx). Near-black, slow mint and blue
-   light, frosted glass over it, Geist. Every moving part stands still under
-   reduced motion and shows its final state without script. */
+/* AGENT SUPERVISOR (agent-supervisor-page.tsx). Royal purple with texture:
+   ribbed glass over a grain, a sunglow-gold sun glowing behind the ribs.
+   White writing, white liquid-glass cards, gold as the one loud colour.
+   Every moving part stands still under reduced motion and shows its final
+   state without script. */
 
 .as-page {
-  --as-bg: #05070a;
-  --as-mint: #3ee6a0;
-  --as-sky: #4aa8ff;
-  --as-text: #eef1f4;
-  background: var(--as-bg);
-  color: var(--as-text);
+  --as-purple: #723cd6;
+  --as-gold: #edb158;
+  --as-white: #fcffff;
+  --as-ink: #2a0f63;
+  background: var(--as-purple);
+  color: var(--as-white);
   font-family: var(--as-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 .as-page > section { position: relative; z-index: 1; }
 
-/* ── The light behind the glass ─────────────────────────────────────────── */
-.as-sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.as-orb { position: absolute; border-radius: 50%; will-change: transform; }
-.as-orb--a {
-  width: 62vmax; height: 62vmax; left: -18vmax; top: -24vmax;
-  background: radial-gradient(closest-side, rgba(62, 230, 160, 0.26), rgba(62, 230, 160, 0.06) 55%, transparent);
-  animation: as-drift-a 22s ease-in-out infinite alternate;
+/* ── The field: purple, a sun behind ribbed glass, grain ─────────────────── */
+.as-sky {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.08), transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgba(40, 8, 110, 0.55), transparent 70%),
+    radial-gradient(80% 60% at 0% 100%, rgba(40, 8, 110, 0.45), transparent 70%),
+    var(--as-purple);
 }
-.as-orb--b {
-  width: 58vmax; height: 58vmax; right: -22vmax; top: 8vmax;
-  background: radial-gradient(closest-side, rgba(74, 168, 255, 0.22), rgba(74, 168, 255, 0.05) 55%, transparent);
-  animation: as-drift-b 26s ease-in-out infinite alternate;
+/* The sun: a tall gold glow, smeared like something moving behind the glass. */
+.as-sun {
+  position: absolute; left: 60%; top: 4%; width: 32vmax; height: 60vmax; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 214, 140, 0.95), rgba(237, 177, 88, 0.75) 35%, rgba(237, 177, 88, 0.25) 62%, transparent);
+  filter: blur(28px);
+  transform: translateX(-50%);
+  animation: as-sun 18s ease-in-out infinite alternate;
 }
-.as-orb--c {
-  width: 44vmax; height: 44vmax; left: 22vw; bottom: -30vmax;
-  background: radial-gradient(closest-side, rgba(150, 120, 255, 0.12), transparent 70%);
-  animation: as-drift-a 30s ease-in-out infinite alternate-reverse;
+.as-sun--streak {
+  left: 50%; top: 30%; width: 50vmax; height: 18vmax; opacity: 0.55;
+  background: radial-gradient(closest-side, rgba(237, 177, 88, 0.85), rgba(237, 177, 88, 0.2) 60%, transparent);
+  filter: blur(36px);
+  animation: as-streak 14s ease-in-out infinite alternate;
 }
-@keyframes as-drift-a { to { transform: translate3d(8vw, 6vh, 0) scale(1.08); } }
-@keyframes as-drift-b { to { transform: translate3d(-7vw, 10vh, 0) scale(0.94); } }
+@keyframes as-sun { to { transform: translate(-44%, 4vh) scale(1.06, 0.96); } }
+@keyframes as-streak { to { transform: translate(-58%, -3vh) scaleX(1.15); } }
+@media (max-width: 1023px) {
+  .as-sun { left: 78%; top: 22%; width: 60vmax; height: 90vmax; opacity: 0.8; }
+  .as-sun--streak { top: 50%; }
+}
+/* Ribbed glass: each rib catches light on its left and falls into shade on its right. */
+.as-ribs {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg,
+    rgba(255, 255, 255, 0.13) 0px,
+    rgba(255, 255, 255, 0.04) 3px,
+    rgba(255, 255, 255, 0) 9px,
+    rgba(30, 0, 80, 0.1) 15px,
+    rgba(30, 0, 80, 0.16) 17px,
+    rgba(255, 255, 255, 0.13) 18px);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.as-grain {
+  position: absolute; inset: 0; opacity: 0.16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-/* ── Glass ───────────────────────────────────────────────────────────────── */
+/* ── Liquid glass: white, frosted, lit along its top-left edge ──────────── */
 .as-glass {
   position: relative;
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 40px 90px -40px rgba(0, 0, 0, 0.75);
-  -webkit-backdrop-filter: blur(26px) saturate(150%);
-  backdrop-filter: blur(26px) saturate(150%);
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 30px rgba(255, 255, 255, 0.06),
+    0 30px 70px -28px rgba(30, 6, 90, 0.6);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
+  backdrop-filter: blur(24px) saturate(125%);
+}
+.as-glass::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 32%);
 }
 
 /* ── Type ────────────────────────────────────────────────────────────────── */
 .as-h1 {
-  margin: 0;
-  font-size: clamp(3.7rem, 10.5vw, 8.4rem);
-  line-height: 0.9;
-  font-weight: 650;
-  letter-spacing: -0.058em;
+  font-size: clamp(3.6rem, 9.6vw, 7.6rem);
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.055em;
 }
 .as-h2 {
-  margin: 0;
-  font-size: clamp(2.3rem, 5.4vw, 4.4rem);
-  line-height: 0.98;
-  font-weight: 600;
-  letter-spacing: -0.048em;
+  font-size: clamp(2.3rem, 5.2vw, 4.2rem);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.045em;
   text-wrap: balance;
 }
-.as-grad {
-  background: linear-gradient(100deg, #6ff5bd 10%, #3ee6a0 40%, #4aa8ff 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.42); }
-.as-label--mint { color: var(--as-mint); }
+.as-gold { color: var(--as-gold); text-shadow: 0 0 34px rgba(237, 177, 88, 0.45); }
+.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.7); }
+.as-label--gold { color: var(--as-gold); }
 
 .as-pill {
   display: inline-flex; align-items: center; gap: 0.6rem; margin: 0;
   padding: 0.42rem 0.95rem 0.42rem 0.8rem; border-radius: 999px;
-  font-size: 0.86rem; color: rgba(255, 255, 255, 0.82);
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.86rem; color: #fff;
+  background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
 }
-.as-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex: none;
-  background: var(--as-mint); box-shadow: 0 0 0 0 rgba(62, 230, 160, 0.55);
-  animation: as-ping 2.4s ease-out infinite;
-}
-@keyframes as-ping { 0% { box-shadow: 0 0 0 0 rgba(62, 230, 160, 0.55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(62, 230, 160, 0); } }
+.as-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--as-gold); animation: as-ping 2.4s ease-out infinite; }
+@keyframes as-ping { 0% { box-shadow: 0 0 0 0 rgba(237, 177, 88, 0.7); } 70%, 100% { box-shadow: 0 0 0 9px rgba(237, 177, 88, 0); } }
 
-/* The button: lit mint glass. Unlayered, so it wins over the tone's colours. */
+/* The button: sunglow gold. Unlayered, so it wins over the tone's colours. */
 .as-cta {
-  background: linear-gradient(135deg, #6ff5bd, #3ee6a0 45%, #3ec7ff) !important;
-  color: #03140c !important;
+  background: linear-gradient(180deg, #f6c878, #edb158) !important;
+  color: var(--as-ink) !important;
   font-weight: 600 !important;
-  box-shadow: 0 14px 44px -12px rgba(62, 230, 160, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow: 0 12px 36px -10px rgba(237, 177, 88, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* The four things it does: one quiet row along the bottom of the first screen. */
+.as-row { border-top: 1px solid rgba(255, 255, 255, 0.24); }
+.as-row li { padding: 1.4rem 1.2rem 0 0; }
+.as-row li + li { padding-left: 1.2rem; border-left: 1px solid rgba(255, 255, 255, 0.18); }
+@media (max-width: 1023px) {
+  .as-row li:nth-child(3) { padding-left: 0; border-left: 0; }
+  .as-row li:nth-child(n + 3) { margin-top: 0.4rem; }
 }
 
 /* The hero settles in as the opening lifts. Only a move, never hidden. */
 .as-rise { animation: as-rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 2.15s both; }
 @keyframes as-rise { from { transform: translateY(18px); } to { transform: none; } }
 
-/* ── The opening loader ─────────────────────────────────────────────────── */
+/* ── The opening loader: a gold sun swells behind four checks ──────────── */
 .as-load {
-  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
-  background: radial-gradient(40rem 30rem at 50% 45%, rgba(62, 230, 160, 0.1), transparent 70%), #05070a;
-  animation: as-load-out 0.6s cubic-bezier(0.6, 0, 0.3, 1) 2.2s forwards;
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0px, rgba(255, 255, 255, 0) 8px, rgba(30, 0, 80, 0.14) 16px, rgba(255, 255, 255, 0.1) 18px),
+    radial-gradient(70% 60% at 50% 45%, #8150e0, #5a28bd 70%, #45199e);
+  animation: as-load-out 0.65s cubic-bezier(0.6, 0, 0.3, 1) 2.2s forwards;
 }
+.as-load::before {
+  content: ""; position: absolute; left: 50%; top: 45%; width: 46vmin; height: 46vmin; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 220, 150, 0.95), rgba(237, 177, 88, 0.6) 45%, transparent);
+  filter: blur(18px);
+  transform: translate(-50%, -50%) scale(0.2); opacity: 0;
+  animation: as-glow 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s forwards;
+}
+@keyframes as-glow { to { transform: translate(-50%, -50%) scale(1); opacity: 0.85; } }
 .as-load[data-done] { animation: as-load-out 0.35s ease forwards; }
-@keyframes as-load-out {
-  to { opacity: 0; visibility: hidden; transform: scale(1.06); filter: blur(10px); }
-}
-.as-load__stage { display: grid; justify-items: center; gap: 1.1rem; }
-.as-load__ring { width: 7.5rem; height: 7.5rem; overflow: visible; }
-.as-load__track { fill: none; stroke: rgba(255, 255, 255, 0.07); stroke-width: 5; }
+@keyframes as-load-out { to { opacity: 0; visibility: hidden; transform: scale(1.06); filter: blur(12px); } }
+.as-load__stage { position: relative; display: grid; justify-items: center; gap: 1.1rem; }
+.as-load__ring { width: 7.5rem; height: 7.5rem; overflow: visible; animation: as-ring-pulse 0.5s ease 1.45s; }
+@keyframes as-ring-pulse { 50% { transform: scale(1.07); } }
+.as-load__track { fill: none; stroke: rgba(255, 255, 255, 0.22); stroke-width: 5; }
 .as-load__arc {
-  fill: none; stroke: var(--as-mint); stroke-width: 5; stroke-linecap: round;
-  transform-origin: 50px 50px;
-  stroke-dasharray: 0 100;
-  filter: drop-shadow(0 0 5px rgba(62, 230, 160, 0.8));
+  fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round;
+  transform-origin: 50px 50px; stroke-dasharray: 0 100;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
   animation: as-arc 0.3s cubic-bezier(0.3, 0.7, 0.3, 1) calc(0.25s + var(--i) * 0.3s) forwards;
 }
 @keyframes as-arc { to { stroke-dasharray: 17 100; } }
 .as-load__tick {
-  fill: none; stroke: #fff; stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round;
+  fill: none; stroke: #fff; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round;
   stroke-dasharray: 1; stroke-dashoffset: 1;
   animation: as-tick 0.38s cubic-bezier(0.5, 0, 0.2, 1) 1.5s forwards;
 }
 @keyframes as-tick { to { stroke-dashoffset: 0; } }
-.as-load__ring { animation: as-ring-pulse 0.5s ease 1.45s; }
-@keyframes as-ring-pulse { 50% { transform: scale(1.07); } }
 .as-load__labels {
   position: relative; height: 1.6rem; width: 14rem; text-align: center;
   font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.85);
 }
 .as-load__labels span { position: absolute; inset: 0; opacity: 0; animation: as-label 0.32s linear calc(0.24s + var(--i) * 0.3s) both; }
 @keyframes as-label {
@@ -138,71 +179,74 @@
   100% { opacity: 0; transform: translateY(-5px); }
 }
 .as-load__labels .as-load__proven {
-  font-family: var(--as-sans), ui-sans-serif, sans-serif; font-size: 1.35rem; letter-spacing: -0.03em; text-transform: none; font-weight: 600; color: #fff;
+  font-family: var(--as-sans), ui-sans-serif, sans-serif; font-size: 1.4rem; letter-spacing: -0.03em; text-transform: none; font-weight: 500; color: #fff;
   animation: as-proven 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 1.62s both;
 }
 @keyframes as-proven { from { opacity: 0; transform: translateY(8px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 
 /* ── The demo card ───────────────────────────────────────────────────────── */
-.as-demo { width: 100%; max-width: 31rem; justify-self: center; overflow: hidden; }
+.as-demo { width: 100%; max-width: 30rem; justify-self: center; overflow: hidden; }
 @media (min-width: 1024px) { .as-demo { justify-self: end; } }
-.as-demo__bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.95rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
-.as-demo__bar i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.16); }
-.as-demo__bar span { margin-left: auto; font-family: var(--as-mono), monospace; font-size: 0.72rem; color: rgba(255, 255, 255, 0.4); }
-.as-demo__body { padding: 1.35rem 1.35rem 1.4rem; }
+.as-demo__bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.95rem 1.2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+.as-demo__bar i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.45); }
+.as-demo__bar span { margin-left: auto; font-family: var(--as-mono), monospace; font-size: 0.72rem; color: rgba(255, 255, 255, 0.75); }
+.as-demo__body { position: relative; padding: 1.35rem 1.35rem 1.4rem; }
 .as-demo__said { margin: 0; display: grid; gap: 0.35rem; }
-.as-demo__who { font-family: var(--as-mono), monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.4); }
+.as-demo__who { font-family: var(--as-mono), monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.75); }
 .as-demo__quote {
   justify-self: start; padding: 0.7rem 0.95rem; border-radius: 16px 16px 16px 6px;
-  background: rgba(255, 255, 255, 0.07); font-size: 1.04rem; line-height: 1.4; color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94); color: var(--as-ink); font-size: 1.02rem; line-height: 1.4;
   animation: as-doubt 0.5s ease 0.5s both;
 }
-@keyframes as-doubt { to { color: rgba(255, 255, 255, 0.45); background: rgba(255, 255, 255, 0.035); } }
+@keyframes as-doubt { to { background: rgba(255, 255, 255, 0.24); color: rgba(255, 255, 255, 0.85); } }
 .as-demo__prove {
   display: inline-flex; align-items: center; gap: 0.5rem; margin: 0.85rem 0 0;
   padding: 0.38rem 0.8rem; border-radius: 999px; font-size: 0.86rem; font-weight: 600;
-  color: var(--as-mint); background: rgba(62, 230, 160, 0.1); border: 1px solid rgba(62, 230, 160, 0.28);
+  color: var(--as-ink); background: var(--as-gold);
+  box-shadow: 0 6px 22px -6px rgba(237, 177, 88, 0.9);
   animation: as-pop 0.42s cubic-bezier(0.3, 1.6, 0.5, 1) 0.75s both;
 }
+.as-demo__prove .as-dot { background: var(--as-ink); animation: none; }
 @keyframes as-pop { from { opacity: 0; transform: scale(0.7) translateY(4px); } to { opacity: 1; transform: none; } }
 .as-demo__rows { list-style: none; margin: 1.1rem 0 0; padding: 0; }
 .as-demo__rows li {
   display: grid; grid-template-columns: 1.25rem auto 1fr; align-items: center; gap: 0.75rem;
-  padding: 0.72rem 0; border-top: 1px solid rgba(255, 255, 255, 0.06); font-size: 0.97rem;
+  padding: 0.72rem 0; border-top: 1px solid rgba(255, 255, 255, 0.18); font-size: 0.97rem;
   animation: as-in 0.35s ease calc(1.25s + var(--i) * 0.65s) both;
 }
 @keyframes as-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .as-demo__state { position: relative; width: 1.25rem; height: 1.25rem; }
 .as-demo__spin {
   position: absolute; inset: 1px; border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.14); border-top-color: var(--as-mint);
+  border: 2px solid rgba(255, 255, 255, 0.28); border-top-color: var(--as-gold);
   animation: as-spin 0.7s linear infinite, as-gone 0.15s linear calc(1.75s + var(--i) * 0.65s) both;
 }
 @keyframes as-spin { to { transform: rotate(360deg); } }
 @keyframes as-gone { to { opacity: 0; } }
-.as-demo__check { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; background: rgba(62, 230, 160, 0.16); }
+.as-demo__check {
+  position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; background: var(--as-gold);
+  animation: as-show 0.2s ease calc(1.75s + var(--i) * 0.65s) both;
+}
 .as-demo__check path {
-  fill: none; stroke: var(--as-mint); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  fill: none; stroke: var(--as-ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
   stroke-dasharray: 1; stroke-dashoffset: 1;
   animation: as-tick 0.3s ease calc(1.8s + var(--i) * 0.65s) forwards;
 }
-.as-demo__check { animation: as-show 0.2s ease calc(1.75s + var(--i) * 0.65s) both; }
 @keyframes as-show { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
-.as-demo__k { color: rgba(255, 255, 255, 0.85); }
+.as-demo__k { color: #fff; }
 .as-demo__v {
-  justify-self: end; font-family: var(--as-mono), monospace; font-size: 0.82rem; color: rgba(255, 255, 255, 0.55);
+  justify-self: end; font-family: var(--as-mono), monospace; font-size: 0.82rem; color: rgba(255, 255, 255, 0.8);
   animation: as-show 0.25s ease calc(1.85s + var(--i) * 0.65s) both;
 }
 .as-demo__done {
   display: flex; align-items: center; justify-content: space-between; margin: 1rem 0 0;
   padding: 0.85rem 1.05rem; border-radius: 18px;
-  background: linear-gradient(110deg, rgba(62, 230, 160, 0.2), rgba(74, 168, 255, 0.12));
-  border: 1px solid rgba(62, 230, 160, 0.35);
-  box-shadow: 0 0 40px -8px rgba(62, 230, 160, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  background: #fff; color: var(--as-ink);
+  box-shadow: 0 0 46px -6px rgba(237, 177, 88, 0.75);
   animation: as-pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 4.15s both;
 }
-.as-demo__done span { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; color: #fff; }
-.as-demo__done b { font-family: var(--as-mono), monospace; font-size: 0.95rem; color: var(--as-mint); }
+.as-demo__done span { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; }
+.as-demo__done b { font-family: var(--as-mono), monospace; font-size: 0.95rem; color: var(--as-ink); background: var(--as-gold); padding: 0.15rem 0.55rem; border-radius: 999px; }
 
 /* Held at the start until the card is on screen, then played once. */
 .as-demo :is(.as-demo__quote, .as-demo__prove, .as-demo__rows li, .as-demo__spin, .as-demo__check, .as-demo__check path, .as-demo__v, .as-demo__done) { animation-play-state: paused; }
@@ -213,13 +257,10 @@
 @media (min-width: 1024px) { .as-stop { min-height: 92svh; padding: 6rem 1.25rem; } }
 .as-phrase {
   margin: 0; max-width: 11ch; text-align: center; text-wrap: balance;
-  font-size: clamp(3.4rem, 12vw, 10.5rem); line-height: 0.92; font-weight: 650; letter-spacing: -0.06em;
+  font-size: clamp(3.4rem, 12vw, 10.5rem); line-height: 0.95; font-weight: 400; letter-spacing: -0.06em;
 }
 .as-word { display: inline-block; white-space: pre; }
-.as-word:last-child {
-  background: linear-gradient(100deg, #6ff5bd, #3ee6a0 40%, #4aa8ff);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+.as-word:last-child { color: var(--as-gold); text-shadow: 0 0 60px rgba(237, 177, 88, 0.5); }
 @supports (animation-timeline: view()) {
   .as-word {
     animation: as-word linear both;
@@ -228,34 +269,23 @@
   }
 }
 @keyframes as-word {
-  from { opacity: 0.1; filter: blur(10px); transform: translateY(0.18em); }
+  from { opacity: 0.12; filter: blur(10px); transform: translateY(0.18em); }
   to { opacity: 1; filter: none; transform: none; }
 }
 
-/* ── Tiles, the two sides, the close ─────────────────────────────────────── */
-.as-tile { padding: 1.1rem; min-height: 0; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s; }
-@media (min-width: 640px) { .as-tile { padding: 1.5rem; min-height: 13.5rem; } }
-.as-tile:hover { transform: translateY(-4px); border-color: rgba(62, 230, 160, 0.3); }
-.as-icon {
-  display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 14px;
-  color: var(--as-mint); background: rgba(62, 230, 160, 0.1); border: 1px solid rgba(62, 230, 160, 0.22);
-}
+/* ── The two sides, the close ────────────────────────────────────────────── */
 .as-vs { padding: 1.6rem 1.6rem 1.5rem; }
-.as-vs__say { margin: 0.7rem 0 0.35rem; font-size: clamp(1.45rem, 2.6vw, 1.85rem); font-weight: 600; letter-spacing: -0.035em; line-height: 1.15; }
-.as-vs--with { border-color: rgba(62, 230, 160, 0.28); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 0 60px -20px rgba(62, 230, 160, 0.35), 0 40px 90px -40px rgba(0, 0, 0, 0.75); }
+.as-vs__say { margin: 0.7rem 0 0.35rem; font-size: clamp(1.45rem, 2.6vw, 1.85rem); font-weight: 500; letter-spacing: -0.035em; line-height: 1.15; }
+.as-vs--with { border-color: rgba(237, 177, 88, 0.65); box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.55), 0 0 60px -18px rgba(237, 177, 88, 0.65), 0 30px 70px -28px rgba(30, 6, 90, 0.6); }
 .as-close { padding: clamp(3rem, 7vw, 5.5rem) 1.25rem; overflow: hidden; }
-.as-close::before {
-  content: ""; position: absolute; inset: auto -10% -60% -10%; height: 90%; pointer-events: none;
-  background: radial-gradient(closest-side, rgba(62, 230, 160, 0.18), transparent);
-}
 .as-close > * { position: relative; }
 .as-step {
   display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1rem 0.5rem 0.55rem; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.95rem; color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.32); font-size: 0.95rem; color: #fff;
 }
 .as-step__n {
   display: grid; place-items: center; width: 1.55rem; height: 1.55rem; border-radius: 50%;
-  font-family: var(--as-mono), monospace; font-size: 0.78rem; font-weight: 600; color: #03140c; background: var(--as-mint);
+  font-family: var(--as-mono), monospace; font-size: 0.78rem; font-weight: 600; color: var(--as-ink); background: var(--as-gold);
 }
 
 /* ── Still and script-free ───────────────────────────────────────────────── */
@@ -264,7 +294,7 @@
   .as-page *, .as-page *::before { animation: none !important; transition: none !important; }
   .as-demo__spin { display: none; }
   .as-demo__check path { stroke-dashoffset: 0; }
-  .as-demo__quote { color: rgba(255, 255, 255, 0.45); }
+  .as-demo__quote { background: rgba(255, 255, 255, 0.24); color: rgba(255, 255, 255, 0.85); }
 }
 @media (scripting: none) {
   .as-load { display: none; }

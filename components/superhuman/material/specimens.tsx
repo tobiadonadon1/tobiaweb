@@ -1202,19 +1202,20 @@ function CarouselDesigner() {
 }
 
 /**
- * AGENT SUPERVISOR — a dark glass disc with a mint ring and a tick cut from
- * two bars: the moment the work is proven, in the page's own colours
- * (product/agent-supervisor-page.tsx). A blue fleck for the second agent.
+ * AGENT SUPERVISOR — a royal-purple disc with a white ring and a sunglow-gold
+ * tick cut from two bars, the page's own colours
+ * (product/agent-supervisor-page.tsx). A gold fleck for the sun behind it.
  */
 function AgentSupervisor() {
   return (
     <>
       <Cut d={DISC} x={117} y={80} s={1.3} fill={SHADE} />
-      <Cut d={DISC} x={109} y={70} s={1.3} fill="#3ee6a0" />
-      <Cut d={DISC} x={121} y={82} s={1.13} fill="#0d1117" />
-      <Cut d={BAR} x={160} y={150} s={0.2} sy={0.72} fill="#3ee6a0" rotate={45} />
-      <Cut d={BAR} x={180} y={196} s={0.37} sy={0.72} fill="#3ee6a0" rotate={-52} />
-      <Cut d={FLECK} x={292} y={74} s={0.7} fill="#4aa8ff" rotate={12} />
+      <Cut d={DISC} x={109} y={70} s={1.3} fill="#723CD6" />
+      <Cut d={DISC} x={124} y={85} s={1.09} fill="#ffffff" opacity={0.28} />
+      <Cut d={DISC} x={131} y={92} s={0.99} fill="#723CD6" />
+      <Cut d={BAR} x={160} y={150} s={0.2} sy={0.72} fill="#EDB158" rotate={45} />
+      <Cut d={BAR} x={180} y={196} s={0.37} sy={0.72} fill="#EDB158" rotate={-52} />
+      <Cut d={FLECK} x={292} y={74} s={0.7} fill="#EDB158" rotate={12} />
     </>
   );
 }

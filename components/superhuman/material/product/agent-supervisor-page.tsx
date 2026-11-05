@@ -14,12 +14,13 @@ import "./agent-supervisor.css";
  * AGENT SUPERVISOR (was Done Checker), a free skill for Claude Code and Codex:
  * the agent can't say it's done until it proves it.
  *
- * THE LOOK (Tobia, 2026-11-05, on the first page: "glassmorphism, modern,
- * short, value-driven… one simple phrase… minimal… a scroll stop… a loader
- * animation that looks cool… I don't want receipts"): near-black with slow
- * mint and blue light behind frosted glass, Geist, one phrase per screen.
- * The opening loader is the product in two seconds: four checks close a ring,
- * a tick, "Proven."
+ * THE LOOK (Tobia, 2026-11-05, second pass, with a reference): royal purple
+ * #723CD6 with texture (ribbed glass over a grain), white writing, white
+ * liquid-glass cards, one loud accent: sunglow gold #EDB158, a sun glowing
+ * behind the ribs. Futuristic, space-calm, minimal, value first. Before that:
+ * "short… one simple phrase… a scroll stop… a loader that looks cool… I don't
+ * want receipts". The opening loader is the product in two seconds: four
+ * checks close a ring, a gold tick, "Proven."
  *
  * THE DEMO IS REAL: Claude Code adding a signup to a small app with the guard
  * on (5 Nov 2026). It said it was finished, was sent back, and came back with
@@ -63,33 +64,46 @@ export function AgentSupervisorPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <AgentSupervisorLoader />
       <div className="as-sky" aria-hidden>
-        <span className="as-orb as-orb--a" />
-        <span className="as-orb as-orb--b" />
-        <span className="as-orb as-orb--c" />
+        <span className="as-sun" />
+        <span className="as-sun as-sun--streak" />
+        <span className="as-ribs" />
+        <span className="as-grain" />
       </div>
       <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
-      {/* 01. ONE PHRASE, THE BUTTON, THE PROOF. */}
+      {/* 01. ONE PHRASE, THE BUTTON, THE PROOF, WHAT IT DOES. */}
       <section aria-labelledby="as-title" className="relative">
-        <div className="mx-auto grid max-w-[76rem] lg:min-h-[100svh] grid-cols-1 items-center gap-x-14 gap-y-14 px-5 pb-20 pt-28 sm:px-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pt-24">
-          <div className="as-rise">
-            <p className="as-pill">
-              <span className="as-dot" aria-hidden />
-              Free skill for Claude Code &amp; Codex
-            </p>
-            <h1 id="as-title" className="as-h1 mt-7">
-              No proof,
-              <br />
-              <span className="as-grad">no done.</span>
-            </h1>
-            <p className="mt-6 max-w-[30ch] text-pretty text-[1.2rem] leading-[1.45] text-white/70 sm:text-[1.3rem]">
-              Your AI agent can&rsquo;t say it&rsquo;s finished until it proves it.
-            </p>
-            <div id={HERO_ID} className="mt-9 scroll-mt-28">
-              <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="dark" align="start" quiet buttonClassName="as-cta" />
+        <div className="mx-auto flex max-w-[78rem] flex-col px-5 pb-10 pt-28 sm:px-8 lg:min-h-[100svh] lg:pt-32">
+          <div className="grid flex-1 grid-cols-1 items-center gap-x-14 gap-y-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+            <div className="as-rise">
+              <p className="as-pill">
+                <span className="as-dot" aria-hidden />
+                Free skill for Claude Code &amp; Codex
+              </p>
+              <h1 id="as-title" className="as-h1 mt-7">
+                No proof,
+                <br />
+                <span className="as-gold">no done.</span>
+              </h1>
+              <p className="mt-6 max-w-[32ch] text-pretty text-[1.15rem] leading-[1.5] text-white/80 sm:text-[1.25rem]">
+                Your AI agent can&rsquo;t say it&rsquo;s finished until it proves it.
+              </p>
+              <div id={HERO_ID} className="mt-9 scroll-mt-28">
+                <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="violet" align="start" quiet buttonClassName="as-cta" />
+              </div>
             </div>
+            <AgentSupervisorDemo />
           </div>
-          <AgentSupervisorDemo />
+
+          <ul className="as-row mt-16 grid list-none grid-cols-2 p-0 lg:mt-20 lg:grid-cols-4">
+            {DOES.map(({ Icon, title, body }) => (
+              <li key={title}>
+                <Icon aria-hidden className="h-[1.1rem] w-[1.1rem] text-[var(--as-gold)]" strokeWidth={1.7} />
+                <h2 className="mt-3 text-[1rem] font-medium tracking-[-0.01em]">{title}</h2>
+                <p className="mt-1 text-[0.88rem] leading-[1.45] text-white/65">{body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -104,47 +118,30 @@ export function AgentSupervisorPage() {
         </p>
       </section>
 
-      {/* 03. WHAT IT DOES, IN FOUR TILES. */}
-      <section aria-labelledby="as-does" className="relative">
-        <div className="mx-auto max-w-[76rem] px-5 pb-28 sm:px-8 md:pb-36">
-          <h2 id="as-does" className="as-h2 max-w-[16ch]">
-            Before it says done, it checks.
-          </h2>
-          <ul className="mt-10 grid list-none grid-cols-2 gap-3 p-0 sm:mt-12 sm:gap-4 lg:grid-cols-4">
-            {DOES.map(({ Icon, title, body }) => (
-              <li key={title} className="as-glass as-tile">
-                <span className="as-icon" aria-hidden>
-                  <Icon className="h-5 w-5" strokeWidth={1.8} />
-                </span>
-                <h3 className="mt-5 text-[1.05rem] font-semibold leading-[1.2] tracking-[-0.02em] sm:mt-8 sm:text-[1.2rem]">{title}</h3>
-                <p className="mt-1.5 text-[0.9rem] leading-[1.4] text-white/60 sm:text-[0.98rem]">{body}</p>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="as-glass as-vs">
-              <p className="as-label">Without it</p>
-              <p className="as-vs__say">&ldquo;Done! All tests pass.&rdquo;</p>
-              <p className="text-white/55">Then you find the bug.</p>
-            </div>
-            <div className="as-glass as-vs as-vs--with">
-              <p className="as-label as-label--mint">With it</p>
-              <p className="as-vs__say">
-                Done <span className="text-white/40">·</span> <span className="as-grad">9/9 proven</span>
-              </p>
-              <p className="text-white/55">Or it tells you exactly what&rsquo;s missing.</p>
-            </div>
+      {/* 03. WITHOUT IT, WITH IT. */}
+      <section aria-label="Without it and with it" className="relative">
+        <div className="mx-auto grid max-w-[78rem] grid-cols-1 gap-4 px-5 pb-28 sm:px-8 md:grid-cols-2 md:pb-36">
+          <div className="as-glass as-vs">
+            <p className="as-label">Without it</p>
+            <p className="as-vs__say">&ldquo;Done! All tests pass.&rdquo;</p>
+            <p className="text-white/70">Then you find the bug.</p>
+          </div>
+          <div className="as-glass as-vs as-vs--with">
+            <p className="as-label as-label--gold">With it</p>
+            <p className="as-vs__say">
+              Done <span className="text-white/45">·</span> <span className="as-gold">9/9 proven</span>
+            </p>
+            <p className="text-white/70">Or it tells you exactly what&rsquo;s missing.</p>
           </div>
         </div>
       </section>
 
       {/* 04. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="as-close-title" className="relative scroll-mt-28">
-        <div className="mx-auto max-w-[76rem] px-5 pb-36 sm:px-8 md:pb-44">
+        <div className="mx-auto max-w-[78rem] px-5 pb-36 sm:px-8 md:pb-44">
           <div className="as-glass as-close">
             <h2 id="as-close-title" className="as-h2 mx-auto max-w-[14ch] text-center">
-              Ship work that&rsquo;s <span className="as-grad">actually done.</span>
+              Ship work that&rsquo;s <span className="as-gold">actually done.</span>
             </h2>
             <ol className="mx-auto mt-9 flex list-none flex-wrap justify-center gap-2.5 p-0">
               {STEPS.map((s, i) => (
@@ -155,9 +152,9 @@ export function AgentSupervisorPage() {
               ))}
             </ol>
             <div id="claim" className="mt-10 flex scroll-mt-28 justify-center">
-              <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="dark" prompt={false} quiet buttonClassName="as-cta" />
+              <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="violet" prompt={false} quiet buttonClassName="as-cta" />
             </div>
-            <p className="mx-auto mt-6 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white/45">
+            <p className="mx-auto mt-6 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white/60">
               Free. Claude Code or Codex, Node 18+ and git. Mac, Windows or Linux.
             </p>
           </div>
@@ -173,7 +170,7 @@ export function AgentSupervisorPage() {
         href="#claim"
         label="Get it free"
         note="Free, downloads at once"
-        buttonClassName="bg-[#0b0e13] text-white hover:bg-black"
+        buttonClassName="bg-[#723CD6] text-white hover:bg-[#6331c4]"
       />
     </main>
   );
