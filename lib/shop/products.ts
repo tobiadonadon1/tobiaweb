@@ -1597,6 +1597,7 @@ export const AGENT_SUPERVISOR: Product = {
   },
   contents: [
     ["agent-supervisor/SKILL.md", "what done means at the start, the proof at the end, step by step"],
+    ["references/ux.md", "what good UX and UI are, from the research, with numbers: what it measures on every screen"],
     ["references/eyes.md", "the eyes pass: every screen looked at like a picky human, AI-looking design included"],
     ["references/lies.md", "the ways \"done\" gets faked, and how each one is caught"],
     ["references/verifier.md", "the brief for the second agent, who checks the work cold"],

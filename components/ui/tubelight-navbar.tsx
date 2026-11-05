@@ -166,6 +166,8 @@ export function NavBar({ items, className }: NavBarProps) {
             <Link
               key={item.name}
               href={item.url}
+              // On phones only the icon shows, so the name has to be said for it.
+              aria-label={item.name}
               onClick={() => setSpyTab(item.name)}
               data-nav-link=""
               data-nav-active={isActive ? "" : undefined}

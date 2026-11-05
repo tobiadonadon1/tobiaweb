@@ -101,8 +101,10 @@
   text-wrap: balance;
 }
 .as-gold { color: var(--as-gold); text-shadow: 0 0 34px rgba(237, 177, 88, 0.45); }
-.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; }
-.as-label--gold { color: var(--as-gold); }
+.as-label { margin: 0; font-family: var(--as-mono), ui-monospace, monospace; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: #fff; }
+/* Gold stays for big type only: small gold on purple measured 3.3:1, under WCAG AA. */
+.as-label--gold { color: #fff; }
+.as-label--gold::before { content: ""; display: inline-block; width: 6px; height: 6px; margin: 0 0.55em 0.12em 0; border-radius: 50%; background: var(--as-gold); vertical-align: middle; }
 
 .as-pill {
   display: inline-flex; align-items: center; gap: 0.6rem; margin: 0;

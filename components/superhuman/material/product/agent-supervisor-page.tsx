@@ -82,6 +82,8 @@ const REPORT: [string, string][] = [
 ];
 
 const FAQ: [string, string][] = [
+  ["Isn't “good UX” just its opinion?", "No. It measures every screen against published standards: readable contrast (WCAG), tap targets big enough for a thumb (Apple, Android), text size and line length, labelled fields, nothing cut off or broken. Fresh eyes judge the rest, from decades of usability research."],
+  ["Does it follow everything I asked?", "Every message you sent is read again at the end. Each one has to be answered by something it built and proved, or it says why not. A half-followed instruction can’t pass."],
   ["Does it slow my agent down?", "A small fix adds about a minute. A real feature, a few: in our test, 5 minutes instead of 1, and it caught a crash nobody had asked about. Less than one round of feedback."],
   ["Will it touch my code?", "No. It only writes its notes, in a folder kept out of git. Your agent fixes what it finds; you see the result."],
   ["What's the guard?", "Two small hooks. When the agent says “done” or “looks great” without the checks, it’s sent back, twice at most, then you’re told."],
