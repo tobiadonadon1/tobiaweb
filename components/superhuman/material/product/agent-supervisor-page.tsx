@@ -65,16 +65,44 @@ const PHRASE = ["“It", "looks", "great,”", "it", "said.", "It", "didn’t."]
 
 const STEPS = ["Get it free", "Type claude, then hi", "Say yes to the guard"];
 
+/** How it supervises, start to finish (SKILL.md, in plain words). */
+const HOW = [
+  { n: "01", title: "You say it once.", body: "It writes down what “done” means, including what you’d obviously expect but didn’t say. If something’s unclear, it asks, up to three questions." },
+  { n: "02", title: "It checks like you would.", body: "Runs your tests and build, reads every changed line for faked work, opens every screen on desktop and phone, and uses it." },
+  { n: "03", title: "Fresh eyes judge it.", body: "A second agent that never saw the work hunts for what’s off, AI-looking design included. What it finds gets fixed first." },
+  { n: "04", title: "You get the truth.", body: "Done, Partly done or Not done: what’s proven, what nobody could check, and what’s your call." },
+];
+
+/** The report from a real run (5 Nov 2026: Claude Code adding a signup to a small app, guard on). */
+const REPORT: [string, string][] = [
+  ["Tests", "10 passed"],
+  ["Faked work", "none found"],
+  ["Screens", "desktop + phone"],
+  ["Second agent", "agrees, 9 of 9"],
+];
+
+const FAQ: [string, string][] = [
+  ["Does it slow my agent down?", "A small fix adds about a minute. A real feature, a few: in our test, 5 minutes instead of 1, and it caught a crash nobody had asked about. Less than one round of feedback."],
+  ["Will it touch my code?", "No. It only writes its notes, in a folder kept out of git. Your agent fixes what it finds; you see the result."],
+  ["What's the guard?", "Two small hooks. When the agent says “done” or “looks great” without the checks, it’s sent back, twice at most, then you’re told."],
+  ["Can it check work that's already done?", "Yes. Say “prove it” or “check what Codex did” on any project, branch or pull request."],
+  ["What if it can't check something?", "It says so. Another browser, real payments, an OS it doesn’t have: listed under “not checked”, never rounded up."],
+  ["Does it work with Codex?", "Yes, Claude Code and Codex, on Mac, Windows and Linux. Codex asks you to approve the two hooks once."],
+];
+
 export function AgentSupervisorPage() {
   return (
     <main className={`as-page ${sans.variable} ${mono.variable} relative overflow-x-clip`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <AgentSupervisorLoader />
-      <div className="as-sky" aria-hidden>
-        <span className="as-sun" />
-        <span className="as-sun as-sun--streak" />
-        <span className="as-ribs" />
-        <span className="as-grain" />
+      {/* Sticky, not fixed: it ends with the page, so the site's footer shows under it. */}
+      <div className="as-skywrap" aria-hidden>
+        <div className="as-sky">
+          <span className="as-sun" />
+          <span className="as-sun as-sun--streak" />
+          <span className="as-ribs" />
+          <span className="as-grain" />
+        </div>
       </div>
       <BackLink href={folderHref("skills")} label="Skills" tone="ink" />
 
@@ -127,9 +155,84 @@ export function AgentSupervisorPage() {
         </p>
       </section>
 
-      {/* 03. WITHOUT IT, WITH IT. */}
+      {/* 03. HOW IT SUPERVISES. */}
+      <section aria-labelledby="as-how" className="relative">
+        <div className="mx-auto max-w-[78rem] px-5 pb-24 sm:px-8 md:pb-32">
+          <p className="as-label as-label--gold">How it works</p>
+          <h2 id="as-how" className="as-h2 mt-4 max-w-[16ch]">
+            A second pair of eyes, <span className="as-gold">every time.</span>
+          </h2>
+          <ol className="mt-12 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2 lg:grid-cols-4">
+            {HOW.map((h) => (
+              <li key={h.n} className="as-glass as-tile as-how">
+                <span className="as-how__n">{h.n}</span>
+                <h3 className="mt-8 text-[1.25rem] font-semibold leading-[1.15] tracking-[-0.02em] text-white">{h.title}</h3>
+                <p className="mt-2 text-[0.95rem] leading-[1.5] text-white">{h.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 04. WHAT YOU GET AT THE END. */}
+      <section aria-labelledby="as-get" className="relative">
+        <div className="mx-auto grid max-w-[78rem] grid-cols-1 items-center gap-12 px-5 pb-24 sm:px-8 md:pb-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
+          <div>
+            <p className="as-label as-label--gold">What you get</p>
+            <h2 id="as-get" className="as-h2 mt-4 max-w-[13ch]">
+              The answer, <span className="as-gold">not a “trust me”.</span>
+            </h2>
+            <ul className="mt-9 grid list-none gap-3.5 p-0 text-[1.05rem] leading-[1.45] text-white">
+              {[
+                "One word up front: Done, Partly done or Not done.",
+                "How each thing you asked for was proven.",
+                "What a person would notice, and what was fixed.",
+                "What nobody could check, said plainly.",
+                "Every changed line, if you want to look.",
+              ].map((t) => (
+                <li key={t} className="flex gap-3">
+                  <span className="as-tick" aria-hidden />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <figure className="m-0">
+            <div className="as-glass as-report">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-[0.9rem] font-medium text-white">Agent Supervisor · signup</span>
+                <span className="as-report__pill">Done</span>
+              </div>
+              <p className="mt-6 text-[2.6rem] font-normal leading-none tracking-[-0.04em] text-white">
+                9/9 <span className="text-[1.1rem] tracking-normal">proven</span>
+              </p>
+              <ul className="mt-6 list-none p-0">
+                {REPORT.map(([k, v]) => (
+                  <li key={k} className="as-report__row">
+                    <span>{k}</span>
+                    <span className="as-report__v">{v}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="as-report__box">
+                  <p className="as-label">Not checked</p>
+                  <p className="mt-1.5 text-[0.92rem] leading-[1.4] text-white">Safari, Firefox, a real phone</p>
+                </div>
+                <div className="as-report__box">
+                  <p className="as-label as-label--gold">Your call</p>
+                  <p className="mt-1.5 text-[0.92rem] leading-[1.4] text-white">Two old users have plain-text passwords</p>
+                </div>
+              </div>
+            </div>
+            <figcaption className="mt-3 text-[0.85rem] text-white">A real report: Claude Code adding a signup to a small app.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      {/* 05. WITHOUT IT, WITH IT. */}
       <section aria-label="Without it and with it" className="relative">
-        <div className="mx-auto grid max-w-[78rem] grid-cols-1 gap-4 px-5 pb-28 sm:px-8 md:grid-cols-2 md:pb-36">
+        <div className="mx-auto grid max-w-[78rem] grid-cols-1 gap-4 px-5 pb-24 sm:px-8 md:grid-cols-2 md:pb-32">
           <div className="as-glass as-vs">
             <p className="as-label">Without it</p>
             <p className="as-vs__say">&ldquo;Verified. The UI looks great.&rdquo;</p>
@@ -143,7 +246,25 @@ export function AgentSupervisorPage() {
         </div>
       </section>
 
-      {/* 04. THE CLOSE. */}
+      {/* 06. QUESTIONS. */}
+      <section aria-labelledby="as-faq" className="relative">
+        <div className="mx-auto max-w-[58rem] px-5 pb-24 sm:px-8 md:pb-32">
+          <h2 id="as-faq" className="as-h2 text-center">Questions</h2>
+          <div className="mt-10 grid gap-2.5">
+            {FAQ.map(([q, a]) => (
+              <details key={q} className="as-glass as-faq">
+                <summary>
+                  {q}
+                  <span className="as-faq__plus" aria-hidden />
+                </summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 07. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="as-close-title" className="relative scroll-mt-28">
         <div className="mx-auto max-w-[78rem] px-5 pb-36 sm:px-8 md:pb-44">
           <div className="as-glass as-close">
@@ -163,8 +284,13 @@ export function AgentSupervisorPage() {
             <div id="claim" className="mt-10 flex scroll-mt-28 justify-center">
               <FreeClaim productId={PRODUCT.id} reveal="Get it free" tone="violet" prompt={false} quiet buttonClassName="as-cta" />
             </div>
-            <p className="mx-auto mt-6 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white">
-              Free. Claude Code or Codex, Node 18+ and git. Mac, Windows or Linux.
+            <ul className="mx-auto mt-8 flex max-w-[40rem] list-none flex-wrap justify-center gap-2 p-0">
+              {["Free", "Claude Code", "Codex", "Mac", "Windows", "Linux", "2-minute install"].map((t) => (
+                <li key={t} className="as-chip">{t}</li>
+              ))}
+            </ul>
+            <p className="mx-auto mt-5 max-w-[48ch] text-balance text-center text-[0.86rem] leading-[1.5] text-white">
+              Needs Node 18+ and git. Chrome, Edge or Brave lets it open your pages.
             </p>
           </div>
         </div>
