@@ -81,7 +81,7 @@ writeFileSync(path.join(cwd, "private", "mascot-designer.zip.enc"), seal(MASCOT_
 const CAROUSEL_ZIP = Buffer.from("PK\u0003\u0004 the carousel designer skill " + "c".repeat(3900));
 writeFileSync(path.join(cwd, "private", "carousel-designer.zip.enc"), seal(CAROUSEL_ZIP, parseKey(fileKey)));
 const DONE_ZIP = Buffer.from("PK\u0003\u0004 the done checker skill " + "d".repeat(3900));
-writeFileSync(path.join(cwd, "private", "done-checker.zip.enc"), seal(DONE_ZIP, parseKey(fileKey)));
+writeFileSync(path.join(cwd, "private", "agent-supervisor.zip.enc"), seal(DONE_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -310,10 +310,10 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(carD.file.attach, false);
   assert.equal(forSale(carD), false);
   assert.equal(carD.stripeProductId, "none");
-  // Done Checker: a free skill for Claude Code and Codex, downloading at once, the newest on Skills.
-  const doneC = productById("done-checker");
-  assert.equal(doneC.href, entryHref("skills", "done-checker"));
-  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "done-checker")?.product, "done-checker");
+  // Agent Supervisor (was Done Checker): a free skill for Claude Code and Codex, downloading at once, the newest on Skills.
+  const doneC = productById("agent-supervisor");
+  assert.equal(doneC.href, entryHref("skills", "agent-supervisor"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "agent-supervisor")?.product, "agent-supervisor");
   assert.equal(doneC.free, true);
   assert.equal(doneC.instant, true);
   assert.equal(doneC.file.attach, false);
@@ -321,7 +321,7 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(doneC.stripeProductId, "none");
   // One list since 2026-11-04: Skills holds every skill, free and paid, newest first; Setups is closed and empty.
   const skillSlugs = FOLDER_BY_ID.skills.entries.map((e) => e.slug);
-  assert.deepEqual(skillSlugs.slice(0, 7), ["done-checker", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot"], "the newest first");
+  assert.deepEqual(skillSlugs.slice(0, 7), ["agent-supervisor", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot"], "the newest first");
   assert.deepEqual(skillSlugs.slice(-3), ["art-director", "product-manager", "code-reviewer"], "the September three last, in their own order");
   for (const e of FOLDER_BY_ID.skills.entries) assert.ok(RELEASED[e.slug], `${e.slug} has a release date`);
   assert.equal(FOLDER_BY_ID.setups, undefined, "Setups has no route while it is closed");

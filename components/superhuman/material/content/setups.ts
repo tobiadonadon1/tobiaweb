@@ -15,17 +15,17 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
-    slug: "done-checker",
-    title: "Done Checker",
+    slug: "agent-supervisor",
+    title: "Agent Supervisor",
     kind: "setup",
-    summary: "Your agent can't say done until it proves it: the tests it ran, the page it opened, what it didn't check and every line it changed, on one receipt.",
+    summary: "Your AI agent can't say it's done until it proves it: tests run, faked work caught, the page opened, a second agent checking.",
     // Minutes from the download to the guard being on.
     minutes: 2,
     status: "ready",
     when: "Claude Code or Codex keeps telling you it's finished, and you keep finding out it isn't.",
     level: "Anyone",
     body: [],
-    product: "done-checker",
+    product: "agent-supervisor",
   },
   {
     slug: "carousel-designer",

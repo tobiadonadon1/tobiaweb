@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer" | "carousel-designer" | "done-checker";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer" | "carousel-designer" | "agent-supervisor";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1570,18 +1570,18 @@ export const CAROUSEL_DESIGNER: Product = {
  * or NOT DONE, the proof, what wasn't checked, the diff. An optional guard
  * (hooks) sends the agent back when it says done without one.
  */
-export const DONE_CHECKER: Product = {
-  id: "done-checker",
-  name: "Done Checker",
+export const AGENT_SUPERVISOR: Product = {
+  id: "agent-supervisor",
+  name: "Agent Supervisor",
   description:
-    "A free skill for Claude Code and Codex: before your agent says \"done\", it has to prove it. The tests it ran, the page it opened, what it didn't check, every line it changed, on one receipt.",
+    "A free skill for Claude Code and Codex: your agent can't say it's done until it proves it. It runs the tests, catches faked work, opens the page and gets a second agent to check.",
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
-  href: "/projects/construct/material/skills/done-checker",
+  href: "/projects/construct/material/skills/agent-supervisor",
   file: {
-    sealed: "done-checker.zip.enc",
-    filename: "done-checker.zip",
+    sealed: "agent-supervisor.zip.enc",
+    filename: "agent-supervisor.zip",
     // The skill ships .mjs scripts, and Gmail refuses zips with scripts in them.
     attach: false,
   },
@@ -1590,18 +1590,17 @@ export const DONE_CHECKER: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Done Checker, free for Claude Code and Codex: your agent can't say \"done\" until it proves it. Tests run, pages opened on desktop and phone, a second agent checking cold, and a receipt with what was proven, what wasn't checked and the diff.",
+      "Agent Supervisor, free for Claude Code and Codex: your AI agent can't say it's done until it proves it. Tests run, faked work caught, the page opened on desktop and phone, a second agent checking.",
     kicker: "Skill · for Claude Code and Codex",
-    line: "Done? Prove it.",
-    proof: "the checks · a real browser · a second opinion · a receipt",
+    line: "No proof, no done.",
+    proof: "tests · faked work caught · a real browser · a second agent",
   },
   contents: [
-    ["done-checker/SKILL.md", "the contract at the start, the check, the proof and the receipt at the end, step by step"],
-    ["references/contract.md", "turning a request into a definition of done, with what people expect but don't say"],
+    ["agent-supervisor/SKILL.md", "what done means at the start, the proof at the end, step by step"],
     ["references/lies.md", "the ways \"done\" gets faked, and how each one is caught"],
-    ["references/verifier.md", "the brief for the second agent, who judges the work without having seen it done"],
-    ["scripts/done.mjs", "runs the checks, reads the diff, records every proof, opens pages in a real browser, writes the receipt"],
-    ["the guard", "two hooks for Claude Code and Codex: no receipt, no \"done\""],
+    ["references/verifier.md", "the brief for the second agent, who checks the work cold"],
+    ["scripts/done.mjs", "runs the checks, reads the diff, opens pages in a real browser, writes the report"],
+    ["the guard", "two hooks for Claude Code and Codex: no proof, no \"done\""],
   ],
   steps: [
     "Unzip the folder.",
@@ -1611,7 +1610,7 @@ export const DONE_CHECKER: Product = {
   email: {
     preheader: "Your download link is inside. Unzip it, open it in Claude Code or Codex, type hi.",
     after: [
-      "Then work as usual. When your agent finishes, it hands you a receipt: DONE, PARTLY DONE or NOT DONE, what it proved and how, and what it didn't check.",
+      "Then work as usual. When your agent finishes, it shows you the proof: Done, Partly done or Not done, and what it didn't check.",
       "Doubting a \"done\" from before? Open that project and say \"prove it\".",
     ],
   },
@@ -1621,7 +1620,7 @@ export const DONE_CHECKER: Product = {
     next: [
       ["Right after install", "Say yes to the guard. From then on, a \"done\" without proof is sent back."],
       ["On your next task", "Bigger tasks start with what \"done\" means, in a few lines, before any code."],
-      ["When it finishes", "A receipt: what's proven, what isn't, what nobody checked, and how to see it yourself in a minute."],
+      ["When it finishes", "Done, Partly done or Not done, with the proof and what nobody checked."],
     ],
   },
 };
@@ -1651,7 +1650,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "conversion-teardown": CONVERSION_TEARDOWN,
   "mascot-designer": MASCOT_DESIGNER,
   "carousel-designer": CAROUSEL_DESIGNER,
-  "done-checker": DONE_CHECKER,
+  "agent-supervisor": AGENT_SUPERVISOR,
 };
 
 export function productById(id: unknown): Product | undefined {

@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
          Each old page (and its /thanks, which old receipts link to) lands on the same page under Skills, query
          string and all. The slugs are named, so a future Setups can reuse the folder. The folder itself goes to
          Skills for now, temporarily, because Setups will open again with something new in it. */
+      /* Done Checker was renamed Agent Supervisor on 2026-11-05, the day it opened. */
+      { source: "/projects/construct/material/skills/done-checker/:rest*", destination: "/projects/construct/material/skills/agent-supervisor/:rest*", statusCode: 308 },
+      { source: "/projects/construct/material/skills/done-checker", destination: "/projects/construct/material/skills/agent-supervisor", statusCode: 308 },
       { source: "/projects/construct/material/setups/:slug(carousel-designer|mascot-designer|conversion-teardown|meta-ads|1k-bot|video-editor-pro|web-designer-pro|app-designer-pro|grok-army|reel-bot|the-98c-trade|launchr|jev-crypto-analyst)", destination: "/projects/construct/material/skills/:slug", statusCode: 308 },
       { source: "/projects/construct/material/setups/:slug(carousel-designer|mascot-designer|conversion-teardown|meta-ads|1k-bot|video-editor-pro|web-designer-pro|app-designer-pro|grok-army|reel-bot|the-98c-trade|launchr|jev-crypto-analyst)/:rest+", destination: "/projects/construct/material/skills/:slug/:rest+", statusCode: 308 },
       { source: "/projects/construct/material/setups", destination: "/projects/construct/material/skills", permanent: false },

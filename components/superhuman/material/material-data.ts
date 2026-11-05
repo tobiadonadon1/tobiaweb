@@ -47,7 +47,7 @@ import { CONFIGURATION } from "./content/configuration";
  * A NEW SKILL GETS A LINE HERE: tests/shop.test.mjs fails for any entry on Skills without one.
  */
 export const RELEASED: Record<string, string> = {
-  "done-checker": "2026-11-05",
+  "agent-supervisor": "2026-11-05",
   "reel-bot": "2026-11-04",
   "carousel-designer": "2026-11-02",
   "mascot-designer": "2026-11-01",
