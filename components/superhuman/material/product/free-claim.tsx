@@ -57,7 +57,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe" | "egypt" | "egypt-night";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -172,9 +172,38 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe" || tone === "egypt" || tone === "egypt-night";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
-  const t = tone === "swipe"
+  const t = tone === "egypt"
+    ? {
+        // Meta Ads 2.0's white page: Egyptian blue words, a white field with a blue edge, a scarlet button.
+        ink: "text-[#03203D]",
+        soft: "text-[rgba(3,32,61,0.72)]",
+        ask: "text-[rgba(3,32,61,0.88)]",
+        field: "border-2 border-[#03203D] bg-white shadow-[0_18px_36px_-24px_rgba(3,32,61,0.5)] focus-within:border-[#EB2F33]",
+        input: "text-[#03203D] placeholder:text-[rgba(3,32,61,0.45)]",
+        ring: "focus-visible:outline-[#03203D]",
+        check: "bg-[#03203D] text-white",
+        error: "text-[#B3191D] font-semibold",
+        button: "bg-[#EB2F33] text-white hover:bg-[#d8262a]",
+        box: ["#03203D", "#ffffff", "#03203D", "#ffffff"],
+        boxText: "text-[#03203D] font-medium",
+      }
+    : tone === "egypt-night"
+    ? {
+        // The same page's Egyptian blue band: white words, a white field, the scarlet button.
+        ink: "text-white",
+        soft: "text-[rgba(255,255,255,0.8)]",
+        ask: "text-[rgba(255,255,255,0.92)]",
+        field: "border-transparent bg-white shadow-[0_18px_40px_-20px_rgba(0,0,0,0.6)] focus-within:border-[#EB2F33]",
+        input: "text-[#03203D] placeholder:text-[rgba(3,32,61,0.45)]",
+        ring: "focus-visible:outline-white",
+        check: "bg-white text-[#03203D]",
+        error: "text-[#ffd0cf] font-semibold",
+        button: "bg-[#EB2F33] text-white hover:bg-[#d8262a]",
+        box: ["#ffffff", "#03203D", "rgba(255,255,255,0.75)"],
+      }
+    : tone === "swipe"
     ? {
         // Carousel Designer's paper page: ink words, a white field with an ink edge, a cobalt button.
         ink: "text-[#111111]",
