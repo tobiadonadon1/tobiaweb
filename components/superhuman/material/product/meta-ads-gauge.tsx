@@ -30,9 +30,11 @@ export function MetaAdsGauge() {
 
   return (
     <figure ref={ref} className="ma-gauge m-0" data-in={seen || undefined}>
-      <p className="text-[0.82rem] font-bold uppercase tracking-[0.02em]">The hard brake</p>
-      <p className="mt-2 max-w-[30ch] text-[1.45rem] font-bold leading-[1.1] tracking-[-0.045em]">
-        Meta stops all spending at your limit. Not one cent over.
+      <p className="ma-label">The hard brake</p>
+      <p className="ma-gauge__title mt-4">
+        Meta stops all spending at your limit.
+        <br />
+        Not one cent over.
       </p>
       <div className="ma-gauge__track" aria-hidden>
         <span className="ma-gauge__fill" />

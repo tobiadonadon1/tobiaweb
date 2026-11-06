@@ -275,7 +275,7 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(okb.free, true);
   assert.equal(forSale(okb), false);
   assert.equal(okb.stripeProductId, "none");
-  // The Meta Ads Skill: three free skills for Claude Code, downloading at once, first on Setups.
+  // Meta Ads 2.0: a free skill for Claude Code, downloading at once, the newest on Skills.
   const mad = productById("meta-ads");
   assert.equal(mad.href, entryHref("skills", "meta-ads"));
   assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "meta-ads")?.product, "meta-ads");
@@ -321,7 +321,7 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(doneC.stripeProductId, "none");
   // One list since 2026-11-04: Skills holds every skill, free and paid, newest first; Setups is closed and empty.
   const skillSlugs = FOLDER_BY_ID.skills.entries.map((e) => e.slug);
-  assert.deepEqual(skillSlugs.slice(0, 7), ["agent-supervisor", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "meta-ads", "1k-bot"], "the newest first");
+  assert.deepEqual(skillSlugs.slice(0, 7), ["meta-ads", "agent-supervisor", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "1k-bot"], "the newest first");
   assert.deepEqual(skillSlugs.slice(-3), ["art-director", "product-manager", "code-reviewer"], "the September three last, in their own order");
   for (const e of FOLDER_BY_ID.skills.entries) assert.ok(RELEASED[e.slug], `${e.slug} has a release date`);
   assert.equal(FOLDER_BY_ID.setups, undefined, "Setups has no route while it is closed");

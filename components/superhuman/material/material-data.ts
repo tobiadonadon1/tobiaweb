@@ -47,12 +47,13 @@ import { CONFIGURATION } from "./content/configuration";
  * A NEW SKILL GETS A LINE HERE: tests/shop.test.mjs fails for any entry on Skills without one.
  */
 export const RELEASED: Record<string, string> = {
+  // Meta Ads 2.0, a rebuild of the 2026-10-30 skill.
+  "meta-ads": "2026-11-06",
   "agent-supervisor": "2026-11-05",
   "reel-bot": "2026-11-04",
   "carousel-designer": "2026-11-02",
   "mascot-designer": "2026-11-01",
   "conversion-teardown": "2026-10-31",
-  "meta-ads": "2026-10-30",
   "1k-bot": "2026-10-29",
   "video-editor-pro": "2026-10-26",
   "shorts-animator": "2026-10-25",

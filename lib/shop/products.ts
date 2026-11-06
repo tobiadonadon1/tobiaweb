@@ -1321,17 +1321,17 @@ export const ONE_K_BOT: Product = {
  */
 export const META_ADS: Product = {
   id: "meta-ads",
-  name: "Meta Ads Skill",
+  name: "Meta Ads 2.0",
   description:
-    "A free skill for Claude Code that runs your Meta ads: it studies your numbers, leads and competitors, proposes options, and moves nothing without your ok.",
+    "A skill for Claude Code that runs your Meta ads with you: every morning it says what to switch off, what to scale and what to make next, with the number behind each, and moves nothing without your yes.",
   priceCents: 0,
   currency: "usd",
   priceLabel: "Free",
   href: "/projects/construct/material/skills/meta-ads",
   file: {
     sealed: "meta-ads.zip.enc",
-    filename: "meta-ads.zip",
-    // The skill ships ads.py, and Gmail refuses zips with scripts in them.
+    filename: "Meta Ads 2.0.zip",
+    // The skill ships Node scripts (.mjs), and Gmail refuses zips with scripts in them.
     attach: false,
   },
   free: true,
@@ -1339,37 +1339,37 @@ export const META_ADS: Product = {
   stripeProductId: "none",
   share: {
     description:
-      "Meta Ads Skill, free for Claude Code: it studies your numbers, your leads and your competitors' ads, proposes options every morning, and moves no money without your ok.",
-    kicker: "Skill · for Claude Code",
-    line: "No dollar moves without your ok.",
-    proof: "Studies · proposes · waits for you · learns",
+      "Meta Ads 2.0 for Claude Code: every morning it reads your Facebook and Instagram ads and tells you what to switch off, what to scale and what to make next. Nothing moves without your yes.",
+    kicker: "Skill · 2.0 · for Claude Code",
+    line: "Stop paying for ads that don't sell.",
+    proof: "Every morning · the number behind every call · nothing moves without your yes",
   },
   contents: [
-    ["skills/ads-meta/", "the daily loop: setup, launch, one proposal a morning, the stop and scale rules, the month-end report"],
-    ["skills/mkt-ad-creative/", "headlines, primary text and new variants, written from what's winning"],
-    ["skills/util-competitive-ads-extractor/", "reads competitors' live ads in the Ad Library and what they lead with"],
-    ["03_ADS/pipeline/ads/ads.py", "talks to Meta's Marketing API directly, with a daily cap and a +20% limit on every change"],
-    ["03_ADS/_template-ads/", "a folder per client: plan, budget, setup, launch file, daily log"],
+    ["meta-ads/SKILL.md", "the skill: the morning report, the four setup questions, the rules it never bends"],
+    ["meta-ads/scripts/", "the engine (Node, no installs): reads Meta or an Ads Manager export, judges every ad on two weeks, acts only with your yes"],
+    ["meta-ads/references/", "connecting three ways, launching, new ads, competitors, leads, the month-end, how Meta works now"],
+    ["meta-ads/templates/", "launch plans for a shop and for a lead business"],
+    ["START HERE.txt", "three steps to your first report"],
   ],
   steps: [
     "Unzip the folder.",
-    "Copy the skills into Claude Code and open a terminal in the folder.",
-    "Type claude, then \"set up my Meta ads\". It walks you through connecting the account.",
+    "Open a terminal in it and type claude.",
+    "Type hi. It installs, shows you an example morning report, then asks four questions about your business.",
   ],
   email: {
-    preheader: "Your download link is inside. Unzip it, open it in Claude Code, and ask it to set up your Meta ads.",
+    preheader: "Your Meta Ads 2.0 is ready. Unzip it, type claude, then hi.",
     after: [
-      "From then on, ask \"how are my ads today?\" each morning. It reads the numbers and the leads, then gives you one proposal and waits for your ok.",
-      "Set a spending limit on the ad account in Ads Manager first: the skill can never spend past it.",
+      "From then on, say \"morning report\" each morning. It reads your ads and gives you options, each with the number behind it. Nothing moves without your yes.",
+      "Set a spending limit on the ad account in Ads Manager first: it won't switch anything on without one.",
     ],
+    footnote: "Meta Ads 2.0 is an independent skill, not made by Meta or Anthropic.",
   },
   thanks: {
-    needs:
-      "You'll need Claude Code (paid Claude plan), Python 3.11 or newer, and a Meta ad account you manage, on a Mac, Windows or Linux.",
+    needs: "You'll need Claude Code, Node.js 18 or newer, and a Meta ad account you manage, on a Mac, Windows or Linux.",
     next: [
-      ["Right after install", "It sets up the account with you: the app, the token, the spending limit and the daily cap."],
-      ["Every morning", "Ask how your ads are doing. One proposal, with the numbers behind it. Nothing moves until you say ok."],
-      ["End of the month", "It writes the report: what won, what to drop, what to test next."],
+      ["Right after install", "An example report, then four questions: your business, what a sale or lead is worth, your budget, who says yes."],
+      ["Every morning", "Say \"morning report\". What to switch off, scale or make next, with the numbers. Nothing moves until you say yes."],
+      ["End of the month", "It closes the month with you: what won, what to drop, what to test next."],
     ],
   },
 };

@@ -68,13 +68,13 @@ export const SETUPS: MaterialEntry[] = [
   },
   {
     slug: "meta-ads",
-    title: "Meta Ads Skill",
+    title: "Meta Ads 2.0",
     kind: "setup",
-    summary: "Your Meta ads, run by Claude: it studies your numbers, leads and competitors, proposes options every morning, and moves nothing without your ok.",
-    // Minutes from the download to the account connected and the first report.
-    minutes: 20,
+    summary: "Stop paying for ads that don't sell: every morning it says what to switch off, scale and make next, with the number behind each. Nothing moves without your yes.",
+    // Minutes from the download to the example report and the four questions.
+    minutes: 5,
     status: "ready",
-    when: "You run Meta ads and want every dollar checked daily, without handing an AI your budget.",
+    when: "You run Facebook and Instagram ads for a shop or a lead business and want every dollar checked daily, without handing an AI your budget.",
     level: "Anyone",
     body: [],
     product: "meta-ads",
