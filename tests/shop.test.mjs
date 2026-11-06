@@ -82,6 +82,8 @@ const CAROUSEL_ZIP = Buffer.from("PK\u0003\u0004 the carousel designer skill " +
 writeFileSync(path.join(cwd, "private", "carousel-designer.zip.enc"), seal(CAROUSEL_ZIP, parseKey(fileKey)));
 const DONE_ZIP = Buffer.from("PK\u0003\u0004 the done checker skill " + "d".repeat(3900));
 writeFileSync(path.join(cwd, "private", "agent-supervisor.zip.enc"), seal(DONE_ZIP, parseKey(fileKey)));
+const THINK_ZIP = Buffer.from("PK\u0003\u0004 the blueprint pdf and the think-first plugin " + "t".repeat(3900));
+writeFileSync(path.join(cwd, "private", "think-first.zip.enc"), seal(THINK_ZIP, parseKey(fileKey)));
 // Stored, not sealed: Supabase serves it, so it can be any size (12.2 MB really).
 const VEP_ZIP = Buffer.from("PK\u0003\u0004 the reel director skill " + "e".repeat(3900));
 // The Drive copy of its masterclass lesson, sealed like the real one (lib/masterclass/drive.ts).
@@ -319,9 +321,18 @@ test("the product, its page and its folder entry agree", async () => {
   assert.equal(doneC.file.attach, false);
   assert.equal(forSale(doneC), false);
   assert.equal(doneC.stripeProductId, "none");
+  // think-first: the THINK article's lead magnet (the blueprint PDF + the skill), free, downloading at once.
+  const think = productById("think-first");
+  assert.equal(think.href, entryHref("skills", "think-first"));
+  assert.equal(FOLDER_BY_ID.skills.entries.find((e) => e.slug === "think-first")?.product, "think-first");
+  assert.equal(think.free, true);
+  assert.equal(think.instant, true);
+  assert.equal(think.file.attach, false, "the plugin ships a .sh hook, so the email carries a link");
+  assert.equal(forSale(think), false);
+  assert.equal(think.stripeProductId, "none");
   // One list since 2026-11-04: Skills holds every skill, free and paid, newest first; Setups is closed and empty.
   const skillSlugs = FOLDER_BY_ID.skills.entries.map((e) => e.slug);
-  assert.deepEqual(skillSlugs.slice(0, 7), ["meta-ads", "agent-supervisor", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown", "1k-bot"], "the newest first");
+  assert.deepEqual(skillSlugs.slice(0, 7), ["think-first", "meta-ads", "agent-supervisor", "reel-bot", "carousel-designer", "mascot-designer", "conversion-teardown"], "the newest first");
   assert.deepEqual(skillSlugs.slice(-3), ["art-director", "product-manager", "code-reviewer"], "the September three last, in their own order");
   for (const e of FOLDER_BY_ID.skills.entries) assert.ok(RELEASED[e.slug], `${e.slug} has a release date`);
   assert.equal(FOLDER_BY_ID.setups, undefined, "Setups has no route while it is closed");

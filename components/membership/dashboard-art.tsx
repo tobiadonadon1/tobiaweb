@@ -60,6 +60,7 @@ export const SKILL_LOOK: Record<ProductId, Look & { added: string }> = {
   "mascot-designer": { a: "#ff9e7a", b: "#fff4e6", added: "2026-11-01" },
   "carousel-designer": { a: "#8fa0ff", b: "#f4f1ea", added: "2026-11-02" },
   "agent-supervisor": { a: "#723CD6", b: "#f3eefc", added: "2026-11-05" },
+  "think-first": { a: "#FC75B4", b: "#F0E5DB", added: "2026-11-06" },
 };
 
 /** The library's own sections, each with its mark from the shelf and the material room. */

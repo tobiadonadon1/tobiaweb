@@ -27,6 +27,7 @@ export function StickyBuy({
   note,
   buttonClassName,
   soon = false,
+  colors,
 }: {
   productId: string;
   name: string;
@@ -42,6 +43,8 @@ export function StickyBuy({
   buttonClassName?: string;
   /** Built ahead of its Stripe product: the button says it opens soon. */
   soon?: boolean;
+  /** The bar's own colours, for a page that isn't navy on paper (think-first's mocha on sand). */
+  colors?: { bar?: string; name?: string; note?: string };
 }) {
   const [heroGone, setHeroGone] = useState(false);
   const [closeReached, setCloseReached] = useState(false);
@@ -77,11 +80,11 @@ export function StickyBuy({
         shown ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
       }`}
     >
-      <div className="flex items-center justify-between gap-3 rounded-full border border-[rgba(11,31,58,0.1)] bg-[rgba(250,248,242,0.92)] py-1.5 pl-5 pr-1.5 shadow-[0_18px_44px_-18px_rgba(11,31,58,0.45)] backdrop-blur-xl">
+      <div className={`flex items-center justify-between gap-3 rounded-full border py-1.5 pl-5 pr-1.5 backdrop-blur-xl ${colors?.bar ?? "border-[rgba(11,31,58,0.1)] bg-[rgba(250,248,242,0.92)] shadow-[0_18px_44px_-18px_rgba(11,31,58,0.45)]"}`}>
         <div className="min-w-0">
-          <p className="truncate text-[0.95rem] leading-tight text-[var(--ink)]">{name}</p>
+          <p className={`truncate text-[0.95rem] leading-tight ${colors?.name ?? "text-[var(--ink)]"}`}>{name}</p>
           {note ? (
-            <p className="mt-0.5 text-[0.86rem] text-[color:rgba(11,31,58,0.7)]">{note}</p>
+            <p className={`mt-0.5 text-[0.86rem] ${colors?.note ?? "text-[color:rgba(11,31,58,0.7)]"}`}>{note}</p>
           ) : (
             <p className="mt-0.5 font-mono text-[0.72rem] uppercase tracking-[0.12em] text-[color:rgba(11,31,58,0.68)]">
               {href ? "Free · sent by email" : "Instant download"}

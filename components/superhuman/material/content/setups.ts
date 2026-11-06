@@ -15,6 +15,19 @@ import type { MaterialEntry } from "../material-types";
  */
 export const SETUPS: MaterialEntry[] = [
   {
+    slug: "think-first",
+    title: "think-first",
+    kind: "setup",
+    summary: "The prompt to fill in before you build anything, and a Claude Code skill that says in 2 lines what it will build (or asks 3 quick questions) before it builds.",
+    // Minutes from the download to the plugin on and the PDF open.
+    minutes: 1,
+    status: "ready",
+    when: "Your AI builds come back looking done but not what you wanted, and you fix them one correction at a time.",
+    level: "Anyone",
+    body: [],
+    product: "think-first",
+  },
+  {
     slug: "agent-supervisor",
     title: "Agent Supervisor",
     kind: "setup",

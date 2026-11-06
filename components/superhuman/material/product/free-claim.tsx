@@ -57,7 +57,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe" | "egypt" | "egypt-night";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe" | "egypt" | "egypt-night" | "sand";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -172,9 +172,25 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe" || tone === "egypt" || tone === "egypt-night";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe" || tone === "egypt" || tone === "egypt-night" || tone === "sand";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
-  const t = tone === "egypt"
+  const t = tone === "sand"
+    ? {
+        // think-first's soft sand page: mocha-green words, a white glass field, a mocha button lit pink.
+        // Pink text or a pink button with mocha words measured under 4.5:1, so pink stays the light.
+        ink: "text-[#474329]",
+        soft: "text-[rgba(71,67,41,0.86)]",
+        ask: "text-[#474329]",
+        field: "border-[rgba(71,67,41,0.28)] bg-[rgba(255,255,255,0.62)] shadow-[0_18px_40px_-22px_rgba(252,117,180,0.75)] backdrop-blur-md focus-within:border-[#474329]",
+        input: "text-[#474329] placeholder:text-[rgba(71,67,41,0.55)]",
+        ring: "focus-visible:outline-[#474329]",
+        check: "bg-[#FC75B4] text-[#474329]",
+        error: "text-[#474329] font-semibold",
+        button: "bg-[#474329] text-[#F0E5DB] hover:bg-[#3b3820] shadow-[0_12px_32px_-10px_rgba(252,117,180,0.95)]",
+        box: ["#474329", "#F0E5DB", "rgba(71,67,41,0.6)", "rgba(255,255,255,0.6)"],
+        boxText: "text-[#474329]",
+      }
+    : tone === "egypt"
     ? {
         // Meta Ads 2.0's white page: Egyptian blue words, a white field with a blue edge, a scarlet button.
         ink: "text-[#03203D]",

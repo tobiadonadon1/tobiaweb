@@ -21,7 +21,7 @@
  * find a URL. The tests check the two agree.
  */
 
-export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer" | "carousel-designer" | "agent-supervisor";
+export type ProductId = "the-98c-trade" | "launchr" | "jev-crypto-analyst" | "jev-review-miner" | "whitehat" | "app-designer" | "web-designer" | "app-launcher" | "grok-army" | "app-designer-pro" | "copycat-detective" | "viral-machine" | "web-designer-pro" | "duo-designer" | "video-editor" | "motion-designer" | "shorts-animator" | "reel-bot" | "video-editor-pro" | "1k-bot" | "meta-ads" | "conversion-teardown" | "mascot-designer" | "carousel-designer" | "agent-supervisor" | "think-first";
 
 /**
  * The shop's address: the sender of every delivery email and the contact a
@@ -1627,6 +1627,69 @@ export const AGENT_SUPERVISOR: Product = {
   },
 };
 
+/**
+ * THINK-FIRST (2026-11-06): the lead magnet for Tobia's X article "how to keep
+ * thinking when AI does the work" (comment THINK). One download, both things
+ * the article promises: the blueprint PDF (one paragraph with 17 blanks, three
+ * filled examples, the 4 decisions and the finish line, the 2-correction rule)
+ * and the think-first plugin for Claude Code (clear prompt: 2 lines on what
+ * it will build, then it builds; vague: max 3 one-line questions; small task: silent).
+ * The zip installs itself: open a terminal in it, type claude, then hi.
+ * Built by ~/Desktop/think-first/package/build.sh.
+ */
+export const THINK_FIRST: Product = {
+  id: "think-first",
+  name: "think-first",
+  description:
+    "Free: the blueprint PDF (the prompt I fill in before I build anything, filled in twice, and why each part works) and the think-first skill for Claude Code, which makes the AI work out what success needs before it builds.",
+  priceCents: 0,
+  currency: "usd",
+  priceLabel: "Free",
+  href: "/projects/construct/material/skills/think-first",
+  file: {
+    sealed: "think-first.zip.enc",
+    filename: "think-first.zip",
+    // The plugin ships a .sh hook, and Gmail refuses zips with scripts in them.
+    attach: false,
+  },
+  free: true,
+  instant: true,
+  stripeProductId: "none",
+  share: {
+    description:
+      "The blueprint (the prompt I fill in before I build anything, two filled examples, why it works, the 2-correction rule) and the think-first skill for Claude Code: a clear prompt gets 2 lines on exactly what it will build, a vague one gets 3 quick questions. Free.",
+    kicker: "Free · prompt blueprint + Claude Code skill",
+    line: "Know what you want before you hit enter.",
+    proof: "4-page PDF · Claude Code skill · 1-minute install",
+  },
+  contents: [
+    ["think-first-blueprint.pdf", "the prompt to fill in, two filled examples, why each part works, and how to use it (the 2-correction rule included)"],
+    ["plugin/", "the think-first skill for Claude Code, and the tiny hook that lets it tell you what it will build before it builds"],
+    ["CLAUDE.md", "the installer: type claude, then hi"],
+  ],
+  steps: [
+    "Unzip the folder.",
+    "Open a terminal in it and type claude.",
+    "Type hi. It installs in a minute. The PDF is in the same folder.",
+  ],
+  email: {
+    preheader: "The blueprint PDF and the think-first skill. Unzip it, type claude, then hi.",
+    stepsIntro: "Unzip it, open a terminal in the folder, then:",
+    after: [
+      "Then start a new Claude Code session. Ask for a real build: a clear prompt gets 2 lines on what it will build, a vague one gets 3 quick questions first.",
+      "Before your next build, open the PDF and fill in the prompt. The brackets that are hard to fill are where you need to think.",
+    ],
+  },
+  thanks: {
+    needs: "You'll need Claude Code (run claude update if it's old). The PDF opens anywhere.",
+    next: [
+      ["Right now", "Open the PDF. Copy the prompt on page 1 and fill its brackets for what you're building next."],
+      ["Your next build", "A clear prompt: think-first says in 2 lines what it will build, then builds. A vague one: 3 quick questions first."],
+      ["When it's off", "Two corrections that didn't land? Fix the prompt, not the output."],
+    ],
+  },
+};
+
 export const PRODUCTS: Record<ProductId, Product> = {
   "the-98c-trade": THE_98C_TRADE,
   launchr: LAUNCHR,
@@ -1653,6 +1716,7 @@ export const PRODUCTS: Record<ProductId, Product> = {
   "mascot-designer": MASCOT_DESIGNER,
   "carousel-designer": CAROUSEL_DESIGNER,
   "agent-supervisor": AGENT_SUPERVISOR,
+  "think-first": THINK_FIRST,
 };
 
 export function productById(id: unknown): Product | undefined {

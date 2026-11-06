@@ -18,6 +18,7 @@ import { ConversionTeardownPage } from "@/components/superhuman/material/product
 import { MascotDesignerPage } from "@/components/superhuman/material/product/mascot-designer-page";
 import { CarouselDesignerPage } from "@/components/superhuman/material/product/carousel-designer-page";
 import { AgentSupervisorPage } from "@/components/superhuman/material/product/agent-supervisor-page";
+import { ThinkFirstPage } from "@/components/superhuman/material/product/think-first-page";
 import { CopycatDetectivePage } from "@/components/superhuman/material/product/copycat-detective-page";
 import { DuoDesignerPage } from "@/components/superhuman/material/product/duo-designer-page";
 import { VideoEditorPage } from "@/components/superhuman/material/product/video-editor-page";
@@ -179,6 +180,7 @@ const BESPOKE: Partial<Record<ProductId, () => React.ReactElement>> = {
   "mascot-designer": MascotDesignerPage,
   "carousel-designer": CarouselDesignerPage,
   "agent-supervisor": AgentSupervisorPage,
+  "think-first": ThinkFirstPage,
   "duo-designer": DuoDesignerPage,
   "video-editor": VideoEditorPage,
   "motion-designer": MotionDesignerPage,

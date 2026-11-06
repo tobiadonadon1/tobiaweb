@@ -49,6 +49,8 @@ import { CONFIGURATION } from "./content/configuration";
 export const RELEASED: Record<string, string> = {
   // Meta Ads 2.0, a rebuild of the 2026-10-30 skill.
   "meta-ads": "2026-11-06",
+  // The lead magnet for the THINK article: the blueprint PDF + the skill.
+  "think-first": "2026-11-06",
   "agent-supervisor": "2026-11-05",
   "reel-bot": "2026-11-04",
   "carousel-designer": "2026-11-02",

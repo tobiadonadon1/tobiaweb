@@ -1220,6 +1220,27 @@ function AgentSupervisor() {
   );
 }
 
+/**
+ * THINK-FIRST — the blueprint as a cut card: a mocha-green paragraph with
+ * sand lines and watermelon-pink blanks, and the pink ◆ that opens every
+ * think-first reply (product/think-first-page.tsx).
+ */
+function ThinkFirst() {
+  return (
+    <>
+      <Cut d={CARD} x={104} y={90} s={1.05} fill={SHADE} />
+      <Cut d={CARD} x={96} y={80} s={1.05} fill="#474329" />
+      <Cut d={BAR} x={122} y={116} s={0.33} sy={0.62} fill="#F0E5DB" />
+      <Cut d={BAR} x={222} y={115} s={0.22} sy={0.8} fill="#FC75B4" />
+      <Cut d={BAR} x={122} y={148} s={0.2} sy={0.8} fill="#FC75B4" />
+      <Cut d={BAR} x={186} y={149} s={0.36} sy={0.62} fill="#F0E5DB" />
+      <Cut d={BAR} x={122} y={181} s={0.4} sy={0.62} fill="#F0E5DB" />
+      <Cut d={BAR} x={240} y={180} s={0.15} sy={0.8} fill="#FC75B4" />
+      <Cut d={CARD} x={300} y={44} s={0.27} sy={0.36} fill="#FC75B4" rotate={45} />
+    </>
+  );
+}
+
 const MARKS: Record<string, () => React.ReactElement> = {
   // the room
   skills: Skills,
@@ -1239,6 +1260,7 @@ const MARKS: Record<string, () => React.ReactElement> = {
   "mascot-designer": MascotDesigner,
   "carousel-designer": CarouselDesigner,
   "agent-supervisor": AgentSupervisor,
+  "think-first": ThinkFirst,
   "app-designer-pro": AppDesignerPro,
   "viral-machine": ViralMachine,
   "web-designer-pro": WebDesignerPro,
