@@ -57,7 +57,7 @@ export function FreeClaim({
   /** "light" for a page on paper (App Designer), "saffron" for Web Designer's
       colour field, "forest" for App Launcher's green field, "dark" for the
       black pages, "ink" for paper with a black button (Viral Machine). */
-  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe" | "egypt" | "egypt-night" | "sand";
+  tone?: "dark" | "light" | "ink" | "saffron" | "forest" | "cobalt" | "ember" | "night" | "violet" | "gold" | "pop" | "swipe" | "egypt" | "egypt-night" | "sand" | "sand-night";
   /** The newsletter consent as very small fine print (Duo Designer). */
   fine?: boolean;
   /** Show the one-line ask above the field. */
@@ -172,9 +172,24 @@ export function FreeClaim({
     </Link>
   );
   // "light" decides the input's autofill colours: the field is pale on all three.
-  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe" || tone === "egypt" || tone === "egypt-night" || tone === "sand";
+  const light = tone === "light" || tone === "ink" || tone === "saffron" || tone === "forest" || tone === "cobalt" || tone === "ember" || tone === "night" || tone === "violet" || tone === "gold" || tone === "pop" || tone === "swipe" || tone === "egypt" || tone === "egypt-night" || tone === "sand" || tone === "sand-night";
   // "ember": Motion Designer's orange field, black type, a black button, a white field.
-  const t = tone === "sand"
+  const t = tone === "sand-night"
+    ? {
+        // think-first's mocha-green cards: sand words, a see-through field, a sand button lit pink.
+        ink: "text-[#F0E5DB]",
+        soft: "text-[rgba(240,229,219,0.86)]",
+        ask: "text-[#F0E5DB]",
+        field: "border-[rgba(240,229,219,0.32)] bg-[rgba(240,229,219,0.1)] shadow-[0_18px_40px_-22px_rgba(252,117,180,0.75)] focus-within:border-[#FC75B4]",
+        input: "text-[#F0E5DB] placeholder:text-[rgba(240,229,219,0.6)]",
+        ring: "focus-visible:outline-[#F0E5DB]",
+        check: "bg-[#FC75B4] text-[#474329]",
+        error: "text-[#F0E5DB] font-semibold",
+        button: "bg-[#F0E5DB] text-[#474329] hover:bg-white shadow-[0_12px_32px_-10px_rgba(252,117,180,0.95)]",
+        box: ["#F0E5DB", "#474329", "rgba(240,229,219,0.65)", "rgba(240,229,219,0.08)"],
+        boxText: "text-[#F0E5DB]",
+      }
+    : tone === "sand"
     ? {
         // think-first's soft sand page: mocha-green words, a white glass field, a mocha button lit pink.
         // Pink text or a pink button with mocha words measured under 4.5:1, so pink stays the light.

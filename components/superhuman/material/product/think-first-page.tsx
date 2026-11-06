@@ -110,7 +110,7 @@ export function ThinkFirstPage() {
               <span className="whitespace-nowrap">Then hit enter.</span>
             </h1>
             <p className="mt-7 max-w-[30ch] text-pretty text-[1.18rem] leading-[1.5] sm:text-[1.3rem]">
-              The prompt I fill in before I build anything, and a Claude Code skill that does the thinking with you. So the first build is the one you meant.
+              The prompt I fill in before I build, and a Claude Code skill that thinks with you.
             </p>
             <div id={HERO_ID} className="mt-9 scroll-mt-28">
               <FreeClaim productId={PRODUCT.id} reveal="Get both free" tone="sand" align="start" prompt={false} quiet buttonClassName="tf-cta" />
@@ -174,7 +174,7 @@ export function ThinkFirstPage() {
               </div>
             </article>
 
-            <article className="tf-glass tf-card lg:self-start" aria-labelledby="tf-skill">
+            <article className="tf-glass tf-glass--green tf-card lg:self-start" aria-labelledby="tf-skill">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3 id="tf-skill" className="m-0 text-[1.6rem] font-medium tracking-[-0.03em]">think-first</h3>
                 <span className="tf-mono text-[0.78rem]">Claude Code skill</span>
@@ -215,7 +215,7 @@ export function ThinkFirstPage() {
       {/* 05. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="tf-close-title" className="scroll-mt-28">
         <div className="mx-auto max-w-[78rem] px-5 pb-36 sm:px-8 md:pb-44">
-          <div className="tf-glass tf-glass--lit tf-close">
+          <div className="tf-glass tf-glass--green tf-glass--lit tf-close">
             <h2 id="tf-close-title" className="tf-h2 mx-auto max-w-[16ch]">
               Know what you want <span className="tf-hl">before you hit enter.</span>
             </h2>
@@ -228,7 +228,7 @@ export function ThinkFirstPage() {
               ))}
             </ol>
             <div id="claim" className="mt-10 flex scroll-mt-28 justify-center">
-              <FreeClaim productId={PRODUCT.id} reveal="Get both free" tone="sand" prompt={false} quiet buttonClassName="tf-cta" />
+              <FreeClaim productId={PRODUCT.id} reveal="Get both free" tone="sand-night" prompt={false} quiet buttonClassName="tf-cta tf-cta--light" />
             </div>
             <p className="mx-auto mt-4 max-w-[46ch] text-balance text-[0.9rem] leading-[1.5]">
               Free. It downloads now, and a copy comes by email. Needs Claude Code; the PDF opens anywhere.

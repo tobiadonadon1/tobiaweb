@@ -278,7 +278,7 @@ export function ThinkFirstDemo() {
   }, [elapsed, tab, run, still]);
 
   return (
-    <figure ref={box} className="tf-glass tf-glass--lit tf-term m-0">
+    <figure ref={box} className="tf-glass tf-glass--green tf-glass--lit tf-term m-0">
       <div className="tf-term__bar" aria-hidden>
         <i />
         <i />
