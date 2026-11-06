@@ -26,6 +26,9 @@ import "./meta-ads.css";
  * outlined scarlet button (meta-ads.css, meta-ads-art.tsx).
  * Graphical, dynamic, interactive, converting, four sections at most, the
  * value said up front. No price on the page: the pill says what it is.
+ * Round 3: keep the poster, but fewer words, round corners and glass, and the
+ * whole hero (promise, button and report card) on the first screen with no
+ * scroll. A fully minimal Apple version was "too simplistic".
  *
  * FOUR SECTIONS: the promise with the morning report drawn live; try a
  * morning yourself (the skill's two real demo reports); the brakes and the
@@ -67,30 +70,23 @@ const JSON_LD = {
 
 /** The hero's report: `ads demo`, the example candle shop. */
 const REPORT: { v: string; ad: string; num: string; sub: string; w: number }[] = [
-  { v: "OFF", ad: "A2 · gift box carousel", num: "$96", sub: "0 sales", w: 45 },
-  { v: "NEW", ad: "A4 · founder story", num: "$138", sub: "5 sales · tired", w: 64 },
-  { v: "BEST", ad: "A1 · customer video", num: "$214", sub: "$17.83 a sale", w: 100 },
-  { v: "KEEP", ad: "A6 · 5-star reviews", num: "$80", sub: "$26.67 a sale", w: 37 },
-  { v: "WAIT", ad: "A5 · autumn scents", num: "$11", sub: "2 days live", w: 6 },
-];
-
-const STATS: { n: React.ReactNode; t: string }[] = [
-  { n: <>1 <i>min</i></>, t: "a morning. Read it, say yes, get on with your day." },
-  { n: <>2 <i>weeks</i></>, t: "of numbers behind every call. Never one bad day." },
-  { n: <>0</>, t: "changes without your yes. In your words, written down." },
+  { v: "OFF", ad: "Gift box carousel", num: "$96", sub: "0 sales", w: 45 },
+  { v: "NEW", ad: "Founder story", num: "$138", sub: "wearing out", w: 64 },
+  { v: "BEST", ad: "Customer video", num: "$214", sub: "12 sales", w: 100 },
+  { v: "KEEP", ad: "5-star reviews", num: "$80", sub: "3 sales", w: 37 },
 ];
 
 const BRAKES = [
-  { title: "Your yes, every time.", body: "Every change waits for it, and your words are written down with the date. A yes to one thing is never a yes to another." },
-  { title: "Judged on two weeks.", body: "An ad needs 1,000 views and 4 days before it’s judged. One that sells under your target is never switched off." },
-  { title: "It says when it’s unsure.", body: "Too early, tracking broken, not enough spent: it tells you, and what would settle it." },
-  { title: "Launches paused.", body: "New campaigns are checked first: made-up proof, wording Meta rejects, the rules for housing and jobs. Then they wait for you." },
+  { title: "Your yes, every time.", body: "Written down, with the date." },
+  { title: "Judged on two weeks.", body: "Never on one bad day." },
+  { title: "Says when it’s unsure.", body: "And what would settle it." },
+  { title: "New ads start paused.", body: "Checked first, then they wait for you." },
 ];
 
 const WAYS = [
-  { title: "Meta’s own connector", body: "Log in with Facebook. Read and change from chat.", note: "Easiest" },
-  { title: "An Ads Manager export", body: "Nothing to connect. One file a morning, in six languages.", note: "One minute" },
-  { title: "A token", body: "Fully automatic: reports, leads, launches.", note: "15 minutes, once" },
+  { title: "Meta’s connector", note: "Log in with Facebook" },
+  { title: "An Ads Manager export", note: "Nothing to connect" },
+  { title: "A token", note: "Fully automatic" },
 ];
 
 function GetIt({ id, dark = false }: { id?: string; dark?: boolean }) {
@@ -138,7 +134,7 @@ export function MetaAdsPage() {
             <div className="ma-rise relative">
               <p className="ma-pill">
                 <b>2.0</b>
-                Meta Ads · a skill for Claude Code
+                Meta Ads for Claude Code
               </p>
               <h1 id="ma-title" className="ma-h1 mt-8">
                 Stop paying for ads that <span className="ma-red">don&rsquo;t&nbsp;sell.</span>
@@ -150,12 +146,10 @@ export function MetaAdsPage() {
                 <Splatter id="ma-splat-1" seed={11} className="-top-2 left-20 h-[11rem] w-[11rem]" />
               </div>
               <div className="ma-rise relative">
-                <p className="ma-shout max-w-[40ch]">
-                  Every morning, Claude reads your Facebook and Instagram ads. It tells you what to switch off, what to scale
-                  and what to make next, with the number behind every call. And it moves nothing, not one dollar, without
-                  your yes.
+                <p className="ma-shout max-w-[26ch]">
+                  Claude reads your ads every morning. <span className="ma-stone">You decide what to cut.</span>
                 </p>
-                <div className="mt-8">
+                <div className="mt-7">
                   <GetIt id={HERO_ID} />
                 </div>
               </div>
@@ -177,19 +171,18 @@ export function MetaAdsPage() {
               ))}
             </div>
             <p className="ma-hero__caps" aria-hidden>
-              <span>It doesn&rsquo;t spend.</span>
-              <span>You do.</span>
+              <span>Your 9:00 report</span>
             </p>
             <div className="ma-cardwrap">
-              <figure className="ma-card m-0" aria-labelledby="ma-card-cap">
+              <figure className="ma-card ma-glass m-0" aria-labelledby="ma-card-cap">
                 <div className="ma-card__top">
-                  <span>Morning report · 09:00</span>
+                  <span>Good morning</span>
                   <span>Example shop</span>
                 </div>
                 <div className="ma-card__sum">
                   <strong>$583</strong>
                   <span>
-                    this week · 21 sales · <em>target $25</em> a sale
+                    spent this week · 21 sales
                   </span>
                 </div>
                 <ul className="ma-rows">
@@ -222,8 +215,8 @@ export function MetaAdsPage() {
                 </ul>
                 <div className="ma-card__ask">
                   <p>
-                    Switch off A2?
-                    <span>$166 a sale over two weeks. About $96 a week goes to the ads that sell.</span>
+                    Switch off Gift box carousel?
+                    <span>$96 spent, 0 sales.</span>
                   </p>
                   <span className="ma-card__yes" aria-hidden>
                     Yes
@@ -231,20 +224,12 @@ export function MetaAdsPage() {
                 </div>
               </figure>
               <p id="ma-card-cap" className="ma-card__note">
-                The skill&rsquo;s own example report: an example account, made-up numbers.
+                Example account, made-up numbers.
               </p>
             </div>
           </div>
         </div>
 
-        <ul className="ma-stats">
-          {STATS.map((s, i) => (
-            <li key={i} className="ma-stat">
-              <strong>{s.n}</strong>
-              <p>{s.t}</p>
-            </li>
-          ))}
-        </ul>
       </section>
 
       {/* 02. TRY A MORNING. */}
@@ -252,14 +237,12 @@ export function MetaAdsPage() {
         <div className="mx-auto max-w-[80rem] px-5 py-20 sm:px-10 md:py-28">
           <div className="grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
             <div>
-              <p className="ma-label">Try a morning</p>
-              <h2 id="ma-try" className="ma-h2 relative mt-5 max-w-[14ch]">
-                It reads. It proposes. <span className="ma-red">You say yes.</span>
+              <p className="ma-label">Try it here</p>
+              <h2 id="ma-try" className="ma-h2 relative mt-5 max-w-[13ch]">
+                Press yes. <span className="ma-red">Watch the waste stop.</span>
               </h2>
             </div>
-            <p className="ma-lede max-w-[34ch]">
-              The skill&rsquo;s real report, on two example businesses. Pick what to do, then say yes.
-            </p>
+            <p className="ma-lede max-w-[30ch]">This is the report you get every morning. Tick what to do.</p>
           </div>
           <div className="mt-12">
             <MetaAdsTry />
@@ -274,11 +257,11 @@ export function MetaAdsPage() {
             No dollar moves <span className="ma-red">without your yes.</span>
           </h2>
         </div>
-        <div className="ma-split">
+        <div className="ma-split mx-auto max-w-[80rem] px-5 sm:px-10">
           <div className="ma-split__stone">
             <MetaAdsGauge />
           </div>
-          <div className="ma-split__blue">
+          <div className="ma-split__blue ma-glass">
             <ol className="ma-brakes">
               {BRAKES.map((b, i) => (
                 <li key={b.title} className="ma-brake">
@@ -294,40 +277,41 @@ export function MetaAdsPage() {
         </div>
         <div className="mx-auto max-w-[80rem] px-5 pt-16 sm:px-10">
           <h3 className="ma-h2 !text-[clamp(2.2rem,4.4vw,3.8rem)]">
-            Connect your way. <span className="ma-stone">Shops and lead businesses.</span>
+            Connect <span className="ma-stone">your way.</span>
           </h3>
+          <ol className="ma-ways mt-8">
+            {WAYS.map((w, i) => (
+              <li key={w.title} className="ma-way ma-glass">
+                <span className="ma-way__n">0{i + 1}</span>
+                <div>
+                  <h3>{w.title}</h3>
+                  <small>{w.note}</small>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-        <ol className="ma-ways mt-8 border-y border-[color:var(--ma-line)]">
-          {WAYS.map((w, i) => (
-            <li key={w.title} className="ma-way">
-              <span className="ma-way__n">0{i + 1}</span>
-              <h3>{w.title}</h3>
-              <p>{w.body}</p>
-              <small>{w.note}</small>
-            </li>
-          ))}
-        </ol>
       </section>
 
       {/* 04. THE CLOSE. */}
       <section id={CLOSE_ID} aria-labelledby="ma-close-title" className="ma-close scroll-mt-28">
         <Spray id="ma-spray-2" className="-right-24 top-10 h-[24rem] w-[32rem] opacity-80" d="M380 40 C 300 90, 330 200, 230 210 S 90 120, 140 70 S 260 160, 40 270" />
-        <Splatter id="ma-splat-2" seed={23} className="-left-10 bottom-16 h-[14rem] w-[14rem] opacity-90" />
+        <Splatter id="ma-splat-2" seed={23} className="-left-10 bottom-16 h-[14rem] w-[14rem] opacity-90 max-md:hidden" />
         <div className="relative mx-auto max-w-[80rem] px-5 pb-28 pt-24 text-center sm:px-10 md:pb-36 md:pt-32">
           <h2 id="ma-close-title" className="ma-h2 mx-auto max-w-[12ch] !text-[clamp(3.6rem,9vw,8.6rem)]">
-            Every morning. Plain words. <span className="ma-red">Your call.</span>
+            Every morning. <span className="ma-red">Your call.</span>
           </h2>
           <ol className="ma-steps mx-auto mt-12 max-w-[56rem] text-left">
-            <li className="ma-step">
-              <b>1</b>Get it, unzip it
+            <li className="ma-step ma-glass">
+              <b>1</b>Download it
             </li>
-            <li className="ma-step">
+            <li className="ma-step ma-glass">
               <b>2</b>
               <span>
                 Type <kbd>claude</kbd>, then <kbd>hi</kbd>
               </span>
             </li>
-            <li className="ma-step">
+            <li className="ma-step ma-glass">
               <b>3</b>Answer four questions
             </li>
           </ol>
@@ -340,7 +324,7 @@ export function MetaAdsPage() {
             ))}
           </ul>
           <p className="mx-auto mt-6 max-w-[52ch] text-[0.88rem] leading-[1.5] text-white/85">
-            Needs Claude Code and Node.js 18+. An independent skill, not made by Meta.
+            Needs Claude Code. Not made by Meta.
           </p>
         </div>
       </section>
@@ -355,7 +339,7 @@ export function MetaAdsPage() {
         label="Get it"
         soon={!PRODUCT.free && !forSale(PRODUCT)}
         note="Your ads, every morning"
-        buttonClassName="bg-[#EB2F33] text-white hover:bg-[#d8262a] font-bold rounded-none"
+        buttonClassName="bg-[#EB2F33] text-white hover:bg-[#d8262a] font-bold rounded-full"
       />
     </main>
   );
